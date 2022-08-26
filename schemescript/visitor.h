@@ -10,6 +10,7 @@ enum class visitor_entry_type
   {
   vet_expression,
   vet_begin,
+  vet_begin_post,
   vet_case,
   vet_cond,
   vet_do,
@@ -107,13 +108,52 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     {
     if (func.PreVisitBegin(*entry.expr))
       {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_begin_post));
       Begin& b = std::get<Begin>(*entry.expr);
       auto rit = b.arguments.rbegin();
       auto rend = b.arguments.rend();
       for (; rit != rend; ++rit)
         expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
       }
+    break;
+    }
+    case visitor_entry_type::vet_begin_post:
+    {
     func.PostVisitBegin(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_literal:
+    {
+    Literal& lit = std::get<Literal>(*entry.expr);
+    switch (lit.index())
+    { //std::variant<Character, False, Fixnum, Flonum, Nil, String, Symbol, True>
+      case 0:
+        func.VisitCharacter(*entry.expr);
+        break;
+      case 1:
+        func.VisitFalse(*entry.expr);
+        break;
+      case 2:
+        func.VisitFixnum(*entry.expr);
+        break;
+      case 3:
+        func.VisitFlonum(*entry.expr);
+        break;
+      case 4:
+        func.VisitNil(*entry.expr);
+        break;
+      case 5:
+        func.VisitString(*entry.expr);
+        break;
+      case 6:
+        func.VisitSymbol(*entry.expr);
+        break;
+      case 7:
+        func.VisitTrue(*entry.expr);
+        break;
+      default:
+      break;
+    }
     break;
     }
     default:
