@@ -9,6 +9,7 @@ COMPILER_BEGIN
 enum class visitor_entry_type
   {
   vet_expression,
+  vet_expression_post,
   vet_begin,
   vet_begin_post,
   vet_case,
@@ -50,6 +51,7 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     {
       if (func.PreVisit(*entry.expr))
         {
+        expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_expression_post));
         switch (entry.expr->index())
           {
           case 0: // begin
@@ -101,7 +103,11 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
             break;
           }
         }
-        func.PostVisit(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_expression_post:
+    {
+    func.PostVisit(*entry.expr);
     break;
     }
     case visitor_entry_type::vet_begin:
@@ -155,6 +161,10 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
       break;
     }
     break;
+    }
+    case visitor_entry_type::vet_nop:
+    {
+    func.VisitNop(*entry.expr);
     }
     default:
     break;

@@ -21,14 +21,14 @@ namespace
       bool PreVisit(Expression&) {return true;}
       void PostVisit(Expression&) {}
       bool PreVisitBegin(Expression&) { str << "( begin "; return true; }
-      void VisitFixnum(Expression& e) { str << std::get<Fixnum>(std::get<Literal>(e)).value << " "; return true; }
-      void VisitFlonum(Expression& e) { str << std::get<Flonum>(std::get<Literal>(e)).value << " "; return true; }
-      void VisitNil(Expression&) { str << "() " << " "; return true; }
-      void VisitString(Expression& e) { str << "\"" << std::get<String>(std::get<Literal>(e)).value << "\" "; return true; }
-      void VisitSymbol(Expression& e) { str << std::get<Symbol>(std::get<Literal>(e)).value << " "; return true; }
-      void VisitTrue(Expression&) { str << "#t "; return true; }
-      void VisitFalse(Expression&) { str << "#f "; return true; }
-      void VisitNop(Expression&) { str << "#undefined "; return true; }
+      void VisitFixnum(Expression& e) { str << std::get<Fixnum>(std::get<Literal>(e)).value << " "; }
+      void VisitFlonum(Expression& e) { str << std::get<Flonum>(std::get<Literal>(e)).value << " "; }
+      void VisitNil(Expression&) { str << "() " << " "; }
+      void VisitString(Expression& e) { str << "\"" << std::get<String>(std::get<Literal>(e)).value << "\" "; }
+      void VisitSymbol(Expression& e) { str << std::get<Symbol>(std::get<Literal>(e)).value << " "; }
+      void VisitTrue(Expression&) { str << "#t "; }
+      void VisitFalse(Expression&) { str << "#f "; }
+      void VisitNop(Expression&) { str << "#undefined "; }
       void VisitCharacter(Expression& e)
         {
         unsigned char ch = (unsigned char)std::get<Character>(std::get<Literal>(e)).value;
