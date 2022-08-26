@@ -1,10 +1,12 @@
 set(HDRS
 test_assert.h
+tokenize_tests.h
     )
 	
 set(SRCS
 test.cpp
 test_assert.cpp
+tokenize_tests.cpp
 )
 
 if (WIN32)

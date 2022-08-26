@@ -1,5 +1,5 @@
 #include "test_assert.h"
-
+#include "tokenize_tests.h"
 #include <ctime>
 
 int main(int /*argc*/, const char* /*argv*/[])
@@ -7,7 +7,7 @@ int main(int /*argc*/, const char* /*argv*/[])
   InitTestEngine();
 
   auto tic = std::clock();
-
+  run_all_tokenize_tests();
   auto toc = std::clock();
 
   if (!testing_fails) 
