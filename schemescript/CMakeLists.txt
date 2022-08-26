@@ -1,11 +1,20 @@
 set(HDRS
-schemescript_api.h
+compile_error.h
 defines.h
+dump.h
 namespace.h
+parse.h
+reader.h
+schemescript_api.h
 tokenize.h
+visitor.h
 )
 	
 set(SRCS
+compile_error.cpp
+dump.cpp
+parse.cpp
+reader.cpp
 tokenize.cpp
 )
 

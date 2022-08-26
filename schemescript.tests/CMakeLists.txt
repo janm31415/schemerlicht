@@ -1,9 +1,11 @@
 set(HDRS
+parse_tests.h
 test_assert.h
 tokenize_tests.h
     )
 	
 set(SRCS
+parse_tests.cpp
 test.cpp
 test_assert.cpp
 tokenize_tests.cpp
