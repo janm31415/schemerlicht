@@ -69,7 +69,7 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
   {
     case visitor_entry_type::vet_expression:
     {
-      if (func.PreVisit(*entry.expr))
+      if (func.PreVisitExpression(*entry.expr))
         {
         expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_expression_post));
         switch (entry.expr->index())
@@ -127,7 +127,7 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     }
     case visitor_entry_type::vet_expression_post:
     {
-    func.PostVisit(*entry.expr);
+    func.PostVisitExpression(*entry.expr);
     break;
     }
     case visitor_entry_type::vet_begin:

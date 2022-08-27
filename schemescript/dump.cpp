@@ -18,7 +18,7 @@ namespace
       
       bool PreVisit(Program&) { return true; }
       void PostVisit(Program&) {}
-      bool PreVisit(Expression&) { return true; }
+      bool PreVisitExpression(Expression&) { return true; }
       bool PreVisitBinding(Expression&, const std::string& binding_name)
         {
           str << "( " << binding_name << " ";
@@ -28,7 +28,7 @@ namespace
         {
         str << ") ";
         }
-      void PostVisit(Expression&) {}
+      void PostVisitExpression(Expression&) {}
       bool PreVisitBegin(Expression&) { str << "( begin "; return true; }
       void VisitFixnum(Expression& e) { str << std::get<Fixnum>(std::get<Literal>(e)).value << " "; }
       void VisitFlonum(Expression& e) { str << std::get<Flonum>(std::get<Literal>(e)).value << " "; }
@@ -100,31 +100,13 @@ namespace
         {
         str << " ) ";
         }
-      bool PreVisitFunCall(Expression& e)
+      bool PreVisitFunCall(Expression&)
         {
-        FunCall& f = std::get<FunCall>(e);
+        //FunCall& f = std::get<FunCall>(e);
         str << "( ";
         return true;
         }
       /*
-      bool PreVisit(Variable& v) { str << v.name << " "; return true; }
-      bool PreVisit(FunCall& f)
-        {
-        str << "( ";
-        visitor<Expression, dump_visitor>::visit(f.fun.front(), this);
-        for (auto& arg : f.arguments)
-          visitor<Expression, dump_visitor>::visit(arg, this);
-        return false;
-        }
-      bool PreVisit(If&) { str << "( if ";  return true; }
-      bool PreVisit(Lambda& l)
-        {
-        str << "( lambda ( ";
-        for (const auto& v : l.variables)
-          str << v << " ";
-        str << ") ";
-        return true;
-        }
       bool PreVisit(Case& c)
         {
         str << "( case ";
@@ -175,60 +157,7 @@ namespace
         str << ") ";
         return false;
         }
-      bool PreVisit(Let& l)
-        {
-        switch (l.bt)
-          {
-          case bt_let: str << "( let ( "; break;
-          case bt_let_star: str << "( let* ( "; break;
-          case bt_letrec: str << "( letrec ( "; break;
-          }
-        for (auto& arg : l.bindings)
-          {
-          str << sbl << " " << arg.first << " ";
-          visitor<Expression, dump_visitor>::visit(arg.second, this);
-          str << sbr << " ";
-          }
-        str << ") ";
-        visitor<Expression, dump_visitor>::visit(l.body.front(), this);
-        return false;
-        }
-      bool PreVisit(Quote& q)
-        {
-        switch (q.type)
-          {
-          case Quote::qt_quote: str << "( quote "; break;
-          case Quote::qt_backquote: str << "( quasiquote "; break;
-          case Quote::qt_unquote: str << "( unquote "; break;
-          case Quote::qt_unquote_splicing: str << "( unquote-splicing "; break;
-          }
-        str << q.arg << " ) ";
-        return true;
-        }
-      bool PreVisit(PrimitiveCall& p)
-        {
-        if (p.as_object)
-          {
-          str << p.primitive_name << " ";
-          return false;
-          }
-        str << "( ";
-        str << p.primitive_name;
-        str << " ";
-        return true;
-        }
-      bool PreVisit(ForeignCall& p)
-        {
-        str << "( foreign-call ";
-        str << p.foreign_name;
-        str << " ";
-        return true;
-        }
-      bool PreVisit(Set& s)
-        {
-        str << "( set! " << s.name << " ";
-        return true;
-        }
+   
       */
       void PostVisitBegin(Expression&) { str << ") "; }
       void PostVisitFunCall(Expression&) { str << ") "; }
