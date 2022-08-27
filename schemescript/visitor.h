@@ -7,6 +7,70 @@
 
 COMPILER_BEGIN
 
+  class VisitorBaseClass
+    {
+    public:
+      
+      bool PreVisit(Program&) { return true; }
+      void PostVisit(Program&) {}
+      bool PreVisitExpression(Expression&) { return true; }
+      void PostVisitExpression(Expression&) {}
+      bool PreVisitBinding(Expression&, cell&) { return true; }
+      void PostVisitBinding(Expression&) {}
+      bool PreVisitBegin(Expression&) { return true; }
+      void PostVisitBegin(Expression&) { }
+      
+      void VisitFixnum(Expression&) { }
+      void VisitFlonum(Expression&) { }
+      void VisitNil(Expression&) { }
+      void VisitString(Expression&) { }
+      void VisitSymbol(Expression&) { }
+      void VisitTrue(Expression&) { }
+      void VisitFalse(Expression&) { }
+      void VisitNop(Expression&) { }
+      void VisitCharacter(Expression&) {}
+      
+      bool PreVisitPrimitiveCall(Expression&) { return true; }
+      void PostVisitPrimitiveCall(Expression&) { }
+      
+      bool PreVisitForeignCall(Expression&) { return true; }      
+      void PostVisitForeignCall(Expression&) {  }
+            
+      void VisitVariable(Expression&) {  }
+      
+      
+      bool PreVisitIf(Expression&) { return true; }
+      void PostVisitIf(Expression&) { }
+      
+      void VisitQuote(Expression&) {}
+      
+      bool PreVisitSet(Expression&) { return true; }
+      void PostVisitSet(Expression&) { }
+      
+      bool PreVisitLambda(Expression&) { return true; }
+      void PostVisitLambda(Expression&) { }
+      
+      bool PreVisitLet(Expression&) { return true; }
+      void VisitLetPostBindings(Expression&) {}
+      void PostVisitLet(Expression&) { }
+      
+      bool PreVisitFunCall(Expression&) { return true; }
+      void PostVisitFunCall(Expression&) { }
+      
+      bool PreVisitCase(Expression&) { return true; }
+      void VisitCaseElse(Expression&) {}
+      void PostVisitCase(Expression& ) { }
+
+      bool PreVisitCond(Expression&) { return true; }
+      void PostVisitCond(Expression&) { }
+      
+      bool PreVisitDo(Expression& e) { return true; }
+      void VisitDoPostBindings(Expression&) {}
+      void VisitDoPostTest(Expression&) {}
+      void PostVisitDo(Expression&) { }
+    };
+  
+
 enum class visitor_entry_type
   {
   vet_expression,
@@ -274,7 +338,7 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     }
     case visitor_entry_type::vet_foreigncall:
     {
-    if (func.PreVisitPrimitiveCall(*entry.expr))
+    if (func.PreVisitForeignCall(*entry.expr))
       {
       expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_foreigncall_post));
       ForeignCall& f = std::get<ForeignCall>(*entry.expr);

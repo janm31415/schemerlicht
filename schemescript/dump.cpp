@@ -8,7 +8,7 @@ COMPILER_BEGIN
 namespace
   {
   
-  class DumpOperationFunctor
+  class DumpOperationFunctor : public VisitorBaseClass
     {
     public:
       std::stringstream str;
@@ -56,6 +56,14 @@ namespace
           }
         str << "( ";
         str << p.primitive_name;
+        str << " ";
+        return true;
+        }
+    bool PreVisitForeignCall(Expression& e)
+        {
+        ForeignCall& f = std::get<ForeignCall>(e);
+        str << "( ";
+        str << f.foreign_name;
         str << " ";
         return true;
         }
