@@ -21,14 +21,14 @@ namespace
       bool PreVisitExpression(Expression&) { return true; }
       bool PreVisitBinding(Expression&, cell& binding) // cell binding can be invalid
         {
-        str << "( ";
+        str << sbl << " ";
         if (binding.type != ct_invalid_cell)
           str << binding << " ";
         return true;
         }
       void PostVisitBinding(Expression&)
         {
-        str << ") ";
+        str << sbr << " ";
         }
       void PostVisitExpression(Expression&) {}
       bool PreVisitBegin(Expression&) { str << "( begin "; return true; }
@@ -104,7 +104,6 @@ namespace
         }
       bool PreVisitFunCall(Expression&)
         {
-        //FunCall& f = std::get<FunCall>(e);
         str << "( ";
         return true;
         }
@@ -115,7 +114,7 @@ namespace
         }
       void VisitCaseElse(Expression& e)
         {
-        str << "( else ";
+        str << sbl << " else ";
         }
       bool PreVisitCond(Expression& e)
         {
@@ -135,28 +134,6 @@ namespace
         {
         str << ") ( ";
         }
-      /*
-      bool PreVisit(Do& d)
-        {
-        str << "( do ";
-        for (auto& b : d.bindings)
-          {
-          str << sbl << " ";
-          for (auto& arg : b)
-            visitor<Expression, dump_visitor>::visit(arg, this);
-          str << sbr << " ";
-          }
-        str << ") ( ";
-        for (auto& tst : d.test)
-          visitor<Expression, dump_visitor>::visit(tst, this);
-        str << ") ";
-        for (auto& c : d.commands)
-          visitor<Expression, dump_visitor>::visit(c, this);
-        str << ") ";
-        return false;
-        }
-   
-      */
       void PostVisitBegin(Expression&) { str << ") "; }
       void PostVisitFunCall(Expression&) { str << ") "; }
       void PostVisitIf(Expression&) { str << ") "; }
@@ -168,7 +145,7 @@ namespace
       void PostVisitCase(Expression& e)
         {
           if (!std::get<Case>(e).else_body.empty())
-            str << ") ";
+            str << sbr << " ";
           str << ") ";
         }
       void PostVisitCond(Expression&) { str << ") "; }
@@ -180,6 +157,11 @@ namespace
 void dump(std::ostream& out, Program& prog, bool use_square_brackets)
 {
   DumpOperationFunctor func;
+  if (!use_square_brackets)
+    {
+    func.sbl = '(';
+    func.sbr = ')';
+    }
   visit(prog, func);
   out << func.str.str();
 }
@@ -187,6 +169,11 @@ void dump(std::ostream& out, Program& prog, bool use_square_brackets)
 void dump(std::ostream& out, Expression& expr, bool use_square_brackets)
 {
   DumpOperationFunctor func;
+  if (!use_square_brackets)
+    {
+    func.sbl = '(';
+    func.sbr = ')';
+    }
   std::vector<visitor_entry> expression_stack;
   expression_stack.push_back(make_visitor_entry(&expr, visitor_entry_type::vet_expression));
   visit(expression_stack, func);
