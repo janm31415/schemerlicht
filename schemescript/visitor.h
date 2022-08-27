@@ -19,7 +19,11 @@ enum class visitor_entry_type
   vet_case_else,
   vet_case_post,
   vet_cond,
+  vet_cond_post,
   vet_do,
+  vet_do_post_bindings,
+  vet_do_post_test,
+  vet_do_post,
   vet_foreigncall,
   vet_foreigncall_post,
   vet_funcall,
@@ -46,6 +50,7 @@ struct visitor_entry
   Expression* expr;
   visitor_entry_type type;
   cell binding;
+  std::vector<Expression*> bindings;
   };
   
 inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t)
@@ -71,6 +76,24 @@ inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t, con
   entry.expr = e;
   entry.type = t;
   entry.binding = binding;
+  return entry;
+}
+
+inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t, Expression* binding)
+{
+  visitor_entry entry;
+  entry.expr = e;
+  entry.type = t;
+  entry.bindings.push_back(binding);
+  return entry;
+}
+
+inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t, std::vector<Expression*>& bindings)
+{
+  visitor_entry entry;
+  entry.expr = e;
+  entry.type = t;
+  entry.bindings = bindings;
   return entry;
 }
 
@@ -291,6 +314,10 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
       {
       expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_binding_post));
       expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_expression));
+      auto rit = entry.bindings.rbegin();
+      auto rend = entry.bindings.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry((*rit), visitor_entry_type::vet_expression));
       }
     break;
     }
@@ -397,6 +424,80 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     {
     func.PostVisitCase(*entry.expr);
     break;
+    }
+    
+    case visitor_entry_type::vet_cond:
+    {
+    if (func.PreVisitCond(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_cond_post));
+      Cond& c = std::get<Cond>(*entry.expr);
+      auto rit = c.arguments.rbegin();
+      auto rend = c.arguments.rend();
+      for (; rit != rend; ++rit)
+        {
+        expression_stack.push_back(make_visitor_entry(&(rit->back()), visitor_entry_type::vet_binding, &(rit->front())));
+        }
+      }
+    break;
+    }
+    case visitor_entry_type::vet_cond_post:
+    {
+    func.PostVisitCond(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_do:
+    {
+      if (func.PreVisitDo(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_do_post_bindings));
+      Do& d = std::get<Do>(*entry.expr);
+      auto rit = d.bindings.rbegin();
+      auto rend = d.bindings.rend();
+      for (; rit != rend; ++rit)
+        {
+        // This is kind of a hack of the binding system, but it's not too bad here, as Do will be rewritten to core forms
+        // early on.
+        std::vector<Expression*> bindings;
+        auto rit2 = rit->begin();
+        auto rend2 = rit->end()-1;
+        for (; rit2 != rend2; ++rit2)
+          bindings.push_back(&(*rit2));
+        expression_stack.push_back(make_visitor_entry(&rit->back(), visitor_entry_type::vet_binding, bindings));
+        }
+      }
+      break;
+    }
+    case visitor_entry_type::vet_do_post_bindings:
+    {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_do_post_test));
+      func.VisitDoPostBindings(*entry.expr);
+      Do& d = std::get<Do>(*entry.expr);
+      auto rit = d.test.rbegin();
+      auto rend = d.test.rend();
+      for (; rit != rend; ++rit)
+        {
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+        }
+      break;
+    }
+    case visitor_entry_type::vet_do_post_test:
+    {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_do_post));
+      func.VisitDoPostTest(*entry.expr);
+      Do& d = std::get<Do>(*entry.expr);
+      auto rit = d.commands.rbegin();
+      auto rend = d.commands.rend();
+      for (; rit != rend; ++rit)
+        {
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+        }
+      break;
+    }
+    case visitor_entry_type::vet_do_post:
+    {
+      func.PostVisitDo(*entry.expr);
+      break;
     }
     default:
     break;

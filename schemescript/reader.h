@@ -20,7 +20,8 @@ enum cell_type
   ct_flonum,
   ct_string,
   ct_pair,
-  ct_vector
+  ct_vector,
+  ct_invalid_cell
   };
 
 struct cell

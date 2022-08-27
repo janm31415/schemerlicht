@@ -233,6 +233,23 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     prog = make_program(tokens);
     dump(std::cout, prog);
+    
+    script = R"((cond ((> 3 3) 'greater)
+                ((< 3 3) 'less)
+                (else 'equal)))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    
+    script = R"( (do ((vec (make-vector 5))
+               (i 0 (+ i 1)))
+              ((= i 5) vec)
+            (vector-set! vec i i)) )";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
     }
   }
 

@@ -19,9 +19,11 @@ namespace
       bool PreVisit(Program&) { return true; }
       void PostVisit(Program&) {}
       bool PreVisitExpression(Expression&) { return true; }
-      bool PreVisitBinding(Expression&, const cell& binding)
+      bool PreVisitBinding(Expression&, cell& binding) // cell binding can be invalid
         {
-          str << "( " << binding << " ";
+        str << "( ";
+        if (binding.type != ct_invalid_cell)
+          str << binding << " ";
         return true;
         }
       void PostVisitBinding(Expression&)
@@ -115,20 +117,25 @@ namespace
         {
         str << "( else ";
         }
-      /*      
-      bool PreVisit(Cond& c)
+      bool PreVisitCond(Expression& e)
         {
         str << "( cond ";
-        for (auto& arg_v : c.arguments)
-          {
-          str << sbl << " ";
-          for (auto& arg : arg_v)
-            visitor<Expression, dump_visitor>::visit(arg, this);
-          str << sbr << " ";
-          }
-        str << ") ";
-        return false;
+        return true;
         }
+      bool PreVisitDo(Expression& e)
+        {
+        str << "( do ( ";
+        return true;
+        }
+      void VisitDoPostBindings(Expression& e)
+        {
+        str << ") ( ";
+        }
+      void VisitDoPostTest(Expression& e)
+        {
+        str << ") ( ";
+        }
+      /*
       bool PreVisit(Do& d)
         {
         str << "( do ";
@@ -164,6 +171,8 @@ namespace
             str << ") ";
           str << ") ";
         }
+      void PostVisitCond(Expression&) { str << ") "; }
+      void PostVisitDo(Expression&) { str << ") ) "; }
     };
 
   }

@@ -7,7 +7,7 @@
 
 COMPILER_BEGIN
 
-cell::cell()
+cell::cell() : type(ct_invalid_cell)
   {
 
   }
