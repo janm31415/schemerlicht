@@ -241,5 +241,5 @@ void run_all_parse_tests()
   parse_primitive_call();
   parse_let();
   dump_tests();
-  //parse_quasiquote();
+  parse_quasiquote();
   }
