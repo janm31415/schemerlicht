@@ -2,6 +2,7 @@
 
 #include "namespace.h"
 #include "parse.h"
+#include "reader.h"
 #include <vector>
 
 COMPILER_BEGIN
@@ -15,6 +16,8 @@ enum class visitor_entry_type
   vet_begin,
   vet_begin_post,
   vet_case,
+  vet_case_else,
+  vet_case_post,
   vet_cond,
   vet_do,
   vet_foreigncall,
@@ -42,7 +45,7 @@ struct visitor_entry
   {
   Expression* expr;
   visitor_entry_type type;
-  std::string binding_name;
+  cell binding;
   };
   
 inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t)
@@ -58,7 +61,16 @@ inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t, con
   visitor_entry entry;
   entry.expr = e;
   entry.type = t;
-  entry.binding_name = binding;
+  entry.binding = cell(ct_string, binding);
+  return entry;
+}
+
+inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t, const cell& binding)
+{
+  visitor_entry entry;
+  entry.expr = e;
+  entry.type = t;
+  entry.binding = binding;
   return entry;
 }
 
@@ -275,7 +287,7 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     }
     case visitor_entry_type::vet_binding:
     {
-    if (func.PreVisitBinding(*entry.expr, entry.binding_name))
+    if (func.PreVisitBinding(*entry.expr, entry.binding))
       {
       expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_binding_post));
       expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_expression));
@@ -350,6 +362,40 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     case visitor_entry_type::vet_set_post:
     {
     func.PostVisitSet(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_case:
+    {
+    if (func.PreVisitCase(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_case_else));
+      Case& c = std::get<Case>(*entry.expr);
+      for (int32_t i = (int32_t)c.datum_args.size() - 1; i >= 0; --i)
+        {
+        expression_stack.push_back(make_visitor_entry(&c.then_bodies[i].front(), visitor_entry_type::vet_binding, c.datum_args[i]));
+        }
+      auto rit = c.val_expr.rbegin();
+      auto rend = c.val_expr.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_case_else:
+    {
+    expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_case_post));
+    Case& c = std::get<Case>(*entry.expr);
+    if (!c.else_body.empty())
+      func.VisitCaseElse(*entry.expr);
+    auto rit = c.else_body.rbegin();
+    auto rend = c.else_body.rend();
+    for (; rit != rend; ++rit)
+      expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+    break;
+    }
+    case visitor_entry_type::vet_case_post:
+    {
+    func.PostVisitCase(*entry.expr);
     break;
     }
     default:

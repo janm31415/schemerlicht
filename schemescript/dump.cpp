@@ -19,9 +19,9 @@ namespace
       bool PreVisit(Program&) { return true; }
       void PostVisit(Program&) {}
       bool PreVisitExpression(Expression&) { return true; }
-      bool PreVisitBinding(Expression&, const std::string& binding_name)
+      bool PreVisitBinding(Expression&, const cell& binding)
         {
-          str << "( " << binding_name << " ";
+          str << "( " << binding << " ";
         return true;
         }
       void PostVisitBinding(Expression&)
@@ -106,25 +106,16 @@ namespace
         str << "( ";
         return true;
         }
-      /*
-      bool PreVisit(Case& c)
+      bool PreVisitCase(Expression& e)
         {
         str << "( case ";
-        visitor<Expression, dump_visitor>::visit(c.val_expr.front(), this);
-        assert(c.datum_args.size() == c.then_bodies.size());
-        for (size_t i = 0; i < c.datum_args.size(); ++i)
-          {
-          str << sbl << " " << c.datum_args[i] << " ";
-          for (auto& arg : c.then_bodies[i])
-            visitor<Expression, dump_visitor>::visit(arg, this);
-          str << sbr << " ";
-          }
-        str << sbl << " else ";
-        for (auto& arg : c.else_body)
-          visitor<Expression, dump_visitor>::visit(arg, this);
-        str << sbr << " ) ";
-        return false;
+        return true;
         }
+      void VisitCaseElse(Expression& e)
+        {
+        str << "( else ";
+        }
+      /*      
       bool PreVisit(Cond& c)
         {
         str << "( cond ";
@@ -167,7 +158,12 @@ namespace
       void PostVisitForeignCall(Expression&) { str << ") "; }
       void PostVisitPrimitiveCall(Expression& e) { if (!std::get<PrimitiveCall>(e).as_object) str << ") "; }
       void PostVisitSet(Expression&) { str << ") "; }
-      
+      void PostVisitCase(Expression& e)
+        {
+          if (!std::get<Case>(e).else_body.empty())
+            str << ") ";
+          str << ") ";
+        }
     };
 
   }

@@ -224,6 +224,15 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     prog = make_program(tokens);
     dump(std::cout, prog);
+    
+    script = R"((case (car '(c d))
+                ((a e i o u) 'vowel)
+                ((w y) 'semivowel)
+                (else 'consonant)) )";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
     }
   }
 
