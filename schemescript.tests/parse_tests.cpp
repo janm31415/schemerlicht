@@ -266,6 +266,7 @@ void run_all_parse_tests()
   parse_string();
   parse_primitive_call();
   parse_let();
-  dump_tests();
   parse_quasiquote();
+  
+  //dump_tests();
   }

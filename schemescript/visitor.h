@@ -13,10 +13,13 @@ COMPILER_BEGIN
       
       bool PreVisit(Program&) { return true; }
       void PostVisit(Program&) {}
+      
       bool PreVisitExpression(Expression&) { return true; }
       void PostVisitExpression(Expression&) {}
+      
       bool PreVisitBinding(Expression&, cell&) { return true; }
       void PostVisitBinding(Expression&) {}
+      
       bool PreVisitBegin(Expression&) { return true; }
       void PostVisitBegin(Expression&) { }
       
@@ -28,7 +31,9 @@ COMPILER_BEGIN
       void VisitTrue(Expression&) { }
       void VisitFalse(Expression&) { }
       void VisitNop(Expression&) { }
-      void VisitCharacter(Expression&) {}
+      void VisitCharacter(Expression&) { }
+      void VisitVariable(Expression&) { }
+      void VisitQuote(Expression&) { }
       
       bool PreVisitPrimitiveCall(Expression&) { return true; }
       void PostVisitPrimitiveCall(Expression&) { }
@@ -36,13 +41,8 @@ COMPILER_BEGIN
       bool PreVisitForeignCall(Expression&) { return true; }      
       void PostVisitForeignCall(Expression&) {  }
             
-      void VisitVariable(Expression&) {  }
-      
-      
       bool PreVisitIf(Expression&) { return true; }
       void PostVisitIf(Expression&) { }
-      
-      void VisitQuote(Expression&) {}
       
       bool PreVisitSet(Expression&) { return true; }
       void PostVisitSet(Expression&) { }
@@ -51,22 +51,22 @@ COMPILER_BEGIN
       void PostVisitLambda(Expression&) { }
       
       bool PreVisitLet(Expression&) { return true; }
-      void VisitLetPostBindings(Expression&) {}
+      void VisitLetPostBindings(Expression&) { }
       void PostVisitLet(Expression&) { }
       
       bool PreVisitFunCall(Expression&) { return true; }
       void PostVisitFunCall(Expression&) { }
       
       bool PreVisitCase(Expression&) { return true; }
-      void VisitCaseElse(Expression&) {}
+      void VisitCaseElse(Expression&) { }
       void PostVisitCase(Expression& ) { }
 
       bool PreVisitCond(Expression&) { return true; }
       void PostVisitCond(Expression&) { }
       
       bool PreVisitDo(Expression& e) { return true; }
-      void VisitDoPostBindings(Expression&) {}
-      void VisitDoPostTest(Expression&) {}
+      void VisitDoPostBindings(Expression&) { }
+      void VisitDoPostTest(Expression&) { }
       void PostVisitDo(Expression&) { }
     };
   
