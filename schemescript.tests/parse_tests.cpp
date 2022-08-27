@@ -189,6 +189,41 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     auto prog = make_program(tokens);
     dump(std::cout, prog);
+    script = R"((+ 1.2 4 7.9))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    script = R"((if (> 2 3) 1.5  8.9))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    script = R"('(+ 1 2 3))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    script = R"((set! x (+ 1 2)))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    script = R"((lambda (x) (* x x)))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    script = R"((let ((x 2) (y 3)) (+ x y)))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
+    script = R"(((lambda (x) (* x x)) 7))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    dump(std::cout, prog);
     }
   }
 

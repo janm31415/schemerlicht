@@ -18,7 +18,16 @@ namespace
       
       bool PreVisit(Program&) { return true; }
       void PostVisit(Program&) {}
-      bool PreVisit(Expression&) {return true;}
+      bool PreVisit(Expression&) { return true; }
+      bool PreVisitBinding(Expression&, const std::string& binding_name)
+        {
+          str << "( " << binding_name << " ";
+        return true;
+        }
+      void PostVisitBinding(Expression&)
+        {
+        str << ") ";
+        }
       void PostVisit(Expression&) {}
       bool PreVisitBegin(Expression&) { str << "( begin "; return true; }
       void VisitFixnum(Expression& e) { str << std::get<Fixnum>(std::get<Literal>(e)).value << " "; }
@@ -35,21 +44,69 @@ namespace
         str << "#\\" << int(ch) << " ";
         return true;
         }
-      /*
-      bool PreVisit(Fixnum& f) { str << f.value << " "; return true; }
-      bool PreVisit(Flonum& f) { str << f.value << " "; return true; }
-      bool PreVisit(Nil&) { str << "() " << " "; return true; }
-      bool PreVisit(String& s) { str << "\"" << s.value << "\" "; return true; }
-      bool PreVisit(Symbol& s) { str << s.value << " "; return true; }
-      bool PreVisit(True&) { str << "#t "; return true; }
-      bool PreVisit(False&) { str << "#f "; return true; }
-      bool PreVisit(Nop&) { str << "#undefined "; return true; }
-      bool PreVisit(Character& cha)
+      bool PreVisitPrimitiveCall(Expression& e)
         {
-        unsigned char ch = (unsigned char)cha.value;
-        str << "#\\" << int(ch) << " ";
+        PrimitiveCall& p = std::get<PrimitiveCall>(e);
+        if (p.as_object)
+          {
+          str << p.primitive_name << " ";
+          return false;
+          }
+        str << "( ";
+        str << p.primitive_name;
+        str << " ";
         return true;
         }
+      void VisitVariable(Expression& e) { str << std::get<Variable>(e).name << " "; }
+      bool PreVisitIf(Expression&) { str << "( if ";  return true; }
+      void VisitQuote(Expression& e)
+        {
+        Quote& q = std::get<Quote>(e);
+        switch (q.type)
+          {
+          case Quote::qt_quote: str << "( quote "; break;
+          case Quote::qt_backquote: str << "( quasiquote "; break;
+          case Quote::qt_unquote: str << "( unquote "; break;
+          case Quote::qt_unquote_splicing: str << "( unquote-splicing "; break;
+          }
+        str << q.arg << " ) ";
+        }
+      bool PreVisitSet(Expression& e)
+        {
+        str << "( set! " << std::get<Set>(e).name << " ";
+        return true;
+        }
+      bool PreVisitLambda(Expression& e)
+        {
+        Lambda& l = std::get<Lambda>(e);
+        str << "( lambda ( ";
+        for (const auto& v : l.variables)
+          str << v << " ";
+        str << ") ";
+        return true;
+        }
+      bool PreVisitLet(Expression& e)
+        {
+        Let& l = std::get<Let>(e);
+        switch (l.bt)
+          {
+          case bt_let: str << "( let ( "; break;
+          case bt_let_star: str << "( let* ( "; break;
+          case bt_letrec: str << "( letrec ( "; break;
+          }
+        return true;
+        }
+      void VisitLetPostBindings(Expression& e)
+        {
+        str << " ) ";
+        }
+      bool PreVisitFunCall(Expression& e)
+        {
+        FunCall& f = std::get<FunCall>(e);
+        str << "( ";
+        return true;
+        }
+      /*
       bool PreVisit(Variable& v) { str << v.name << " "; return true; }
       bool PreVisit(FunCall& f)
         {

@@ -10,21 +10,31 @@ enum class visitor_entry_type
   {
   vet_expression,
   vet_expression_post,
+  vet_binding,
+  vet_binding_post,
   vet_begin,
   vet_begin_post,
   vet_case,
   vet_cond,
   vet_do,
   vet_foreigncall,
+  vet_foreigncall_post,
   vet_funcall,
+  vet_funcall_post,
   vet_if,
+  vet_if_post,
   vet_lambda,
+  vet_lambda_post,
   vet_let,
+  vet_let_post_bindings,
+  vet_let_post,
   vet_literal,
   vet_nop,
   vet_primitivecall,
+  vet_primitivecall_post,
   vet_quote,
   vet_set,
+  vet_set_post,
   vet_variable
   };
 
@@ -32,6 +42,7 @@ struct visitor_entry
   {
   Expression* expr;
   visitor_entry_type type;
+  std::string binding_name;
   };
   
 inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t)
@@ -39,6 +50,15 @@ inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t)
   visitor_entry entry;
   entry.expr = e;
   entry.type = t;
+  return entry;
+}
+
+inline visitor_entry make_visitor_entry(Expression* e, visitor_entry_type t, const std::string& binding)
+{
+  visitor_entry entry;
+  entry.expr = e;
+  entry.type = t;
+  entry.binding_name = binding;
   return entry;
 }
 
@@ -165,6 +185,172 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     case visitor_entry_type::vet_nop:
     {
     func.VisitNop(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_variable:
+    {
+    func.VisitVariable(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_quote:
+    {
+    func.VisitQuote(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_funcall:
+    {
+    if (func.PreVisitFunCall(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_funcall_post));
+      FunCall& f = std::get<FunCall>(*entry.expr);
+      auto rit = f.arguments.rbegin();
+      auto rend = f.arguments.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      rit = f.fun.rbegin();
+      rend = f.fun.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_funcall_post:
+    {
+    func.PostVisitFunCall(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_primitivecall:
+    {
+    if (func.PreVisitPrimitiveCall(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_primitivecall_post));
+      PrimitiveCall& p = std::get<PrimitiveCall>(*entry.expr);
+      auto rit = p.arguments.rbegin();
+      auto rend = p.arguments.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_primitivecall_post:
+    {
+    func.PostVisitPrimitiveCall(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_foreigncall:
+    {
+    if (func.PreVisitPrimitiveCall(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_foreigncall_post));
+      ForeignCall& f = std::get<ForeignCall>(*entry.expr);
+      auto rit = f.arguments.rbegin();
+      auto rend = f.arguments.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_foreigncall_post:
+    {
+    func.PostVisitForeignCall(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_if:
+    {
+    if (func.PreVisitIf(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_if_post));
+      If& i = std::get<If>(*entry.expr);
+      auto rit = i.arguments.rbegin();
+      auto rend = i.arguments.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_if_post:
+    {
+    func.PostVisitIf(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_binding:
+    {
+    if (func.PreVisitBinding(*entry.expr, entry.binding_name))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_binding_post));
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_binding_post:
+    {
+    func.PostVisitBinding(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_let:
+    {
+    if (func.PreVisitLet(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_let_post_bindings));
+      Let& l = std::get<Let>(*entry.expr);
+      auto rit = l.bindings.rbegin();
+      auto rend = l.bindings.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(rit->second), visitor_entry_type::vet_binding, rit->first));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_let_post_bindings:
+    {
+    func.VisitLetPostBindings(*entry.expr);
+    expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_let_post));
+    Let& l = std::get<Let>(*entry.expr);
+    auto rit = l.body.rbegin();
+    auto rend = l.body.rend();
+    for (; rit != rend; ++rit)
+      expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+    break;
+    }
+    case visitor_entry_type::vet_let_post:
+    {
+    func.PostVisitLet(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_lambda:
+    {
+    if (func.PreVisitLambda(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_lambda_post));
+      Lambda& l = std::get<Lambda>(*entry.expr);
+      auto rit = l.body.rbegin();
+      auto rend = l.body.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_lambda_post:
+    {
+    func.PostVisitLambda(*entry.expr);
+    break;
+    }
+    case visitor_entry_type::vet_set:
+    {
+    if (func.PreVisitSet(*entry.expr))
+      {
+      expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_set_post));
+      Set& s = std::get<Set>(*entry.expr);
+      auto rit = s.value.rbegin();
+      auto rend = s.value.rend();
+      for (; rit != rend; ++rit)
+        expression_stack.push_back(make_visitor_entry(&(*rit), visitor_entry_type::vet_expression));
+      }
+    break;
+    }
+    case visitor_entry_type::vet_set_post:
+    {
+    func.PostVisitSet(*entry.expr);
+    break;
     }
     default:
     break;
