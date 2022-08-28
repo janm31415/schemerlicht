@@ -2,6 +2,7 @@ set(HDRS
 compile_error.h
 defines.h
 dump.h
+environment.h
 format.h
 namespace.h
 parse.h
