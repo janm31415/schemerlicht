@@ -4,9 +4,11 @@ defines.h
 dump.h
 environment.h
 format.h
+macro_data.h
 namespace.h
 parse.h
 reader.h
+repl_data.h
 schemescript_api.h
 tokenize.h
 visitor.h
@@ -16,6 +18,7 @@ set(SRCS
 compile_error.cpp
 dump.cpp
 format.cpp
+macro_data.cpp
 parse.cpp
 reader.cpp
 tokenize.cpp
