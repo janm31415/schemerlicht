@@ -15,6 +15,7 @@ primitive_map.h
 reader.h
 repl_data.h
 schemescript_api.h
+simplify_to_core.h
 tokenize.h
 types.h
 visitor.h
@@ -30,6 +31,7 @@ macro_data.cpp
 parse.cpp
 preprocess.cpp
 reader.cpp
+simplify_to_core.cpp
 tokenize.cpp
 )
 

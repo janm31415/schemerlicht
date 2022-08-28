@@ -595,5 +595,12 @@ inline void visit(Program& prog, TOperationFunctor& func)
   func.PostVisit(prog);
   }
 
+template <class TOperationFunctor>
+inline void visit(Expression& e, TOperationFunctor& func)
+  {
+  std::vector<visitor_entry> expression_stack;
+  expression_stack.push_back(make_visitor_entry(&e, visitor_entry_type::vet_expression));
+  visit(expression_stack, func);
+  }
 
 COMPILER_END

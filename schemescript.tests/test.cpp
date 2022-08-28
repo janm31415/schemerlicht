@@ -1,4 +1,5 @@
 #include "test_assert.h"
+#include "conversion_tests.h"
 #include "format_tests.h"
 #include "parse_tests.h"
 #include "tokenize_tests.h"
@@ -9,6 +10,7 @@ int main(int /*argc*/, const char* /*argv*/[])
   InitTestEngine();
 
   auto tic = std::clock();
+  run_all_conversion_tests();
   run_all_format_tests();
   run_all_parse_tests();
   run_all_tokenize_tests();

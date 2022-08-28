@@ -108,7 +108,7 @@ namespace
         }
       void VisitLetPostBindings(Expression& e)
         {
-        str << " ) ";
+        str << ") ";
         }
       bool PreVisitFunCall(Expression&)
         {
