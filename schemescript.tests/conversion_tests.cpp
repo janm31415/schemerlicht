@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "schemescript/alpha_conversion.h"
 #include "schemescript/simplify_to_core.h"
 #include "schemescript/dump.h"
 
@@ -16,6 +17,20 @@ namespace
     std::stringstream str;
     dump(str, prog);
     return str.str();
+    }
+    
+  void alpha_conversion()
+    {
+    auto tokens = tokenize("(let ([x 5][y 6]) x)");
+    std::reverse(tokens.begin(), tokens.end());
+    auto prog = make_program(tokens);
+    uint64_t index = 0;
+    environment<alpha_conversion_data> empty;
+    alpha_conversion(prog, index, empty);
+    TEST_ASSERT(std::get<Let>(prog.expressions.front()).bindings[0].first == "x_0");
+    TEST_ASSERT(std::get<Let>(prog.expressions.front()).bindings[1].first == "y_1");
+    TEST_ASSERT(std::get<Variable>(std::get<Begin>(std::get<Let>(prog.expressions.front()).body.front()).arguments.front()).name == "x_0");
+    TEST_ASSERT(to_string(prog) == "( let ( [ x_0 5 ] [ y_1 6 ] ) ( begin x_0 ) ) ");
     }
     
   void simplify_to_core_conversion_and()
@@ -61,7 +76,7 @@ namespace
     prog = make_program(tokens);
     simplify_to_core_forms(prog);
     TEST_ASSERT(std::holds_alternative<Let>(prog.expressions.front()));
-    TEST_ASSERT(to_string(prog) == "( let ( [ #%x 3 ] ) ( begin ( if #%x #%x 4 ) ) ) ");    
+    TEST_ASSERT(to_string(prog) == "( let ( [ #%x 3 ] ) ( begin ( if #%x #%x 4 ) ) ) ");
     }
 
   void simplify_to_core_conversion_letrec()
@@ -85,6 +100,7 @@ COMPILER_END
 void run_all_conversion_tests()
   {
   using namespace COMPILER;
+  alpha_conversion();
   simplify_to_core_conversion_and();
   simplify_to_core_conversion_or();
   simplify_to_core_conversion_letrec();
