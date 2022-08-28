@@ -20,7 +20,7 @@ compiler_options::compiler_options()
   do_collect_quotes = true;
   do_quote_conversion = true;
   do_quasiquote_conversion = true;
-  //lsa_algo = lsa_detailed;
+  lsa_algo = lsa_detailed;
   primitives_inlined = true;
   safe_primitives = true;
   safe_cons = true;
