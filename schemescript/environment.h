@@ -1,6 +1,7 @@
 #pragma once
 
 #include "namespace.h"
+#include "liveness_range.h"
 
 #include <map>
 #include <stdint.h>
@@ -95,5 +96,31 @@ class environment
   private:
     std::map<std::string, TEntry> env;
   };
+
+
+struct environment_entry
+  {
+  environment_entry() {}
+
+  enum storage_type
+    {
+    st_register,
+    st_local,
+    st_global
+    };
+
+  storage_type st;
+  uint64_t pos;
+  liveness_range live_range;
+
+  bool operator < (const environment_entry& other) const
+    {
+    if (st == other.st)
+      return pos < other.pos;
+    return st < other.st;
+    }
+  };
+  
+typedef environment<environment_entry> environment_map;
 
 COMPILER_END

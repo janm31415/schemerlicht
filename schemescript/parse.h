@@ -5,6 +5,7 @@
 #include "reader.h"
 #include "schemescript_api.h"
 #include "tokenize.h"
+#include "liveness_range.h"
 
 #include <stdint.h>
 #include <variant>
@@ -14,11 +15,6 @@
 #include <string>
 
 COMPILER_BEGIN
-
-struct liveness_range
-  {
-  uint64_t first, last; // interval containing start and end point of liveness of variable
-  };
 
 enum expression_type
   {
