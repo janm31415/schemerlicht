@@ -826,5 +826,5 @@ void run_all_conversion_tests()
   linear_scan_tests_naive();
   bug1();
   quasiquote_conversion_tests();
-  //constant_propagation_tests();
+  constant_propagation_tests();
   }
