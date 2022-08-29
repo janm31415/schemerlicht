@@ -11,7 +11,7 @@ namespace
   
   struct global_define_env_visitor : public VisitorBaseClass
     {
-    environment_map* env;
+    environment_map env;
     repl_data* rd;
     context* p_ctxt;
 
@@ -24,7 +24,7 @@ namespace
         e.st = environment_entry::st_global;
         e.pos = rd->global_index * 8;
         ++(rd->global_index);
-        env->push(s.name, e);
+        env->push_outer(s.name, e);
         uint64_t* addr = p_ctxt->globals + (e.pos >> 3);
         *addr = reserved_tag; // This is a new address, previously equal to unalloc_tag. To avoid that gc stops here when cleaning, we change its value to reserved_tag.
         }
@@ -37,7 +37,7 @@ void global_define_environment_allocation(Program& prog, environment_map& env, r
   {
   assert(prog.alpha_converted);
   global_define_env_visitor gdev;
-  gdev.env = &env;
+  gdev.env = env;
   gdev.rd = &data;
   gdev.p_ctxt = &ctxt;
   visit(prog, gdev);

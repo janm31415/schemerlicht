@@ -11,7 +11,6 @@ COMPILER_BEGIN
 
 namespace
   {
-  
   std::vector<Set*> g_unhandled_sets;
 
   struct alpha_conversion_state
@@ -33,14 +32,15 @@ namespace
   struct alpha_conversion_helper
     {
     std::vector<alpha_conversion_state> expressions;
-    uint64_t index;
-    environment<alpha_conversion_data>& env;
+    std::vector<uint64_t> index;
+    std::vector<std::shared_ptr<environment<alpha_conversion_data>>> env;
     bool modify_names;
 
-    alpha_conversion_helper(uint64_t i, environment<alpha_conversion_data>& input_env, bool mn) : env(input_env)
+    alpha_conversion_helper(uint64_t i, const std::shared_ptr<environment<alpha_conversion_data>>& p_outer, bool mn)
       {
       modify_names = mn;
-      index = i;
+      index.push_back(i);
+      env.push_back(std::make_shared<environment<alpha_conversion_data>>(p_outer));
       }
 
     std::string make_name(const std::string& original, uint64_t i)
@@ -70,12 +70,12 @@ namespace
             {
             Variable& v = std::get<Variable>(e);
             alpha_conversion_data new_name;
-            if (!env.find(new_name, v.name)) // variables are already used in a context with the variable being defined later
+            if (!env.back()->find(new_name, v.name)) // variables are already used in a context with the variable being defined later
               {
               //throw_error(v.line_nr, v.column_nr, v.filename, primitive_unknown, v.name);
-              new_name.name = modify_names ? make_name(v.name, index++) : v.name;
+              new_name.name = modify_names ? make_name(v.name, index.back()++) : v.name;
               new_name.forward_declaration = true;
-              env.push(v.name, new_name);
+              env.back()->push_outer(v.name, new_name);
               }
             v.name = new_name.name;
             }
@@ -120,11 +120,14 @@ namespace
             expressions.emplace_back(&e, alpha_conversion_state::e_ac_state::T_STEP_1);
             //alpha_conversion_visitor new_visitor(index, env, modify_names);
 
+            index.push_back(index.back());
+            env.push_back(std::make_shared<environment<alpha_conversion_data>>(env.back()));
+
             for (size_t i = 0; i < lam.variables.size(); ++i)
               {
               std::string& var_name = lam.variables[i];
-              std::string new_name = modify_names ? make_name(var_name, index++) : var_name;
-              env.push(var_name, new_name);
+              std::string new_name = modify_names ? make_name(var_name, index.back()++) : var_name;
+              env.back()->push(var_name, new_name);
               lam.variables[i] = new_name;
               }
             //visitor<Expression, alpha_conversion_visitor>::visit(lam.body.front(), &new_visitor);
@@ -153,17 +156,22 @@ namespace
           {
           if (std::holds_alternative<Lambda>(e))
             {
-            
+            auto ind = index.back();
+            index.pop_back();
+            index.back() = ind;
+            env.pop_back();
             }
           else if (std::holds_alternative<Let>(e))
             {
             Let& l = std::get<Let>(e);
             expressions.emplace_back(&e, alpha_conversion_state::e_ac_state::T_STEP_2);
+            index.push_back(index.back());
+            env.push_back(std::make_shared<environment<alpha_conversion_data>>(env.back()));
             for (auto& binding : l.bindings)
               {
               std::string original = binding.first;
-              std::string adapted = modify_names ? make_name(original, index++) : original;
-              env.push(original, adapted);
+              std::string adapted = modify_names ? make_name(original, index.back()++) : original;
+              env.back()->push(original, adapted);
               binding.first = adapted;
               }
 
@@ -176,31 +184,31 @@ namespace
 
             if (s.originates_from_define || s.originates_from_quote)
               {
-              if (!env.find(new_name, s.name))
+              if (!env.back()->find(new_name, s.name))
                 {
-                new_name.name = modify_names ? make_name(s.name, index++) : s.name;
-                env.push(s.name, new_name);
+                new_name.name = modify_names ? make_name(s.name, index.back()++) : s.name;
+                env.back()->push(s.name, new_name);
                 }
               else
                 {
                 if (new_name.forward_declaration) // this variable was forward declared, but now it is also defined, so set forward_declaration to false.
                   {
                   new_name.forward_declaration = false;
-                  env.push(s.name, new_name);
+                  env.back()->push(s.name, new_name);
                   }
                 else
                   s.originates_from_define = false; // was already defined before, therefore, treat this define as a set!
                 }
               s.name = new_name.name;
               }
-            else if (!env.find(new_name, s.name))
+            else if (!env.back()->find(new_name, s.name))
               {
               static std::map<std::string, expression_type> expr_map = generate_expression_map();
               auto it = expr_map.find(s.name);
               if (it != expr_map.end() && it->second == et_primitive_call)
                 { // we're setting a primitive call, convert it to a define
-                new_name.name = modify_names ? make_name(s.name, index++) : s.name;
-                env.push(s.name, new_name);
+                new_name.name = modify_names ? make_name(s.name, index.back()++) : s.name;
+                env.back()->push(s.name, new_name);
                 s.name = new_name.name;
                 s.originates_from_define = true;
                 }
@@ -214,7 +222,7 @@ namespace
             {
             PrimitiveCall& p = std::get<PrimitiveCall>(e);
             alpha_conversion_data new_name;
-            if (env.find(new_name, p.primitive_name)) // it is possible that a primitive name has been redefined. That case is treated here.
+            if (env.back()->find(new_name, p.primitive_name)) // it is possible that a primitive name has been redefined. That case is treated here.
               {
               FunCall f;
               Variable v;
@@ -235,6 +243,10 @@ namespace
           {
           if (std::holds_alternative<Let>(e))
             {
+            auto ind = index.back();
+            index.pop_back();
+            index.back() = ind;
+            env.pop_back();
             }
           else
             throw std::runtime_error("Compiler error!: alpha conversion: not implemented");
@@ -244,10 +256,9 @@ namespace
         }
       }
     };
-  
   }
 
-void alpha_conversion(Program& prog, uint64_t& alpha_conversion_index, environment<alpha_conversion_data>& env, bool modify_names)
+void alpha_conversion(Program& prog, uint64_t& alpha_conversion_index, std::shared_ptr<environment<alpha_conversion_data>>& env, bool modify_names)
   {
   g_unhandled_sets.clear();
 
@@ -257,10 +268,13 @@ void alpha_conversion(Program& prog, uint64_t& alpha_conversion_index, environme
   std::reverse(ach.expressions.begin(), ach.expressions.end());
   ach.treat_expressions();
 
+  env = ach.env.back();
+  env->rollup();
+  
   for (auto& unhandled_set : g_unhandled_sets)
     {
     alpha_conversion_data new_name;
-    if (!env.find(new_name, unhandled_set->name))
+    if (!env->find(new_name, unhandled_set->name))
       {
       throw std::runtime_error("alpha conversion: set! error");
       //could not resolve this set!, so treat it as a define
@@ -273,7 +287,7 @@ void alpha_conversion(Program& prog, uint64_t& alpha_conversion_index, environme
       unhandled_set->name = new_name.name;
     }
 
-  alpha_conversion_index = ach.index;
+  alpha_conversion_index = ach.index.back();
   prog.alpha_converted = true;
   }
 

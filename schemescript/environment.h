@@ -6,6 +6,7 @@
 #include <map>
 #include <stdint.h>
 #include <string>
+#include <memory>
 
 COMPILER_BEGIN
 
@@ -13,18 +14,24 @@ template <class TEntry>
 class environment
   {
   public:
-    environment(const environment<TEntry>* outer = nullptr)
-      {
-      if (outer)
-        env = outer->env;
-      }
-  
+    environment(const std::shared_ptr<environment<TEntry>>& outer) : p_outer(outer) {}
+
     bool has(const std::string& name)
       {
       auto it = env.find(name);
-      return (it != env.end());
+      if (it != env.end())
+        return true;
+      auto p_outer_copy = p_outer;
+      while (p_outer_copy)
+        {
+        it = p_outer_copy->env.find(name);
+        if (it != p_outer_copy->env.end())
+          return true;
+        p_outer_copy = p_outer_copy->p_outer;
+        }
+      return false;
       }
-      
+
     bool find(TEntry& e, const std::string& name)
       {
       auto it = env.find(name);
@@ -33,9 +40,20 @@ class environment
         e = it->second;
         return true;
         }
+      auto p_outer_copy = p_outer;
+      while (p_outer_copy)
+        {
+        it = p_outer_copy->env.find(name);
+        if (it != p_outer_copy->env.end())
+          {
+          e = it->second;
+          return true;
+          }
+        p_outer_copy = p_outer_copy->p_outer;
+        }
       return false;
       }
-      
+
     template <class Pred>
     bool find_if(std::pair<std::string, TEntry>& out, Pred p)
       {
@@ -45,9 +63,24 @@ class environment
         out = *it;
         return true;
         }
+      //if (p_outer)
+      //  {
+      //  return p_outer->find_if(out, p);
+      //  }
+      auto p_outer_copy = p_outer;
+      while (p_outer_copy)
+        {
+        it = std::find_if(p_outer_copy->env.begin(), p_outer_copy->env.end(), p);
+        if (it != p_outer_copy->env.end())
+          {
+          out = *it;
+          return true;
+          }
+        p_outer_copy = p_outer_copy->p_outer;
+        }
       return false;
       }
-      
+
     bool replace(const std::string& name, TEntry e)
       {
       auto it = env.find(name);
@@ -56,9 +89,22 @@ class environment
         it->second = e;
         return true;
         }
+      auto p_outer_copy = p_outer;
+      while (p_outer_copy)
+        {
+        it = p_outer_copy->env.find(name);
+        if (it != p_outer_copy->env.end())
+          {
+          it->second = e;
+          return true;
+          }
+        p_outer_copy = p_outer_copy->p_outer;
+        }
+      //if (p_outer)
+      //  return p_outer->replace(name, e);
       return false;
       }
-      
+
     void remove(const std::string& name)
       {
       auto it = env.find(name);
@@ -66,13 +112,44 @@ class environment
         {
         env.erase(it);
         }
+      //if (p_outer)
+      //  p_outer->remove(name);
+      auto p_outer_copy = p_outer;
+      while (p_outer_copy)
+        {
+        it = p_outer_copy->env.find(name);
+        if (it != p_outer_copy->env.end())
+          {
+          p_outer_copy->env.erase(it);
+          }
+        p_outer_copy = p_outer_copy->p_outer;
+        }
       }
-      
+
     void push(const std::string& name, TEntry e)
       {
       env[name] = e;
       }
-      
+
+    void push_outer(const std::string& name, TEntry e)
+      {
+      /*
+      if (p_outer)
+        p_outer->push_outer(name, e);
+      else
+        env[name] = e;
+      */
+      if (p_outer)
+        {
+        auto p_outer_copy = p_outer;
+        while (p_outer_copy->p_outer)
+          p_outer_copy = p_outer_copy->p_outer;
+        p_outer_copy->env[name] = e;
+        }
+      else
+        env[name] = e;
+      }
+
     typename std::map<std::string, TEntry>::iterator begin()
       {
       return env.begin();
@@ -82,20 +159,53 @@ class environment
       {
       return env.end();
       }
-      
-    typename std::map<std::string, TEntry>::const_iterator begin() const
+
+    void rollup()
       {
-      return env.begin();
+      /*
+      if (p_outer)
+        {
+        p_outer->rollup();
+        auto it = p_outer->begin();
+        auto it_end = p_outer->end();
+        for (; it != it_end; ++it)
+          env.insert(*it);
+        p_outer.reset();
+        }
+      */
+      while (p_outer)
+        {
+        auto it = p_outer->begin();
+        auto it_end = p_outer->end();
+        for (; it != it_end; ++it)
+          env.insert(*it);
+        p_outer = p_outer->p_outer;
+        }
       }
 
-    typename std::map<std::string, TEntry>::const_iterator end() const
-      {
-      return env.end();
-      }
-      
   private:
+    template <class T>
+    friend std::shared_ptr<environment<T>> make_deep_copy(const std::shared_ptr<environment<T>>& env);
     std::map<std::string, TEntry> env;
+    std::shared_ptr<environment<TEntry>> p_outer;
   };
+
+template <class TEntry>
+std::shared_ptr<environment<TEntry>> make_deep_copy(const std::shared_ptr<environment<TEntry>>& env)
+  {
+  if (!env.get())
+    return env;
+  std::shared_ptr<environment<TEntry>> out = std::make_shared<environment<TEntry>>(*env);
+  //if (out->p_outer)
+  //  out->p_outer = make_deep_copy(out->p_outer);
+  auto* p_outer_copy = &(out->p_outer);
+  while (*p_outer_copy)
+    { // this loop is not tested anywhere yet
+    *p_outer_copy = std::make_shared<environment<TEntry>>(*p_outer_copy);
+    p_outer_copy = &((*p_outer_copy)->p_outer);
+    }
+  return out;
+  }
 
 
 struct environment_entry
@@ -121,6 +231,6 @@ struct environment_entry
     }
   };
   
-typedef environment<environment_entry> environment_map;
+typedef std::shared_ptr<environment<environment_entry>> environment_map;
 
 COMPILER_END

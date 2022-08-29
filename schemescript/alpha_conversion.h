@@ -28,7 +28,7 @@ The environment env contains the mapping of a variable name to their alpha conve
 
 The index is in and output via the variable alpha_conversion_index.
 */
-COMPILER_SCHEMESCRIPT_API void alpha_conversion(Program& prog, uint64_t& alpha_conversion_index, environment<alpha_conversion_data>& env, bool modify_names = true);
+COMPILER_SCHEMESCRIPT_API void alpha_conversion(Program& prog, uint64_t& alpha_conversion_index, std::shared_ptr<environment<alpha_conversion_data>>& env, bool modify_names = true);
 
 std::string get_variable_name_before_alpha(const std::string& variable_name_after_alpha);
 

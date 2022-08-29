@@ -41,14 +41,14 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     auto prog = make_program(tokens);
     uint64_t index = 0;
-    environment<alpha_conversion_data> empty;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
     alpha_conversion(prog, index, empty);
     TEST_ASSERT(std::get<Let>(prog.expressions.front()).bindings[0].first == "x_0");
     TEST_ASSERT(std::get<Let>(prog.expressions.front()).bindings[1].first == "y_1");
     TEST_ASSERT(std::get<Variable>(std::get<Begin>(std::get<Let>(prog.expressions.front()).body.front()).arguments.front()).name == "x_0");
     TEST_ASSERT(to_string(prog) == "( let ( [ x_0 5 ] [ y_1 6 ] ) ( begin x_0 ) ) ");
     }
-    
+
   void simplify_to_core_conversion_and()
     {
     auto tokens = tokenize("(and)");
@@ -109,7 +109,7 @@ namespace
     simplify_to_core_forms(prog);
     TEST_ASSERT(to_string(prog) == "( let ( [ f #undefined ] [ g #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( x y ) ( begin ( + x y ) ) ) ] [ #%t1 ( lambda ( x ) ( begin ( + x 12 ) ) ) ] ) ( begin ( set! f #%t0 ) ( set! g #%t1 ) ) ) ( f 16 ( f ( g 0 ) ( + 1 ( g 0 ) ) ) ) ) ) ");
     }
-    
+
   void convert_define()
     {
     auto tokens = tokenize("(let ([x 5]) (define foo (lambda (y) (bar x y))) (define bar (lambda (a b) (+ (* a b) a))) (foo (+ x 3)))");
@@ -125,7 +125,7 @@ namespace
     define_conversion(prog);
     TEST_ASSERT(to_string(prog) == "( set! x 5 ) ");
     uint64_t alpha_conversion_index = 0;
-    environment<alpha_conversion_data> empty;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
     alpha_conversion(prog, alpha_conversion_index, empty);
     TEST_ASSERT(to_string(prog) == "( set! x_0 5 ) ");
 
@@ -137,7 +137,7 @@ namespace
     alpha_conversion(prog, alpha_conversion_index, empty);
     TEST_ASSERT(to_string(prog) == "( set! y_0 5 ) ( let ( [ z_1 y_0 ] ) ( begin ( + z_1 1 ) ) ) ");
     }
-    
+
   void single_begin_conv()
     {
     auto tokens = tokenize("(define x 5) (define y 6)");
@@ -194,7 +194,7 @@ namespace
     prog = make_program(tokens);
     TEST_ASSERT(to_string(prog) == script);
     }
-    
+
   void closure_conversion()
     {
     context ctxt = create_context(1024, 1024, 1024, 1024);
@@ -203,10 +203,10 @@ namespace
     auto tokens = tokenize("(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
     std::reverse(tokens.begin(), tokens.end());
     auto prog = make_program(tokens);
-    environment_map env;
+    environment_map env = std::make_shared<environment<environment_entry>>(nullptr);
     uint64_t alpha_conversion_index = 0;
     repl_data rd;
-    environment<alpha_conversion_data> empty;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
     alpha_conversion(prog, alpha_conversion_index, empty);
     global_define_environment_allocation(prog, env, rd, ctxt);
     free_variable_analysis(prog, env);
@@ -232,7 +232,7 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     auto prog = make_program(tokens);
     uint64_t alpha_conversion_index = 0;
-    environment<alpha_conversion_data> empty;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
     alpha_conversion(prog, alpha_conversion_index, empty);
     assignable_variable_conversion(prog, ops);
     TEST_ASSERT(to_string(prog) == "( let ( [ x_0 12 ] ) ( begin ( let ( [ y_2 ( let ( [ #%x_1 #f ] ) ( begin ( let ( [ x_1 ( vector #%x_1 ) ] ) ( begin ( vector-set! x_1 0 14 ) ) ) ) ) ] ) ( begin x_0 ) ) ) ) ");
@@ -548,10 +548,10 @@ namespace
     single_begin_conversion(prog);
     simplify_to_core_forms(prog);
     uint64_t alpha_conversion_index = 0;
-    environment<alpha_conversion_data> empty;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
     alpha_conversion(prog, alpha_conversion_index, empty);
     cps_conversion(prog, ops);
-    environment_map env;
+    environment_map env = std::make_shared<environment<environment_entry>>(nullptr);
     repl_data rd;
     global_define_environment_allocation(prog, env, rd, ctxt);
     free_variable_analysis(prog, env);
@@ -802,7 +802,9 @@ namespace
     quasiquote_conversion(prog);
     TEST_EQ("( cons ( quote a ) ( cons ( cons ( quote quasiquote ) ( cons ( cons ( quote b ) ( cons ( cons ( quote unquote ) ( cons ( quote (+ 1 2) ) ( quote () ) ) ) ( cons ( cons ( quote unquote ) ( cons ( cons ( quote foo ) ( cons ( + 1 3 ) ( quote (d) ) ) ) ( quote () ) ) ) ( quote (e) ) ) ) ) ( quote () ) ) ) ( quote (f) ) ) ) ", to_string(prog));
     }
+
   }
+
 
 COMPILER_END
 
@@ -817,7 +819,7 @@ void run_all_conversion_tests()
   single_begin_conv();
   dump_conversion();
   closure_conversion();
-  //assignable_var_conversion();
+  assignable_var_conversion();
   //tail_calls_analysis();
   //cps_conversion();
   //cps_conversion_2();

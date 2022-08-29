@@ -27,13 +27,13 @@ namespace
   struct free_var_analysis_helper
     {
     std::vector<free_var_analysis_state> expressions;
-    environment_map* env;
+    environment_map env;
     std::vector<std::set<std::string>> local_variables;
     std::vector<std::set<std::string>> free_variables;
 
-    free_var_analysis_helper(environment_map& input_env)
+    free_var_analysis_helper(const environment_map& input_env)
       {
-      env = &input_env;
+      env = input_env;
       local_variables.emplace_back();
       free_variables.emplace_back();
       }
@@ -178,11 +178,14 @@ namespace
         }
       }
     };
+
+  
   }
 
 void free_variable_analysis(Program& prog, environment_map& env)
   {
   assert(prog.global_define_env_allocated);
+  assert(env.get());
   free_var_analysis_helper fvah(env);
   for (auto& expr : prog.expressions)
     fvah.expressions.push_back(&expr);

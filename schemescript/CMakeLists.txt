@@ -77,6 +77,7 @@ macro_data.cpp
 parse.cpp
 preprocess.cpp
 reader.cpp
+repl_data.cpp
 simplify_to_core.cpp
 tokenize.cpp
 )
