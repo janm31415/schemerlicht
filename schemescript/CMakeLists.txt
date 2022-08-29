@@ -28,6 +28,7 @@ context.h
 defines.h
 dump.h
 environment.h
+filename_setter.h
 format.h
 liveness_range.h
 macro_data.h
@@ -72,6 +73,7 @@ compile_error.cpp
 compiler_options.cpp
 context.cpp
 dump.cpp
+filename_setter.cpp
 format.cpp
 macro_data.cpp
 parse.cpp
