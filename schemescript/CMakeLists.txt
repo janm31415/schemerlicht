@@ -23,6 +23,7 @@ tail_call_analysis.h
 tail_calls_check.h
 compile_error.h
 compiler_options.h
+concurrency.h
 context.h
 defines.h
 dump.h

@@ -816,7 +816,7 @@ void run_all_conversion_tests()
   convert_define();
   single_begin_conv();
   dump_conversion();
-  //closure_conversion();
+  closure_conversion();
   //assignable_var_conversion();
   //tail_calls_analysis();
   //cps_conversion();
