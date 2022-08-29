@@ -823,7 +823,7 @@ void run_all_conversion_tests()
   tail_calls_analysis();
   cps_conversion();
   cps_conversion_2();
-  //linear_scan_tests_naive();
+  linear_scan_tests_naive();
   //bug1();
   //quasiquote_conversion_tests();
   //constant_propagation_tests();

@@ -115,6 +115,15 @@ struct Symbol
   std::string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
   };
 
+#define index_character 0
+#define index_false 1
+#define index_fixnum 2
+#define index_flonum 3
+#define index_nil 4
+#define index_string 5
+#define index_symbol 6
+#define index_true 7
+
 typedef std::variant<Character, False, Fixnum, Flonum, Nil, String, Symbol, True> Literal;
 
 struct Variable
@@ -148,6 +157,22 @@ struct Quote;
 struct Case;
 struct Cond;
 struct Do;
+
+#define index_begin 0
+#define index_case 1
+#define index_cond 2
+#define index_do 3
+#define index_foreigncall 4
+#define index_funcall 5
+#define index_if 6
+#define index_lambda 7
+#define index_let 8
+#define index_literal 9
+#define index_nop 10
+#define index_primitivecall 11
+#define index_quote 12
+#define index_set 13
+#define index_variable 14
 
 typedef std::variant<Begin, Case, Cond, Do, ForeignCall, FunCall, If, Lambda, Let, Literal, Nop, PrimitiveCall, Quote, Set, Variable> Expression;
 

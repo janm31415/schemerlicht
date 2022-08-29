@@ -173,49 +173,49 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
         expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_expression_post));
         switch (entry.expr->index())
           {
-          case 0: // begin
+          case index_begin: // begin
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_begin));
             break;
-          case 1: // Case
+          case index_case: // Case
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_case));
             break;
-          case 2: // Cond
+          case index_cond: // Cond
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_cond));
             break;
-          case 3: // Do
+          case index_do: // Do
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_do));
             break;
-          case 4: // ForeignCall
+          case index_foreigncall: // ForeignCall
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_foreigncall));
             break;
-          case 5: // FunCall
+          case index_funcall: // FunCall
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_funcall));
             break;
-          case 6: // If
+          case index_if: // If
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_if));
             break;
-          case 7: // Lambda
+          case index_lambda: // Lambda
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_lambda));
             break;
-          case 8: // Let
+          case index_let: // Let
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_let));
             break;
-          case 9: // Literal
+          case index_literal: // Literal
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_literal));
             break;
-          case 10: // Nop
+          case index_nop: // Nop
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_nop));
             break;
-          case 11: // PrimitiveCall
+          case index_primitivecall: // PrimitiveCall
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_primitivecall));
             break;
-          case 12: // Quote
+          case index_quote: // Quote
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_quote));
             break;
-          case 13: // Set
+          case index_set: // Set
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_set));
             break;
-          case 14: // Variable
+          case index_variable: // Variable
             expression_stack.push_back(make_visitor_entry(entry.expr, visitor_entry_type::vet_variable));
             break;
           default:
@@ -252,28 +252,28 @@ inline void visit(visitor_entry entry, std::vector<visitor_entry>& expression_st
     Literal& lit = std::get<Literal>(*entry.expr);
     switch (lit.index())
     { //std::variant<Character, False, Fixnum, Flonum, Nil, String, Symbol, True>
-      case 0:
+      case index_character:
         func.VisitCharacter(*entry.expr);
         break;
-      case 1:
+      case index_false:
         func.VisitFalse(*entry.expr);
         break;
-      case 2:
+      case index_fixnum:
         func.VisitFixnum(*entry.expr);
         break;
-      case 3:
+      case index_flonum:
         func.VisitFlonum(*entry.expr);
         break;
-      case 4:
+      case index_nil:
         func.VisitNil(*entry.expr);
         break;
-      case 5:
+      case index_string:
         func.VisitString(*entry.expr);
         break;
-      case 6:
+      case index_symbol:
         func.VisitSymbol(*entry.expr);
         break;
-      case 7:
+      case index_true:
         func.VisitTrue(*entry.expr);
         break;
       default:
