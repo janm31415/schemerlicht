@@ -314,6 +314,22 @@ namespace
       case vmcode::MEM_R13: return mem ? ("[r13" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r13]";
       case vmcode::MEM_R14: return mem ? ("[r14" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r14]";
       case vmcode::MEM_R15: return mem ? ("[r15" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r15]";
+      case vmcode::BYTE_MEM_RAX: return mem ? ("byte [rax" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rax]";
+      case vmcode::BYTE_MEM_RBX: return mem ? ("byte [rbx" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rbx]";
+      case vmcode::BYTE_MEM_RCX: return mem ? ("byte [rcx" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rcx]";
+      case vmcode::BYTE_MEM_RDX: return mem ? ("byte [rdx" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rdx]";
+      case vmcode::BYTE_MEM_RDI: return mem ? ("byte [rdi" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rdi]";
+      case vmcode::BYTE_MEM_RSI: return mem ? ("byte [rsi" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rsi]";
+      case vmcode::BYTE_MEM_RSP: return mem ? ("byte [rsp" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rsp]";
+      case vmcode::BYTE_MEM_RBP: return mem ? ("byte [rbp" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rbp]";
+      case vmcode::BYTE_MEM_R8: return  mem ? ("byte [r8" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r8]";
+      case vmcode::BYTE_MEM_R9: return  mem ? ("byte [r9" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r9]";
+      case vmcode::BYTE_MEM_R10: return mem ? ("byte [r10" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r10]";
+      case vmcode::BYTE_MEM_R11: return mem ? ("byte [r11" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r11]";
+      case vmcode::BYTE_MEM_R12: return mem ? ("byte [r12" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r12]";
+      case vmcode::BYTE_MEM_R13: return mem ? ("byte [r13" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r13]";
+      case vmcode::BYTE_MEM_R14: return mem ? ("byte [r14" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r14]";
+      case vmcode::BYTE_MEM_R15: return mem ? ("byte [r15" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r15]";
       case vmcode::LABELADDRESS: return text;
       }
     return "";

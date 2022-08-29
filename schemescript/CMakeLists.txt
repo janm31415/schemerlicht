@@ -1,4 +1,12 @@
 set(HDRS
+asm_aux.h
+context_defs.h
+inlines.h
+primitives.h
+globals.h
+syscalls.h
+file_utils.h
+utf8.h
 alpha_conversion.h
 assignable_var_conversion.h
 cps_conversion.h
@@ -46,6 +54,13 @@ visitor.h
 )
 	
 set(SRCS
+asm_aux.cpp
+inlines.cpp
+asm_aux.cpp
+globals.cpp
+primitives.cpp
+syscalls.cpp
+file_utils.cpp
 alpha_conversion.cpp
 assignable_var_conversion.cpp
 cps_conversion.cpp

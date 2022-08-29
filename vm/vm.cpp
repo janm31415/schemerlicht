@@ -942,6 +942,81 @@ registers::registers()
 
 namespace
   {
+  
+  uint8_t* get_address_8bit(vmcode::operand oper, uint64_t operand_mem, registers& regs)
+    {
+    switch (oper)
+      {
+      case vmcode::EMPTY: return nullptr;
+      case vmcode::RAX: return nullptr;
+      case vmcode::RBX: return nullptr;
+      case vmcode::RCX: return nullptr;
+      case vmcode::RDX: return nullptr;
+      case vmcode::RDI: return nullptr;
+      case vmcode::RSI: return nullptr;
+      case vmcode::RSP: return nullptr;
+      case vmcode::RBP: return nullptr;
+      case vmcode::R8:  return nullptr;
+      case vmcode::R9:  return nullptr;
+      case vmcode::R10: return nullptr;
+      case vmcode::R11: return nullptr;
+      case vmcode::R12: return nullptr;
+      case vmcode::R13: return nullptr;
+      case vmcode::R14: return nullptr;
+      case vmcode::R15: return nullptr;
+      case vmcode::MEM_RAX: return nullptr;
+      case vmcode::MEM_RBX: return nullptr;
+      case vmcode::MEM_RCX: return nullptr;
+      case vmcode::MEM_RDX: return nullptr;
+      case vmcode::MEM_RDI: return nullptr;
+      case vmcode::MEM_RSI: return nullptr;
+      case vmcode::MEM_RSP: return nullptr;
+      case vmcode::MEM_RBP: return nullptr;
+      case vmcode::MEM_R8:  return nullptr;
+      case vmcode::MEM_R9:  return nullptr;
+      case vmcode::MEM_R10: return nullptr;
+      case vmcode::MEM_R11: return nullptr;
+      case vmcode::MEM_R12: return nullptr;
+      case vmcode::MEM_R13: return nullptr;
+      case vmcode::MEM_R14: return nullptr;
+      case vmcode::MEM_R15: return nullptr;
+      case vmcode::BYTE_MEM_RAX: return (uint8_t*)(regs.rax + operand_mem);
+      case vmcode::BYTE_MEM_RBX: return (uint8_t*)(regs.rbx + operand_mem);
+      case vmcode::BYTE_MEM_RCX: return (uint8_t*)(regs.rcx + operand_mem);
+      case vmcode::BYTE_MEM_RDX: return (uint8_t*)(regs.rdx + operand_mem);
+      case vmcode::BYTE_MEM_RDI: return (uint8_t*)(regs.rdi + operand_mem);
+      case vmcode::BYTE_MEM_RSI: return (uint8_t*)(regs.rsi + operand_mem);
+      case vmcode::BYTE_MEM_RSP: return (uint8_t*)(regs.rsp + operand_mem);
+      case vmcode::BYTE_MEM_RBP: return (uint8_t*)(regs.rbp + operand_mem);
+      case vmcode::BYTE_MEM_R8:  return (uint8_t*)(regs.r8 + operand_mem);
+      case vmcode::BYTE_MEM_R9:  return (uint8_t*)(regs.r9 + operand_mem);
+      case vmcode::BYTE_MEM_R10: return (uint8_t*)(regs.r10 + operand_mem);
+      case vmcode::BYTE_MEM_R11: return (uint8_t*)(regs.r11 + operand_mem);
+      case vmcode::BYTE_MEM_R12: return (uint8_t*)(regs.r12 + operand_mem);
+      case vmcode::BYTE_MEM_R13: return (uint8_t*)(regs.r13 + operand_mem);
+      case vmcode::BYTE_MEM_R14: return (uint8_t*)(regs.r14 + operand_mem);
+      case vmcode::BYTE_MEM_R15: return (uint8_t*)(regs.r15 + operand_mem);
+      case vmcode::NUMBER: return nullptr;
+      case vmcode::XMM0: return nullptr;
+      case vmcode::XMM1: return nullptr;
+      case vmcode::XMM2: return nullptr;
+      case vmcode::XMM3: return nullptr;
+      case vmcode::XMM4: return nullptr;
+      case vmcode::XMM5: return nullptr;
+      case vmcode::XMM6: return nullptr;
+      case vmcode::XMM7: return nullptr;
+      case vmcode::XMM8: return nullptr;
+      case vmcode::XMM9: return nullptr;
+      case vmcode::XMM10:return nullptr;
+      case vmcode::XMM11:return nullptr;
+      case vmcode::XMM12:return nullptr;
+      case vmcode::XMM13:return nullptr;
+      case vmcode::XMM14:return nullptr;
+      case vmcode::XMM15:return nullptr;
+      case vmcode::LABELADDRESS: return nullptr;
+      default: return nullptr;
+      }
+    }
 
   uint64_t* get_address_64bit(vmcode::operand oper, uint64_t operand_mem, registers& regs, uint64_t* reserved)
     {
@@ -997,6 +1072,22 @@ namespace
       case vmcode::MEM_R13: return (uint64_t*)(regs.r13 + (int64_t)operand_mem);
       case vmcode::MEM_R14: return (uint64_t*)(regs.r14 + (int64_t)operand_mem);
       case vmcode::MEM_R15: return (uint64_t*)(regs.r15 + (int64_t)operand_mem);
+      case vmcode::BYTE_MEM_RAX: return nullptr;
+      case vmcode::BYTE_MEM_RBX: return nullptr;
+      case vmcode::BYTE_MEM_RCX: return nullptr;
+      case vmcode::BYTE_MEM_RDX: return nullptr;
+      case vmcode::BYTE_MEM_RDI: return nullptr;
+      case vmcode::BYTE_MEM_RSI: return nullptr;
+      case vmcode::BYTE_MEM_RSP: return nullptr;
+      case vmcode::BYTE_MEM_RBP: return nullptr;
+      case vmcode::BYTE_MEM_R8:  return nullptr;
+      case vmcode::BYTE_MEM_R9:  return nullptr;
+      case vmcode::BYTE_MEM_R10: return nullptr;
+      case vmcode::BYTE_MEM_R11: return nullptr;
+      case vmcode::BYTE_MEM_R12: return nullptr;
+      case vmcode::BYTE_MEM_R13: return nullptr;
+      case vmcode::BYTE_MEM_R14: return nullptr;
+      case vmcode::BYTE_MEM_R15: return nullptr;
       case vmcode::LABELADDRESS: *reserved = operand_mem; return reserved;
       default: return nullptr;
       }
