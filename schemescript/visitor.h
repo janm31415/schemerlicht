@@ -603,4 +603,41 @@ inline void visit(Expression& e, TOperationFunctor& func)
   visit(expression_stack, func);
   }
 
+template <class TFind>
+class find_visitor : public VisitorBaseClass
+  {
+  public:
+    find_visitor(TFind i_pred) : pred(i_pred), found(false)
+      {
+      }
+
+    bool found;
+    TFind pred;
+
+    bool PreVisitExpression(Expression& e)
+      {
+      if (pred(e))
+        {
+        found = true;
+        }
+      return !found;
+      }
+  };
+
+template <class TFind>
+bool find(Expression& e, TFind pred)
+  {
+  find_visitor<TFind> fv(pred);
+  visit(e, fv);
+  return fv.found;
+  }
+
+template <class TFind>
+bool find(Program& prog, TFind pred)
+  {
+  find_visitor<TFind> fv(pred);
+  visit(prog, fv);
+  return fv.found;
+  }
+
 COMPILER_END

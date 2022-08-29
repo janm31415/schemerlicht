@@ -813,7 +813,7 @@ void run_all_conversion_tests()
   simplify_to_core_conversion_and();
   simplify_to_core_conversion_or();
   simplify_to_core_conversion_letrec();
-  //convert_define();
+  convert_define();
   single_begin_conv();
   dump_conversion();
   //closure_conversion();
