@@ -820,9 +820,9 @@ void run_all_conversion_tests()
   dump_conversion();
   closure_conversion();
   assignable_var_conversion();
-  //tail_calls_analysis();
-  //cps_conversion();
-  //cps_conversion_2();
+  tail_calls_analysis();
+  cps_conversion();
+  cps_conversion_2();
   //linear_scan_tests_naive();
   //bug1();
   //quasiquote_conversion_tests();
