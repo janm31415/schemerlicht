@@ -8,6 +8,7 @@ asm_aux.h
 context_defs.h
 inlines.h
 primitives.h
+primitives_lib.h
 globals.h
 syscalls.h
 file_utils.h
@@ -69,6 +70,7 @@ inlines.cpp
 asm_aux.cpp
 globals.cpp
 primitives.cpp
+primitives_lib.cpp
 syscalls.cpp
 file_utils.cpp
 alpha_conversion.cpp

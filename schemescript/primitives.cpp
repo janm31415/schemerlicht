@@ -6978,7 +6978,6 @@ void compile_ieee754_mantissa(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_sin(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7026,7 +7025,6 @@ void compile_ieee754_sin(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_cos(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7074,7 +7072,6 @@ void compile_ieee754_cos(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_tan(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7123,7 +7120,6 @@ void compile_ieee754_tan(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_asin(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7179,7 +7175,6 @@ void compile_ieee754_asin(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_acos(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7233,7 +7228,6 @@ void compile_ieee754_acos(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_atan1(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7282,7 +7276,6 @@ void compile_ieee754_atan1(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_log(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7332,7 +7325,6 @@ void compile_ieee754_log(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_round(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7380,7 +7372,6 @@ void compile_ieee754_round(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_truncate(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
@@ -7459,7 +7450,6 @@ void compile_ieee754_sqrt(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_pi(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   if (ops.safe_primitives)
@@ -7535,7 +7525,6 @@ void compile_fixnum_expt(vmcode& code, const compiler_options& ops)
 
 void compile_flonum_expt(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   // only for positive exponents
   std::string error;
@@ -7859,7 +7848,6 @@ void compile_skiwi_quiet_undefined(vmcode& code, const compiler_options&)
 
 void compile_load(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   if (ops.safe_primitives)
@@ -7925,7 +7913,6 @@ rdi
 
 void compile_eval(vmcode& code, const compiler_options& ops)
   {
-  assert(0);
   /*
   std::string error;
   if (ops.safe_primitives)

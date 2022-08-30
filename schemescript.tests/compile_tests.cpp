@@ -29,6 +29,7 @@
 #include "schemescript/parse.h"
 #include "schemescript/preprocess.h"
 #include "schemescript/primitives.h"
+#include "schemescript/primitives_lib.h"
 #include "schemescript/repl_data.h"
 #include "schemescript/runtime.h"
 #include "schemescript/simplify_to_core.h"
@@ -36,6 +37,7 @@
 #include "schemescript/tokenize.h"
 #include "schemescript/types.h"
 #include "schemescript/visitor.h"
+
 
 #include <chrono>
 
@@ -61,25 +63,19 @@ namespace
 
     compile_fixture()
       {
-      ops.garbage_collection = false;
-      ops.do_cps_conversion = false;
       stream_out = false;
       ctxt = create_context(1024 * 1024, 1024, 1024, 1024);
       env = std::make_shared<environment<environment_entry>>(nullptr);
 
       vmcode code;
-      /*
+      
       try
         {
         compile_primitives_library(pm, rd, env, ctxt, code, ops);
         uint64_t size;
         first_pass_data d;
         uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
-#ifdef _WIN32
         reg.rcx = (uint64_t)(&ctxt);
-#else
-        reg.rdi = (uint64_t)(&ctxt);
-#endif
         run_bytecode(f, size, reg);
         compiled_bytecode.emplace_back(f, size);
         assign_primitive_addresses(pm, d, (uint64_t)f);
@@ -87,8 +83,7 @@ namespace
       catch (std::logic_error e)
         {
         std::cout << e.what() << " while compiling primitives library\n\n";
-        }
-      */
+        }      
       }
 
     virtual ~compile_fixture()
