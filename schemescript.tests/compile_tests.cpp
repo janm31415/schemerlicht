@@ -61,6 +61,8 @@ namespace
 
     compile_fixture()
       {
+      ops.garbage_collection = false;
+      ops.do_cps_conversion = false;
       stream_out = false;
       ctxt = create_context(1024 * 1024, 1024, 1024, 1024);
       env = std::make_shared<environment<environment_entry>>(nullptr);
@@ -143,11 +145,7 @@ namespace
       uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
       std::stringstream str;
       str << std::setprecision(precision);
-#ifdef _WIN32
       reg.rcx = (uint64_t)(&ctxt);
-#else
-      reg.rdi = (uint64_t)(&ctxt);
-#endif
       try {
         run_bytecode(f, size, reg, externals_for_vm);
         }
