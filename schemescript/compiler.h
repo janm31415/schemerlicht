@@ -33,6 +33,10 @@ struct external_function
   std::vector<argtype> arguments;
   argtype return_type;
   };
+  
+typedef void(*fun_ptr)(VM::vmcode&, const compiler_options&);
+
+typedef std::map<std::string, fun_ptr> function_map;
 
 COMPILER_SCHEMESCRIPT_API void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt, VM::vmcode& code, Program& prog, const primitive_map& pm, const std::map<std::string, external_function>& external_functions, const compiler_options& options);
 

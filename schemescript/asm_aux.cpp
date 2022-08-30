@@ -61,41 +61,6 @@ std::string label_to_string(uint64_t lab)
   return str.str();
   }
 
-
-void store_registers(vmcode& code)
-  {
-  /*
-  linux: r12, r13, r14, r15, rbx, rsp, rbp should be preserved
-  windows: r12, r13, r14, r15, rbx, rsp, rbp, rdi, rsi
-  */
-  code.add(vmcode::MOV, RBX_STORE, vmcode::RBX);
-  code.add(vmcode::MOV, RDI_STORE, vmcode::RDI);
-  code.add(vmcode::MOV, RSI_STORE, vmcode::RSI);
-  code.add(vmcode::MOV, RSP_STORE, vmcode::RSP);
-  code.add(vmcode::MOV, RBP_STORE, vmcode::RBP);
-  code.add(vmcode::MOV, R12_STORE, vmcode::R12);
-  code.add(vmcode::MOV, R13_STORE, vmcode::R13);
-  code.add(vmcode::MOV, R14_STORE, vmcode::R14);
-  code.add(vmcode::MOV, R15_STORE, vmcode::R15);
-  }
-
-void load_registers(vmcode& code)
-  {
-  /*
-  linux: r12, r13, r14, r15, rbx, rsp, rbp should be preserved
-  windows: r12, r13, r14, r15, rbx, rsp, rbp, rdi, rsi
-  */
-  code.add(vmcode::MOV, vmcode::RBX, RBX_STORE);
-  code.add(vmcode::MOV, vmcode::RDI, RDI_STORE);
-  code.add(vmcode::MOV, vmcode::RSI, RSI_STORE);
-  code.add(vmcode::MOV, vmcode::RSP, RSP_STORE);
-  code.add(vmcode::MOV, vmcode::RBP, RBP_STORE);
-  code.add(vmcode::MOV, vmcode::R12, R12_STORE);
-  code.add(vmcode::MOV, vmcode::R13, R13_STORE);
-  code.add(vmcode::MOV, vmcode::R14, R14_STORE);
-  code.add(vmcode::MOV, vmcode::R15, R15_STORE);
-  }
-
 int64_t int2fixnum(int64_t i)
   {
   return (i << fixnum_shift) | fixnum_tag;

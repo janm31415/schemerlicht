@@ -68,7 +68,7 @@ namespace
     //printf("Time spent: %fs\n", t);
     }
   }
-void preprocess(environment_map& env, repl_data& data, macro_data& md, context& ctxt, cinput_data& cinput, Program& prog, const primitive_map& pm, const compiler_options& options)
+void preprocess(environment_map& env, repl_data& data, macro_data& md, context& ctxt, Program& prog, const primitive_map& pm, const compiler_options& options)
   {
   tic();
   debug_string("start handle_include_command");
