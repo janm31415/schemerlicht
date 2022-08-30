@@ -45,6 +45,8 @@ COMPILER_BEGIN
 
 using namespace VM;
 
+compiler_options g_ops;
+
 namespace
   {
   struct compile_fixture
@@ -63,6 +65,7 @@ namespace
 
     compile_fixture()
       {
+      ops = g_ops;
       stream_out = false;
       ctxt = create_context(1024 * 1024, 1024, 1024, 1024);
       env = std::make_shared<environment<environment_entry>>(nullptr);
@@ -432,9 +435,27 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  fixnums().test();
-  bools().test();
-  test_for_nil().test();
-  chars().test();
-  doubles().test();
+  for (int i = 0; i < 3; ++i)
+    {
+    g_ops = compiler_options();
+    switch (i)
+      {
+      case 1:
+        g_ops.primitives_inlined = false;
+        break;
+      case 2:
+        g_ops.safe_cons = false;
+        g_ops.safe_flonums = false;
+        g_ops.safe_promises = false;
+        g_ops.safe_primitives = false;
+        break;
+      default:
+        break;
+      }
+    fixnums().test();
+    bools().test();
+    test_for_nil().test();
+    chars().test();
+    doubles().test();
+    }
   }
