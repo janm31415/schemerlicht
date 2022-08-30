@@ -35,12 +35,15 @@ namespace
     switch (op)
       {
       case vmcode::ADD: return 2;
+      case vmcode::ADD8: return 2;
       case vmcode::ADDSD: return 2;
       case vmcode::AND: return 2;
+      case vmcode::AND8: return 2;
       case vmcode::CALLEXTERNAL:return 1;
       case vmcode::CALL:return 1;
       case vmcode::COMMENT: return 0;
       case vmcode::CMP: return 2;
+      case vmcode::CMP8: return 2;
       case vmcode::CMPEQPD: return 2;
       case vmcode::CMPLTPD: return 2;
       case vmcode::CMPLEPD: return 2;
@@ -85,6 +88,7 @@ namespace
       case vmcode::MOD: return 2;
       case vmcode::MODSD: return 2;
       case vmcode::MOV: return 2;
+      case vmcode::MOV8: return 2;
       case vmcode::MOVMSKPD: return 2;
       case vmcode::MUL: return 1;
       case vmcode::MULSD:return 2;
@@ -108,6 +112,7 @@ namespace
       case vmcode::SUB: return 2;
       case vmcode::SUBSD: return 2;
       case vmcode::TEST: return 2;
+      case vmcode::TEST8: return 2;
       case vmcode::UCOMISD: return 2;
       case vmcode::XOR: return 2;
       case vmcode::XORPD: return 2;
@@ -943,6 +948,65 @@ registers::registers()
 namespace
   {
 
+  uint8_t* get_address_8bit(vmcode::operand oper, uint64_t operand_mem, registers& regs, uint8_t* reserved)
+    {
+    switch (oper)
+      {
+      case vmcode::EMPTY: return nullptr;
+      case vmcode::RAX: return (uint8_t*)&regs.rax;
+      case vmcode::RBX: return (uint8_t*)&regs.rbx;
+      case vmcode::RCX: return (uint8_t*)&regs.rcx;
+      case vmcode::RDX: return (uint8_t*)&regs.rdx;
+      case vmcode::RDI: return (uint8_t*)&regs.rdi;
+      case vmcode::RSI: return (uint8_t*)&regs.rsi;
+      case vmcode::RSP: return (uint8_t*)&regs.rsp;
+      case vmcode::RBP: return (uint8_t*)&regs.rbp;
+      case vmcode::R8:  return (uint8_t*)&regs.r8;
+      case vmcode::R9:  return (uint8_t*)&regs.r9;
+      case vmcode::R10: return (uint8_t*)&regs.r10;
+      case vmcode::R11: return (uint8_t*)&regs.r11;
+      case vmcode::R12: return (uint8_t*)&regs.r12;
+      case vmcode::R13: return (uint8_t*)&regs.r13;
+      case vmcode::R14: return (uint8_t*)&regs.r14;
+      case vmcode::R15: return (uint8_t*)&regs.r15;
+      case vmcode::XMM0: return (uint8_t*)(&regs.xmm0);
+      case vmcode::XMM1: return (uint8_t*)(&regs.xmm1);
+      case vmcode::XMM2: return (uint8_t*)(&regs.xmm2);
+      case vmcode::XMM3: return (uint8_t*)(&regs.xmm3);
+      case vmcode::XMM4: return (uint8_t*)(&regs.xmm4);
+      case vmcode::XMM5: return (uint8_t*)(&regs.xmm5);
+      case vmcode::XMM6: return (uint8_t*)(&regs.xmm6);
+      case vmcode::XMM7: return (uint8_t*)(&regs.xmm7);
+      case vmcode::XMM8: return (uint8_t*)(&regs.xmm8);
+      case vmcode::XMM9: return (uint8_t*)(&regs.xmm9);
+      case vmcode::XMM10:return (uint8_t*)(&regs.xmm10);
+      case vmcode::XMM11:return (uint8_t*)(&regs.xmm11);
+      case vmcode::XMM12:return (uint8_t*)(&regs.xmm12);
+      case vmcode::XMM13:return (uint8_t*)(&regs.xmm13);
+      case vmcode::XMM14:return (uint8_t*)(&regs.xmm14);
+      case vmcode::XMM15:return (uint8_t*)(&regs.xmm15);
+      case vmcode::NUMBER: *reserved = operand_mem; return reserved;
+      case vmcode::MEM_RAX: return (uint8_t*)(regs.rax + (int64_t)operand_mem);
+      case vmcode::MEM_RBX: return (uint8_t*)(regs.rbx + (int64_t)operand_mem);
+      case vmcode::MEM_RCX: return (uint8_t*)(regs.rcx + (int64_t)operand_mem);
+      case vmcode::MEM_RDX: return (uint8_t*)(regs.rdx + (int64_t)operand_mem);
+      case vmcode::MEM_RDI: return (uint8_t*)(regs.rdi + (int64_t)operand_mem);
+      case vmcode::MEM_RSI: return (uint8_t*)(regs.rsi + (int64_t)operand_mem);
+      case vmcode::MEM_RSP: return (uint8_t*)(regs.rsp + (int64_t)operand_mem);
+      case vmcode::MEM_RBP: return (uint8_t*)(regs.rbp + (int64_t)operand_mem);
+      case vmcode::MEM_R8:  return (uint8_t*)(regs.r8 + (int64_t)operand_mem);
+      case vmcode::MEM_R9:  return (uint8_t*)(regs.r9 + (int64_t)operand_mem);
+      case vmcode::MEM_R10: return (uint8_t*)(regs.r10 + (int64_t)operand_mem);
+      case vmcode::MEM_R11: return (uint8_t*)(regs.r11 + (int64_t)operand_mem);
+      case vmcode::MEM_R12: return (uint8_t*)(regs.r12 + (int64_t)operand_mem);
+      case vmcode::MEM_R13: return (uint8_t*)(regs.r13 + (int64_t)operand_mem);
+      case vmcode::MEM_R14: return (uint8_t*)(regs.r14 + (int64_t)operand_mem);
+      case vmcode::MEM_R15: return (uint8_t*)(regs.r15 + (int64_t)operand_mem);
+      case vmcode::LABELADDRESS: return nullptr;
+      default: return nullptr;
+      }
+    }
+    
   uint64_t* get_address_64bit(vmcode::operand oper, uint64_t operand_mem, registers& regs, uint64_t* reserved)
     {
     switch (oper)
@@ -997,22 +1061,6 @@ namespace
       case vmcode::MEM_R13: return (uint64_t*)(regs.r13 + (int64_t)operand_mem);
       case vmcode::MEM_R14: return (uint64_t*)(regs.r14 + (int64_t)operand_mem);
       case vmcode::MEM_R15: return (uint64_t*)(regs.r15 + (int64_t)operand_mem);
-      case vmcode::BYTE_MEM_RAX: *reserved = *(uint8_t*)(regs.rax + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RBX: *reserved = *(uint8_t*)(regs.rbx + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RCX: *reserved = *(uint8_t*)(regs.rcx + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RDX: *reserved = *(uint8_t*)(regs.rdx + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RDI: *reserved = *(uint8_t*)(regs.rdi + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RSI: *reserved = *(uint8_t*)(regs.rsi + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RSP: *reserved = *(uint8_t*)(regs.rsp + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_RBP: *reserved = *(uint8_t*)(regs.rbp + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R8:  *reserved = *(uint8_t*)(regs.r8 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R9:  *reserved = *(uint8_t*)(regs.r9 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R10: *reserved = *(uint8_t*)(regs.r10 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R11: *reserved = *(uint8_t*)(regs.r11 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R12: *reserved = *(uint8_t*)(regs.r12 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R13: *reserved = *(uint8_t*)(regs.r13 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R14: *reserved = *(uint8_t*)(regs.r14 + operand_mem); return reserved;
-      case vmcode::BYTE_MEM_R15: *reserved = *(uint8_t*)(regs.r15 + operand_mem); return reserved;
       case vmcode::LABELADDRESS: *reserved = operand_mem; return reserved;
       default: return nullptr;
       }
@@ -1024,11 +1072,19 @@ namespace
       {
       left += right;
       }
+    static void apply(uint8_t& left, uint8_t right)
+      {
+      left += right;
+      }
     };
 
   struct AndOper
     {
     static void apply(uint64_t& left, uint64_t right)
+      {
+      left &= right;
+      }
+    static void apply(uint8_t& left, uint8_t right)
       {
       left &= right;
       }
@@ -1045,6 +1101,11 @@ namespace
   struct MovOper
     {
     static void apply(uint64_t& left, uint64_t right)
+      {
+      left = right;
+      }
+      
+    static void apply(uint8_t& left, uint8_t right)
       {
       left = right;
       }
@@ -1269,6 +1330,21 @@ namespace
     assert(oprnd2);
     TOper::apply(*oprnd1, *oprnd2);
     }
+    
+  template <class TOper>
+  inline void execute_byte_operation(vmcode::operand operand1,
+    vmcode::operand operand2,
+    uint64_t operand1_mem,
+    uint64_t operand2_mem,
+    registers& regs)
+    {
+    uint8_t tmp;
+    uint8_t* oprnd1 = get_address_8bit(operand1, operand1_mem, regs, &tmp);
+    assert(oprnd1);
+    uint8_t* oprnd2 = get_address_8bit(operand2, operand2_mem, regs, &tmp);
+    assert(oprnd2);
+    TOper::apply(*oprnd1, *oprnd2);
+    }
 
   template <class TOper>
   inline void execute_double_operation(vmcode::operand operand1,
@@ -1301,6 +1377,23 @@ namespace
     TOper::apply(left, *oprnd2);
     return left;
     }
+    
+  template <class TOper>
+  inline uint8_t execute_byte_operation_const(vmcode::operand operand1,
+    vmcode::operand operand2,
+    uint64_t operand1_mem,
+    uint64_t operand2_mem,
+    registers& regs)
+    {
+    uint8_t tmp;
+    uint8_t* oprnd1 = get_address_8bit(operand1, operand1_mem, regs, &tmp);
+    assert(oprnd1);
+    uint8_t left = *oprnd1;
+    uint8_t* oprnd2 = get_address_8bit(operand2, operand2_mem, regs, &tmp);
+    assert(oprnd2);
+    TOper::apply(left, *oprnd2);
+    return left;
+    }
 
   inline void get_values(int64_t& left_signed, int64_t& right_signed, uint64_t& left_unsigned, uint64_t right_unsigned, vmcode::operand operand1,
     vmcode::operand operand2,
@@ -1317,6 +1410,23 @@ namespace
     assert(oprnd2);
     right_unsigned = *oprnd2;
     right_signed = (int64_t)right_unsigned;
+    }
+    
+  inline void get_byte_values(int8_t& left_signed, int8_t& right_signed, uint8_t& left_unsigned, uint8_t right_unsigned, vmcode::operand operand1,
+    vmcode::operand operand2,
+    uint64_t operand1_mem,
+    uint64_t operand2_mem,
+    registers& regs)
+    {
+    uint8_t tmp;
+    uint8_t* oprnd1 = get_address_8bit(operand1, operand1_mem, regs, &tmp);
+    assert(oprnd1);
+    left_unsigned = *oprnd1;
+    left_signed = (int8_t)left_unsigned;
+    uint8_t* oprnd2 = get_address_8bit(operand2, operand2_mem, regs, &tmp);
+    assert(oprnd2);
+    right_unsigned = *oprnd2;
+    right_signed = (int8_t)right_unsigned;
     }
 
   inline void compare_operation(vmcode::operand operand1,
@@ -1336,6 +1446,29 @@ namespace
     if (left_unsigned < right_unsigned)
       regs.eflags |= carry_flag;
     int64_t temp = left_signed - right_signed;
+    if ((temp < left_signed) != (right_signed > 0))
+      regs.eflags |= overflow_flag;
+    if (temp < 0)
+      regs.eflags |= sign_flag;
+    }
+    
+  inline void compare_byte_operation(vmcode::operand operand1,
+    vmcode::operand operand2,
+    uint64_t operand1_mem,
+    uint64_t operand2_mem,
+    registers& regs)
+    {
+    regs.eflags = 0;
+    int8_t left_signed = 0;
+    int8_t right_signed = 0;
+    uint8_t left_unsigned = 0;
+    uint8_t right_unsigned = 0;
+    get_byte_values(left_signed, right_signed, left_unsigned, right_unsigned, operand1, operand2, operand1_mem, operand2_mem, regs);
+    if (left_signed == right_signed)
+      regs.eflags |= zero_flag;
+    if (left_unsigned < right_unsigned)
+      regs.eflags |= carry_flag;
+    int8_t temp = left_signed - right_signed;
     if ((temp < left_signed) != (right_signed > 0))
       regs.eflags |= overflow_flag;
     if (temp < 0)
@@ -1885,6 +2018,11 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
       execute_operation<AddOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
       break;
       }
+      case vmcode::ADD8:
+      {
+      execute_byte_operation<AddOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
       case vmcode::ADDSD:
       {
       execute_double_operation<AddsdOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
@@ -1893,6 +2031,11 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
       case vmcode::AND:
       {
       execute_operation<AndOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
+      case vmcode::AND8:
+      {
+      execute_byte_operation<AndOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
       break;
       }
       case vmcode::CALL:
@@ -1931,6 +2074,11 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
       case vmcode::CMP:
       {
       compare_operation(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
+      case vmcode::CMP8:
+      {
+      compare_byte_operation(operand1, operand2, operand1_mem, operand2_mem, regs);
       break;
       }
       case vmcode::CMPEQPD:
@@ -2276,6 +2424,11 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
       execute_operation<MovOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
       break;
       }
+      case vmcode::MOV8:
+      {
+      execute_byte_operation<MovOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
       case vmcode::MOVMSKPD:
       {
       uint64_t tmp;
@@ -2447,6 +2600,24 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
         {
         regs.eflags &= ~zero_flag;
         if ((int64_t)tmp < 0)
+          regs.eflags |= sign_flag;
+        else
+          regs.eflags &= ~sign_flag;
+        }
+      else
+        {
+        regs.eflags |= zero_flag;
+        regs.eflags &= ~sign_flag;
+        }
+      break;
+      }
+      case vmcode::TEST8:
+      {
+      uint8_t tmp = execute_byte_operation_const<AndOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      if (tmp)
+        {
+        regs.eflags &= ~zero_flag;
+        if ((int8_t)tmp < 0)
           regs.eflags |= sign_flag;
         else
           regs.eflags &= ~sign_flag;

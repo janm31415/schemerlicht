@@ -3,6 +3,7 @@
 #include "conversion_tests.h"
 #include "format_tests.h"
 #include "parse_tests.h"
+#include "preprocess_tests.h"
 #include "tokenize_tests.h"
 #include <ctime>
 
@@ -15,6 +16,7 @@ int main(int /*argc*/, const char* /*argv*/[])
   run_all_conversion_tests();
   run_all_format_tests();
   run_all_parse_tests();
+  run_all_preprocess_tests();
   run_all_tokenize_tests();
   auto toc = std::clock();
 

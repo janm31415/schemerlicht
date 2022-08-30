@@ -8,7 +8,7 @@ COMPILER_BEGIN
 
 #define ALLOC VM::vmcode::RBP
 #define MEM_ALLOC VM::vmcode::MEM_RBP
-#define BYTE_MEM_ALLOC VM::vmcode::BYTE_MEM_RBP
+//#define BYTE_MEM_ALLOC VM::vmcode::BYTE_MEM_RBP
 
 #define ALLOC_SAVED VM::vmcode::MEM_R10, 0
 #define LIMIT VM::vmcode::MEM_R10, 8

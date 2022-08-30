@@ -554,8 +554,8 @@ void compile_string_append1(vmcode& code, const compiler_options& ops)
   code.add(vmcode::LABEL, repeat);
   code.add(vmcode::TEST, vmcode::RBX, vmcode::RBX);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_RCX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_R11, vmcode::RAX);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_RCX);
+  code.add(vmcode::MOV8, vmcode::MEM_R11, vmcode::RAX);
   code.add(vmcode::DEC, vmcode::RBX);
   code.add(vmcode::INC, vmcode::RCX);
   code.add(vmcode::INC, vmcode::R11);
@@ -566,8 +566,8 @@ void compile_string_append1(vmcode& code, const compiler_options& ops)
   code.add(vmcode::LABEL, repeat2);
   code.add(vmcode::TEST, vmcode::RBX, vmcode::RBX);
   code.add(vmcode::JE, done2);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_R11, vmcode::RAX);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_R11, vmcode::RAX);
   code.add(vmcode::DEC, vmcode::RBX);
   code.add(vmcode::INC, vmcode::RDX);
   code.add(vmcode::INC, vmcode::R11);
@@ -649,8 +649,8 @@ void compile_substring(vmcode& code, const compiler_options& ops)
   code.add(vmcode::LABEL, repeat);
   code.add(vmcode::CMP, vmcode::RDX, vmcode::RSI);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::RBX, vmcode::BYTE_MEM_RCX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RAX, vmcode::RBX);
+  code.add(vmcode::MOV8, vmcode::RBX, vmcode::MEM_RCX);
+  code.add(vmcode::MOV8, vmcode::MEM_RAX, vmcode::RBX);
   code.add(vmcode::INC, vmcode::RDX);
   code.add(vmcode::INC, vmcode::RCX);
   code.add(vmcode::INC, vmcode::RAX);
@@ -661,7 +661,7 @@ void compile_substring(vmcode& code, const compiler_options& ops)
   auto done2 = label_to_string(label++);
   code.add(vmcode::XOR, vmcode::RBX, vmcode::RBX); // make remaining bytes of string equal to 0
   code.add(vmcode::LABEL, repeat2);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RAX, vmcode::RBX);
+  code.add(vmcode::MOV8, vmcode::MEM_RAX, vmcode::RBX);
   code.add(vmcode::INC, vmcode::RAX);
   code.add(vmcode::CMP, vmcode::RAX, ALLOC);
   code.add(vmcode::JE, done2);
@@ -854,14 +854,14 @@ void compile_make_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::JL, fill_rest);
 
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 1, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 2, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 3, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 4, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 5, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 6, vmcode::RDX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 7, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 1, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 2, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 3, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 4, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 5, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 6, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 7, vmcode::RDX);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::SUB, vmcode::RCX, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::JMP, fill_full);
@@ -870,28 +870,28 @@ void compile_make_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::NUMBER, 0);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 1);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 1, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 1, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 2);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 2, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 2, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 3);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 3, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 3, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 4);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 4, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 4, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 5);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 5, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 5, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 6);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 6, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 6, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 7);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 7, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 7, vmcode::RDX);
   code.add(vmcode::LABEL, done);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(1));
 
@@ -1425,41 +1425,41 @@ void compile_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 0);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::RCX, vmcode::NUMBER, 8);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RCX);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RCX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 1);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::RDX, vmcode::NUMBER, 8);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 1, vmcode::RDX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 1, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 2);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::RSI, vmcode::NUMBER, 8);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RSI);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 2, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 2, vmcode::RAX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 3);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::RDI, vmcode::NUMBER, 8);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RDI);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 3, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 3, vmcode::RAX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 4);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::R8, vmcode::NUMBER, 8);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R8);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 4, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 4, vmcode::RAX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 5);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::R9, vmcode::NUMBER, 8);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R9);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 5, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 5, vmcode::RAX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 6);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::R12, vmcode::NUMBER, 8);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R12);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 6, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 6, vmcode::RAX);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 7);
   code.add(vmcode::JE, done);
   code.add(vmcode::SHR, vmcode::R14, vmcode::NUMBER, 8);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R14);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 7, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 7, vmcode::RAX);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::NUMBER, 0);
   code.add(vmcode::SUB, vmcode::R11, vmcode::NUMBER, 8);
@@ -1470,42 +1470,42 @@ void compile_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 1, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 1, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 2, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 2, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 3, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 3, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 4, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 4, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 5, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 5, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 6, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 6, vmcode::RAX);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, 7, vmcode::RAX);
+  code.add(vmcode::MOV8, MEM_ALLOC, 7, vmcode::RAX);
 
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::NUMBER, 0);
@@ -1520,7 +1520,7 @@ void compile_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RDX);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, vmcode::RAX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, vmcode::RAX);
   code.add(vmcode::INC, vmcode::RCX);
   code.add(vmcode::DEC, vmcode::R11);
   code.add(vmcode::JMP, remainder_loop);
@@ -1688,7 +1688,7 @@ void compile_string_set(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RCX, vmcode::RDX);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RSI);
   code.add(vmcode::SHR, vmcode::RAX, vmcode::NUMBER, 8);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, vmcode::RAX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, vmcode::RAX);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RSI);
   code.add(vmcode::JMP, CONTINUE);
   if (ops.safe_primitives)
@@ -1756,14 +1756,14 @@ void compile_string_fill(vmcode& code, const compiler_options& ops)
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::JL, fill_rest);
 
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 1, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 2, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 3, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 4, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 5, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 6, vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 7, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 1, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 2, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 3, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 4, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 5, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 6, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 7, vmcode::RDX);
   code.add(vmcode::ADD, vmcode::RCX, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::SUB, vmcode::R15, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::JMP, fill_full);
@@ -1772,28 +1772,28 @@ void compile_string_fill(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::MEM_RCX, vmcode::NUMBER, 0);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 0);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 1);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 1, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 1, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 2);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 2, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 2, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 3);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 3, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 3, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 4);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 4, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 4, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 5);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 5, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 5, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 6);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 6, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 6, vmcode::RDX);
   code.add(vmcode::CMP, vmcode::R15, vmcode::NUMBER, 7);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RCX, 7, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RCX, 7, vmcode::RDX);
   code.add(vmcode::LABEL, done);
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
@@ -2997,14 +2997,14 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RCX); // 1st arg
   code.add(vmcode::MOV, vmcode::RBX, vmcode::RDX); // 2nd arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 2);
   code.add(vmcode::JE, lab_arg_yes);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::RSI); // 3th arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 3);
   code.add(vmcode::JE, lab_arg_yes);
@@ -3012,7 +3012,7 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::RDI); // 4th arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 4);
   code.add(vmcode::JE, lab_arg_yes); // JES works for assembly but not for vm
@@ -3020,7 +3020,7 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::R8); // 5th arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 5);
   code.add(vmcode::JE, lab_arg_yes);
@@ -3028,7 +3028,7 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::R9); // 6th arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 6);
   code.add(vmcode::JE, lab_arg_yes);
@@ -3036,7 +3036,7 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::R12); // 7th arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 7);
   code.add(vmcode::JE, lab_arg_yes);
@@ -3044,7 +3044,7 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::R14); // 8th arg
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::SUB, vmcode::R11, vmcode::NUMBER, 8);
   code.add(vmcode::TEST, vmcode::R11, vmcode::R11);
@@ -3055,7 +3055,7 @@ void compile_pairwise_compare(vmcode& code, const compiler_options&)
   code.add(vmcode::MOV, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::MOV, vmcode::RBX, vmcode::MEM_RDX);
   code.add(vmcode::CALL, vmcode::R15);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, bool_f);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, bool_f);
   code.add(vmcode::JE, lab_arg_no);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
   code.add(vmcode::DEC, vmcode::R11);
@@ -4261,7 +4261,7 @@ void compile_is_eof_object(vmcode& code, const compiler_options&)
 
 void compile_is_char(vmcode& code, const compiler_options&)
   {
-  code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, char_tag);
+  code.add(vmcode::CMP8, vmcode::RCX, vmcode::NUMBER, char_tag);
   // if comparison (last cmp call) succeeded, then sete puts 1 in al, otherwise 0
   code.add(vmcode::SETE, vmcode::RAX);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 3);
@@ -4271,7 +4271,7 @@ void compile_is_char(vmcode& code, const compiler_options&)
 
 void compile_is_boolean(vmcode& code, const compiler_options&)
   {
-  code.add(vmcode::AND, vmcode::RCX, vmcode::NUMBER, 247);
+  code.add(vmcode::AND8, vmcode::RCX, vmcode::NUMBER, 247);
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, bool_f);
   code.add(vmcode::SETE, vmcode::RAX);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 3);
@@ -5906,7 +5906,7 @@ void compile_peek_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::AND, vmcode::R15, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8); // get address to string
   code.add(vmcode::ADD, vmcode::R11, vmcode::NUMBER, 8); // increase 8 for header
   code.add(vmcode::ADD, vmcode::R15, vmcode::R11);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_R15);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_R15);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::OR, vmcode::RAX, vmcode::NUMBER, char_tag);
 
@@ -6016,7 +6016,7 @@ void compile_read_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::AND, vmcode::R15, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8); // get address to string
   code.add(vmcode::ADD, vmcode::R11, vmcode::NUMBER, 8); // increase 8 for header
   code.add(vmcode::ADD, vmcode::R15, vmcode::R11);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_R15);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_R15);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::OR, vmcode::RAX, vmcode::NUMBER, char_tag);
 
@@ -6216,7 +6216,7 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::TEST, vmcode::R11, vmcode::R11);
   code.add(vmcode::JE, done);
   code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RCX);
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RAX, vmcode::RDX);
+  code.add(vmcode::MOV8, vmcode::MEM_RAX, vmcode::RDX);
   code.add(vmcode::INC, vmcode::RCX);
   code.add(vmcode::INC, vmcode::RAX);
   code.add(vmcode::DEC, vmcode::R11);
@@ -6241,7 +6241,7 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
     error = label_to_string(label++);
     code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 2);
     code.add(vmcode::JNE, error);
-    code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, char_tag);
+    code.add(vmcode::CMP8, vmcode::RCX, vmcode::NUMBER, char_tag);
     code.add(vmcode::JNE, error);
     jump_if_arg_is_not_block(code, vmcode::RDX, vmcode::R11, error);
     }
@@ -6323,7 +6323,7 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::R11, vmcode::NUMBER, 8); // increase 8 for header
   code.add(vmcode::ADD, vmcode::RAX, vmcode::R11);
   code.add(vmcode::SHR, vmcode::RCX, vmcode::NUMBER, 8); // get char
-  code.add(vmcode::MOV, vmcode::BYTE_MEM_RAX, vmcode::RCX); // write char
+  code.add(vmcode::MOV8, vmcode::MEM_RAX, vmcode::RCX); // write char
 
   code.add(vmcode::SUB, vmcode::R11, vmcode::NUMBER, 7);
   code.add(vmcode::SHL, vmcode::R11, vmcode::NUMBER, 1);
@@ -6669,7 +6669,7 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
 #endif
 
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_R11);
-  code.add(vmcode::TEST, vmcode::RCX, vmcode::RCX);
+  code.add(vmcode::TEST8, vmcode::RCX, vmcode::RCX);
   code.add(vmcode::JE, rax_is_integer);
 
   // now try as a float
@@ -6712,7 +6712,7 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
 #endif
 
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_R11);
-  code.add(vmcode::TEST, vmcode::RCX, vmcode::RCX);
+  code.add(vmcode::TEST8, vmcode::RCX, vmcode::RCX);
   code.add(vmcode::JNE, empty_string);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7690,8 +7690,8 @@ void compile_compare_strings(vmcode& code, const compiler_options& ops)
   code.add(vmcode::LABEL, repeat);
   code.add(vmcode::TEST, vmcode::RSI, vmcode::RSI);
   code.add(vmcode::JE, equal);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_RDX);
-  code.add(vmcode::CMP, vmcode::BYTE_MEM_RCX, vmcode::RAX);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_RDX);
+  code.add(vmcode::CMP8, vmcode::MEM_RCX, vmcode::RAX);
   code.add(vmcode::JL, less);
   code.add(vmcode::JG, greater);
   code.add(vmcode::INC, vmcode::RCX);
@@ -7754,23 +7754,23 @@ void compile_compare_strings_ci(vmcode& code, const compiler_options& ops)
   code.add(vmcode::LABEL, repeat);
   code.add(vmcode::TEST, vmcode::RSI, vmcode::RSI);
   code.add(vmcode::JE, equal);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_RCX);
-  code.add(vmcode::MOV, vmcode::RBX, vmcode::BYTE_MEM_RDX);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::RBX);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_RCX);
+  code.add(vmcode::MOV8, vmcode::RBX, vmcode::MEM_RDX);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::JE, local_equal);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 65);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 65);
   code.add(vmcode::JL, test_bl);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 90);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 90);
   code.add(vmcode::JG, test_bl);
-  code.add(vmcode::ADD, vmcode::RAX, vmcode::NUMBER, 32);
+  code.add(vmcode::ADD8, vmcode::RAX, vmcode::NUMBER, 32);
   code.add(vmcode::LABEL, test_bl);
-  code.add(vmcode::CMP, vmcode::RBX, vmcode::NUMBER, 65);
+  code.add(vmcode::CMP8, vmcode::RBX, vmcode::NUMBER, 65);
   code.add(vmcode::JL, test_again);
-  code.add(vmcode::CMP, vmcode::RBX, vmcode::NUMBER, 90);
+  code.add(vmcode::CMP8, vmcode::RBX, vmcode::NUMBER, 90);
   code.add(vmcode::JG, test_again);
-  code.add(vmcode::ADD, vmcode::RBX, vmcode::NUMBER, 32);
+  code.add(vmcode::ADD8, vmcode::RBX, vmcode::NUMBER, 32);
   code.add(vmcode::LABEL, test_again);
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::RBX);
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::RBX);
   code.add(vmcode::JL, less);
   code.add(vmcode::JG, greater);
   code.add(vmcode::LABEL, local_equal);
@@ -7896,8 +7896,8 @@ rdi
 #endif
   // now check whether rax contains an error: if so we jump to ERROR
   code.add(vmcode::MOV, vmcode::RCX, vmcode::RAX);
-  code.add(vmcode::AND, vmcode::RCX, vmcode::NUMBER, error_mask);
-  code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, error_tag);
+  code.add(vmcode::AND8, vmcode::RCX, vmcode::NUMBER, error_mask);
+  code.add(vmcode::CMP8, vmcode::RCX, vmcode::NUMBER, error_tag);
   std::string error_in_load = label_to_string(label++);
   code.add(vmcode::JE, error_in_load);
   code.add(vmcode::JMP, CONTINUE);
@@ -8083,15 +8083,15 @@ rdi
   code.add(vmcode::LABEL, repeat);
   code.add(vmcode::TEST, vmcode::R11, vmcode::R11);
   code.add(vmcode::JE, done);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_RCX);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RAX);
+  code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_RCX);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RAX);
   code.add(vmcode::DEC, vmcode::R11);
   code.add(vmcode::INC, ALLOC);
   code.add(vmcode::INC, vmcode::RCX);
   code.add(vmcode::JMP, repeat);
   code.add(vmcode::LABEL, done);
 
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::NUMBER, 0);
   code.add(vmcode::INC, ALLOC);
 
   auto repeat2 = label_to_string(label++);
@@ -8101,7 +8101,7 @@ rdi
   code.add(vmcode::AND, vmcode::RAX, ALLOC);
   code.add(vmcode::TEST, vmcode::RAX, vmcode::RAX);
   code.add(vmcode::JE, done2);
-  code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, MEM_ALLOC, vmcode::NUMBER, 0);
   code.add(vmcode::INC, ALLOC);
   code.add(vmcode::JMP, repeat2);
   code.add(vmcode::LABEL, done2);

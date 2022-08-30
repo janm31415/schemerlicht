@@ -238,7 +238,7 @@ void inline_is_boolean(VM::vmcode& code, const compiler_options&)
 
 void inline_is_char(VM::vmcode& code, const compiler_options&)
   {
-  code.add(VM::vmcode::CMP, VM::vmcode::RAX, VM::vmcode::NUMBER, char_tag);
+  code.add(VM::vmcode::CMP8, VM::vmcode::RAX, VM::vmcode::NUMBER, char_tag);
   code.add(VM::vmcode::SETE, VM::vmcode::RAX);
   code.add(VM::vmcode::SHL, VM::vmcode::RAX, VM::vmcode::NUMBER, 3);
   code.add(VM::vmcode::OR, VM::vmcode::RAX, VM::vmcode::NUMBER, bool_f);

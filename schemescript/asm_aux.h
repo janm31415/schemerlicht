@@ -10,9 +10,6 @@ COMPILER_BEGIN
 
 VM::vmcode::operand get_mem_operand(VM::vmcode::operand reg);
 
-VM::vmcode::operand get_byte_mem_operand(VM::vmcode::operand reg);
-
-
 std::string label_to_string(uint64_t lab);
 void store_registers(VM::vmcode& code);
 void load_registers(VM::vmcode& code);

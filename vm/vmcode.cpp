@@ -190,9 +190,12 @@ namespace
     switch (op)
       {
       case vmcode::ADD: return "add";
+      case vmcode::ADD8: return "add byte ";
       case vmcode::ADDSD: return "addsd";
       case vmcode::AND: return "and";
+      case vmcode::AND8: return "and byte ";
       case vmcode::CMP: return "cmp";
+      case vmcode::CMP8: return "cmp byte ";
       case vmcode::CMPEQPD: return "cmpeqpd";
       case vmcode::CMPLTPD: return "cmpltpd";
       case vmcode::CMPLEPD: return "cmplepd";
@@ -224,6 +227,7 @@ namespace
       case vmcode::MOD: return "mod";
       case vmcode::MODSD: return "modsd";
       case vmcode::MOV: return "mov";
+      case vmcode::MOV8: return "mov byte ";
       case vmcode::MOVMSKPD: return "movmskpd";
       case vmcode::MUL: return "mul";
       case vmcode::MULSD: return "mulsd";
@@ -247,6 +251,7 @@ namespace
       case vmcode::SUB: return "sub";
       case vmcode::SUBSD: return "subsd";
       case vmcode::TEST: return "test";
+      case vmcode::TEST8: return "test byte ";
       case vmcode::UCOMISD: return "ucomisd";
       case vmcode::XOR: return "xor";
       case vmcode::XORPD: return "xorpd";
@@ -313,23 +318,7 @@ namespace
       case vmcode::MEM_R12: return mem ? ("[r12" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r13]";
       case vmcode::MEM_R13: return mem ? ("[r13" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r13]";
       case vmcode::MEM_R14: return mem ? ("[r14" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r14]";
-      case vmcode::MEM_R15: return mem ? ("[r15" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r15]";
-      case vmcode::BYTE_MEM_RAX: return mem ? ("byte [rax" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rax]";
-      case vmcode::BYTE_MEM_RBX: return mem ? ("byte [rbx" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rbx]";
-      case vmcode::BYTE_MEM_RCX: return mem ? ("byte [rcx" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rcx]";
-      case vmcode::BYTE_MEM_RDX: return mem ? ("byte [rdx" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rdx]";
-      case vmcode::BYTE_MEM_RDI: return mem ? ("byte [rdi" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rdi]";
-      case vmcode::BYTE_MEM_RSI: return mem ? ("byte [rsi" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rsi]";
-      case vmcode::BYTE_MEM_RSP: return mem ? ("byte [rsp" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rsp]";
-      case vmcode::BYTE_MEM_RBP: return mem ? ("byte [rbp" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [rbp]";
-      case vmcode::BYTE_MEM_R8: return  mem ? ("byte [r8" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r8]";
-      case vmcode::BYTE_MEM_R9: return  mem ? ("byte [r9" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r9]";
-      case vmcode::BYTE_MEM_R10: return mem ? ("byte [r10" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r10]";
-      case vmcode::BYTE_MEM_R11: return mem ? ("byte [r11" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r11]";
-      case vmcode::BYTE_MEM_R12: return mem ? ("byte [r12" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r12]";
-      case vmcode::BYTE_MEM_R13: return mem ? ("byte [r13" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r13]";
-      case vmcode::BYTE_MEM_R14: return mem ? ("byte [r14" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r14]";
-      case vmcode::BYTE_MEM_R15: return mem ? ("byte [r15" + ((int64_t(mem)) > 0 ? (" + " + _to_string(mem)) : _to_string_signed(mem)) + "]") : "byte [r15]";
+      case vmcode::MEM_R15: return mem ? ("[r15" + ((int64_t(mem)) > 0 ? ("+" + _to_string(mem)) : _to_string_signed(mem)) + "]") : "[r15]";      
       case vmcode::LABELADDRESS: return text;
       }
     return "";
@@ -458,12 +447,15 @@ std::string vmcode::operation_to_string(operation oper)
   switch (oper)
     {
     case vmcode::ADD: return std::string("ADD");
+    case vmcode::ADD8: return std::string("ADD8");
     case vmcode::ADDSD: return std::string("ADDSD");
     case vmcode::AND: return std::string("AND");
+    case vmcode::AND8: return std::string("AND8");
     case vmcode::CALL:return std::string("CALL");
     case vmcode::CALLEXTERNAL:return std::string("CALLEXTERNAL");
     case vmcode::COMMENT: return std::string("COMMENT");
     case vmcode::CMP: return std::string("CMP");
+    case vmcode::CMP8: return std::string("CMP8");
     case vmcode::CMPEQPD: return std::string("CMPEQPD");
     case vmcode::CMPLTPD: return std::string("CMPLTPD");
     case vmcode::CMPLEPD: return std::string("CMPLEPD");
@@ -508,6 +500,7 @@ std::string vmcode::operation_to_string(operation oper)
     case vmcode::MOD: return std::string("MOD");
     case vmcode::MODSD: return std::string("MODSD");
     case vmcode::MOV: return std::string("MOV");
+    case vmcode::MOV8: return std::string("MOV8");
     case vmcode::MOVMSKPD: return std::string("MOVMSKPD");
     case vmcode::MUL: return std::string("MUL");
     case vmcode::MULSD:return std::string("MULSD");
@@ -531,6 +524,7 @@ std::string vmcode::operation_to_string(operation oper)
     case vmcode::SUB: return std::string("SUB");
     case vmcode::SUBSD: return std::string("SUBSD");
     case vmcode::TEST: return std::string("TEST");
+    case vmcode::TEST8: return std::string("TEST8");
     case vmcode::UCOMISD:return std::string("UCOMISD");
     case vmcode::XOR: return std::string("XOR");
     case vmcode::XORPD: return std::string("XORPD");

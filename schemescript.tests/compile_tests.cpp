@@ -959,6 +959,9 @@ void run_all_compile_tests()
     g_ops = compiler_options();
     switch (i)
       {
+      case 0:
+        g_ops.primitives_inlined = false;
+        break;
       case 1:
         g_ops.primitives_inlined = false;
         break;

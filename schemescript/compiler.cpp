@@ -439,14 +439,14 @@ namespace
     for (int i = 0; i < nr_of_args; ++i)
       {
       code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, (uint64_t)str[i]);
-      code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RAX);
+      code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RAX);
       code.add(vmcode::INC, ALLOC);
       }
     code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
     int end = ((nr_of_args >> 3) + 1) << 3;
     for (int i = nr_of_args; i < end; ++i)
       {
-      code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RAX);
+      code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RAX);
       code.add(vmcode::INC, ALLOC);
       }
 
@@ -477,14 +477,14 @@ namespace
     for (int i = 0; i < nr_of_args; ++i)
       {
       code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, (uint64_t)str[i]);
-      code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RAX);
+      code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RAX);
       code.add(vmcode::INC, ALLOC);
       }
     code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
     int end = ((nr_of_args >> 3) + 1) << 3;
     for (int i = nr_of_args; i < end; ++i)
       {
-      code.add(vmcode::MOV, BYTE_MEM_ALLOC, vmcode::RAX);
+      code.add(vmcode::MOV8, MEM_ALLOC, vmcode::RAX);
       code.add(vmcode::INC, ALLOC);
       }
 
@@ -1518,8 +1518,8 @@ namespace
       code.add(vmcode::MOV, vmcode::R15, vmcode::RAX); // char pointer in r15
       code.add(vmcode::XOR, vmcode::R11, vmcode::R11); // r11 is counter for string length, initialize to 0
       code.add(vmcode::LABEL, repeat);
-      code.add(vmcode::MOV, vmcode::RAX, vmcode::BYTE_MEM_R15); // get first character in al
-      code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0); // is zero?
+      code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_R15); // get first character in al
+      code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0); // is zero?
       code.add(vmcode::JE, done);
       code.add(vmcode::INC, vmcode::R15);
       code.add(vmcode::INC, vmcode::R11);

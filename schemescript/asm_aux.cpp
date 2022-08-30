@@ -31,28 +31,6 @@ vmcode::operand get_mem_operand(vmcode::operand reg)
     }
   }
 
-vmcode::operand get_byte_mem_operand(vmcode::operand reg)
-  {
-  switch (reg)
-    {
-    case vmcode::RAX: return vmcode::BYTE_MEM_RAX;
-    case vmcode::RBX: return vmcode::BYTE_MEM_RBX;
-    case vmcode::RCX: return vmcode::BYTE_MEM_RCX;
-    case vmcode::RDX: return vmcode::BYTE_MEM_RDX;
-    case vmcode::RSI: return vmcode::BYTE_MEM_RSI;
-    case vmcode::RDI: return vmcode::BYTE_MEM_RDI;
-    case vmcode::R8: return vmcode::BYTE_MEM_R8;
-    case vmcode::R9: return vmcode::BYTE_MEM_R9;
-    case vmcode::R10: return vmcode::BYTE_MEM_R10;
-    case vmcode::R11: return vmcode::BYTE_MEM_R11;
-    case vmcode::R12: return vmcode::BYTE_MEM_R12;
-    case vmcode::R13: return vmcode::BYTE_MEM_R13;
-    case vmcode::R14: return vmcode::BYTE_MEM_R14;
-    case vmcode::R15: return vmcode::BYTE_MEM_R15;
-    default: throw std::runtime_error("not implemented");
-    }
-  }
-
 
 std::string label_to_string(uint64_t lab)
   {
@@ -371,8 +349,8 @@ void raw_string_length(vmcode& code, vmcode::operand string_reg)
 
   code.add(vmcode::XOR, vmcode::R15, vmcode::R15);
   code.add(vmcode::LABEL, repeat);
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
@@ -398,44 +376,44 @@ void string_length(vmcode& code, vmcode::operand string_reg)
   code.add(vmcode::SHL, vmcode::R15, vmcode::NUMBER, 3);
   code.add(vmcode::ADD, string_reg, vmcode::R15);
   code.add(vmcode::SUB, vmcode::R15, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
 
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
 
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
 
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
 
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
 
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
 
-  code.add(vmcode::MOV, vmcode::RAX, get_byte_mem_operand(string_reg));
-  code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
+  code.add(vmcode::MOV8, vmcode::RAX, get_mem_operand(string_reg));
+  code.add(vmcode::CMP8, vmcode::RAX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, stringlengthdone);
   code.add(vmcode::INC, vmcode::R15);
   code.add(vmcode::INC, string_reg);
