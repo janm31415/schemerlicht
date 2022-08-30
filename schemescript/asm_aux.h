@@ -14,6 +14,8 @@ VM::vmcode::operand get_byte_mem_operand(VM::vmcode::operand reg);
 
 
 std::string label_to_string(uint64_t lab);
+void store_registers(VM::vmcode& code);
+void load_registers(VM::vmcode& code);
 
 int64_t int2fixnum(int64_t i);
 int64_t fixnum2int(int64_t i);

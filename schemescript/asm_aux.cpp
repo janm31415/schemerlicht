@@ -61,6 +61,17 @@ std::string label_to_string(uint64_t lab)
   return str.str();
   }
 
+
+void store_registers(vmcode& code)
+  {
+  code.add(vmcode::MOV, RSP_STORE, vmcode::RSP);
+  }
+
+void load_registers(vmcode& code)
+  {
+  code.add(vmcode::MOV, vmcode::RSP, RSP_STORE);
+  }
+
 int64_t int2fixnum(int64_t i)
   {
   return (i << fixnum_shift) | fixnum_tag;

@@ -1752,6 +1752,12 @@ void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt,
     code.add(VM::vmcode::SUB, VM::vmcode::RSP, VM::vmcode::NUMBER, rsp_offset);
     
   code.add(vmcode::MOV, CONTEXT, CALLING_CONVENTION_INT_PAR_1);
+  
+  /*
+  Save the current content of the registers in the context
+  */
+  store_registers(code);
+  
   code.add(vmcode::MOV, ERROR, vmcode::LABELADDRESS, "L_error");
   code.add(vmcode::MOV, STACK_REGISTER, STACK); // get the stack location from the context and put it in the dedicated register
   code.add(vmcode::MOV, STACK_SAVE, STACK_REGISTER);  // save the current stack position. At the end of this method we'll restore STACK to STACK_SAVE, as scheme
@@ -1781,6 +1787,10 @@ void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt,
 
   code.add(vmcode::MOV, STACK_REGISTER, STACK_SAVE); // restore the scheme stack to its saved position
   code.add(vmcode::MOV, STACK, STACK_REGISTER);
+  
+  
+  /*Restore the registers to their original state*/
+  load_registers(code);
   
   if constexpr (rsp_offset)
     code.add(VM::vmcode::ADD, VM::vmcode::RSP, VM::vmcode::NUMBER, rsp_offset);

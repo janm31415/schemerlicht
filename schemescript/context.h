@@ -34,8 +34,9 @@ struct context {
   uint64_t* stack; // offset 168
   uint64_t* stack_save; // offset 176
   uint64_t* error_label; // offset 184
-  uint64_t* stack_end; // offset 192
-  uint64_t last_global_variable_used[SKIWI_VARIABLE_DEBUG_STACK_SIZE]; // offset 200
+  void* rsp; // offset 192
+  uint64_t* stack_end; // offset 200
+  uint64_t last_global_variable_used[SKIWI_VARIABLE_DEBUG_STACK_SIZE]; // offset 208
 
   uint64_t* memory_allocated;
   };

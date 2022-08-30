@@ -38,7 +38,9 @@ COMPILER_BEGIN
 
 #define ERROR VM::vmcode::MEM_R10, 184
 
-#define LAST_GLOBAL_VARIABLE_USED VM::vmcode::MEM_R10, 200
+#define RSP_STORE VM::vmcode::MEM_R10, 192
+
+#define LAST_GLOBAL_VARIABLE_USED VM::vmcode::MEM_R10, 208
 
 
 #define STACK_REGISTER VM::vmcode::R13

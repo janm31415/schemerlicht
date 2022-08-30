@@ -954,7 +954,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 1; ++i)
     {
     g_ops = compiler_options();
     switch (i)
