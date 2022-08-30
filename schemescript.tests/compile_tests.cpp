@@ -952,6 +952,481 @@ namespace
       }
     };
     
+
+  struct vector : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#(1 2)", run("(vector 1 2)"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(vector 1 2 3 4 5 6 7 8)"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8 9)", run("(vector 1 2 3 4 5 6 7 8 9)"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8 9 10)", run("(vector 1 2 3 4 5 6 7 8 9 10)"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)", run("(vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)"));
+      TEST_EQ("2", run("(let ([x (vector 1 2)]) (vector-ref x 1))"));
+      TEST_EQ("2", run("(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 1))"));
+      TEST_EQ("10", run("(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 9))"));
+      TEST_EQ("1", run("(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 0))"));
+      TEST_EQ("15", run("(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 14))"));
+
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: vector-ref: contract violation", run("(let ([x (vector 1 2)] [y 3]) (vector-ref y 1))"));
+        TEST_EQ("runtime error: vector-ref: contract violation", run("(let ([x (vector 1 2)] [y 3]) (vector-ref x #t))"));
+        TEST_EQ("runtime error: vector-ref: out of bounds", run("(let ([x (vector 1 2)] [y 3]) (vector-ref x 2))"));
+        TEST_EQ("runtime error: vector-ref: out of bounds", run("(let ([x (vector 1 2)] [y 3]) (vector-ref x -1))"));
+        }
+      TEST_EQ("100", run("(let ([x (vector 1 2)]) (begin (vector-set! x 1 100) (vector-ref x 1)))"));
+      TEST_EQ("#(1 100)", run("(let ([x (vector 1 2)]) (begin (vector-set! x 1 100) x))"));
+      TEST_EQ("#(3.14 2)", run("(let ([x (vector 1 2)]) (begin (vector-set! x 0 3.14) x))"));
+
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: vector-set!: contract violation", run("(let ([x (vector 1 2)]) (begin (vector-set! x 0.0 3.14) x))"));
+        TEST_EQ("runtime error: vector-set!: contract violation", run("(let ([x (vector 1 2)] [y 3]) (begin (vector-set! y 0.0 3.14) x))"));
+        TEST_EQ("runtime error: vector-set!: out of bounds", run("(let ([x (vector 1 2)]) (begin (vector-set! x -1 3.14) x))"));
+        TEST_EQ("runtime error: vector-set!: out of bounds", run("(let ([x (vector 1 2)]) (begin (vector-set! x 100 3.14) x))"));
+        }
+
+      TEST_EQ("#t", run("(vector? (vector 0)) "));
+      TEST_EQ("#f", run("(vector? 1287) "));
+      TEST_EQ("#f", run("(vector? ()) "));
+      TEST_EQ("#f", run("(vector? #t) "));
+      TEST_EQ("#f", run("(vector? #f) "));
+      }
+    };
+
+  struct letrec : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("12", run("(letrec () 12)"));
+      TEST_EQ("10", run("(letrec () (let ([x 5]) (+ x x)))"));
+      TEST_EQ("7", run("(letrec ([f (lambda () 5)]) 7)"));
+      TEST_EQ("12", run("(letrec () 12)"));
+      TEST_EQ("10", run("(letrec () (let ([x 5]) (+ x x)))"));
+      TEST_EQ("7", run("(letrec ([f (lambda () 5)]) 7)"));
+      TEST_EQ("12", run("(letrec ([f (lambda () 5)]) (let ([x 12]) x))"));
+      TEST_EQ("5", run("(letrec ([f (lambda () 5)]) (f))"));
+      TEST_EQ("5", run("(letrec ([f (lambda () 5)]) (let ([x (f)]) x))"));
+      TEST_EQ("11", run("(letrec ([f (lambda () 5)]) (+ (f) 6))"));
+      TEST_EQ("11", run("(letrec ([f (lambda () 5)]) (+ 6 (f)))"));
+      TEST_EQ("15", run("(letrec ([f (lambda () 5)]) (- 20 (f)))"));
+      TEST_EQ("10", run("(letrec ([f (lambda () 5)]) (+ (f) (f)))"));
+      TEST_EQ("12", run("(letrec ([f (lambda () (+ 5 7))])(f))"));
+      TEST_EQ("25", run("(letrec ([f (lambda (x) (+ x 12))]) (f 13))"));
+      TEST_EQ("12", run("(letrec ([f (lambda (x) (+ x 12))]) (f 0))"));
+      TEST_EQ("24", run("(letrec ([f (lambda (x) (+ x 12))]) (f (f 0)))"));
+      TEST_EQ("36", run("(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))"));
+      TEST_EQ("41", run("(letrec ([f (lambda (x y) (+ x y))] [g (lambda(x) (+ x 12))])(f 16 (f (g 0) (+ 1 (g 0)))))"));
+      TEST_EQ("24", run("(letrec ([f (lambda (x) (g x x))][g(lambda(x y) (+ x y))])(f 12))"));
+      TEST_EQ("34", run("(letrec ([f (lambda (x) (+ x 12))]) (f (f 10)))"));
+      TEST_EQ("36", run("(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))"));
+      TEST_EQ("25", run("(let ([f (lambda () 12)][g(lambda() 13)])(+ (f)(g)))"));
+      TEST_EQ("120", run("(letrec ([f (lambda (x) (if (zero? x) 1 (* x(f(sub1 x)))))]) (f 5))"));
+      TEST_EQ("120", run("(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))"));
+      TEST_EQ("200", run("(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))"));
+      TEST_EQ("500", run("(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))"));
+      }
+    };
+
+  struct lambdas : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("<lambda>", run("(lambda (x) (+ x x))"));
+      TEST_EQ("3", run("((lambda(x) x) 3)"));
+      TEST_EQ("10", run("((lambda(x y) (+ x y)) 3 7)"));
+      TEST_EQ("8", run("(let ([x 5]) ((lambda (y) (+ 3 y)) x ))"));
+      TEST_EQ("5", run("( (lambda () (+ 3 2)) () )"));
+      TEST_EQ("<lambda>", run("(let ([f (lambda () 5)]) f)"));
+      TEST_EQ("8", run("(let ([f (lambda (n) (+ n 5))]) (f 3))"));
+      TEST_EQ("5", run("(let ([f (lambda () 5)]) (f))"));
+
+      TEST_EQ("8", run("(let ([x 5]) ((lambda (y) (+ x y)) 3) )"));
+      }
+    };
+
+  struct is_fixnum : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#f", run(R"((fixnum? #\019))"));
+      TEST_EQ("#f", run(R"((fixnum? #\a))"));
+      TEST_EQ("#f", run(R"((fixnum? #t))"));
+      TEST_EQ("#f", run(R"((fixnum? #f))"));
+      TEST_EQ("#f", run(R"((fixnum? 0.3))"));
+      TEST_EQ("#f", run(R"((fixnum? 0.0))"));
+      TEST_EQ("#f", run(R"((fixnum? ()))"));
+      TEST_EQ("#t", run(R"((fixnum? 0))"));
+      TEST_EQ("#t", run(R"((fixnum? -1))"));
+      TEST_EQ("#t", run(R"((fixnum? 1))"));
+      TEST_EQ("#t", run(R"((fixnum? -1000))"));
+      TEST_EQ("#t", run(R"((fixnum? 1000))"));
+      TEST_EQ("#t", run(R"((fixnum? ((1000))))"));
+      }
+    };
+
+  struct nottest : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#f", run("(not #t)"));
+      TEST_EQ("#t", run("(not #f)"));
+      TEST_EQ("#t", run("(not (not #t))"));
+      TEST_EQ("#f", run(R"((not #\a))"));
+      TEST_EQ("#f", run("(not 0)"));
+      TEST_EQ("#f", run("(not 15)"));
+      TEST_EQ("#f", run("(not ())"));
+      TEST_EQ("#t", run("(not (not 15))"));
+      TEST_EQ("#f", run("(not (fixnum? 15))"));
+      TEST_EQ("#t", run("(not (fixnum? #f))"));
+      }
+    };
+
+  struct is_null : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#t", run("(null? ())"));
+      TEST_EQ("#f", run("(null? #f)"));
+      TEST_EQ("#f", run("(null? #t)"));
+      TEST_EQ("#f", run("(null? (null? ()))"));
+      TEST_EQ("#f", run(R"((null? #\a))"));
+      TEST_EQ("#f", run("(null? 0)"));
+      TEST_EQ("#f", run("(null? -10)"));
+      TEST_EQ("#f", run("(null? 10)"));
+      }
+    };
+
+
+  struct is_flonum : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#f", run(R"((flonum? #\019))"));
+      TEST_EQ("#f", run(R"((flonum? #\a))"));
+      TEST_EQ("#f", run(R"((flonum? #t))"));
+      TEST_EQ("#f", run(R"((flonum? #f))"));
+      TEST_EQ("#t", run(R"((flonum? 0.3))"));
+      TEST_EQ("#t", run(R"((flonum? 0.0))"));
+      TEST_EQ("#f", run(R"((flonum? ()))"));
+      TEST_EQ("#t", run(R"((flonum? 0.0))"));
+      TEST_EQ("#t", run(R"((flonum? -1.50))"));
+      TEST_EQ("#t", run(R"((flonum? 1.02))"));
+      TEST_EQ("#f", run(R"((flonum? -1000))"));
+      TEST_EQ("#f", run(R"((flonum? 1000))"));
+      TEST_EQ("#t", run(R"((flonum? ((1000.0))))"));
+      }
+    };
+  struct is_zero : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#t", run("(zero? 0)"));
+      TEST_EQ("#f", run("(zero? 1)"));
+      TEST_EQ("#f", run("(zero? -1)"));
+      TEST_EQ("#f", run("(zero? 64)"));
+      TEST_EQ("#f", run("(zero? 960)"));
+      TEST_EQ("#f", run("(zero? 53687091158)"));
+
+      TEST_EQ("#t", run("(zero? 0.0)"));
+      TEST_EQ("#f", run("(zero? 0.0001)"));
+      TEST_EQ("#f", run("(zero? 1.1)"));
+      TEST_EQ("#f", run("(zero? -1.1)"));
+      TEST_EQ("#f", run("(zero? 64.1)"));
+      TEST_EQ("#f", run("(zero? 960.1)"));
+      TEST_EQ("#f", run("(zero? 53687091158.1)"));
+
+      if (ops.safe_primitives)        
+        TEST_EQ("runtime error: zero?: contract violation", run("(zero? #t)"));
+      }
+    };
+
+  struct is_boolean : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#t", run("(boolean? #t)"));
+      TEST_EQ("#t", run("(boolean? #f)"));
+      TEST_EQ("#f", run("(boolean? 0)"));
+      TEST_EQ("#f", run("(boolean? 1)"));
+      TEST_EQ("#f", run("(boolean? -1)"));
+      TEST_EQ("#f", run("(boolean? ())"));
+      TEST_EQ("#f", run(R"((boolean? #\a))"));
+      TEST_EQ("#t", run("(boolean? (boolean? 0))"));
+      TEST_EQ("#t", run("(boolean? (fixnum? (boolean? 0)))"));
+      }
+    };
+
+  struct is_char : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#t", run(R"((char? #\a))"));
+      TEST_EQ("#t", run(R"((char? #\Z))"));
+      TEST_EQ("#t", run(R"((char? #\000))"));
+      TEST_EQ("#f", run(R"((char? #t))"));
+      TEST_EQ("#f", run(R"((char? #f))"));
+      TEST_EQ("#f", run(R"((char? (char? #t)))"));
+      TEST_EQ("#f", run(R"((char? 0))"));
+      TEST_EQ("#f", run(R"((char? 10))"));
+      TEST_EQ("#f", run(R"((char? 0.3))"));
+      }
+    };
+  struct cons : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#t", run("(pair? (cons 1 2))"));
+      TEST_EQ("#f", run("(pair? 12)"));
+      TEST_EQ("#f", run("(pair? #t)"));
+      TEST_EQ("#f", run("(pair? #f)"));
+      TEST_EQ("#f", run("(pair? ())"));
+
+      TEST_EQ("#f", run("(fixnum? (cons 12 43))"));
+      TEST_EQ("#f", run("(boolean? (cons 12 43))"));
+      TEST_EQ("#f", run("(null? (cons 12 43))"));
+      TEST_EQ("#f", run("(not (cons 12 43))"));
+
+      TEST_EQ("32", run("(if (cons 12 43) 32 43)"));
+      TEST_EQ("1", run("(car(cons 1 23))"));
+      TEST_EQ("123", run("(cdr(cons 43 123))"));
+      TEST_EQ("#t", run("(let([x(cons 1 2)] [y(cons 3 4)]) (pair? x))"));
+      TEST_EQ("#t", run("(pair? (cons(cons 12 3) #f))"));
+      TEST_EQ("#t", run("(pair? (cons(cons 12 3) (cons #t #f)))"));
+      TEST_EQ("12", run("(car(car(cons(cons 12 3) (cons #t #f))))"));
+      TEST_EQ("3", run("(cdr(car(cons(cons 12 3) (cons #t #f))))"));
+      TEST_EQ("#t", run("(car(cdr(cons(cons 12 3) (cons #t #f))))"));
+      TEST_EQ("#f", run("(cdr(cdr(cons(cons 12 3) (cons #t #f))))"));
+      TEST_EQ("#t", run("(pair? (cons(* 1 1) 1))"));
+
+      TEST_EQ("((1 . 4) 3 . 2)", run("(let ([t0 (cons 1 2)] [t1 (cons 3 4)]) (let([a0(car t0)][a1(car t1)][d0(cdr t0)][d1(cdr t1)])(let([t0(cons a0 d1)][t1(cons a1 d0)]) (cons t0 t1))))"));
+      TEST_EQ("(1 . 2)", run("(let ([t (cons 1 2)])(let([t t])(let([t t])(let([t t]) t))))"));
+      TEST_EQ("(1 . 2)", run("(let ([t (let ([t (let ([t (let ([t (cons 1 2)]) t)]) t)]) t)]) t)"));
+      TEST_EQ("((((()) ()) (()) ()) ((()) ()) (()) ())", run("(let ([x ()])(let([x(cons x x)])(let([x(cons x x)])(let([x(cons x x)])(cons x x)))))"));
+      TEST_EQ("((#t #t . #t) ((#f . #f) . #f))", run("(cons (let ([x #t]) (let ([y (cons x x)]) (cons x y))) (cons(let([x #f]) (let([y(cons x x)]) (cons y x))) ())) "));
+
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10)", run("(letrec ([f (lambda (i lst) (if (= i 0) lst (f (sub1 i) (cons i lst))))])(f 10 ())) "));
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: cons: contract violation", run("(cons 2)"));
+        TEST_EQ("runtime error: cons: contract violation", run("(cons 2 3 4)"));
+
+        TEST_EQ("runtime error: car: contract violation", run("(car 2)"));
+        TEST_EQ("runtime error: cdr: contract violation", run("(cdr 2 3 4)"));
+        }
+      }
+    };
+  struct tailcall : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("#f", run("(letrec ([e (lambda (x) (if (zero? x) #t (o (sub1 x))))][o(lambda(x) (if (zero? x) #f(e(sub1 x))))])(e 1))"));
+      TEST_EQ("0", run("(letrec ([countdown (lambda (n) (if (zero? n) n (countdown(sub1 n))))])(countdown 5050))"));
+      TEST_EQ("50005000", run("(letrec ([sum (lambda (n ac)(if (zero? n) ac (sum(sub1 n) (+ n ac))))]) (sum 10000 0))"));
+      TEST_EQ("#t", run("(letrec ([e (lambda (x) (if (zero? x) #t (o (sub1 x))))][o(lambda(x) (if (zero? x) #f(e(sub1 x))))])(e 500))"));
+      }
+    };
+
+  struct begin : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("12", run("(begin 12)"));
+      TEST_EQ("122", run("(begin 13 122)"));
+      TEST_EQ("#t", run("(begin 123 2343 #t)"));
+      TEST_EQ("(1 . 2)", run("(let ([t (begin 12 (cons 1 2))]) (begin t t))"));
+      TEST_EQ("(1 . 2)", run("(let ([t (begin 13 (cons 1 2))])(begin (cons 1 t)t ))"));
+      TEST_EQ("(1 . 2)", run("(let ([t (cons 1 2)])(if (pair? t)(begin t) 12))"));
+      }
+    };
+
+  struct implicit_begin : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("(1 . 2)", run("(let ([t (begin 13 (cons 1 2))])(cons 1 t)t)"));
+      }
+    };
+
+  struct closures : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("12", run("(let ([n 12])(let([f(lambda() n)])(f)))"));
+      TEST_EQ("112", run("(let ([n 12])(let([f(lambda(m) (+ n m))])(f 100)))"));
+      TEST_EQ("120", run("(let ([f (lambda (f n m)(if (zero? n)  m (f(sub1 n) (* n m))))]) (let([g(lambda(g n m) (f(lambda(n m) (g g n m)) n m))])  (g g 5 1)))"));
+      TEST_EQ("120", run("(let ([f (lambda (f n) (if (zero? n) 1 (* n(f(sub1 n)))))]) (let([g(lambda(g n) (f(lambda(n) (g g n)) n))]) (g g 5)))"));
+      }
+    };
+
+  struct set : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("13", run("(let ([x 12])(set! x 13) x)"));
+      TEST_EQ("13", run("(let([x 12]) (set! x(add1 x)) x) "));
+      TEST_EQ("12", run("(let([x 12]) (let([x #f]) (set! x 14)) x) "));
+      TEST_EQ("12", run("(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x)) "));
+      TEST_EQ("10", run("(let([f #f])(let([g(lambda() f)]) (set! f 10) (g))) "));
+      TEST_EQ("13", run("(let([f(lambda(x) (set! x (add1 x)) x)]) (f 12)) "));
+      TEST_EQ("(10 . 11)", run("(let([x 10]) (let([f(lambda(x) (set! x(add1 x)) x)]) (cons x(f x)))) "));
+      TEST_EQ("17", run("(let([t #f]) (let([locative (cons (lambda() t) (lambda(n) (set! t n)))]) ((cdr locative) 17) ((car locative))))"));
+      TEST_EQ("17", run("(let([locative (let([t #f]) (cons (lambda() t)  (lambda(n) (set! t n))))]) ((cdr locative) 17) ((car locative))) "));
+      TEST_EQ("(1 . 0)", run("(let([make-counter (lambda() (let([counter -1]) (lambda()  (set! counter(add1 counter)) counter)))]) (let([c0(make-counter)] [c1(make-counter)])(c0) (cons(c0) (c1)))) "));
+      TEST_EQ("120", run("(let([fact #f]) (set! fact(lambda(n) (if (zero? n) 1 (* n(fact(sub1 n)))))) (fact 5)) "));
+      TEST_EQ("120", run("(let([fact #f]) ((begin (set! fact(lambda(n) (if (zero? n)  1 (* n(fact(sub1 n)))))) fact) 5)) "));
+      }
+    };
+
+  struct letrec2 : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("12", run("(letrec() 12) "));
+      TEST_EQ("12", run("(letrec([f 12]) f) "));
+      TEST_EQ("25", run("(letrec([f 12][g 13]) (+ f g)) "));
+      TEST_EQ("120", run("(letrec([fact (lambda(n) (if (zero? n)  1  (* n(fact(sub1 n)))))]) (fact 5)) "));
+      TEST_EQ("12", run("(letrec([f 12][g(lambda() f)]) (g)) "));
+      TEST_EQ("130", run("(letrec([f 12][g(lambda(n) (set! f n))])(g 130) f) "));
+      TEST_EQ("12", run("(letrec([f (lambda(g) (set! f g) (f))]) (f(lambda() 12))) "));
+      TEST_EQ("100", run("(letrec([f (cons (lambda() f) (lambda(x) (set! f x)))]) (let([g(car f)]) ((cdr f) 100) (g))) "));
+      TEST_EQ("1", run("(let([v (vector 1 2 3)])(vector-ref v 0))"));
+      TEST_EQ("#(5 2 3)", run("(let([v (vector 1 2 3)])(vector-set! v 0 5) v)"));
+      TEST_EQ("48", run("(letrec([f(letrec([g(lambda(x) (* x 2))]) (lambda(n) (g(* n 2))))]) (f 12)) "));
+      TEST_EQ("120", run("(letrec([f(lambda(f n) (if (zero? n)  1 (* n(f f(sub1 n)))))]) (f f 5)) "));
+      TEST_EQ("120", run("(let([f(lambda(f) (lambda(n) (if (zero? n)  1 (* n(f(sub1 n))))))]) (letrec([fix (lambda(f) (f(lambda(n) ((fix f) n))))])((fix f) 5))) "));
+      }
+    };
+
+
+  struct inner_define : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("7", run("(let()(define x 3)(define y 4)(+ x y))"));
+      //TEST_EQ("6", run("(let()(letrec ([x 3][y x]) (+ x y)))")); // this violates r5rs letrec definition
+      //TEST_EQ("6", run("(letrec ([x 3][y x]) (+ x y))")); // this violates r5rs letrec definition
+      //TEST_EQ("6", run("(let()(define x 3)(define y x)(+ x y))"));  // this violates r5rs letrec / define definition : it must be possible to evaluate each (expression) of every internal definition in a body without assigning or referring to the value of any variable being defined
+      //TEST_EQ("8", run("(let()(define x 3)(set! x 4)(define y x)(+ x y))"));  // this violates r5rs letrec / define definition
+      TEST_EQ("45", run("(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))"));
+      }
+    };
+
+  struct global_define : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("3", run("(define x 3) x"));
+      TEST_EQ("4", run("(define x 3) (set! x 4) x"));
+      TEST_EQ("4", run("(begin (define x 3) (set! x 4) x)"));
+      }
+    };
+  struct list : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("()", run("(list)"));
+      TEST_EQ("(3)", run("(list 3)"));
+      TEST_EQ("(3 6)", run("(list 3 6)"));
+      TEST_EQ("(1 2 3)", run("(list 1 2 3)"));
+      TEST_EQ("(1 2 3 4)", run("(list 1 2 3 4)"));
+      TEST_EQ("(1 2 3 4 5)", run("(list 1 2 3 4 5)"));
+      TEST_EQ("(1 2 3 4 5 6)", run("(list 1 2 3 4 5 6)"));
+      TEST_EQ("(1 2 3 4 5 6 7)", run("(list 1 2 3 4 5 6 7)"));
+      TEST_EQ("(1 2 3 4 5 6 7 8)", run("(list 1 2 3 4 5 6 7 8)"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9)", run("(list 1 2 3 4 5 6 7 8 9)"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10)", run("(list 1 2 3 4 5 6 7 8 9 10)"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11)", run("(list 1 2 3 4 5 6 7 8 9 10 11)"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12)", run("(list 1 2 3 4 5 6 7 8 9 10 11 12)"));
+      }
+    };
+/*
+  struct scheme_tests : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("(testing 1 (2) -3.14e+159)", run("(quote (testing 1 (2.0) -3.14e159))"));
+      TEST_EQ("4", run("(+ 2 2)"));
+      TEST_EQ("210", run("(+ (* 2 100) (* 1 10))"));
+      TEST_EQ("2", run("(if (> 6 5) (+ 1 1) (+ 2 2))"));
+      TEST_EQ("4", run("(if (< 6 5) (+ 1 1) (+ 2 2))"));
+      TEST_EQ("3", run("(define x 3)"));
+      TEST_EQ("3", run("x"));
+      TEST_EQ("6", run("(+ x x)"));
+      TEST_EQ("3", run("(begin (define x 1) (set! x (+ x 1)) (+ x 1))"));
+      TEST_EQ("10", run("((lambda (x) (+ x x)) 5)"));
+      TEST_EQ("<lambda>", run("(define twice (lambda (x) (* 2 x)))"));
+      TEST_EQ("10", run("(twice 5)"));
+      TEST_EQ("<lambda>", run("(define cube (lambda (x) (* x x x)))"));
+      TEST_EQ("125", run("(cube 5)"));
+      TEST_EQ("<lambda>", run("(define compose (lambda (f g) (lambda (x) (f (g x)))))"));
+      TEST_EQ("<lambda>", run("(define repeat (lambda (f) (compose f f)))"));
+      TEST_EQ("20", run("((repeat twice) 5)"));
+      TEST_EQ("80", run("((repeat (repeat twice)) 5)"));
+      TEST_EQ("120", run("(let ([x 5]) (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact x))"));
+      TEST_EQ("<lambda>", run("(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))"));
+      TEST_EQ("6", run("(fact 3)"));
+      TEST_EQ("479001600", run("(fact 12)"));
+      TEST_EQ("<lambda>", run("(define make_list (lambda (n) (list n)))"));
+      TEST_EQ("(10)", run("((compose make_list twice) 5)"));
+      TEST_EQ("<lambda>", run("(define abs (lambda (n) (if (> n 0) n (- 0 n))))"));
+      TEST_EQ("(3 0 3)", run("(list (abs -3) (abs 0) (abs 3))"));
+      TEST_EQ("<lambda>", run("(define make_cons (lambda (m n) (cons m n)))"));
+      TEST_EQ("(1 . 2)", run("(make_cons 1 2)"));
+
+      TEST_EQ("<lambda>", run("(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))"));
+      TEST_EQ("<lambda>", run("(define zip (combine make_cons))"));
+      TEST_EQ("((1 5) (2 6) (3 7) (4 8))", run("(zip (list 1 2 3 4) (list 5 6 7 8))"));
+      }
+    };
+*/
+  struct scheme_tests_part_b : public compile_fixture {
+    void test()
+      {
+      run("(define append (lambda (l m)(if (null? l) m (cons(car l) (append(cdr l) m)))))");
+      TEST_EQ("<lambda>", run("(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))"));
+      TEST_EQ("<lambda>", run("(define riff-shuffle (lambda (deck) (begin (define take (lambda (n seq) (if (<= n 0) (quote ()) (cons (car seq) (take (- n 1) (cdr seq)))))) (define drop (lambda (n seq) (if (<= n 0) seq (drop (- n 1) (cdr seq))))) (define mid (lambda (seq) (/ (length seq) 2))) ((combine append) (take (mid deck) deck) (drop (mid deck) deck)))))"));
+      TEST_EQ("(1 2 3 4 5 6 7 8)", run("(cons 1 (cons 2 (cons 3 (cons 4 (cons 5 (cons 6 (cons 7 (cons 8 ()))))))))"));
+      TEST_EQ("(1 5 2 6 3 7 4 8)", run("(riff-shuffle (list 1 2 3 4 5 6 7 8))"));
+      TEST_EQ("(1 2 3 4 5 6 7 8)", run("(riff-shuffle (riff-shuffle (riff-shuffle (list 1 2 3 4 5 6 7 8))))"));
+      }
+    };
+
+  struct scheme_tests_part_c : public compile_fixture {
+    void test()
+      {
+      run("(define append (lambda (l m)(if (null? l) m (cons(car l) (append(cdr l) m)))))");
+      TEST_EQ("<lambda>", run("(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))"));
+      TEST_EQ("<lambda>", run("(define riff-shuffle (lambda (deck) (begin (define take (lambda (n seq) (if (<= n 0) (quote ()) (cons (car seq) (take (- n 1) (cdr seq)))))) (define drop (lambda (n seq) (if (<= n 0) seq (drop (- n 1) (cdr seq))))) (define mid (lambda (seq) (/ (length seq) 2))) ((combine append) (take (mid deck) deck) (drop (mid deck) deck)))))"));
+      TEST_EQ("<lambda>", run("(define compose (lambda (f g) (lambda (x) (f (g x)))))"));
+      TEST_EQ("<lambda>", run("(define repeat (lambda (f) (compose f f)))"));
+      TEST_EQ("(1 3 5 7 2 4 6 8)", run("((repeat riff-shuffle) (list 1 2 3 4 5 6 7 8))"));
+      }
+    };
+
+  struct scheme_tests_2 : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("<lambda>", run("(define multiply-by (lambda (n) (lambda (y) (* y n))))"));
+      TEST_EQ("<lambda>", run("(define doubler (multiply-by 2))"));
+      TEST_EQ("<lambda>", run("(define tripler (multiply-by 3))"));
+      TEST_EQ("8", run("(doubler 4)"));
+      TEST_EQ("12", run("(tripler 4)"));
+      TEST_EQ("9", run("(doubler 4.5)"));
+      TEST_EQ("13.5", run("(tripler 4.5)"));
+      }
+    };
+
+  struct scheme_tests_3 : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("<lambda>", run("(define count-down-from (lambda (n) (lambda () (set! n (- n 1)))))"));
+      TEST_EQ("<lambda>", run("(define count-down-from-3  (count-down-from 3))"));
+      TEST_EQ("<lambda>", run("(define count-down-from-4  (count-down-from 4))"));
+      TEST_EQ("2", run("(count-down-from-3)"));
+      TEST_EQ("3", run("(count-down-from-4)"));
+      TEST_EQ("1", run("(count-down-from-3)"));
+      TEST_EQ("0", run("(count-down-from-3)"));
+      TEST_EQ("2", run("(count-down-from-4)"));
+      TEST_EQ("1", run("(count-down-from-4)"));
+      TEST_EQ("0", run("(count-down-from-4)"));
+      TEST_EQ("-1", run("(count-down-from-4)"));
+      TEST_EQ("-1", run("(count-down-from-3)"));
+      }
+    };
+
+  struct scheme_tests_4 : public compile_fixture {
+    void test()
+      {
+      TEST_EQ("0", run("(define set-hidden 0)"));
+      TEST_EQ("0", run("(define get-hidden 0)"));
+      TEST_EQ("<lambda>", run("((lambda () (begin (define hidden 0) (set! set-hidden (lambda (n) (set! hidden n))) (set! get-hidden (lambda () hidden)))))"));
+      TEST_EQ("0", run("(get-hidden)"));
+      TEST_EQ("1234", run("(set-hidden 1234)"));
+      TEST_EQ("1234", run("(get-hidden)"));
+      }
+    };
   }
   
 COMPILER_END
@@ -1007,5 +1482,32 @@ void run_all_compile_tests()
     let_star().test();
     arithmetic().test();
     globals().test();
+    
+    vector().test();
+    letrec().test();
+    lambdas().test();
+    is_fixnum().test();
+    nottest().test();
+    is_null().test();
+    is_flonum().test();
+    is_zero().test();
+    is_boolean().test();
+    is_char().test();
+    cons().test();
+    tailcall().test();
+    begin().test();
+    implicit_begin().test();
+    closures().test();
+    set().test();
+    letrec2().test();
+    inner_define().test();
+    global_define().test();
+    list().test();
+    //scheme_tests().test();
+    scheme_tests_part_b().test();
+    scheme_tests_part_c().test();
+    scheme_tests_2().test();
+    scheme_tests_3().test();
+    scheme_tests_4().test();
     }
   }

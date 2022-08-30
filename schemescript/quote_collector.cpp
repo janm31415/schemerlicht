@@ -12,13 +12,12 @@ namespace
     {
     std::map<std::string, cell> collected_quotes;
 
-    bool PreVisitQuote(Expression& e)
+    void VisitQuote(Expression& e)
       {
       Quote& q = std::get<Quote>(e);
       std::stringstream str;
       str << q.arg;
       collected_quotes[str.str()] = q.arg;
-      return true;
       }
     };
   }
