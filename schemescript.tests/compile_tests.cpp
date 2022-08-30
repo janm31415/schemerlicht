@@ -62,6 +62,7 @@ namespace
     registers reg;
     std::map<std::string, COMPILER::external_function> externals;
     std::vector<VM::external_function> externals_for_vm;
+    std::ostream* vm_output = nullptr;
 
     compile_fixture()
       {
@@ -79,7 +80,7 @@ namespace
         first_pass_data d;
         uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
         reg.rcx = (uint64_t)(&ctxt);
-        run_bytecode(f, size, reg);
+        run_bytecode(f, size, reg, vm_output);
         compiled_bytecode.emplace_back(f, size);
         assign_primitive_addresses(pm, d, (uint64_t)f);
         }
@@ -145,7 +146,7 @@ namespace
       str << std::setprecision(precision);
       reg.rcx = (uint64_t)(&ctxt);
       try {
-        run_bytecode(f, size, reg, externals_for_vm);
+        run_bytecode(f, size, reg, externals_for_vm, vm_output);
         }
       catch (std::logic_error e)
         {

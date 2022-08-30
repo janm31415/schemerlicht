@@ -99,6 +99,9 @@ struct external_function
   argtype return_type;
   };
 
-VM_API void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const std::vector<external_function>& externals = std::vector<external_function>());
+VM_API void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const std::vector<external_function>& externals, std::ostream* debug);
+VM_API void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs);
+VM_API void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const std::vector<external_function>& externals);
+VM_API void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, std::ostream* debug);
 
 VM_END

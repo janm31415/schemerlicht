@@ -1342,7 +1342,7 @@ namespace
       regs.eflags |= sign_flag;
     }
 
-  void print(vmcode::operation op, vmcode::operand operand1,
+  void print(std::ostream& output, vmcode::operation op, vmcode::operand operand1,
     vmcode::operand operand2,
     uint64_t operand1_mem,
     uint64_t operand2_mem)
@@ -1353,7 +1353,7 @@ namespace
     i.operand2 = operand2;
     i.operand1_mem = operand1_mem;
     i.operand2_mem = operand2_mem;
-    i.stream(std::cout);
+    i.stream(output);
     }
 
   std::vector<vmcode::operand> get_calling_registers()
@@ -1857,7 +1857,7 @@ namespace
     }
 
   } // namespace
-void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const std::vector<external_function>& externals)
+void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const std::vector<external_function>& externals, std::ostream* debug)
   {
   (void*)size;
   *((uint64_t*)regs.rsp - 1) = 0xffffffffffffffff; // this address means the function call representing this bytecode
@@ -1875,7 +1875,8 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
     uint64_t operand3_mem;
     uint64_t sz = disassemble_bytecode(op, operand1, operand2, operand3, operand1_mem, operand2_mem, operand3_mem, bytecode_ptr);
 
-    //print(op, operand1, operand2, operand1_mem, operand2_mem);
+    if (debug)
+      print(*debug, op, operand1, operand2, operand1_mem, operand2_mem);
 
     switch (op)
       {
@@ -2594,4 +2595,19 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
     }
   }
 
+void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs)
+  {
+  run_bytecode(bytecode, size, regs, std::vector<external_function>(), nullptr);
+  }
+  
+void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const std::vector<external_function>& externals)
+  {
+  run_bytecode(bytecode, size, regs, externals, nullptr);
+  }
+  
+void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, std::ostream* debug)
+  {
+  run_bytecode(bytecode, size, regs, std::vector<external_function>(), debug);
+  }
+  
 VM_END

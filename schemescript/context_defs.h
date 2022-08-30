@@ -16,15 +16,15 @@ COMPILER_BEGIN
 #define FROM_SPACE_END VM::vmcode::MEM_R10, 24
 #define TO_SPACE VM::vmcode::MEM_R10, 32
 #define TO_SPACE_END VM::vmcode::MEM_R10, 40
-#define FROMSPACE_RESERVE VM::vmcode::MEM_R10, 48
-#define TEMP_FLONUM VM::vmcode::MEM_R10, 56
-#define GC_SAVE VM::vmcode::MEM_R10, 64
-#define RSP_SAVE VM::vmcode::MEM_R10, 72
-#define NUMBER_OF_LOCALS VM::vmcode::MEM_R10, 80
+#define FROMSPACE_RESERVE VM::vmcode::MEM_R10, 56
+#define TEMP_FLONUM VM::vmcode::MEM_R10, 80
+#define GC_SAVE VM::vmcode::MEM_R10, 88
+#define RSP_SAVE VM::vmcode::MEM_R10, 112
+#define NUMBER_OF_LOCALS VM::vmcode::MEM_R10, 72
 
 #define GLOBALS VM::vmcode::MEM_R10, 96
 #define GLOBALS_END VM::vmcode::MEM_R10, 104
-#define LOCAL VM::vmcode::MEM_R10, 112
+#define LOCAL VM::vmcode::MEM_R10, 64
 
 #define BUFFER VM::vmcode::MEM_R10, 120
 #define DCVT VM::vmcode::MEM_R10, 128
