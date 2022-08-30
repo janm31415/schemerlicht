@@ -1,4 +1,5 @@
 set(HDRS
+compile_tests.h
 conversion_tests.h
 format_tests.h
 parse_tests.h
@@ -7,6 +8,7 @@ tokenize_tests.h
     )
 	
 set(SRCS
+compile_tests.cpp
 conversion_tests.cpp
 format_tests.cpp
 parse_tests.cpp

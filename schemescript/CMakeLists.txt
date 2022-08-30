@@ -1,4 +1,5 @@
 set(HDRS
+compiler.h
 runtime.h
 reg_alloc.h
 reg_alloc_map.h
@@ -58,6 +59,7 @@ visitor.h
 )
 	
 set(SRCS
+compiler.cpp
 runtime.cpp
 reg_alloc.cpp
 reg_alloc_map.cpp
