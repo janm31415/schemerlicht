@@ -383,10 +383,8 @@ namespace
     uint64_t v = *reinterpret_cast<const uint64_t*>(&f.value);
     code.add(vmcode::MOV, vmcode::R15, ALLOC);
     code.add(vmcode::OR, vmcode::R15, vmcode::NUMBER, block_tag);
-    code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
-    code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-    code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, v);
-    code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::RAX);
+    code.add(vmcode::MOV, MEM_ALLOC, vmcode::NUMBER, header);
+    code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::NUMBER, v);
     code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
     code.add(vmcode::MOV, target, vmcode::R15);
     }
