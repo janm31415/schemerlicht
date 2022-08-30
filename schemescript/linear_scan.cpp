@@ -428,7 +428,7 @@ void linear_scan(Program& prog, linear_scan_algorithm lsa, const compiler_option
         auto& arg = beg.arguments[i];
         if (lsa == lsa_naive)
           {
-          #if 1
+          #if 0
           naive_scan_visitor nsv;
           visit(arg, nsv);
           #else
@@ -439,7 +439,7 @@ void linear_scan(Program& prog, linear_scan_algorithm lsa, const compiler_option
           }
         else
           {
-          #if 1
+          #if 0
           find_liveness_of_variable flov;
           visit(arg, flov);
           linear_scan_visitor lsv;
@@ -461,7 +461,7 @@ void linear_scan(Program& prog, linear_scan_algorithm lsa, const compiler_option
       {
       if (lsa == lsa_naive)
         {
-        #if 1
+        #if 0
         naive_scan_visitor nsv;
         visit(prog, nsv);
         #else
@@ -474,7 +474,7 @@ void linear_scan(Program& prog, linear_scan_algorithm lsa, const compiler_option
         }
       else
         {
-        #if 1
+        #if 0
         find_liveness_of_variable flov;
         visit(prog, flov);
         linear_scan_visitor lsv;

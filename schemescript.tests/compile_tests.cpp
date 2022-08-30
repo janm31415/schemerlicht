@@ -548,6 +548,8 @@ namespace
   struct add_incorrect_argument : public compile_fixture {
     void test()
       {
+      if (!ops.safe_primitives)
+        return;
       TEST_EQ("runtime error: add1: contract violation", run("(add1 #t)"));
       TEST_EQ("runtime error: sub1: contract violation", run("(sub1 ())"));
 
@@ -804,6 +806,8 @@ namespace
   struct compare_incorrect_argument : public compile_fixture {
     void test()
       {
+      if (!ops.safe_primitives)
+        return;
       TEST_EQ("runtime error: =: contract violation", run("(= 3 #t)"));
       TEST_EQ("runtime error: !=: contract violation", run("(!= 3 ())"));
       TEST_EQ("runtime error: <: contract violation", run("(< 3 #t)"));
@@ -903,7 +907,8 @@ namespace
       TEST_EQ("192", run("(let ([x 12])  (let([x(+ x x)]) (let([x(+ x x)]) (let([x(+ x x)]) (+ x x)))))"));
 
       TEST_EQ("45", run("(let ([a 0] [b 1] [c 2] [d 3] [e 4] [f 5] [g 6] [h 7] [i 8] [j 9]) (+ a b c d e f g h i j) )"));
-      TEST_EQ("runtime error: closure expected", run("(let ([x 5]) (x))"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: closure expected", run("(let ([x 5]) (x))"));
       }
     };
 
@@ -954,13 +959,12 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 1; ++i)
+  for (int i = 0; i < 3; ++i)
     {
     g_ops = compiler_options();
     switch (i)
       {
       case 0:
-        g_ops.primitives_inlined = false;
         break;
       case 1:
         g_ops.primitives_inlined = false;
