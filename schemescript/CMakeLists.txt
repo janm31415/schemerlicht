@@ -1,4 +1,7 @@
 set(HDRS
+reg_alloc.h
+reg_alloc_map.h
+compile_data.h
 asm_aux.h
 context_defs.h
 inlines.h
@@ -54,6 +57,9 @@ visitor.h
 )
 	
 set(SRCS
+reg_alloc.cpp
+reg_alloc_map.cpp
+compile_data.cpp
 asm_aux.cpp
 inlines.cpp
 asm_aux.cpp
