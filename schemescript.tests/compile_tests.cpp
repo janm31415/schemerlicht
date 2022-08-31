@@ -3790,8 +3790,11 @@ namespace
       TEST_EQ("\"cdefghijklm\"", run("(substring \"abcdefghijklm\" 2 13)"));
       TEST_EQ("\"cdefghijklm\"", run("(substring \"abcdefghijklm\" 2 14)"));
       TEST_EQ("\"cdefghijklm\"", run("(substring \"abcdefghijklm\" 2 15)"));
-      TEST_EQ("runtime error: substring: out of bounds", run("(substring \"abcdefghijklm\" 2 16)"));
-      TEST_EQ("runtime error: substring: out of bounds", run("(substring \"abcdefghijklm\" 2 35)"));
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: substring: out of bounds", run("(substring \"abcdefghijklm\" 2 16)"));
+        TEST_EQ("runtime error: substring: out of bounds", run("(substring \"abcdefghijklm\" 2 35)"));
+        }
 
       TEST_EQ("\"abcdef\"", run("(string-append1 \"abc\" \"def\")"));
       TEST_EQ("\"abcddefg\"", run("(string-append1 \"abcd\" \"defg\")"));
