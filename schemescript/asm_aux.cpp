@@ -193,76 +193,6 @@ void check_heap(vmcode& code, runtime_error re)
   code.add(vmcode::LABEL, heap_ok);
   }
 
-void save_before_foreign_call(vmcode& code)
-  {
-  /*
-  sub rsp, CELLS(8)
-  mov [rsp + CELLS(0)], rbx
-  mov [rsp + CELLS(1)], rcx
-  mov [rsp + CELLS(2)], rdx
-  mov [rsp + CELLS(3)], rsi
-  mov [rsp + CELLS(4)], rdi
-  mov [rsp + CELLS(5)], r8
-  mov [rsp + CELLS(6)], r9
-  mov [rsp + CELLS(7)], r10
-  */
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, CELLS(8));
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(0), vmcode::RBX);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(1), vmcode::RCX);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(2), vmcode::RDX);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(3), vmcode::RSI);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(4), vmcode::RDI);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(5), vmcode::R8);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(6), vmcode::R9);
-  code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(7), vmcode::R10);
-
-  code.add(vmcode::MOV, STACK, STACK_REGISTER); // We save the current stack position in the context, so that any load or eval functions start from the correct stack position.
-                                                 // This is important for the garbage collector.
-  }
-
-void restore_after_foreign_call(vmcode& code)
-  {
-  /*
-  mov r10, [rsp + CELLS(7)]
-  mov r9, [rsp + CELLS(6)]
-  mov r8, [rsp + CELLS(5)]
-  mov rdi, [rsp + CELLS(4)]
-  mov rsi, [rsp + CELLS(3)]
-  mov rdx, [rsp + CELLS(2)]
-  mov rcx, [rsp + CELLS(1)]
-  mov rbx, [rsp + CELLS(0)]
-  add rsp, CELLS(8)
-  */
-  code.add(vmcode::MOV, vmcode::R10, vmcode::MEM_RSP, CELLS(7));
-  code.add(vmcode::MOV, vmcode::R9, vmcode::MEM_RSP, CELLS(6));
-  code.add(vmcode::MOV, vmcode::R8, vmcode::MEM_RSP, CELLS(5));
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RSP, CELLS(4));
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::MEM_RSP, CELLS(3));
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RSP, CELLS(2));
-  code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_RSP, CELLS(1));
-  code.add(vmcode::MOV, vmcode::RBX, vmcode::MEM_RSP, CELLS(0));
-  code.add(vmcode::ADD, vmcode::RSP, vmcode::NUMBER, CELLS(8));
-
-  code.add(vmcode::MOV, STACK_REGISTER, STACK); // We update the stack register with the current stack position. The external function might have called load or eval which
-                                                 // might update the scheme stack. This is important for the garbage collector.
-  }
-
-void align_stack(vmcode& code)
-  {
-  /*
-    mov qword [rsp_save], rsp
-  and rsp, [rsp_alignment_mask]
-  */
-  code.add(vmcode::MOV, RSP_SAVE, vmcode::RSP);
-  code.add(vmcode::AND, vmcode::RSP, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF0);
-  }
-
-void restore_stack(vmcode& code)
-  {
-  //mov rsp, qword [rsp_save]
-  code.add(vmcode::MOV, vmcode::RSP, RSP_SAVE);
-  }
-
 void copy_string_to_buffer(vmcode& code)
   {
   // assumptions:
@@ -435,20 +365,10 @@ void break_point(vmcode& code)
   code.add(vmcode::PUSH, vmcode::R15);
   code.add(vmcode::PUSH, vmcode::R11);
   code.add(vmcode::PUSH, vmcode::RAX);
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
+
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_break);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_break);
-#endif  
   code.add(vmcode::CALL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
+
   code.add(vmcode::POP, vmcode::RAX);
   code.add(vmcode::POP, vmcode::R11);
   code.add(vmcode::POP, vmcode::R15);

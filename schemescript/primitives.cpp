@@ -5870,21 +5870,9 @@ void compile_peek_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
-
+  
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
@@ -5981,20 +5969,8 @@ void compile_read_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6109,20 +6085,9 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
+  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6165,20 +6130,8 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6290,20 +6243,8 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6397,20 +6338,8 @@ void compile_flush_output_port(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6462,20 +6391,8 @@ void compile_close_file(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_close);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_close);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifndef WIN32
   code.add(vmcode::POP, vmcode::RDI);
@@ -6556,20 +6473,12 @@ void compile_open_file(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
 #ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_open);
 #else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&open);
 #endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6643,21 +6552,8 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDI, BUFFER);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&strtoll);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&strtoll);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
-
   // check endptr
   code.add(vmcode::POP, vmcode::R11);
 
@@ -6688,20 +6584,9 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDI, BUFFER);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
+  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&strtod);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&strtod);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
   // check endptr
   code.add(vmcode::POP, vmcode::R11);
@@ -6810,20 +6695,9 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDI, BUFFER);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
+
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf_floating);
-#else
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf_floating);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -6866,20 +6740,9 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDI, BUFFER);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf);
-#endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
+  
 
 #ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
@@ -7975,38 +7838,16 @@ rdi
 
 void compile_current_seconds(VM::vmcode& code, const compiler_options& /*options*/)
   {
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_current_seconds);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::JMP, CONTINUE);
   }
 
 void compile_current_milliseconds(VM::vmcode& code, const compiler_options& /*options*/)
   {
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_current_milliseconds);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::JMP, CONTINUE);
   }
@@ -8039,19 +7880,8 @@ rdi
   code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_getenv);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
 #ifndef WIN32
   code.add(vmcode::POP, vmcode::RDI);
 #endif
@@ -8161,19 +7991,9 @@ rsi:
   code.add(vmcode::MOV, vmcode::RSI, vmcode::RDX);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_putenv);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
+  
 #ifndef WIN32
   code.add(vmcode::POP, vmcode::RSI);
   code.add(vmcode::POP, vmcode::RDI);
@@ -8223,19 +8043,9 @@ rdi:
   code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
 #endif
 
-  save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_file_exists);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
-  restore_after_foreign_call(code);
+  
 #ifndef WIN32
   code.add(vmcode::POP, vmcode::RDI);
 #endif

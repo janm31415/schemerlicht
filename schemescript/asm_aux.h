@@ -34,13 +34,6 @@ void jump_if_arg_does_not_point_to_promise(VM::vmcode& code, VM::vmcode::operand
 /*assumes RAX contains the extra heap size requested*/
 void check_heap(VM::vmcode& code, runtime_error re);
 
-
-void save_before_foreign_call(VM::vmcode& code);
-void restore_after_foreign_call(VM::vmcode& code);
-
-void align_stack(VM::vmcode& code);
-void restore_stack(VM::vmcode& code);
-
 void copy_string_to_buffer(VM::vmcode& code);
 void allocate_buffer_as_string(VM::vmcode& code);
 
