@@ -34,8 +34,9 @@ namespace
     
   struct define_conversion_visitor : public VisitorBaseClass
     {
-    void rewrite(PrimitiveCall& p)
+    void rewrite(Expression& e)
       {
+      PrimitiveCall& p = std::get<PrimitiveCall>(e);
       if (p.arguments.size() < 2)
         throw_error(p.line_nr, p.column_nr, p.filename, invalid_number_of_arguments);
       assert(p.arguments.size() >= 2);
@@ -99,7 +100,7 @@ namespace
         p.arguments[0] = f.fun.front();
         p.arguments[1] = lam;
         remove_nested_begin_expressions(p.arguments[1]);
-        //visitor<PrimitiveCall, define_conversion_visitor>::visit(p, this);
+        visit(e, *this);
         }
       }
 
@@ -116,7 +117,7 @@ namespace
           PrimitiveCall& p = std::get<PrimitiveCall>(arg);
           if (p.primitive_name == "define")
             {
-            rewrite(p);
+            rewrite(arg);
 
             define_args.push_back(index);
             define_exprs.push_back(p);
@@ -166,7 +167,7 @@ namespace
           PrimitiveCall& p = std::get<PrimitiveCall>(expr);
           if (p.primitive_name == "define")
             {
-            rewrite(p);
+            rewrite(expr);
             if (p.arguments.size() != 2)
               throw_error(p.line_nr, p.column_nr, p.filename, invalid_number_of_arguments);
             Set s;
