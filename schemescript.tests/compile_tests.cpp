@@ -1702,7 +1702,8 @@ namespace
       TEST_EQ("#\\a", run(R"((string-ref (string #\j #\a #\n) 1))"));
       TEST_EQ("#\\n", run(R"((string-ref (string #\j #\a #\n) 2))"));
       TEST_EQ("#\\000", run(R"((string-ref (string #\j #\a #\n) 4))"));
-      TEST_EQ("runtime error: string-ref: out of bounds", run(R"((string-ref (string #\j #\a #\n) 9))"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string-ref: out of bounds", run(R"((string-ref (string #\j #\a #\n) 9))"));
 
       TEST_EQ("\"abcde\"", run(R"((let([s (make-string 5 #\a)]) (string-set! s 1 #\b)  (string-set! s 2 #\c) (string-set! s 3 #\d) (string-set! s 4 #\e) s))"));
       TEST_EQ(R"(#\c)", run(R"((let([s (make-string 5 #\a)]) (string-set! s 1 #\b)  (string-set! s 2 #\c) (string-set! s 3 #\d) (string-set! s 4 #\e) (string-ref s 2)))"));
@@ -1826,7 +1827,8 @@ namespace
       TEST_EQ("55", run("(fib 9)"));
       TEST_EQ("89", run("(fib 10)"));
       //TEST_EQ("165580141", run("(fib 40)"));
-      TEST_EQ("runtime error: closure: heap overflow", run("(fib 40)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: closure: heap overflow", run("(fib 40)"));
       }
     };
 
@@ -2059,48 +2061,59 @@ namespace
       uint64_t global_stack_space = 512;
       make_new_context(64, global_stack_space, 64, 128);
       TEST_EQ("#(#undefined)", run("(make-vector 1)"));
-      TEST_EQ("runtime error: make-vector: heap overflow", run("(make-vector 1000000000)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: make-vector: heap overflow", run("(make-vector 1000000000)"));
       for (int i = 0; i < 3; ++i)
         TEST_EQ("15", run("(let ([a 1] [b 2] [c 3] [d 4] [e 5]) ((lambda () (+ a b c d e))))"));
-      TEST_EQ("runtime error: closure: heap overflow", run("(let ([a 1] [b 2] [c 3] [d 4] [e 5]) ((lambda () (+ a b c d e))))"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: closure: heap overflow", run("(let ([a 1] [b 2] [c 3] [d 4] [e 5]) ((lambda () (+ a b c d e))))"));
       make_new_context(64, global_stack_space, 64, 128);
       for (int i = 0; i < 5; ++i)
         TEST_EQ("#(1 2 3 4 5)", run("(vector 1 2 3 4 5)"));
-      TEST_EQ("runtime error: vector: heap overflow", run("(vector 1 2 3 4 5)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: vector: heap overflow", run("(vector 1 2 3 4 5)"));
       make_new_context(64, global_stack_space, 64, 128);
       for (int i = 0; i < 5; ++i)
         TEST_EQ(R"("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")", run("(make-string (+ (* 8 4) 1) #\\a)"));
-      TEST_EQ("runtime error: make-string: heap overflow", run("(make-string (+ (* 8 4) 1) #\\a)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: make-string: heap overflow", run("(make-string (+ (* 8 4) 1) #\\a)"));
 
       make_new_context(64, global_stack_space, 64, 128);
       for (int i = 0; i < 5; ++i)
         TEST_EQ(R"("abcdefghabcdefghabcdefghabcdefgha")", run("(string #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a)"));
-      TEST_EQ("runtime error: string: heap overflow", run("(string #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string: heap overflow", run("(string #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a #\\b #\\c #\\d #\\e #\\f #\\g #\\h #\\a)"));
       make_new_context(64, global_stack_space, 64, 128);
       for (int i = 0; i < 5; ++i)
         TEST_EQ(R"("abcdefghabcdefghabcdefghabcdefgha")", run("\"abcdefghabcdefghabcdefghabcdefgha\""));
-      TEST_EQ("runtime error: string: heap overflow", run("\"abcdefghabcdefghabcdefghabcdefgha\""));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string: heap overflow", run("\"abcdefghabcdefghabcdefghabcdefgha\""));
 
       make_new_context(64, global_stack_space, 64, 128);
       TEST_EQ("(1 2 3 4 5 6 7 8 9 10)", run("(list 1 2 3 4 5 6 7 8 9 10)"));
-      TEST_EQ("runtime error: list: heap overflow", run("(list 1 2)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: list: heap overflow", run("(list 1 2)"));
 
       make_new_context(64, global_stack_space, 64, 128);
       TEST_EQ("(1 2 3 4 5 6 7 8 9 10)", run("(cons 1 (cons 2 (cons 3 (cons 4 (cons 5 (cons 6 (cons 7 (cons 8 (cons 9 (cons 10 ()))))))))))"));
-      TEST_EQ("runtime error: cons: heap overflow", run("(cons 1 2)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: cons: heap overflow", run("(cons 1 2)"));
 
       make_new_context((256 + 32) * 2, global_stack_space, 64, 128); // at least 256 because of the symbol table
       build_string_to_symbol();
       TEST_EQ("abcdefghabcdefghabcdefghabcdefgh1", run("(quote abcdefghabcdefghabcdefghabcdefgh1)"));
-      TEST_EQ("runtime error: string: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh2)"));
-      TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh3)"));
-      TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh4)"));
-      TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh5)"));
-      TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh6)"));
-
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: string: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh2)"));
+        TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh3)"));
+        TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh4)"));
+        TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh5)"));
+        TEST_EQ("runtime error: closure: heap overflow", run("(quote abcdefghabcdefghabcdefghabcdefgh6)"));
+        }
       make_new_context(8, global_stack_space, 64, 128);
       TEST_EQ("2.5", run("(2.5)"));
-      TEST_EQ("runtime error: flonum: heap overflow", run("(2.5)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: flonum: heap overflow", run("(2.5)"));
       }
     };
 
@@ -2112,7 +2125,8 @@ namespace
       ops.safe_flonums = true;
       make_new_context(64, 512, 64, 128);
       TEST_EQ("#(#undefined)", run("(make-vector 1)"));
-      TEST_EQ("runtime error: make-vector: heap overflow", run("(make-vector 1000000000)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: make-vector: heap overflow", run("(make-vector 1000000000)"));
       for (int i = 0; i < 3; ++i)
         TEST_EQ("15", run("(let ([a 1] [b 2] [c 3] [d 4] [e 5]) ((lambda () (+ a b c d e))))"));
       TEST_EQ("15", run("(let ([a 1] [b 2] [c 3] [d 4] [e 5]) ((lambda () (+ a b c d e))))"));
@@ -2389,7 +2403,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 1; ++i)
+  for (int i = 0; i < 3; ++i)
     {
     g_ops = compiler_options();
     switch (i)
