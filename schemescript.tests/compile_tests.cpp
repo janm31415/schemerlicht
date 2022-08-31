@@ -4741,6 +4741,85 @@ to /* and */ in c/c++
       }
     };
     
+  uint64_t g_my_address;
+
+  uint64_t get_my_address()
+    {
+    return g_my_address;
+    }
+
+  void scm_load_simulation(uint64_t addr, const char* script);
+
+  struct load_simulation : public compile_fixture
+    {
+
+    void test()
+      {
+      build_libs();
+      g_my_address = (uint64_t)this;
+
+      external_function ef;
+      ef.name = "my-address";
+      ef.address = (uint64_t)&get_my_address;
+      ef.return_type = external_function::T_INT64;
+      externals[ef.name] = ef;
+
+      ef.name = "load-simulation";
+      ef.address = (uint64_t)&scm_load_simulation;
+      ef.return_type = external_function::T_VOID;
+      ef.arguments.push_back(external_function::T_INT64);
+      ef.arguments.push_back(external_function::T_CHAR_POINTER);
+      externals[ef.name] = ef;
+
+      convert_externals_to_vm();
+
+      run("(define addr (foreign-call my-address))");
+      run("(foreign-call load-simulation addr \"13\")");
+
+      int sz = (int)std::distance(env->begin(), env->end());
+      printf("Environment has %d elements\n", sz);
+
+      run("(foreign-call load-simulation addr \"(define x 14)\")");
+
+      sz = (int)std::distance(env->begin(), env->end());
+      printf("Environment has %d elements\n", sz);
+
+      TEST_EQ("14", run("x"));
+      }
+    };
+
+  void scm_load_simulation(uint64_t addr, const char* in)
+    {
+    load_simulation* p_ls = (load_simulation*)addr;
+    std::string script(in);
+
+    uint64_t rbx = p_ls->reg.rbx;
+    uint64_t rdi = p_ls->reg.rdi;
+    uint64_t rsi = p_ls->reg.rsi;
+    uint64_t rsp = p_ls->reg.rsp;
+    uint64_t rbp = p_ls->reg.rbp;
+    uint64_t r12 = p_ls->reg.r12;
+    uint64_t r13 = p_ls->reg.r13;
+    uint64_t r14 = p_ls->reg.r14;
+    uint64_t r15 = p_ls->reg.r15;
+
+    std::string out = p_ls->run(script);
+    std::cout << out << std::endl;
+
+    p_ls->reg.rbx = rbx;
+    p_ls->reg.rdi = rdi;
+    p_ls->reg.rsi = rsi;
+    p_ls->reg.rsp = rsp;
+    p_ls->reg.rbp = rbp;
+    p_ls->reg.r12 = r12;
+    p_ls->reg.r13 = r13;
+    p_ls->reg.r14 = r14;
+    p_ls->reg.r15 = r15;
+
+    int sz = (int)std::distance(p_ls->env->begin(), p_ls->env->end());
+    printf("Environment has %d elements\n", sz);
+    }
+    
   }
   
 COMPILER_END
@@ -4918,11 +4997,13 @@ void run_all_compile_tests()
     empty_let_crash().test();
 
     many_vars_in_lambda_test().test();
-#endif
     c_input_test_2doubles().test();
     c_input_test_5doubles().test();
     c_input_test_8doubles().test();
     current_seconds_test().test();
     current_milliseconds_test().test();
+#endif
+    //load_test();
+    load_simulation().test();
     }
   }
