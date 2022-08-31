@@ -2250,11 +2250,11 @@ namespace
 
       run("(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) ");
       //run("(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) ");
-      auto tic = std::clock();
-      TEST_EQ("165580141", run("(fib 40)"));
+      auto tic = std::chrono::high_resolution_clock::now();
+      TEST_EQ("121393", run("(fib 25)"));
       //TEST_EQ("165580141", run("(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)"));
-      auto toc = std::clock();
-      std::cout << "fibonacci: " << (toc - tic) << "ms\n";
+      auto toc = std::chrono::high_resolution_clock::now();
+      std::cout << "fibonacci: " << std::chrono::duration<double>(toc - tic).count() << "s\n";
 
       //ops.safe_primitives = true;
       //ops.standard_bindings = false;
@@ -4846,7 +4846,7 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 0
+#if 1
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -4954,7 +4954,7 @@ void run_all_compile_tests()
     apply().test();
     long_apply_test().test();
     fib_iterative_perf_test().test();
-    //fib_perf_test().test();
+    fib_perf_test().test();
     r5rs_test().test();
     ieee745_test().test();
 
@@ -5003,7 +5003,5 @@ void run_all_compile_tests()
     current_seconds_test().test();
     current_milliseconds_test().test();
 #endif
-    //load_test();
-
     }
   }
