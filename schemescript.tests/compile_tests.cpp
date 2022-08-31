@@ -4613,8 +4613,8 @@ void run_all_compile_tests()
     //fib_perf_test().test();
 #endif
     r5rs_test().test();
-#if 0
     ieee745_test().test();
+#if 0
     minmax_test().test();
     make_port_test().test();
     make_port2_test().test();

@@ -6978,7 +6978,6 @@ void compile_ieee754_mantissa(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_sin(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -6996,13 +6995,11 @@ void compile_ieee754_sin(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7010,8 +7007,8 @@ void compile_ieee754_sin(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FSIN);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CSIN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7020,12 +7017,10 @@ void compile_ieee754_sin(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_sin_contract_violation);
     }
-    */
   }
 
 void compile_ieee754_cos(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7043,13 +7038,11 @@ void compile_ieee754_cos(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7057,8 +7050,8 @@ void compile_ieee754_cos(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FCOS);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CCOS, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7067,12 +7060,10 @@ void compile_ieee754_cos(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_cos_contract_violation);
     }
-  */
   }
 
 void compile_ieee754_tan(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7090,13 +7081,11 @@ void compile_ieee754_tan(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7104,9 +7093,8 @@ void compile_ieee754_tan(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FPTAN);
-  code.add(vmcode::FSTP, vmcode::ST0);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CTAN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7115,12 +7103,10 @@ void compile_ieee754_tan(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_tan_contract_violation);
     }
-  */
   }
 
 void compile_ieee754_asin(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7138,13 +7124,11 @@ void compile_ieee754_asin(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7152,16 +7136,8 @@ void compile_ieee754_asin(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-
-  code.add(vmcode::FLD, vmcode::ST0);
-  code.add(vmcode::FMUL, vmcode::ST0, vmcode::ST0);
-  code.add(vmcode::FLD1);
-  //code.add(vmcode::FSUBR, vmcode::ST1, vmcode::ST0);
-  //code.add(vmcode::FXCH);
-  code.add(vmcode::FSUBRP);
-  code.add(vmcode::FSQRT);
-  code.add(vmcode::FPATAN);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CASIN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7170,12 +7146,10 @@ void compile_ieee754_asin(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_asin_contract_violation);
     }
-    */
   }
 
 void compile_ieee754_acos(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7193,13 +7167,11 @@ void compile_ieee754_acos(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7207,14 +7179,8 @@ void compile_ieee754_acos(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FLD, vmcode::ST0);
-  code.add(vmcode::FMUL, vmcode::ST0, vmcode::ST0);
-  code.add(vmcode::FLD1);
-  code.add(vmcode::FSUBRP);
-  code.add(vmcode::FSQRT);
-  code.add(vmcode::FXCH, vmcode::ST1);
-  code.add(vmcode::FPATAN);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CACOS, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7223,12 +7189,10 @@ void compile_ieee754_acos(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_acos_contract_violation);
     }
-    */
   }
 
 void compile_ieee754_atan1(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7246,13 +7210,11 @@ void compile_ieee754_atan1(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7260,9 +7222,8 @@ void compile_ieee754_atan1(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FLD1);
-  code.add(vmcode::FPATAN);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CATAN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7271,12 +7232,10 @@ void compile_ieee754_atan1(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_atan1_contract_violation);
     }
-    */
   }
 
 void compile_ieee754_log(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7286,7 +7245,6 @@ void compile_ieee754_log(vmcode& code, const compiler_options& ops)
     code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 1);
     code.add(vmcode::JNE, error);
     }
-  code.add(vmcode::FLDLN2);
   code.add(vmcode::TEST, vmcode::RCX, vmcode::NUMBER, 1);
   code.add(vmcode::JE, is_fixnum);
   if (ops.safe_primitives)
@@ -7295,13 +7253,11 @@ void compile_ieee754_log(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7309,9 +7265,8 @@ void compile_ieee754_log(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-
-  code.add(vmcode::FYL2X);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CLOG, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7320,12 +7275,10 @@ void compile_ieee754_log(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_log_contract_violation);
     }
-  */
   }
 
 void compile_ieee754_round(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_flonum = label_to_string(label++);
@@ -7343,13 +7296,11 @@ void compile_ieee754_round(vmcode& code, const compiler_options& ops)
   if (ops.safe_primitives)
     jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
 
-  code.add(vmcode::FLD, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
   code.add(vmcode::JMP, save_flonum);
   code.add(vmcode::LABEL, is_fixnum);
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
-  code.add(vmcode::PUSH, vmcode::RCX);
-  code.add(vmcode::FILD, vmcode::MEM_RSP);
-  code.add(vmcode::POP, vmcode::RCX);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
   code.add(vmcode::LABEL, save_flonum);
 
   uint64_t header = make_block_header(1, T_FLONUM);
@@ -7357,8 +7308,8 @@ void compile_ieee754_round(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FRNDINT);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CROUND, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7367,12 +7318,10 @@ void compile_ieee754_round(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_round_contract_violation);
     }
-  */
   }
 
 void compile_ieee754_truncate(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   std::string is_fixnum = label_to_string(label++);
   std::string save_fixnum = label_to_string(label++);
@@ -7403,7 +7352,6 @@ void compile_ieee754_truncate(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_round_contract_violation);
     }
-  */
   }
 
 void compile_ieee754_sqrt(vmcode& code, const compiler_options& ops)
@@ -7450,7 +7398,6 @@ void compile_ieee754_sqrt(vmcode& code, const compiler_options& ops)
 
 void compile_ieee754_pi(vmcode& code, const compiler_options& ops)
   {
-  /*
   std::string error;
   if (ops.safe_primitives)
     {
@@ -7463,8 +7410,9 @@ void compile_ieee754_pi(vmcode& code, const compiler_options& ops)
   code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
   code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
-  code.add(vmcode::FLDPI);
-  code.add(vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  double pi = 3.14159265358979323846264338327950288419716939937510;
+  uint64_t value = *((uint64_t*)(&pi));
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::NUMBER, value);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
   code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
 
@@ -7473,7 +7421,6 @@ void compile_ieee754_pi(vmcode& code, const compiler_options& ops)
     {
     error_label(code, error, re_ieee754_pi_contract_violation);
     }
-  */
   }
 
 void compile_fixnum_expt(vmcode& code, const compiler_options& ops)
@@ -7525,6 +7472,65 @@ void compile_fixnum_expt(vmcode& code, const compiler_options& ops)
 
 void compile_flonum_expt(vmcode& code, const compiler_options& ops)
   {
+  // only for positive exponents
+  std::string error;
+  std::string rcx_is_fixnum = label_to_string(label++);
+  std::string rcx_stored = label_to_string(label++);
+  std::string rdx_is_fixnum = label_to_string(label++);
+  std::string rdx_stored = label_to_string(label++);
+  if (ops.safe_primitives)
+    {
+    error = label_to_string(label++);
+    code.add(vmcode::CMP, vmcode::R11, vmcode::NUMBER, 2);
+    code.add(vmcode::JNE, error);
+    }
+  code.add(vmcode::TEST, vmcode::RDX, vmcode::NUMBER, 1);
+  code.add(vmcode::JE, rdx_is_fixnum);
+  if (ops.safe_primitives)
+    jump_if_arg_is_not_block(code, vmcode::RDX, vmcode::R11, error);
+  code.add(vmcode::AND, vmcode::RDX, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
+  if (ops.safe_primitives)
+    jump_if_arg_does_not_point_to_flonum(code, vmcode::RDX, vmcode::R11, error);
+
+  code.add(vmcode::MOV, vmcode::XMM1, vmcode::MEM_RDX, CELLS(1));
+  code.add(vmcode::JMP, rdx_stored);
+  code.add(vmcode::LABEL, rdx_is_fixnum);
+  code.add(vmcode::SAR, vmcode::RDX, vmcode::NUMBER, 1);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM1, vmcode::RDX);
+  code.add(vmcode::LABEL, rdx_stored);
+
+  code.add(vmcode::TEST, vmcode::RCX, vmcode::NUMBER, 1);
+  code.add(vmcode::JE, rcx_is_fixnum);
+  if (ops.safe_primitives)
+    jump_if_arg_is_not_block(code, vmcode::RCX, vmcode::R11, error);
+  code.add(vmcode::AND, vmcode::RCX, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
+  if (ops.safe_primitives)
+    jump_if_arg_does_not_point_to_flonum(code, vmcode::RCX, vmcode::R11, error);
+
+  code.add(vmcode::MOV, vmcode::XMM0, vmcode::MEM_RCX, CELLS(1));
+  code.add(vmcode::JMP, rcx_stored);
+  code.add(vmcode::LABEL, rcx_is_fixnum);
+  code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
+  code.add(vmcode::CVTSI2SD, vmcode::XMM0, vmcode::RCX);
+  code.add(vmcode::LABEL, rcx_stored);
+
+  uint64_t header = make_block_header(1, T_FLONUM);
+  code.add(vmcode::MOV, vmcode::R11, ALLOC);
+  code.add(vmcode::OR, vmcode::R11, vmcode::NUMBER, block_tag);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
+  code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
+
+  code.add(vmcode::CPOW, vmcode::XMM0, vmcode::XMM1);
+
+  code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::XMM0);
+  code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::R11);
+  code.add(vmcode::JMP, CONTINUE);
+
+  if (ops.safe_primitives)
+    {
+    error_label(code, error, re_flonum_expt_contract_violation);
+    }
   /*
   // only for positive exponents
   std::string error;

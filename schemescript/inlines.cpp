@@ -793,7 +793,7 @@ void inline_ieee754_mantissa(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxsin(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -809,7 +809,7 @@ void inline_ieee754_fxsin(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxcos(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -825,7 +825,7 @@ void inline_ieee754_fxcos(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxtan(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -841,7 +841,7 @@ void inline_ieee754_fxtan(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxasin(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -857,7 +857,7 @@ void inline_ieee754_fxasin(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxacos(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -873,7 +873,7 @@ void inline_ieee754_fxacos(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxatan1(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -889,7 +889,7 @@ void inline_ieee754_fxatan1(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxlog(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
@@ -905,7 +905,7 @@ void inline_ieee754_fxlog(VM::vmcode& code, const compiler_options&)
 void inline_ieee754_fxround(VM::vmcode& code, const compiler_options&)
   {
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
+  code.add(VM::vmcode::CVTSI2SD, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
