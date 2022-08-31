@@ -2,6 +2,7 @@
 #include "test_assert.h"
 #include "schemescript/preprocess.h"
 #include "schemescript/dump.h"
+#include "schemescript/cinput_data.h"
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -29,7 +30,8 @@ namespace
     macro_data md;
     primitive_map pm;
     compiler_options ops;
-    preprocess(env, rd, md, ctxt, prog, pm, ops);
+    cinput_data cin;
+    preprocess(env, rd, md, ctxt, cin, prog, pm, ops);
     std::string preprocessed_script = R"(( let ( [ x_0 ( if ( ##eq? + ###+ ) 3 ( + 1 2 ) ) ] ) ( let ( [ y_1 ( if ( ##eq? + ###+ ) 7 ( + 3 4 ) ) ] ) ( let ( [ #%k0 ( if ( ##eq? + ###+ ) ( if ( if ( ##fixnum? x_0 ) ( ##fixnum? y_1 ) #f ) ( ##fx+ x_0 y_1 ) ( if ( if ( ##flonum? x_0 ) ( ##flonum? y_1 ) #f ) ( ##fl+ x_0 y_1 ) ( + x_0 y_1 ) ) ) ( + x_0 y_1 ) ) ] ) ( halt #%k0 ) ) ) ) )";
     TEST_ASSERT(to_string(prog)==preprocessed_script);
     
@@ -38,7 +40,7 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     prog = make_program(tokens);
     ops.primitives_inlined = false;
-    preprocess(env, rd, md, ctxt, prog, pm, ops);
+    preprocess(env, rd, md, ctxt, cin, prog, pm, ops);
     TEST_ASSERT(to_string(prog) == "( if ( char? #\\97 ) ( halt 13 ) ( halt 14 ) ) ");
     }
   

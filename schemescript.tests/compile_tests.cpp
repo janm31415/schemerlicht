@@ -4502,6 +4502,55 @@ to /* and */ in c/c++
       }
     };
     
+  struct c_input_test_2doubles : public compile_fixture
+    {
+    void test()
+      {
+      std::stringstream str, str2;
+      std::string script = R"(
+(c-input "(double a, double b) " )
+
+(+ a b)
+)";
+      bool error = false;
+      vmcode code;
+      try
+        {
+        code = get_vmcode(script);
+        }
+      catch (std::logic_error e)
+        {
+        error = true;
+        str << e.what();
+        }
+      if (!error)
+        {
+        first_pass_data d;
+        uint64_t size;
+        uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
+        try {
+          reg.rcx = (uint64_t)(&ctxt);
+          reg.xmm1 = 3.4;
+          reg.xmm2 = 6.7;
+          run_bytecode(f, size, reg);
+          scheme_runtime(reg.rax, str, env, rd, nullptr);
+          reg.rcx = (uint64_t)(&ctxt);
+          reg.xmm1 = 101.123;
+          reg.xmm2 = 4.5;
+          run_bytecode(f, size, reg);
+          scheme_runtime(reg.rax, str2, env, rd, nullptr);
+          }
+        catch (std::logic_error e)
+          {
+          std::cout << e.what() << "\n";
+          }
+        compiled_bytecode.emplace_back(f, size);
+        }
+      TEST_EQ("10.1", str.str());
+      TEST_EQ("105.623", str2.str());
+      }
+    };
+    
   }
   
 COMPILER_END
@@ -4528,6 +4577,7 @@ void run_all_compile_tests()
       default:
         break;
       }
+#if 0
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -4678,6 +4728,7 @@ void run_all_compile_tests()
     empty_let_crash().test();
 
     many_vars_in_lambda_test().test();
-
+#endif
+    c_input_test_2doubles().test();
     }
   }

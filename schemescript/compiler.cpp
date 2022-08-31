@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "primitives.h"
 #include "inlines.h"
+#include "cinput_data.h"
 #include <sstream>
 
 COMPILER_BEGIN
@@ -1658,7 +1659,79 @@ namespace
     code.add(vmcode::JMP, "L_finish");
     }
   
+  
+  void compile_cinput_parameters(cinput_data& cinput, environment_map& env, vmcode& code)
+    {
+    for (int j = 0; j < (int)cinput.parameters.size(); ++j)
+      {
+      if (cinput.parameters[j].second == cinput_data::cin_int)
+        {
+        std::string name = cinput.parameters[j].first;
+
+        environment_entry e;
+        if (!env->find(e, name) || e.st != environment_entry::st_global)
+          throw_error(invalid_c_input_syntax);
+        code.add(vmcode::MOV, vmcode::RAX, GLOBALS);
+        if (j == 0)
+          {
+          code.add(vmcode::SHL, vmcode::RDX, vmcode::NUMBER, 1);
+          code.add(vmcode::MOV, vmcode::MEM_RAX, e.pos, vmcode::RDX);
+          }
+        else if (j == 1)
+          {
+          code.add(vmcode::SHL, vmcode::R8, vmcode::NUMBER, 1);
+          code.add(vmcode::MOV, vmcode::MEM_RAX, e.pos, vmcode::R8);
+          }
+        else if (j == 2)
+          {
+          code.add(vmcode::SHL, vmcode::R9, vmcode::NUMBER, 1);
+          code.add(vmcode::MOV, vmcode::MEM_RAX, e.pos, vmcode::R9);
+          }
+        else
+          {
+          int addr = j - 3;
+          code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_RSP, (40 + addr * 8));
+          code.add(vmcode::SHL, vmcode::RCX, vmcode::NUMBER, 1);
+          code.add(vmcode::MOV, vmcode::MEM_RAX, e.pos, vmcode::RCX);
+          }
+        }
+      else if (cinput.parameters[j].second == cinput_data::cin_double)
+        {
+        std::string name = cinput.parameters[j].first;
+
+        environment_entry e;
+        if (!env->find(e, name) || e.st != environment_entry::st_global)
+          throw_error(invalid_c_input_syntax);
+
+        uint64_t header = make_block_header(1, T_FLONUM);
+        code.add(vmcode::MOV, vmcode::R15, ALLOC);
+        code.add(vmcode::OR, vmcode::R15, vmcode::NUMBER, block_tag);
+        code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, header);
+        code.add(vmcode::MOV, MEM_ALLOC, vmcode::RAX);
+
+        if (j == 0)
+          code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::XMM1);
+        else if (j == 1)
+          code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::XMM2);
+        else if (j == 2)
+          code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::XMM3);
+        else
+          {
+          int addr = j - 3;
+          code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RSP, (40 + addr * 8));
+          code.add(vmcode::MOV, MEM_ALLOC, CELLS(1), vmcode::RAX);
+          }
+
+        code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(2));
+        code.add(vmcode::MOV, vmcode::RAX, GLOBALS);
+        code.add(vmcode::MOV, vmcode::MEM_RAX, e.pos, vmcode::R15);
+        }
+      }
+    }
+  
   }
+  
+  
 
 void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt, VM::vmcode& code, Program& prog, const primitive_map& pm, const std::map<std::string, external_function>& external_functions, const compiler_options& options)
   {
@@ -1669,7 +1742,9 @@ void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt,
   fns.inlined_primitives = &inlined_prims;
   fns.externals = &external_functions;
   
-  preprocess(env, rd, md, ctxt, prog, pm, options);
+  cinput_data cinput;
+  
+  preprocess(env, rd, md, ctxt, cinput, prog, pm, options);
   label = 0;
 
   compile_data data = create_compile_data(ctxt.total_heap_size, ctxt.globals_end - ctxt.globals, (uint32_t)ctxt.number_of_locals, &ctxt);
@@ -1698,6 +1773,9 @@ void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt,
                                                        // does not pop every stack position that was pushed due to continuation passing style.
 
   code.add(vmcode::MOV, ALLOC, ALLOC_SAVED);
+  
+  compile_cinput_parameters(cinput, env, code);
+  
   /*
   Make registers point to unalloc_tag, so that gc cannot crash due to old register content
   */

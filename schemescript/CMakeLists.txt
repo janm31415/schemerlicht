@@ -1,4 +1,6 @@
 set(HDRS
+cinput_data.h
+cinput_conversion.h
 load_lib.h
 compiler.h
 runtime.h
@@ -61,6 +63,7 @@ visitor.h
 )
 	
 set(SRCS
+cinput_conversion.cpp
 compiler.cpp
 runtime.cpp
 reg_alloc.cpp
