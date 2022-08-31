@@ -1,4 +1,5 @@
 set(HDRS
+load_lib.h
 compiler.h
 runtime.h
 reg_alloc.h
@@ -67,6 +68,7 @@ reg_alloc_map.cpp
 compile_data.cpp
 asm_aux.cpp
 inlines.cpp
+load_lib.cpp
 asm_aux.cpp
 globals.cpp
 primitives.cpp
@@ -136,3 +138,13 @@ target_link_libraries(schemescript
     PRIVATE	
 	  vm
     )	
+
+if (WIN32)
+add_custom_command(TARGET schemescript POST_BUILD 
+   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/scm" "${CMAKE_CURRENT_BINARY_DIR}/scm")
+endif (WIN32)
+
+if (UNIX)
+add_custom_command(TARGET schemescript POST_BUILD 
+   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/scm" "$<TARGET_FILE_DIR:vm.tests>/scm")
+endif (UNIX)
