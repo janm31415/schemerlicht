@@ -3,6 +3,7 @@
 #include "namespace.h"
 #include "schemescript_api.h"
 #include "vm/vm.h"
+#include "compiler.h"
 #include <map>
 #include <string>
 
@@ -18,5 +19,11 @@ uint64_t _skiwi_current_seconds();
 uint64_t _skiwi_current_milliseconds();
 uint64_t _skiwi_sprintf(char *, const char * , const char* );
 uint64_t _skiwi_sprintf_floating(char * a, const char * b, double c);
+
+COMPILER_SCHEMESCRIPT_API void add_system_calls(std::map<std::string, external_function>& externals);
+
+VM::external_function convert_external_to_vm(const external_function& ext);
+std::vector<VM::external_function> convert_externals_to_vm(std::map<std::string, external_function>& externals);
+
 
 COMPILER_END

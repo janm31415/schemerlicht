@@ -1459,21 +1459,21 @@ namespace
         }
       }
 
-    code.add(vmcode::MOV, ALLOC_SAVED, ALLOC); // this line is here so that our foreign calls can access free heap memory
-    save_before_foreign_call(code);
-    align_stack(code);
-    code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
+    //code.add(vmcode::MOV, ALLOC_SAVED, ALLOC); // this line is here so that our foreign calls can access free heap memory
+    //save_before_foreign_call(code);
+    //align_stack(code);
+    //code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
 #ifdef _WIN32
-    code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
+    //code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
 #else
-    code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
+    //code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
 #endif
     code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, ext.address);
     code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-    code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-    restore_stack(code);
-    restore_after_foreign_call(code);
-    code.add(vmcode::MOV, ALLOC, ALLOC_SAVED); // foreign calls should have updated free heap memory if they used some
+    //code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
+    //restore_stack(code);
+    //restore_after_foreign_call(code);
+    //code.add(vmcode::MOV, ALLOC, ALLOC_SAVED); // foreign calls should have updated free heap memory if they used some
     switch (ext.return_type)
       {
       case external_function::T_BOOL:

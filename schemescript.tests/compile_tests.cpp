@@ -38,6 +38,7 @@
 #include "schemescript/types.h"
 #include "schemescript/visitor.h"
 #include "schemescript/load_lib.h"
+#include "schemescript/syscalls.h"
 
 
 #include <chrono>
@@ -67,6 +68,8 @@ namespace
 
     compile_fixture()
       {
+      add_system_calls(externals);
+      convert_externals_to_vm();
       ops = g_ops;
       stream_out = false;
       ctxt = create_context(1024 * 1024, 1024, 1024, 1024);
@@ -99,7 +102,39 @@ namespace
       destroy_macro_data(md);
       destroy_context(ctxt);
       }
+      
 
+    VM::external_function::argtype convert(COMPILER::external_function::argtype arg)
+      {
+      switch (arg)
+        {
+        case COMPILER::external_function::T_BOOL: return VM::external_function::T_BOOL;
+        case COMPILER::external_function::T_CHAR_POINTER: return VM::external_function::T_CHAR_POINTER;
+        case COMPILER::external_function::T_DOUBLE: return VM::external_function::T_DOUBLE;
+        case COMPILER::external_function::T_INT64: return VM::external_function::T_INT64;
+        case COMPILER::external_function::T_VOID: return VM::external_function::T_VOID;
+        case COMPILER::external_function::T_SCM: return VM::external_function::T_INT64;
+        default: return VM::external_function::T_VOID;
+        }
+      }
+      
+    void convert_externals_to_vm()
+      {
+      externals_for_vm.clear();
+      for (const auto& e : externals)
+        {
+        VM::external_function ef;
+        ef.name = e.second.name;
+        ef.address = e.second.address;
+        ef.return_type = convert(e.second.return_type);
+        for (auto arg : e.second.arguments)
+          {
+          ef.arguments.push_back(convert(arg));
+          }
+        externals_for_vm.push_back(ef);
+        }
+      }
+      
     vmcode get_vmcode(const std::string& script)
       {
       vmcode code;
@@ -2395,6 +2430,487 @@ namespace
       }
     };
 
+  uint64_t seventeen()
+    {
+    return 17;
+    }
+
+
+  struct foreign_call_1 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "seventeen";
+      ef.address = (uint64_t)&seventeen;
+      ef.return_type = external_function::T_INT64;
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      
+      TEST_EQ("17", run("(foreign-call seventeen)"));
+      }
+    };
+
+
+  int64_t add_two_integers(int64_t a, int64_t b)
+    {
+    return a + b;
+    }
+
+
+  struct foreign_call_2 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "add_two_integers";
+      ef.address = (uint64_t)&add_two_integers;
+      ef.return_type = external_function::T_INT64;
+      ef.arguments.push_back(external_function::T_INT64);
+      ef.arguments.push_back(external_function::T_INT64);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("15", run("(foreign-call add_two_integers 7 8)"));
+      }
+    };
+
+
+  double add_two_doubles(double a, double b)
+    {
+    return a + b;
+    }
+
+
+  struct foreign_call_3 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "add_two_doubles";
+      ef.address = (uint64_t)&add_two_doubles;
+      ef.return_type = external_function::T_DOUBLE;
+      ef.arguments.push_back(external_function::T_DOUBLE);
+      ef.arguments.push_back(external_function::T_DOUBLE);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("15", run("(foreign-call add_two_doubles 7.0 8.0)"));
+      }
+    };
+
+  double add_two_doubles_and_two_integers(double a, double b, int64_t c, int64_t d)
+    {
+    return a + b + c + d;
+    }
+
+
+  struct foreign_call_4 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "add_two_doubles_and_two_integers";
+      ef.address = (uint64_t)&add_two_doubles_and_two_integers;
+      ef.return_type = external_function::T_DOUBLE;
+      ef.arguments.push_back(external_function::T_DOUBLE);
+      ef.arguments.push_back(external_function::T_DOUBLE);
+      ef.arguments.push_back(external_function::T_INT64);
+      ef.arguments.push_back(external_function::T_INT64);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("18.6", run("(foreign-call add_two_doubles_and_two_integers 7.5 8.1 1 2)"));
+      }
+    };
+
+
+  void print_a_text(const char* txt)
+    {
+    printf("%s\n", txt);
+    }
+
+
+
+  struct foreign_call_5 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "print_a_text";
+      ef.address = (uint64_t)&print_a_text;
+      ef.return_type = external_function::T_VOID;
+      ef.arguments.push_back(external_function::T_CHAR_POINTER);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("0", run("(foreign-call print_a_text \"Hello world!\")"));
+      }
+    };
+
+  const char* get_a_text()
+    {
+    return "This is a text";
+    }
+
+
+
+  struct foreign_call_6 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "get_a_text";
+      ef.address = (uint64_t)&get_a_text;
+      ef.return_type = external_function::T_CHAR_POINTER;
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("\"This is a text\"", run("(foreign-call get_a_text)"));
+      }
+    };
+
+  struct foreign_call_7 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "printf";
+      ef.address = (uint64_t)&printf;
+      ef.return_type = external_function::T_VOID;
+      ef.arguments.push_back(external_function::T_CHAR_POINTER);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("0", run("(foreign-call printf \"Hello world!\n\")"));
+      }
+    };
+
+
+  int64_t get_a_boolean(bool b)
+    {
+    if (b)
+      return 100;
+    else
+      return 200;
+    }
+
+
+  struct foreign_call_8 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "get_a_boolean";
+      ef.address = (uint64_t)&get_a_boolean;
+      ef.return_type = external_function::T_INT64;
+      ef.arguments.push_back(external_function::T_BOOL);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("100", run("(foreign-call get_a_boolean #t)"));
+      TEST_EQ("200", run("(foreign-call get_a_boolean #f)"));
+      TEST_EQ("100", run("(foreign-call get_a_boolean 34859)"));
+      }
+    };
+
+
+
+  bool is_even(int64_t i)
+    {
+    return (i % 2 == 0);
+    }
+
+
+  struct foreign_call_9 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "is_even";
+      ef.address = (uint64_t)&is_even;
+      ef.return_type = external_function::T_BOOL;
+      ef.arguments.push_back(external_function::T_INT64);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      TEST_EQ("#f", run("(foreign-call is_even 1)"));
+      TEST_EQ("#t", run("(foreign-call is_even 2)"));
+      TEST_EQ("#f", run("(foreign-call is_even 3)"));
+      TEST_EQ("#t", run("(foreign-call is_even 4)"));
+      }
+    };
+
+  struct foreign_call_10 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "add-two-integers";
+      ef.address = (uint64_t)&add_two_integers;
+      ef.return_type = external_function::T_INT64;
+      ef.arguments.push_back(external_function::T_INT64);
+      ef.arguments.push_back(external_function::T_INT64);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      run("(define (add-two-integers a b) (foreign-call add-two-integers a b))");
+      TEST_EQ("15", run("(add-two-integers 7 8)"));
+      }
+    };
+
+  void print_scheme_variable(uint64_t i)
+    {
+    std::shared_ptr<environment<environment_entry>> env;
+    repl_data rd;
+    scheme_runtime(i, std::cout, env, rd, nullptr);
+    }
+
+  struct foreign_call_11 : public compile_fixture {
+    void test()
+      {
+      external_function ef;
+      ef.name = "print-scheme-variable";
+      ef.address = (uint64_t)&print_scheme_variable;
+      ef.return_type = external_function::T_VOID;
+      ef.arguments.push_back(external_function::T_SCM);
+      externals[ef.name] = ef;
+      convert_externals_to_vm();
+      run("(define a (vector 1 0 0 0 0 1 0 0 0 0 1 0 20 30 40 1))");
+      run("(foreign-call print-scheme-variable a)");
+      std::cout << std::endl;
+      }
+    };
+
+  struct case_examples : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("big", run("(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])"));
+      TEST_EQ("75", run("(case (+ 7 3) [(10 11 12) 75])"));
+      TEST_EQ("small", run("(case (- 7 5) [(1 2 3) 'small] [(10 11 12) 'big])"));
+
+      TEST_EQ("composite", run("(case (* 2 3) [(2 3 5 7) 'prime][(1 4 6 8 9) 'composite])"));
+      TEST_EQ("#undefined", run("(case (car '(c d)) [(a) 'a] [(b) 'b])"));
+      TEST_EQ("consonant", run("(case (car '(c d)) [(a e i o u) 'vowel][(w y) 'semivowel][else 'consonant])"));
+      TEST_EQ("vowel", run("(case (car '(e d)) [(a e i o u) 'vowel][(w y) 'semivowel][else 'consonant])"));
+
+      //TEST_EQ("backwards", run("(case (list 'y 'x) [((a b) (x y)) 'forwards]  [((b a) (y x)) 'backwards])")); // this only works if case is rewritten with member instead of memv
+      TEST_EQ("5", run("(let ([x 3]) (case x [else 5]))"));
+
+      TEST_EQ("5", run("(let ([x #\\a]) (case x [(#\\newline) 7] [else 5]))"));
+      TEST_EQ("5", run("(let ([x #\\a]) (case x [(#\\newline) (char->fixnum x)] [else 5]))"));
+      TEST_EQ("10", run("(let ([x #\\newline]) (case x [(#\\newline) (char->fixnum x)] [else 5]))"));
+      TEST_EQ("#t", run("(let ([x #\\newline]) (eqv? x #\\newline))"));
+      TEST_EQ("(#\\010)", run("(let ([x #\\newline]) (memv x '(#\\newline)))"));
+      }
+    };
+
+  struct memv : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("(2 3 4)", run("(memv 2 (list 1 2 3 4))"));
+      TEST_EQ("#f", run("(memv 9 (list 1 2 3 4))"));
+      TEST_EQ("(101 102)", run("(memv 101 '(100 101 102))"));
+
+      TEST_EQ("#f", run("(memv 101 '((b a) (y x)))"));
+      TEST_EQ("(a c)", run("(memv 'a '(b a c))"));
+      TEST_EQ("#f", run("(memv '(y x) '((b a) (y x)))"));
+      }
+    };
+
+  struct memq : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("(2 3 4)", run("(memq 2 (list 1 2 3 4))"));
+      TEST_EQ("#f", run("(memq 9 (list 1 2 3 4))"));
+      TEST_EQ("(101 102)", run("(memq 101 '(100 101 102))"));
+
+      TEST_EQ("#f", run("(memq 101 '((b a) (y x)))"));
+      TEST_EQ("(a c)", run("(memq 'a '(b a c))"));
+      TEST_EQ("#f", run("(memq '(y x) '((b a) (y x)))"));
+      }
+    };
+
+  struct member : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("(2 3 4)", run("(member 2 (list 1 2 3 4))"));
+      TEST_EQ("#f", run("(member 9 (list 1 2 3 4))"));
+      TEST_EQ("(101 102)", run("(member 101 '(100 101 102))"));
+
+      TEST_EQ("#f", run("(member 101 '((b a) (y x)))"));
+      TEST_EQ("(a c)", run("(member 'a '(b a c))"));
+      TEST_EQ("((y x))", run("(member '(y x) '((b a) (y x)))"));
+      }
+    };
+
+  struct equality : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("#t", run("(equal? 'yes 'yes)"));
+      TEST_EQ("#f", run("(equal? 'yes 'no)"));
+      TEST_EQ("#t", run("(equal? (* 6 7) 42)"));
+      TEST_EQ("#f", run("(equal? 2 2.0)"));
+      TEST_EQ("#t", run("(let ([v (cons 1 2)]) (equal? v v))"));
+      TEST_EQ("#t", run("(equal? (cons 1 2) (cons 1 2))"));
+      TEST_EQ("#t", run("(equal? (cons (cons 3 4) 2) (cons (cons 3 4) 2))"));
+      TEST_EQ("#t", run("(equal? (fixnum->char 955) (fixnum->char 955))"));
+      TEST_EQ("#t", run("(equal? (make-string 3 #\\z) (make-string 3 #\\z))"));
+      TEST_EQ("#t", run("(equal? #t #t)"));
+
+      TEST_EQ("#t", run("(%eqv? 'yes 'yes)"));
+      TEST_EQ("#f", run("(%eqv? 'yes 'no)"));
+      TEST_EQ("#t", run("(%eqv? (* 6 7) 42)"));
+      TEST_EQ("#f", run("(%eqv? 2 2.0)"));
+      TEST_EQ("#t", run("(let ([v (cons 1 2)]) (%eqv? v v))"));
+      TEST_EQ("#t", run("(%eqv? (cons 1 2) (cons 1 2))"));
+      TEST_EQ("#f", run("(%eqv? (cons (cons 3 4) 2) (cons (cons 3 4) 2))"));
+      TEST_EQ("#t", run("(%eqv? (fixnum->char 955) (fixnum->char 955))"));
+      TEST_EQ("#t", run("(%eqv? (make-string 3 #\\z) (make-string 3 #\\z))"));
+      TEST_EQ("#t", run("(%eqv? #t #t)"));
+
+      TEST_EQ("#t", run("(eq? 'yes 'yes)"));
+      TEST_EQ("#f", run("(eq? 'yes 'no)"));
+      TEST_EQ("#t", run("(eq? (* 6 7) 42)"));
+      TEST_EQ("#f", run("(eq? 2 2.0)"));
+      TEST_EQ("#t", run("(let ([v (cons 1 2)]) (eq? v v))"));
+      TEST_EQ("#f", run("(eq? (cons 1 2) (cons 1 2))"));
+      TEST_EQ("#f", run("(eq? (cons (cons 3 4) 2) (cons (cons 3 4) 2))"));
+      TEST_EQ("#t", run("(eq? (fixnum->char 955) (fixnum->char 955))"));
+      TEST_EQ("#f", run("(eq? (make-string 3 #\\z) (make-string 3 #\\z))"));
+      TEST_EQ("#t", run("(eq? #t #t)"));
+      }
+    };
+
+  struct equality_inlined : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      ops.primitives_inlined = true;
+      TEST_EQ("#t", run("(equal? 'yes 'yes)"));
+      TEST_EQ("#f", run("(equal? 'yes 'no)"));
+      TEST_EQ("#t", run("(equal? (* 6 7) 42)"));
+      TEST_EQ("#f", run("(equal? 2 2.0)"));
+      TEST_EQ("#t", run("(let ([v (cons 1 2)]) (equal? v v))"));
+      TEST_EQ("#t", run("(equal? (cons 1 2) (cons 1 2))"));
+      TEST_EQ("#t", run("(equal? (cons (cons 3 4) 2) (cons (cons 3 4) 2))"));
+      TEST_EQ("#t", run("(equal? (fixnum->char 955) (fixnum->char 955))"));
+      TEST_EQ("#t", run("(equal? (make-string 3 #\\z) (make-string 3 #\\z))"));
+      TEST_EQ("#t", run("(equal? #t #t)"));
+
+      TEST_EQ("#t", run("(%eqv? 'yes 'yes)"));
+      TEST_EQ("#f", run("(%eqv? 'yes 'no)"));
+      TEST_EQ("#t", run("(%eqv? (* 6 7) 42)"));
+      TEST_EQ("#f", run("(%eqv? 2 2.0)"));
+      TEST_EQ("#t", run("(let ([v (cons 1 2)]) (eqv? v v))"));
+      TEST_EQ("#t", run("(%eqv? (cons 1 2) (cons 1 2))"));
+      TEST_EQ("#f", run("(%eqv? (cons (cons 3 4) 2) (cons (cons 3 4) 2))"));
+      TEST_EQ("#t", run("(%eqv? (fixnum->char 955) (fixnum->char 955))"));
+      TEST_EQ("#t", run("(%eqv? (make-string 3 #\\z) (make-string 3 #\\z))"));
+      TEST_EQ("#t", run("(%eqv? #t #t)"));
+
+      TEST_EQ("#t", run("(eq? 'yes 'yes)"));
+      TEST_EQ("#f", run("(eq? 'yes 'no)"));
+      TEST_EQ("#t", run("(eq? (* 6 7) 42)"));
+      TEST_EQ("#f", run("(eq? 2 2.0)"));
+      TEST_EQ("#t", run("(let ([v (cons 1 2)]) (eq? v v))"));
+      TEST_EQ("#f", run("(eq? (cons 1 2) (cons 1 2))"));
+      TEST_EQ("#f", run("(eq? (cons (cons 3 4) 2) (cons (cons 3 4) 2))"));
+      TEST_EQ("#t", run("(eq? (fixnum->char 955) (fixnum->char 955))"));
+      TEST_EQ("#f", run("(eq? (make-string 3 #\\z) (make-string 3 #\\z))"));
+      TEST_EQ("#t", run("(eq? #t #t)"));
+      }
+    };
+
+  struct apply : public compile_fixture {
+    void test()
+      {
+      build_string_to_symbol();
+      build_apply();
+      TEST_EQ("0", run("(apply + ())"));
+      TEST_EQ("7", run("(apply + (list 3 4))"));
+      TEST_EQ("10", run("(apply + (list 1 2 3 4))"));
+      TEST_EQ("10", run("(apply + 1 2 (list 3 4))"));
+      TEST_EQ("36", run("(apply + (list 1 2 3 4 5 6 7 8))"));
+      TEST_EQ("45", run("(apply + (list 1 2 3 4 5 6 7 8 9))"));
+      TEST_EQ("55", run("(apply + (list 1 2 3 4 5 6 7 8 9 10))"));
+      TEST_EQ("55", run("(%apply + 1 2 3 4 5 6 7 8 9 (list 10))"));
+
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector '(1 2 3 4 5 6 7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 '(2 3 4 5 6 7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 '(3 4 5 6 7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 3 '(4 5 6 7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 3 4 '(5 6 7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 3 4 5 '(6 7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 3 4 5 6 '(7 8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 3 4 5 6 7 '(8)) '())"));
+      TEST_EQ("(#(1 2 3 4 5 6 7 8))", run("(cons(apply vector 1 2 3 4 5 6 7 8 ()) '())"));
+
+      TEST_EQ("13", run("(let([f(lambda() 12)])( + (apply f '()) 1))"));
+      TEST_EQ("26", run("(let([f(lambda(x) ( + x 12))]) ( + (apply f 13 '()) 1))"));
+      TEST_EQ("26", run("(let([f(lambda(x) ( + x 12))]) ( + (apply f(cons 13 '())) 1))"));
+      TEST_EQ("27", run("(let([f(lambda(x y z) ( + x(* y z)))])( + (apply f 12 '(7 2)) 1))"));
+
+      TEST_EQ("12", run("(let([f(lambda() 12)])(apply f '()))"));
+      TEST_EQ("25", run("(let([f(lambda(x) ( + x 12))])(apply f 13 '()))"));
+      TEST_EQ("25", run("(let([f(lambda(x) ( + x 12))])(apply f(cons 13 '())))"));
+      TEST_EQ("26", run("(let([f(lambda(x y z) ( + x(* y z)))])(apply f 12 '(7 2)))"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector '(1 2 3 4 5 6 7 8))"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 '(2 3 4 5 6 7 8))"));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 '(3 4 5 6 7 8)) "));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 3 '(4 5 6 7 8)) "));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 3 4 '(5 6 7 8)) "));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 3 4 5 '(6 7 8)) "));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 3 4 5 6 '(7 8)) "));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 3 4 5 6 7 '(8)) "));
+      TEST_EQ("#(1 2 3 4 5 6 7 8)", run("(apply vector 1 2 3 4 5 6 7 8 ())"));
+
+
+      TEST_EQ("<lambda>", run("(define compose (lambda(f g)(lambda args(f(apply g args)))))"));
+      TEST_EQ("<lambda>", run("(define twice (lambda (x) (* 2 x)))"));
+      TEST_EQ("1800", run("((compose twice *) 12 75)"));
+      }
+    };
+
+  struct long_apply_test : public compile_fixture {
+    void test()
+      {
+      make_new_context(1024, 1024, 80, 128);
+      build_string_to_symbol();
+      build_apply();
+      TEST_EQ("15", run("(apply + (list 1 2 3 4 5))"));
+      TEST_EQ("(8 7 6 5 4 3 2 1)", run("(define dm (list 8 7 6 5 4 3 2 1))"));
+      TEST_EQ("(9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 9 dm))"));
+      TEST_EQ("(10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 10 dm))"));
+      TEST_EQ("(11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 11 dm))"));
+      TEST_EQ("(12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 12 dm))"));
+      TEST_EQ("(13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 13 dm))"));
+      TEST_EQ("(14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 14 dm))"));
+      TEST_EQ("(15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 15 dm))"));
+      TEST_EQ("(16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 16 dm))"));
+      TEST_EQ("(17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 17 dm))"));
+      TEST_EQ("(18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 18 dm))"));
+      TEST_EQ("(19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 19 dm))"));
+      TEST_EQ("190", run("(apply + dm)"));
+      TEST_EQ("19", run("(length dm)"));
+      TEST_EQ("(20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 20 dm))"));
+      TEST_EQ("210", run("(apply + dm)"));
+      TEST_EQ("20", run("(length dm)"));
+      TEST_EQ("(21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 21 dm))"));
+      TEST_EQ("(22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 22 dm))"));
+      TEST_EQ("(23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 23 dm))"));
+      TEST_EQ("(24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 24 dm))"));
+      TEST_EQ("(25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1)", run("(set! dm (cons 25 dm))"));
+      TEST_EQ("325", run("(apply + dm)"));
+      TEST_EQ("25", run("(length dm)"));
+      /*
+      TEST_EQ("210", run("(apply + (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))"));
+      TEST_EQ("<lambda>", run("(define (rms nums) (sqrt (/ (apply + (map * nums nums))(length nums))))"));
+      TEST_EQ("11.9791", run("(rms (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("(define dm (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("dm"));
+      TEST_EQ("11.9791", run("(rms dm)"));
+      TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("dm"));
+      */
+      }
+    };
+
+  struct fib_iterative_perf_test : public compile_fixture
+    {
+    void test()
+      {
+      TEST_EQ("<lambda>", run("(define fib (lambda (n) (define iter (lambda (a b c) (cond [(= c 0) b]  [else (iter (+ a b) a (- c 1))]) ) ) (iter 1 0 n) ))"));
+      TEST_EQ("21", run("(fib 8)"));
+      TEST_EQ("165580141", run("(fib 41)"));
+      TEST_EQ("-4249520595888827205", run("(fib 1000000)"));
+      }
+    };
     
   }
   
@@ -2422,6 +2938,7 @@ void run_all_compile_tests()
       default:
         break;
       }
+#if 0
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -2509,6 +3026,29 @@ void run_all_compile_tests()
     lambda_variable_arity_while_using_rest_arg().test();
     lambda_bug().test();
     lambda_variable_arity_while_using_rest_arg_and_closure().test();
-    //fib_perf_test().test();
+#endif
+    foreign_call_1().test();
+    foreign_call_2().test();
+    foreign_call_3().test();
+    foreign_call_4().test();
+    foreign_call_5().test();
+    foreign_call_6().test();
+    foreign_call_7().test();
+    foreign_call_8().test();
+    foreign_call_9().test();
+    foreign_call_10().test();
+    foreign_call_11().test();
+#if 0
+    case_examples().test();
+    memv().test();
+    memq().test();
+    member().test();
+    equality().test();
+    equality_inlined().test();
+    apply().test();
+    long_apply_test().test();
+    fib_iterative_perf_test().test();
+    fib_perf_test().test();
+#endif
     }
   }

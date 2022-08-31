@@ -126,4 +126,181 @@ uint64_t _skiwi_sprintf(char * a, const char * b, const char* c)
     return (uint64_t)value;
 }
 
+
+void add_system_calls(std::map<std::string, external_function>& externals)
+  {
+  external_function ef;
+  ef.name = "_write";
+#ifdef _WIN32
+  ef.address = (uint64_t)&_write;
+#else
+  ef.address = (uint64_t)&write;
+#endif
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_open";
+#ifdef _WIN32
+  ef.address = (uint64_t)&_open;
+#else
+  ef.address = (uint64_t)&open;
+#endif
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "strtoll";
+  ef.address = (uint64_t)&strtoll;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "strtod";
+  ef.address = (uint64_t)&strtod;
+  ef.return_type = external_function::T_DOUBLE;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+  
+  ef.arguments.clear();
+  ef.name = "_skiwi_sprintf";
+  ef.address = (uint64_t)&_skiwi_sprintf;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  externals[ef.name] = ef;
+    
+ef.arguments.clear();
+ef.name = "_skiwi_sprintf_floating";
+ef.address = (uint64_t)&_skiwi_sprintf_floating;
+ef.return_type = external_function::T_INT64;
+ef.arguments.push_back(external_function::T_CHAR_POINTER);
+ef.arguments.push_back(external_function::T_CHAR_POINTER);
+ef.arguments.push_back(external_function::T_DOUBLE);
+externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_close";
+  ef.address = (uint64_t)&_skiwi_close;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_read";
+  ef.address = (uint64_t)&_skiwi_read;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_write";
+  ef.address = (uint64_t)&_skiwi_write;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_getenv";
+  ef.address = (uint64_t)&_skiwi_getenv;
+  ef.return_type = external_function::T_CHAR_POINTER;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_putenv";
+  ef.address = (uint64_t)&_skiwi_putenv;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_file_exists";
+  ef.address = (uint64_t)&_skiwi_file_exists;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_current_seconds";
+  ef.address = (uint64_t)&_skiwi_current_seconds;
+  ef.return_type = external_function::T_INT64;
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_skiwi_current_milliseconds";
+  ef.address = (uint64_t)&_skiwi_current_milliseconds;
+  ef.return_type = external_function::T_INT64;
+  externals[ef.name] = ef;
+/*
+  ef.arguments.clear();
+  ef.name = "c_prim_load";
+  ef.address = (uint64_t)&c_prim_load;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "c_prim_eval";
+  ef.address = (uint64_t)&c_prim_eval;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  externals[ef.name] = ef;
+*/
+  }
+
+namespace {
+VM::external_function::argtype convert(COMPILER::external_function::argtype arg)
+  {
+  switch (arg)
+    {
+    case COMPILER::external_function::T_BOOL: return VM::external_function::T_BOOL;
+    case COMPILER::external_function::T_CHAR_POINTER: return VM::external_function::T_CHAR_POINTER;
+    case COMPILER::external_function::T_DOUBLE: return VM::external_function::T_DOUBLE;
+    case COMPILER::external_function::T_INT64: return VM::external_function::T_INT64;
+    case COMPILER::external_function::T_VOID: return VM::external_function::T_VOID;
+    case COMPILER::external_function::T_SCM: return VM::external_function::T_INT64;
+    default: return VM::external_function::T_VOID;
+    }
+  }
+}
+
+VM::external_function convert_external_to_vm(const external_function& ext)
+{
+    VM::external_function ef;
+    ef.name = ext.name;
+    ef.address = ext.address;
+    ef.return_type = convert(ext.return_type);
+    for (auto arg : ext.arguments)
+      {
+      ef.arguments.push_back(convert(arg));
+      }
+    return ef;
+}
+std::vector<VM::external_function> convert_externals_to_vm(std::map<std::string, external_function>& externals)
+  {
+  std::vector<VM::external_function> out;
+  for (const auto& e : externals)
+    {
+    out.push_back(convert_external_to_vm(e.second));
+    }
+    return out;
+  }
+
 COMPILER_END

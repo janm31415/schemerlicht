@@ -1498,6 +1498,29 @@ namespace
     calling_registers.push_back(vmcode::R9);
     return calling_registers;
     }
+    
+
+  std::vector<vmcode::operand> get_windows_calling_registers()
+    {
+    std::vector<vmcode::operand> calling_registers;
+    calling_registers.push_back(vmcode::RCX);
+    calling_registers.push_back(vmcode::RDX);
+    calling_registers.push_back(vmcode::R8);
+    calling_registers.push_back(vmcode::R9);
+    return calling_registers;
+    }
+
+  std::vector<vmcode::operand> get_linux_calling_registers()
+    {
+    std::vector<vmcode::operand> calling_registers;
+    calling_registers.push_back(vmcode::RDI);
+    calling_registers.push_back(vmcode::RSI);
+    calling_registers.push_back(vmcode::RDX);
+    calling_registers.push_back(vmcode::RCX);
+    calling_registers.push_back(vmcode::R8);
+    calling_registers.push_back(vmcode::R9);
+    return calling_registers;
+    }
 
   std::vector<vmcode::operand> get_floating_point_registers()
     {
@@ -1506,6 +1529,8 @@ namespace
     calling_registers.push_back(vmcode::XMM1);
     calling_registers.push_back(vmcode::XMM2);
     calling_registers.push_back(vmcode::XMM3);
+    calling_registers.push_back(vmcode::XMM4);
+    calling_registers.push_back(vmcode::XMM5);
     return calling_registers;
     }
 
@@ -1513,6 +1538,8 @@ namespace
     {
     switch (reg)
       {
+      case vmcode::RDI: return regs.rdi;
+      case vmcode::RSI: return regs.rsi;
       case vmcode::RDX: return regs.rdx;
       case vmcode::RCX: return regs.rcx;
       case vmcode::R8: return regs.r8;
@@ -1529,6 +1556,8 @@ namespace
       case vmcode::XMM1: return regs.xmm1;
       case vmcode::XMM2: return regs.xmm2;
       case vmcode::XMM3: return regs.xmm3;
+      case vmcode::XMM4: return regs.xmm4;
+      case vmcode::XMM5: return regs.xmm5;
       default: throw std::runtime_error("Invalid floating point register as argument used");
       }
     }
@@ -1536,7 +1565,7 @@ namespace
 
   std::vector<vmcode::operand> _get_arguments(const external_function& f)
     {
-
+#if 0
     static std::vector<vmcode::operand> arg_reg = get_calling_registers();
     static std::vector<vmcode::operand> arg_float_reg = get_floating_point_registers();
 
@@ -1547,6 +1576,63 @@ namespace
       }
 
     return arg_regs;
+#else
+#ifdef _WIN32
+    static std::vector<vmcode::operand> arg_reg = get_windows_calling_registers();
+#else
+    static std::vector<vmcode::operand> arg_reg = get_linux_calling_registers();
+#endif
+    static std::vector<vmcode::operand> arg_float_reg = get_floating_point_registers();
+#ifndef _WIN32
+    std::vector<vmcode::operand> arg_regs;
+    int regular_arg_id = 0;
+    int floating_arg_id = 0;
+    for (size_t i = 0; i < f.arguments.size(); ++i)
+      {
+      if (f.arguments[i] == external_function::T_DOUBLE)
+        {
+        arg_regs.push_back(arg_float_reg[floating_arg_id]);
+        ++floating_arg_id;
+        }
+      else
+        {
+        arg_regs.push_back(arg_reg[regular_arg_id]);
+        ++regular_arg_id;
+        }
+      }
+#endif
+
+    std::vector<vmcode::operand> args;
+    for (size_t i = 0; i < f.arguments.size(); ++i)
+      {
+      switch (f.arguments[i])
+        {
+        case external_function::T_CHAR_POINTER:
+        case external_function::T_INT64:
+        case external_function::T_BOOL:
+        {
+#ifdef _WIN32
+        auto reg = arg_reg[i];
+#else
+        auto reg = arg_regs[i];
+#endif
+        args.push_back(reg);
+        break;
+        }
+        case external_function::T_DOUBLE:
+        {
+#ifdef _WIN32
+        auto reg = arg_float_reg[i];
+#else
+        auto reg = arg_regs[i];
+#endif
+        args.push_back(reg);
+        break;
+        }
+        }
+      }
+    return args;
+#endif
     }
 
   template <class T>
