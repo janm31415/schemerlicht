@@ -3399,7 +3399,8 @@ namespace
       TEST_EQ("\"+inf.0\"", run("(number->string (/ 1.0 0.0))"));
       TEST_EQ("\"-inf.0\"", run("(number->string (/ -1.0 0.0))"));
 
-      TEST_EQ("runtime error: str2num: contract violation", run("(str2num 25 10)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: str2num: contract violation", run("(str2num 25 10)"));
       TEST_EQ("#f", run("(str2num \"\" 10)"));
       TEST_EQ("25", run("(str2num \"25\" 10)"));
       TEST_EQ("21", run("(str2num \"25\" 8)"));
@@ -3438,8 +3439,11 @@ namespace
       TEST_EQ("#t", run(R"((char=? #\A #\A))"));
       TEST_EQ("#f", run(R"((char=? #\A #\a))"));
 
-      TEST_EQ("runtime error: char=?: contract violation", run(R"((char=? #\A 2))"));
-      TEST_EQ("runtime error: char=?: contract violation", run(R"((char=? #\A #\A #\b))"));
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: char=?: contract violation", run(R"((char=? #\A 2))"));
+        TEST_EQ("runtime error: char=?: contract violation", run(R"((char=? #\A #\A #\b))"));
+        }
 
       TEST_EQ("#t", run(R"((char<? #\a #\b))"));
       TEST_EQ("#f", run(R"((char<? #\b #\a))"));
@@ -3643,7 +3647,8 @@ namespace
 
       TEST_EQ("\"sym\"", run("(symbol->string 'sym)"));
       TEST_EQ("\"thisisaverylongsymbol\"", run("(symbol->string 'thisisaverylongsymbol)"));
-      TEST_EQ("runtime error: symbol->string: contract violation", run("(symbol->string '())"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: symbol->string: contract violation", run("(symbol->string '())"));
 
       TEST_EQ("((a 1) (b 2) (c 3))", run("(define e '((a 1 ) ( b 2) (c 3)) )"));
       TEST_EQ("(a 1)", run("(assv 'a e)"));
@@ -3660,7 +3665,8 @@ namespace
 
       TEST_EQ("\"sym\"", run("(string-copy \"sym\")"));
       TEST_EQ("\"thisisaverylongstring\"", run("(string-copy \"thisisaverylongstring\")"));
-      TEST_EQ("runtime error: string-copy: contract violation", run("(string-copy '())"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string-copy: contract violation", run("(string-copy '())"));
 
       TEST_EQ("#f", run("(let ([s \"str\"])  (eq? s (string-copy s)))"));
       TEST_EQ("#t", run("(let ([s \"str\"])  (%eqv? s (string-copy s)))"));
@@ -3670,7 +3676,8 @@ namespace
       TEST_EQ("#f", run("(string=? \"Jan\" \"Jan2\")"));
       TEST_EQ("#f", run("(string=? \"Jan\" 'Jan)"));
 
-      TEST_EQ("runtime error: compare-strings: contract violation", run("(compare-strings \"Jan\" \"Jan\")"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: compare-strings: contract violation", run("(compare-strings \"Jan\" \"Jan\")"));
       TEST_EQ("0", run("(compare-strings \"bbb\" \"bbb\" 3)"));
       TEST_EQ("-1", run("(compare-strings \"aaa\" \"bbb\" 3)"));
       TEST_EQ("1", run("(compare-strings \"ccc\" \"bbb\" 3)"));
@@ -3709,7 +3716,8 @@ namespace
       TEST_EQ("#t", run(R"((string>=? "abcd" "abc"))"));
       TEST_EQ("#t", run(R"((string>=? "abc" "abc"))"));
 
-      TEST_EQ("runtime error: string-length: contract violation", run(R"((string>=? "abc" 5))"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string-length: contract violation", run(R"((string>=? "abc" 5))"));
 
       TEST_EQ(R"((#\a #\b #\c))", run(R"((string->list "abc"))"));
       TEST_EQ(R"("abc")", run(R"((list->string (list #\a #\b #\c)))"));
@@ -3717,7 +3725,8 @@ namespace
 
       TEST_EQ("\"a\"", run("(char->string #\\a)"));
 
-      TEST_EQ("runtime error: compare-strings-ci: contract violation", run("(compare-strings-ci \"Jan\" \"Jan\")"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: compare-strings-ci: contract violation", run("(compare-strings-ci \"Jan\" \"Jan\")"));
       TEST_EQ("0", run("(compare-strings-ci \"bbb\" \"bbb\" 3)"));
       TEST_EQ("0", run("(compare-strings-ci \"bbb\" \"bBb\" 3)"));
       TEST_EQ("0", run("(compare-strings-ci \"BBb\" \"bBb\" 3)"));
