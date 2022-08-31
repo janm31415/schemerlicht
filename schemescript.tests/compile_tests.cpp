@@ -4551,6 +4551,196 @@ to /* and */ in c/c++
       }
     };
     
+
+  struct c_input_test_5doubles : public compile_fixture
+    {
+    void test()
+      {
+      std::stringstream str, str2;
+      std::string script = R"(
+(c-input "(double a, double b, double c, double d, double e) " )
+
+(+ a b c d e)
+)";
+      bool error = false;
+      vmcode code;
+      try
+        {
+        code = get_vmcode(script);
+        }
+      catch (std::logic_error e)
+        {
+        error = true;
+        str << e.what();
+        }
+      if (!error)
+        {
+        first_pass_data d;
+        uint64_t size;
+        uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
+        try {
+          reg.rcx = (uint64_t)(&ctxt);
+          reg.xmm1 = 3.4;
+          reg.xmm2 = 6.7;
+          reg.xmm3 = 1.1;
+          double tmp1 = 2.2;
+          double tmp2 = 3.3;
+          //code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RSP, (40 + addr * 8));
+          reg.stack[255] = *reinterpret_cast<uint64_t*>(&tmp2);
+          reg.stack[254] = *reinterpret_cast<uint64_t*>(&tmp1);
+          reg.rsp = (uint64_t)(&reg.stack[250]);
+          run_bytecode(f, size, reg);
+          scheme_runtime(reg.rax, str, env, rd, nullptr);
+          reg.rcx = (uint64_t)(&ctxt);
+          reg.xmm1 = 0.0;
+          reg.xmm2 = 0.0;
+          reg.xmm3 = 0.0;
+          tmp1 = 101.123;
+          tmp2 = 4.5;
+          reg.stack[255] = *reinterpret_cast<uint64_t*>(&tmp2);
+          reg.stack[254] = *reinterpret_cast<uint64_t*>(&tmp1);
+          reg.rsp = (uint64_t)(&reg.stack[250]);
+          run_bytecode(f, size, reg);
+          scheme_runtime(reg.rax, str2, env, rd, nullptr);
+          }
+        catch (std::logic_error e)
+          {
+          std::cout << e.what() << "\n";
+          }
+        compiled_bytecode.emplace_back(f, size);
+
+        }
+      TEST_EQ("16.7", str.str());
+      TEST_EQ("105.623", str2.str());
+      }
+    };
+  
+  struct c_input_test_8doubles : public compile_fixture
+    {
+    void test()
+      {
+      std::stringstream str, str2;
+      std::string script = R"(
+(c-input "(double a, double b, double c, double d, double e, double f, double g, double h) " )
+
+(+ a b c d e f g h)
+)";
+      bool error = false;
+      vmcode code;
+      try
+        {
+        code = get_vmcode(script);
+        }
+      catch (std::logic_error e)
+        {
+        error = true;
+        str << e.what();
+        }
+      if (!error)
+        {
+        first_pass_data d;
+        uint64_t size;
+        uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
+        try {
+          reg.rcx = (uint64_t)(&ctxt);
+          reg.xmm1 = 1.1;
+          reg.xmm2 = 2.2;
+          reg.xmm3 = 3.3;
+          double tmp1 = 4.4;
+          double tmp2 = 5.5;
+          double tmp3 = 6.6;
+          double tmp4 = 7.7;
+          double tmp5 = 8.8;
+          //code.add(vmcode::MOV, vmcode::RAX, vmcode::MEM_RSP, (40 + addr * 8));
+          reg.stack[255] = *reinterpret_cast<uint64_t*>(&tmp5);
+          reg.stack[254] = *reinterpret_cast<uint64_t*>(&tmp4);
+          reg.stack[253] = *reinterpret_cast<uint64_t*>(&tmp3);
+          reg.stack[252] = *reinterpret_cast<uint64_t*>(&tmp2);
+          reg.stack[251] = *reinterpret_cast<uint64_t*>(&tmp1);
+          reg.rsp = (uint64_t)(&reg.stack[247]);
+          run_bytecode(f, size, reg);
+          scheme_runtime(reg.rax, str, env, rd, nullptr);
+          }
+        catch (std::logic_error e)
+          {
+          std::cout << e.what() << "\n";
+          }
+        compiled_bytecode.emplace_back(f, size);
+        }
+      TEST_EQ("39.6", str.str());
+      }
+    };
+    
+  struct current_seconds_test : public compile_fixture
+    {
+    void test()
+      {
+      uint64_t secondsUTC = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+      vmcode code;
+      uint64_t res = 0;
+      try
+        {
+        code = get_vmcode("(current-seconds)");
+        }
+      catch (std::logic_error e)
+        {
+        std::cout << e.what();
+        }
+      first_pass_data d;
+      uint64_t size;
+      uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
+      try {
+        run_bytecode(f, size, reg, externals_for_vm);
+        res = reg.rax;
+        res >>= 1;
+        }
+      catch (std::logic_error e)
+        {
+        std::cout << e.what() << "\n";
+        }
+      compiled_bytecode.emplace_back(f, size);
+      TEST_ASSERT(secondsUTC <= res);
+      secondsUTC = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+      TEST_ASSERT(res <= secondsUTC);
+      }
+    };
+
+  struct current_milliseconds_test : public compile_fixture
+    {
+    void test()
+      {
+      uint64_t millisecondsUTC = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+      vmcode code;
+      uint64_t res = 0;
+      try
+        {
+        code = get_vmcode("(current-milliseconds)");
+        }
+      catch (std::logic_error e)
+        {
+        std::cout << e.what();
+        }
+      first_pass_data d;
+      uint64_t size;
+      uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
+      try {
+        run_bytecode(f, size, reg, externals_for_vm);
+        res = reg.rax;
+        res >>= 1;
+        }
+      catch (std::logic_error e)
+        {
+        std::cout << e.what() << "\n";
+        }
+      compiled_bytecode.emplace_back(f, size);
+      TEST_ASSERT(millisecondsUTC <= res);
+      millisecondsUTC = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+      TEST_ASSERT(res <= millisecondsUTC);
+      }
+    };
+    
   }
   
 COMPILER_END
@@ -4730,5 +4920,9 @@ void run_all_compile_tests()
     many_vars_in_lambda_test().test();
 #endif
     c_input_test_2doubles().test();
+    c_input_test_5doubles().test();
+    c_input_test_8doubles().test();
+    current_seconds_test().test();
+    current_milliseconds_test().test();
     }
   }
