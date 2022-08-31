@@ -52,10 +52,13 @@ namespace
       case vmcode::CSQRT:return 2;
       case vmcode::CSIN:return 2;
       case vmcode::CCOS:return 2;
+      case vmcode::CASIN:return 2;
+      case vmcode::CACOS:return 2;
       case vmcode::CEXP:return 2;
       case vmcode::CLOG:return 2;
       case vmcode::CLOG2:return 2;
       case vmcode::CABS:return 2;
+      case vmcode::CROUND:return 2;
       case vmcode::CTAN:return 2;
       case vmcode::CATAN:return 2;
       case vmcode::CATAN2:return 2;
@@ -1217,6 +1220,22 @@ namespace
       }
     };
 
+  struct CArcSinOper
+    {
+    static void apply(double& left, double right)
+      {
+      left = std::asin(right);
+      }
+    };
+
+  struct CArcCosOper
+    {
+    static void apply(double& left, double right)
+      {
+      left = std::acos(right);
+      }
+    };
+
   struct CExpOper
     {
     static void apply(double& left, double right)
@@ -1246,6 +1265,14 @@ namespace
     static void apply(double& left, double right)
       {
       left = std::abs(right);
+      }
+    };
+    
+  struct CRoundOper
+    {
+    static void apply(double& left, double right)
+      {
+      left = std::round(right);
       }
     };
 
@@ -2230,6 +2257,16 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
       execute_double_operation<CCosOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
       break;
       }
+      case vmcode::CASIN:
+      {
+      execute_double_operation<CArcSinOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
+      case vmcode::CACOS:
+      {
+      execute_double_operation<CArcCosOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
       case vmcode::CEXP:
       {
       execute_double_operation<CExpOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
@@ -2248,6 +2285,11 @@ void run_bytecode(const uint8_t* bytecode, uint64_t size, registers& regs, const
       case vmcode::CABS:
       {
       execute_double_operation<CAbsOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
+      break;
+      }
+      case vmcode::CROUND:
+      {
+      execute_double_operation<CRoundOper>(operand1, operand2, operand1_mem, operand2_mem, regs);
       break;
       }
       case vmcode::CTAN:

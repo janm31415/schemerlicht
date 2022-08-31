@@ -792,187 +792,130 @@ void inline_ieee754_mantissa(VM::vmcode& code, const compiler_options&)
 
 void inline_ieee754_fxsin(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FSIN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CSIN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxcos(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FCOS);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CCOS, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxtan(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FPTAN);
-  code.add(VM::vmcode::FSTP, VM::vmcode::ST0);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CTAN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxasin(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-
-  code.add(VM::vmcode::FLD, VM::vmcode::ST0);
-  code.add(VM::vmcode::FMUL, VM::vmcode::ST0, VM::vmcode::ST0);
-  code.add(VM::vmcode::FLD1);
-  code.add(VM::vmcode::FSUBRP);
-  code.add(VM::vmcode::FSQRT);
-  code.add(VM::vmcode::FPATAN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CASIN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxacos(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FLD, VM::vmcode::ST0);
-  code.add(VM::vmcode::FMUL, VM::vmcode::ST0, VM::vmcode::ST0);
-  code.add(VM::vmcode::FLD1);
-  code.add(VM::vmcode::FSUBRP);
-  code.add(VM::vmcode::FSQRT);
-  code.add(VM::vmcode::FXCH, VM::vmcode::ST1);
-  code.add(VM::vmcode::FPATAN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CACOS, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxatan1(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FLD1);
-  code.add(VM::vmcode::FPATAN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CATAN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxlog(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
-  code.add(VM::vmcode::FLDLN2);
-
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-
-  code.add(VM::vmcode::FYL2X);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CLOG, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxround(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::SAR, VM::vmcode::RAX, VM::vmcode::NUMBER, 1);
-  code.add(VM::vmcode::PUSH, VM::vmcode::RAX);
-  code.add(VM::vmcode::FILD, VM::vmcode::MEM_RSP);
-  code.add(VM::vmcode::POP, VM::vmcode::RAX);
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::RAX);
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FRNDINT);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CROUND, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fxtruncate(VM::vmcode&, const compiler_options&)
@@ -997,171 +940,130 @@ void inline_ieee754_fxsqrt(VM::vmcode& code, const compiler_options&)
 
 void inline_ieee754_flsin(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FSIN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CSIN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_flcos(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FCOS);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CCOS, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fltan(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FPTAN);
-  code.add(VM::vmcode::FSTP, VM::vmcode::ST0);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CTAN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_flasin(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-
-  code.add(VM::vmcode::FLD, VM::vmcode::ST0);
-  code.add(VM::vmcode::FMUL, VM::vmcode::ST0, VM::vmcode::ST0);
-  code.add(VM::vmcode::FLD1);
-  code.add(VM::vmcode::FSUBRP);
-  code.add(VM::vmcode::FSQRT);
-  code.add(VM::vmcode::FPATAN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CASIN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_flacos(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FLD, VM::vmcode::ST0);
-  code.add(VM::vmcode::FMUL, VM::vmcode::ST0, VM::vmcode::ST0);
-  code.add(VM::vmcode::FLD1);
-  code.add(VM::vmcode::FSUBRP);
-  code.add(VM::vmcode::FSQRT);
-  code.add(VM::vmcode::FXCH, VM::vmcode::ST1);
-  code.add(VM::vmcode::FPATAN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CACOS, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_flatan1(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FLD1);
-  code.add(VM::vmcode::FPATAN);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CATAN, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fllog(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
-  code.add(VM::vmcode::FLDLN2);
-
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-
-  code.add(VM::vmcode::FYL2X);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CLOG, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_flround(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   code.add(VM::vmcode::AND, VM::vmcode::RAX, VM::vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-  code.add(VM::vmcode::FLD, VM::vmcode::MEM_RAX, CELLS(1));
+  code.add(VM::vmcode::MOV, VM::vmcode::XMM0, VM::vmcode::MEM_RAX, CELLS(1));
 
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FRNDINT);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  code.add(VM::vmcode::CROUND, VM::vmcode::XMM0, VM::vmcode::XMM0);
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::XMM0);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_ieee754_fltruncate(VM::vmcode& code, const compiler_options&)
@@ -1189,18 +1091,16 @@ void inline_ieee754_flsqrt(VM::vmcode& code, const compiler_options&)
 
 void inline_ieee754_pi(VM::vmcode& code, const compiler_options&)
   {
-  assert(0);
-  /*
   uint64_t header = make_block_header(1, T_FLONUM);
   code.add(VM::vmcode::MOV, VM::vmcode::RBX, ALLOC);
   code.add(VM::vmcode::OR, VM::vmcode::RBX, VM::vmcode::NUMBER, block_tag);
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, header);
   code.add(VM::vmcode::MOV, MEM_ALLOC, VM::vmcode::RAX);
-  code.add(VM::vmcode::FLDPI);
-  code.add(VM::vmcode::FSTP, MEM_ALLOC, CELLS(1));
+  double pi = 3.14159265358979323846264338327950288419716939937510;
+  uint64_t value = *((uint64_t*)(&pi));
+  code.add(VM::vmcode::MOV, MEM_ALLOC, CELLS(1), VM::vmcode::NUMBER, value);
   code.add(VM::vmcode::ADD, ALLOC, VM::vmcode::NUMBER, CELLS(2));
   code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::RBX);
-  */
   }
 
 void inline_bitwise_and(VM::vmcode& code, const compiler_options&)

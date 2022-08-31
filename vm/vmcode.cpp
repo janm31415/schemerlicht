@@ -204,10 +204,13 @@ namespace
       case vmcode::CSQRT:return std::string("csqrt");
       case vmcode::CSIN:return std::string("csin");
       case vmcode::CCOS:return std::string("ccos");
+      case vmcode::CASIN:return std::string("casin");
+      case vmcode::CACOS:return std::string("cacos");
       case vmcode::CEXP:return std::string("cexp");
       case vmcode::CLOG:return std::string("clog");
       case vmcode::CLOG2:return std::string("clog2");
       case vmcode::CABS:return std::string("cabs");
+      case vmcode::CROUND:return std::string("cround");
       case vmcode::CTAN:return std::string("ctan");
       case vmcode::CATAN:return std::string("catan");
       case vmcode::CATAN2:return std::string("catan2");
@@ -464,10 +467,13 @@ std::string vmcode::operation_to_string(operation oper)
     case vmcode::CSQRT:return std::string("CSQRT");
     case vmcode::CSIN:return std::string("CSIN");
     case vmcode::CCOS:return std::string("CCOS");
+    case vmcode::CASIN:return std::string("CASIN");
+    case vmcode::CACOS:return std::string("CACOS");
     case vmcode::CEXP:return std::string("CEXP");
     case vmcode::CLOG:return std::string("CLOG");
     case vmcode::CLOG2:return std::string("CLOG2");
     case vmcode::CABS:return std::string("CABS");
+    case vmcode::CROUND:return std::string("CROUND");
     case vmcode::CTAN:return std::string("CTAN");
     case vmcode::CATAN:return std::string("CATAN");
     case vmcode::CATAN2:return std::string("CATAN2");
