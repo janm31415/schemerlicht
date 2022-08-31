@@ -1282,18 +1282,6 @@ namespace
     return calling_registers;
     }
 
-  std::vector<vmcode::operand> get_linux_calling_registers()
-    {
-    std::vector<vmcode::operand> calling_registers;
-    calling_registers.push_back(vmcode::RDI);
-    calling_registers.push_back(vmcode::RSI);
-    calling_registers.push_back(vmcode::RDX);
-    calling_registers.push_back(vmcode::RCX);
-    calling_registers.push_back(vmcode::R8);
-    calling_registers.push_back(vmcode::R9);
-    return calling_registers;
-    }
-
   std::vector<vmcode::operand> get_floating_point_registers()
     {
     std::vector<vmcode::operand> calling_registers;
@@ -1301,8 +1289,6 @@ namespace
     calling_registers.push_back(vmcode::XMM1);
     calling_registers.push_back(vmcode::XMM2);
     calling_registers.push_back(vmcode::XMM3);
-    calling_registers.push_back(vmcode::XMM4);
-    calling_registers.push_back(vmcode::XMM5);
     return calling_registers;
     }
 
@@ -1312,11 +1298,8 @@ namespace
     if (ops.safe_primitives)
       error = label_to_string(label++);
 
-#ifdef _WIN32
+
     static std::vector<vmcode::operand> arg_reg = get_windows_calling_registers();
-#else
-    static std::vector<vmcode::operand> arg_reg = get_linux_calling_registers();
-#endif
     static std::vector<vmcode::operand> arg_float_reg = get_floating_point_registers();
 
 
@@ -1348,25 +1331,6 @@ namespace
         }
       }
 
-#ifndef _WIN32
-    std::vector<vmcode::operand> arg_regs;
-    int regular_arg_id = 0;
-    int floating_arg_id = 0;
-    for (size_t i = 0; i < foreign.arguments.size(); ++i)
-      {
-      if (ext.arguments[i] == external_function::T_DOUBLE)
-        {
-        arg_regs.push_back(arg_float_reg[floating_arg_id]);
-        ++floating_arg_id;
-        }
-      else
-        {
-        arg_regs.push_back(arg_reg[regular_arg_id]);
-        ++regular_arg_id;
-        }
-      }
-#endif
-
     for (size_t i = 0; i < foreign.arguments.size(); ++i)
       {
       compile_expression(fns, env, rd, data, code, foreign.arguments[i], pm, ops);
@@ -1380,12 +1344,8 @@ namespace
         {
         case external_function::T_BOOL:
         {
-#ifdef _WIN32
+
         auto reg = arg_reg[i];
-#else
-        auto reg = arg_regs[i];
-#endif
-        //code.add(vmcode::POP, reg);
         pop(code, reg);
         code.add(vmcode::CMP, reg, vmcode::NUMBER, bool_f);
         code.add(vmcode::SETNE, vmcode::RAX);
@@ -1394,11 +1354,8 @@ namespace
         }
         case external_function::T_INT64:
         {
-#ifdef _WIN32
+
         auto reg = arg_reg[i];
-#else
-        auto reg = arg_regs[i];
-#endif
         //code.add(vmcode::POP, reg);
         pop(code, reg);
         if (ops.safe_primitives)
@@ -1411,22 +1368,14 @@ namespace
         }
         case external_function::T_SCM:
         {
-#ifdef _WIN32
         auto reg = arg_reg[i];
-#else
-        auto reg = arg_regs[i];
-#endif
         //code.add(vmcode::POP, reg);
         pop(code, reg);
         break;
         }
         case external_function::T_DOUBLE:
         {
-#ifdef _WIN32
         auto reg = arg_float_reg[i];
-#else
-        auto reg = arg_regs[i];
-#endif
         //code.add(vmcode::POP, vmcode::R11);
         pop(code, vmcode::R11);
         if (ops.safe_primitives)
@@ -1439,11 +1388,7 @@ namespace
         }
         case external_function::T_CHAR_POINTER:
         {
-#ifdef _WIN32
         auto reg = arg_reg[i];
-#else
-        auto reg = arg_regs[i];
-#endif
         //code.add(vmcode::POP, vmcode::R11);
         pop(code, vmcode::R11);
         if (ops.safe_primitives)
@@ -1459,21 +1404,10 @@ namespace
         }
       }
 
-    //code.add(vmcode::MOV, ALLOC_SAVED, ALLOC); // this line is here so that our foreign calls can access free heap memory
-    //save_before_foreign_call(code);
-    //align_stack(code);
-    //code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-    //code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-    //code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif
+
     code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, ext.address);
     code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-    //code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-    //restore_stack(code);
-    //restore_after_foreign_call(code);
-    //code.add(vmcode::MOV, ALLOC, ALLOC_SAVED); // foreign calls should have updated free heap memory if they used some
+
     switch (ext.return_type)
       {
       case external_function::T_BOOL:

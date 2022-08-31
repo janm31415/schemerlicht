@@ -5845,7 +5845,6 @@ void compile_peek_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::R11, vmcode::MEM_RCX, CELLS(4)); // pointer to string
   code.add(vmcode::AND, vmcode::R11, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
 
-#ifdef _WIN32
   code.add(vmcode::PUSH, vmcode::RCX);
   code.add(vmcode::PUSH, vmcode::RDX);
   code.add(vmcode::PUSH, vmcode::R8);
@@ -5857,31 +5856,14 @@ void compile_peek_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_RCX, CELLS(3)); // filehandle
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
 
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RDX);
-
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RCX, CELLS(3)); // filehandle
-  code.add(vmcode::SAR, vmcode::RDI, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RCX, CELLS(5)); // index
-  code.add(vmcode::SAR, vmcode::RDX, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
-  code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
-#endif
-
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   
-#ifdef _WIN32
+
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
   code.add(vmcode::POP, vmcode::RCX);
-#else
-  code.add(vmcode::POP, vmcode::RDX);
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
+
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::MOV, vmcode::MEM_RCX, CELLS(7), vmcode::RAX); // store the number of bytes read
   code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
@@ -5944,7 +5926,6 @@ void compile_read_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::R11, vmcode::MEM_RCX, CELLS(4)); // pointer to string
   code.add(vmcode::AND, vmcode::R11, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
 
-#ifdef _WIN32
   code.add(vmcode::PUSH, vmcode::RCX);
   code.add(vmcode::PUSH, vmcode::RDX);
   code.add(vmcode::PUSH, vmcode::R8);
@@ -5956,31 +5937,15 @@ void compile_read_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_RCX, CELLS(3)); // filehandle
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
 
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RDX);
-
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RCX, CELLS(3)); // filehandle
-  code.add(vmcode::SAR, vmcode::RDI, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RCX, CELLS(5)); // index
-  code.add(vmcode::SAR, vmcode::RDX, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
-  code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
-#endif
 
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
+
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
   code.add(vmcode::POP, vmcode::RCX);
-#else
-  code.add(vmcode::POP, vmcode::RDX);
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
+
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::MOV, vmcode::MEM_RCX, CELLS(7), vmcode::RAX); // store the number of bytes read
   code.add(vmcode::CMP, vmcode::RAX, vmcode::NUMBER, 0);
@@ -6061,7 +6026,6 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::R11, vmcode::MEM_RDX, CELLS(4)); // pointer to string
   code.add(vmcode::AND, vmcode::R11, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
 
-#ifdef _WIN32
   code.add(vmcode::PUSH, vmcode::RCX);
   code.add(vmcode::PUSH, vmcode::RDX);
   code.add(vmcode::PUSH, vmcode::R8);
@@ -6072,39 +6036,21 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::SAR, vmcode::R8, vmcode::NUMBER, 1);
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RDX);
-
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RDX, CELLS(3)); // filehandle
-  code.add(vmcode::SAR, vmcode::RDI, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RDX, CELLS(5)); // index
-  code.add(vmcode::SAR, vmcode::RDX, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
-  code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
-#endif
 
   
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
   code.add(vmcode::POP, vmcode::RCX);
-#else
-  code.add(vmcode::POP, vmcode::RDX);
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   code.add(vmcode::XOR, vmcode::R11, vmcode::R11);
   code.add(vmcode::MOV, vmcode::MEM_RDX, CELLS(5), vmcode::R11);
 
   // now flush the input string
   code.add(vmcode::POP, vmcode::R15); // get the string length
-#ifdef _WIN32
+
   code.add(vmcode::PUSH, vmcode::RCX);
   code.add(vmcode::PUSH, vmcode::RDX);
   code.add(vmcode::PUSH, vmcode::R8);
@@ -6116,32 +6062,12 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R15);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
 
-
-
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RDX);
-
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RDX, CELLS(3)); // filehandle
-  code.add(vmcode::SAR, vmcode::RDI, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::R15); // string length
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::RCX);
-  code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
-#endif
-
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
   code.add(vmcode::POP, vmcode::RCX);
-#else
-  code.add(vmcode::POP, vmcode::RDX);
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
   code.add(vmcode::JMP, CONTINUE); // done
@@ -6219,7 +6145,6 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::R11, vmcode::MEM_RDX, CELLS(4)); // pointer to string
   code.add(vmcode::AND, vmcode::R11, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
 
-#ifdef _WIN32
   code.add(vmcode::PUSH, vmcode::RCX);
   code.add(vmcode::PUSH, vmcode::RDX);
   code.add(vmcode::PUSH, vmcode::R8);
@@ -6230,31 +6155,13 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::SAR, vmcode::R8, vmcode::NUMBER, 1);
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RDX);
-
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RDX, CELLS(3)); // filehandle
-  code.add(vmcode::SAR, vmcode::RDI, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RDX, CELLS(5)); // index
-  code.add(vmcode::SAR, vmcode::RDX, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
-  code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
-#endif
 
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
   code.add(vmcode::POP, vmcode::RCX);
-#else
-  code.add(vmcode::POP, vmcode::RDX);
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   code.add(vmcode::XOR, vmcode::R11, vmcode::R11);
   code.add(vmcode::LABEL, noflush);
@@ -6313,7 +6220,7 @@ void compile_flush_output_port(vmcode& code, const compiler_options& ops)
   code.add(vmcode::JL, skip);
   code.add(vmcode::MOV, vmcode::R11, vmcode::MEM_RAX, CELLS(4)); // pointer to string
   code.add(vmcode::AND, vmcode::R11, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8);
-#ifdef _WIN32
+
   code.add(vmcode::PUSH, vmcode::RDX);
   code.add(vmcode::PUSH, vmcode::R8);
 
@@ -6324,31 +6231,13 @@ void compile_flush_output_port(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::MEM_RAX, CELLS(5), vmcode::NUMBER, 0); // set index to zero
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RDX);
-
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RAX, CELLS(3)); // filehandle
-  code.add(vmcode::SAR, vmcode::RDI, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RAX, CELLS(5)); // index
-  code.add(vmcode::SAR, vmcode::RDX, vmcode::NUMBER, 1);
-  code.add(vmcode::MOV, vmcode::MEM_RAX, CELLS(5), vmcode::NUMBER, 0);  // set index to zero
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
-  code.add(vmcode::ADD, vmcode::RSI, vmcode::NUMBER, CELLS(1));
-#endif
 
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
+
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
-#else
-  code.add(vmcode::POP, vmcode::RDX);
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   code.add(vmcode::LABEL, skip);
   code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
@@ -6451,27 +6340,20 @@ void compile_open_file(vmcode& code, const compiler_options& ops)
   rsi
   rdx
   */
-#ifdef _WIN32
+  
   code.add(vmcode::PUSH, vmcode::R8);
+  
+#ifdef _WIN32
 
   code.add(vmcode::MOV, vmcode::R8, vmcode::NUMBER, _S_IREAD | _S_IWRITE);
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
+
 
 #elif defined(unix)
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::NUMBER, __S_IREAD | __S_IWRITE);
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
+  code.add(vmcode::MOV, vmcode::R8, vmcode::NUMBER, __S_IREAD | __S_IWRITE);
 #elif defined(__APPLE__)
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::NUMBER, S_IREAD | S_IWRITE);
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R11);
+  code.add(vmcode::MOV, vmcode::R8, vmcode::NUMBER, S_IREAD | S_IWRITE);
 #endif
+  code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
 
 #ifdef _WIN32
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_open);
@@ -6480,12 +6362,8 @@ void compile_open_file(vmcode& code, const compiler_options& ops)
 #endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
+
   code.add(vmcode::POP, vmcode::R8);
-#else
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
   code.add(vmcode::SAL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::JMP, CONTINUE);
 
@@ -6534,7 +6412,6 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
   rsi
   rdx
   */
-#ifdef _WIN32
   code.add(vmcode::PUSH, vmcode::R8);
 
   code.add(vmcode::PUSH, vmcode::RAX); // endptr for strtoll
@@ -6543,46 +6420,23 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::RSP);
   code.add(vmcode::MOV, vmcode::RCX, BUFFER);
 
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RAX); // endptr for strtoll
-
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::RSP);
-  code.add(vmcode::MOV, vmcode::RDI, BUFFER);
-#endif
-
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&strtoll);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   // check endptr
   code.add(vmcode::POP, vmcode::R11);
 
-#ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
-#else
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_R11);
   code.add(vmcode::TEST8, vmcode::RCX, vmcode::RCX);
   code.add(vmcode::JE, rax_is_integer);
 
   // now try as a float
-#ifdef _WIN32
+
   code.add(vmcode::PUSH, vmcode::RAX); // endptr for strtoll
 
   code.add(vmcode::MOV, vmcode::RDX, vmcode::RSP);
   code.add(vmcode::MOV, vmcode::RCX, BUFFER);
-
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-  code.add(vmcode::PUSH, vmcode::RAX); // endptr for strtoll
-
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::RSP);
-  code.add(vmcode::MOV, vmcode::RDI, BUFFER);
-#endif
 
   
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&strtod);
@@ -6590,11 +6444,6 @@ void compile_str2num(vmcode& code, const compiler_options& ops)
 
   // check endptr
   code.add(vmcode::POP, vmcode::R11);
-
-#ifndef WIN32
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_R11);
   code.add(vmcode::TEST8, vmcode::RCX, vmcode::RCX);
@@ -6678,7 +6527,6 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   rsi
   rdx
   */
-#ifdef _WIN32
   code.add(vmcode::PUSH, vmcode::R8);
 
   code.add(vmcode::MOV, vmcode::R8, vmcode::RCX);
@@ -6686,25 +6534,11 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R15);
   code.add(vmcode::MOV, vmcode::RCX, BUFFER);
 
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-
-  code.add(vmcode::MOV, vmcode::XMM0, vmcode::RCX);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R15);
-  code.add(vmcode::MOV, vmcode::RDI, BUFFER);
-#endif
-
 
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf_floating);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
-#ifdef _WIN32
   code.add(vmcode::POP, vmcode::R8);
-#else
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   allocate_buffer_as_string(code);
 
@@ -6724,32 +6558,19 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   rsi
   rdx
   */
-#ifdef _WIN32
+
   code.add(vmcode::PUSH, vmcode::R8);
 
   code.add(vmcode::MOV, vmcode::R8, vmcode::RCX);
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R15);
   code.add(vmcode::MOV, vmcode::RCX, BUFFER);
 
-#else
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::PUSH, vmcode::RSI);
-
-  code.add(vmcode::MOV, vmcode::RDX, vmcode::RCX);
-  code.add(vmcode::MOV, vmcode::RSI, vmcode::R15);
-  code.add(vmcode::MOV, vmcode::RDI, BUFFER);
-#endif
-
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   
 
-#ifdef _WIN32
+
   code.add(vmcode::POP, vmcode::R8);
-#else
-  code.add(vmcode::POP, vmcode::RSI);
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
 
   allocate_buffer_as_string(code);
 
