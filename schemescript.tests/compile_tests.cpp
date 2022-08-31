@@ -4988,7 +4988,7 @@ void run_all_compile_tests()
     bugs_from_compiler_scm().test();
     bugs_from_compiler_2().test();
     curry().test();
-    //load_simulation().test();
+    load_simulation().test();
     getenvtest().test();
     filetest().test();
     hex_test().test();
@@ -5004,6 +5004,6 @@ void run_all_compile_tests()
     current_milliseconds_test().test();
 #endif
     //load_test();
-    load_simulation().test();
+
     }
   }
