@@ -4143,12 +4143,16 @@ to /* and */ in c/c++
       TEST_EQ("12", run("(let ([f (lambda () 12)]) (f))"));
       TEST_EQ("12", run("(let ([f (lambda () 12)]) (f 1))"));
       TEST_EQ("12", run("(let ([f (lambda () 12)]) (f 1 2))"));
-
-      TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f (lambda (x) (fx+ x x))]) (f))"));
+      
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f (lambda (x) (fx+ x x))]) (f))"));
       TEST_EQ("4", run("(let ([f (lambda (x) (fx+ x x))]) (f 2))"));
       TEST_EQ("4", run("(let ([f (lambda (x) (fx+ x x))]) (f 2 3))"));
-      TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f (lambda (x y) (fx* x (fx+ y y)))]) (f))"));
-      TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f (lambda (x y) (fx* x (fx+ y y)))]) (f 1))"));
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f (lambda (x y) (fx* x (fx+ y y)))]) (f))"));
+        TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f (lambda (x y) (fx* x (fx+ y y)))]) (f 1))"));
+        }
       TEST_EQ("12", run("(let ([f (lambda (x y) (fx* x (fx+ y y)))]) (f 2 3))"));
 
       TEST_EQ("()", run("(let ([f  (lambda x x)]) (f))"));
@@ -4157,14 +4161,18 @@ to /* and */ in c/c++
       TEST_EQ("(a b c)", run("(let ([f  (lambda x x)]) (f 'a 'b 'c))"));
       TEST_EQ("(a b c d)", run("(let ([f  (lambda x x)]) (f 'a 'b 'c 'd))"));
 
-      TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f  (lambda (x . rest) (vector x rest))]) (f))"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f  (lambda (x . rest) (vector x rest))]) (f))"));
       TEST_EQ("#(a ())", run("(let ([f  (lambda (x . rest) (vector x rest))]) (f 'a ))"));
       TEST_EQ("#(a (b))", run("(let ([f  (lambda (x . rest) (vector x rest))]) (f 'a 'b ))"));
       TEST_EQ("#(a (b c))", run("(let ([f  (lambda (x . rest) (vector x rest))]) (f 'a 'b 'c))"));
       TEST_EQ("#(a (b c d))", run("(let ([f  (lambda (x . rest) (vector x rest))]) (f 'a 'b 'c 'd))"));
 
-      TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f))"));
-      TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f 'a ))"));
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f))"));
+        TEST_EQ("runtime error: <lambda>: invalid number of arguments", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f 'a ))"));
+        }
       TEST_EQ("#(a b ())", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f 'a 'b ))"));
       TEST_EQ("#(a b (c))", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f 'a 'b 'c))"));
       TEST_EQ("#(a b (c d))", run("(let ([f  (lambda (x y . rest) (vector x y rest))]) (f 'a 'b 'c 'd))"));
@@ -4187,13 +4195,15 @@ to /* and */ in c/c++
       TEST_EQ("#t", run("(fx<=? 1 2) "));
       TEST_EQ("#t", run("(fx<=? 10 10) "));
       TEST_EQ("#f", run("(fx<=? 10 2) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([x 12]) (string-set! x 0 #\\a))"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([x(string #\\a #\\b #\\c)] [y 12])(string-set! x 0 y))"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([x(string #\\a #\\b #\\c)]  [y 12])  (string-set! x 8 y)) "));
-      TEST_EQ("runtime error: string-set!: out of bounds", run("(let([x(string #\\a #\\b #\\c)]   [y #\\a]) (string-set! x 8 y))"));
-      TEST_EQ("runtime error: string-set!: out of bounds", run("(let([x(string #\\a #\\b #\\c)]) (string-set! x 8 #\\a))"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([x(string #\\a #\\b #\\c)]   [y #\\a])     (string-set! x - 1 y))"));
-
+      if (ops.safe_primitives)
+        {
+        TEST_EQ("runtime error: string-set!: contract violation", run("(let([x 12]) (string-set! x 0 #\\a))"));
+        TEST_EQ("runtime error: string-set!: contract violation", run("(let([x(string #\\a #\\b #\\c)] [y 12])(string-set! x 0 y))"));
+        TEST_EQ("runtime error: string-set!: contract violation", run("(let([x(string #\\a #\\b #\\c)]  [y 12])  (string-set! x 8 y)) "));
+        TEST_EQ("runtime error: string-set!: out of bounds", run("(let([x(string #\\a #\\b #\\c)]   [y #\\a]) (string-set! x 8 y))"));
+        TEST_EQ("runtime error: string-set!: out of bounds", run("(let([x(string #\\a #\\b #\\c)]) (string-set! x 8 #\\a))"));
+        TEST_EQ("runtime error: string-set!: contract violation", run("(let([x(string #\\a #\\b #\\c)]   [y #\\a])     (string-set! x - 1 y))"));
+        }
       /*
       ; next the general case
       ;;; 6 kinds of errors :
@@ -4210,36 +4220,40 @@ to /* and */ in c/c++
 
       TEST_EQ("\"aXc\"", run("(let([s(string #\\a #\\b #\\c)][i 1][c #\\X]) (string-set! s i c) s)"));
       TEST_EQ("\"aXc\"", run("(let([s(string #\\a #\\b #\\c)][i 1]) (string-set! s i #\\X) s)"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 1][c 'X]) (string-set!  s i c) s)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 1][c 'X]) (string-set!  s i c) s)"));
       TEST_EQ("\"aXc\"", run("(let([s(string #\\a #\\b #\\c)][i 1][c #\\X]) (string-set! s 1 c) s) "));
       TEST_EQ("\"aXc\"", run("(let([s(string #\\a #\\b #\\c)][i 1]) (string-set! s 1 #\\X) s)"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 1][c 'X]) (string-set!  s 1 c) s)"));
+      if (ops.safe_primitives)
+        TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 1][c 'X]) (string-set!  s 1 c) s)"));
 
       TEST_EQ("\"abcX\"", run("(let([s(string #\\a #\\b #\\c)][i 3][c #\\X]) (string-set! s i c) s)"));
       TEST_EQ("\"abcX\"", run("(let([s(string #\\a #\\b #\\c)][i 3]) (string-set! s i #\\X) s)   "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 3][c 'X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: out of bounds", run("(let([s(string #\\a #\\b #\\c)][i -10][c #\\X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: out of bounds", run("(let([s(string #\\a #\\b #\\c)][i -11]) (string-set! s i #\\X) s)  "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i -1][c 'X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 'foo] [c #\\X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 'foo]) (string-set! s i #\\X) s)  "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 'foo] [c 'X]) (string-set! s i c) s)   "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c #\\X]) (string-set! s i c) s)"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1]) (string-set! s i #\\X) s)    "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c 'X]) (string-set! s i c) s)  "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c #\\X]) (string-set! s 1 c) s)  "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1]) (string-set! s 1 #\\X) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c 'X]) (string-set! s 1 c) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 3] [c #\\X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 3]) (string-set! s i #\\X) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 3] [c 'X]) (string-set! s i c) s)"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i -10] [c #\\X]) (string-set! s i c) s)"));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i -11]) (string-set! s i #\\X) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i -1] [c 'X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 'foo][c #\\X]) (string-set! s i c) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 'foo]) (string-set! s i #\\X) s) "));
-      TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 'foo][c 'X]) (string-set! s i c) s)  "));
-
+      if (ops.safe_primitives)
+        {
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 3][c 'X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: out of bounds", run("(let([s(string #\\a #\\b #\\c)][i -10][c #\\X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: out of bounds", run("(let([s(string #\\a #\\b #\\c)][i -11]) (string-set! s i #\\X) s)  "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i -1][c 'X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 'foo] [c #\\X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 'foo]) (string-set! s i #\\X) s)  "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s(string #\\a #\\b #\\c)][i 'foo] [c 'X]) (string-set! s i c) s)   "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c #\\X]) (string-set! s i c) s)"));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1]) (string-set! s i #\\X) s)    "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c 'X]) (string-set! s i c) s)  "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c #\\X]) (string-set! s 1 c) s)  "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1]) (string-set! s 1 #\\X) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 1] [c 'X]) (string-set! s 1 c) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 3] [c #\\X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 3]) (string-set! s i #\\X) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 3] [c 'X]) (string-set! s i c) s)"));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i -10] [c #\\X]) (string-set! s i c) s)"));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i -11]) (string-set! s i #\\X) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i -1] [c 'X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 'foo][c #\\X]) (string-set! s i c) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 'foo]) (string-set! s i #\\X) s) "));
+          TEST_EQ("runtime error: string-set!: contract violation", run("(let([s '(string #\\a #\\b #\\c)] [i 'foo][c 'X]) (string-set! s i c) s)  "));
+        }
       TEST_EQ("\"abc\"", run("(let([f(lambda(a b c) (string a b c))]) (f #\\a #\\b #\\c)) "));
       //TEST_EQ("", run("(let([f(lambda(a b c) (string a b c))])  (f #\\a 12 #\\c))  ")); // right now, string does no checking, so we comment these tests out
       TEST_EQ("\"abc\"", run("(let([f string])   (f #\\a #\\b #\\c)) "));
@@ -4483,7 +4497,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 1; ++i)
+  for (int i = 0; i < 3; ++i)
     {
     g_ops = compiler_options();
     switch (i)
@@ -4502,7 +4516,6 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 0
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -4611,10 +4624,9 @@ void run_all_compile_tests()
     long_apply_test().test();
     fib_iterative_perf_test().test();
     //fib_perf_test().test();
-#endif
     r5rs_test().test();
     ieee745_test().test();
-#if 0
+
     minmax_test().test();
     make_port_test().test();
     make_port2_test().test();
@@ -4654,6 +4666,6 @@ void run_all_compile_tests()
     empty_let_crash().test();
 
     many_vars_in_lambda_test().test();
-#endif
+
     }
   }
