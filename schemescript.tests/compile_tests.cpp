@@ -37,6 +37,7 @@
 #include "schemescript/tokenize.h"
 #include "schemescript/types.h"
 #include "schemescript/visitor.h"
+#include "schemescript/load_lib.h"
 
 
 #include <chrono>
@@ -159,6 +160,29 @@ namespace
         scheme_runtime(res, str, env, rd, &ctxt);
       compiled_bytecode.emplace_back(f, size);
       return str.str();
+      }
+      
+    void build_string_to_symbol()
+      {
+      vmcode code;
+      try
+        {
+        if (load_string_to_symbol(env, rd, md, ctxt, code, pm, ops))
+          {
+          first_pass_data d;
+          uint64_t size;
+          uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
+          reg.rcx = (uint64_t)(&ctxt);
+          run_bytecode(f, size, reg, externals_for_vm, vm_output);
+          compiled_bytecode.emplace_back(f, size);
+          }
+        else
+          std::cout << "Cannot load string-to-symbol library\n";
+        }
+      catch (std::logic_error e)
+        {
+        std::cout << e.what() << " while compiling string to symbol library\n\n";
+        }
       }
     };
 
@@ -1321,7 +1345,7 @@ namespace
       TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12)", run("(list 1 2 3 4 5 6 7 8 9 10 11 12)"));
       }
     };
-/*
+
   struct scheme_tests : public compile_fixture {
     void test()
       {
@@ -1360,7 +1384,7 @@ namespace
       TEST_EQ("((1 5) (2 6) (3 7) (4 8))", run("(zip (list 1 2 3 4) (list 5 6 7 8))"));
       }
     };
-*/
+
   struct scheme_tests_part_b : public compile_fixture {
     void test()
       {
@@ -1503,7 +1527,7 @@ void run_all_compile_tests()
     inner_define().test();
     global_define().test();
     list().test();
-    //scheme_tests().test();
+    scheme_tests().test();
     scheme_tests_part_b().test();
     scheme_tests_part_c().test();
     scheme_tests_2().test();

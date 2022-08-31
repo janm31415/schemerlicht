@@ -61,6 +61,11 @@ class SimplifyToCoreOperationFunctor : public VisitorBaseClass
 public:
   uint64_t letrec_index;
   
+  void _revisit_expr(Expression& e)
+    {
+    visit(e, *this);
+    }
+      
   void _convert_do(Expression& e)
   {
     assert(std::holds_alternative<Do>(e));
@@ -440,10 +445,12 @@ public:
       if (p.primitive_name == "and")
       {
         _convert_and(e, p);
+        _revisit_expr(e);
       }
       else if (p.primitive_name == "or")
       {
         _convert_or(e, p);
+        _revisit_expr(e);
       }
       else if (p.primitive_name == "unless")
       {
@@ -452,10 +459,12 @@ public:
       else if (p.primitive_name == "when")
       {
         _convert_when(e, p);
+        _revisit_expr(e);
       }
       else if (p.primitive_name == "delay")
       {
         _convert_delay(e, p);
+        _revisit_expr(e);
       }
     }
     else if (std::holds_alternative<Let>(e))
@@ -464,27 +473,33 @@ public:
       if (l.bt == bt_letrec)
       {
         _convert_letrec(l);
+        _revisit_expr(e);
       }
       else if (l.bt == bt_let_star)
       {
         _convert_let_star(l);
+        _revisit_expr(e);
       }
       else if (l.named_let)
       {
         _convert_named_let(e, l);
+        _revisit_expr(e);
       }
     }
     else if (std::holds_alternative<Cond>(e))
     {
       _convert_cond(e);
+      _revisit_expr(e);
     }
     else if (std::holds_alternative<Case>(e))
     {
       _convert_case(e);
+      _revisit_expr(e);
     }
     else if (std::holds_alternative<Do>(e))
     {
       _convert_do(e);
+      _revisit_expr(e);
     }
   }
 };
