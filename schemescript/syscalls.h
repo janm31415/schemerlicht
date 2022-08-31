@@ -9,16 +9,16 @@
 
 COMPILER_BEGIN
 
-int _skiwi_close(int const fd);
-int _skiwi_read(int const fd, void* const buffer, unsigned const buffer_size);
-int _skiwi_write(int fd, const void* buffer, unsigned int count);
-const char* _skiwi_getenv(const char* name);
-int _skiwi_putenv(const char* name, const char* value);
-int _skiwi_file_exists(const char* filename);
-uint64_t _skiwi_current_seconds();
-uint64_t _skiwi_current_milliseconds();
-uint64_t _skiwi_sprintf(char *, const char * , const char* );
-uint64_t _skiwi_sprintf_floating(char * a, const char * b, double c);
+int _scheme_close(int const fd);
+int _scheme_read(int const fd, void* const buffer, unsigned const buffer_size);
+int _scheme_write(int fd, const void* buffer, unsigned int count);
+const char* _scheme_getenv(const char* name);
+int _scheme_putenv(const char* name, const char* value);
+int _scheme_file_exists(const char* filename);
+uint64_t _scheme_current_seconds();
+uint64_t _scheme_current_milliseconds();
+uint64_t _scheme_sprintf(char *, const char * , const char* );
+uint64_t _scheme_sprintf_floating(char * a, const char * b, double c);
 
 COMPILER_SCHEMESCRIPT_API void add_system_calls(std::map<std::string, external_function>& externals);
 

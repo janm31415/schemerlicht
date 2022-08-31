@@ -5,7 +5,7 @@
 #include "namespace.h"
 #include <stdint.h>
 
-#define SKIWI_VARIABLE_DEBUG_STACK_SIZE 5
+#define SCHEME_VARIABLE_DEBUG_STACK_SIZE 5
 
 COMPILER_BEGIN
 
@@ -36,7 +36,7 @@ struct context {
   uint64_t* error_label; // offset 184
   void* rsp; // offset 192
   uint64_t* stack_end; // offset 200
-  uint64_t last_global_variable_used[SKIWI_VARIABLE_DEBUG_STACK_SIZE]; // offset 208
+  uint64_t last_global_variable_used[SCHEME_VARIABLE_DEBUG_STACK_SIZE]; // offset 208
 
   uint64_t* memory_allocated;
   };

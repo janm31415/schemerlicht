@@ -45,7 +45,7 @@ context create_context(uint64_t heap_size, uint64_t globals_stack, uint32_t loca
 
   c.temporary_flonum[0] = make_block_header(1, T_FLONUM);
 
-  for (int i = 0; i < SKIWI_VARIABLE_DEBUG_STACK_SIZE; ++i)
+  for (int i = 0; i < SCHEME_VARIABLE_DEBUG_STACK_SIZE; ++i)
     {
     c.last_global_variable_used[i] = (uint64_t)-1;
     }

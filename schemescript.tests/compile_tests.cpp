@@ -4407,30 +4407,30 @@ to /* and */ in c/c++
       {
       TEST_EQ("#f", run("(getenv \"Jan\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"DummyValue\")"));
-      TEST_EQ("\"DummyValue\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"DummyValue\")"));
+      TEST_EQ("\"DummyValue\"", run("(getenv \"SchemeTest\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"DummyValu\")"));
-      TEST_EQ("\"DummyValu\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"DummyValu\")"));
+      TEST_EQ("\"DummyValu\"", run("(getenv \"SchemeTest\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"DummyVal\")"));
-      TEST_EQ("\"DummyVal\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"DummyVal\")"));
+      TEST_EQ("\"DummyVal\"", run("(getenv \"SchemeTest\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"DummyVa\")"));
-      TEST_EQ("\"DummyVa\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"DummyVa\")"));
+      TEST_EQ("\"DummyVa\"", run("(getenv \"SchemeTest\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"DummyV\")"));
-      TEST_EQ("\"DummyV\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"DummyV\")"));
+      TEST_EQ("\"DummyV\"", run("(getenv \"SchemeTest\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"Dummy\")"));
-      TEST_EQ("\"Dummy\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"Dummy\")"));
+      TEST_EQ("\"Dummy\"", run("(getenv \"SchemeTest\")"));
 
-      TEST_EQ("#t", run("(putenv \"SkiwiTest\" \"\")"));
+      TEST_EQ("#t", run("(putenv \"SchemeTest\" \"\")"));
 
 #ifdef _WIN32
-      TEST_EQ("#f", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("#f", run("(getenv \"SchemeTest\")"));
 #else
-      TEST_EQ("\"\"", run("(getenv \"SkiwiTest\")"));
+      TEST_EQ("\"\"", run("(getenv \"SchemeTest\")"));
 #endif
       }
     };

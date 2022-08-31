@@ -117,7 +117,7 @@ void inline_flonum_to_fixnum(VM::vmcode& code, const compiler_options& options);
 void inline_fixnum_to_flonum(VM::vmcode& code, const compiler_options& options);
 
 void inline_undefined(VM::vmcode& code, const compiler_options& options);
-void inline_skiwi_quiet_undefined(VM::vmcode& code, const compiler_options& options);
+void inline_scheme_quiet_undefined(VM::vmcode& code, const compiler_options& options);
 
 void inline_arithmetic_shift(VM::vmcode& code, const compiler_options& options);
 void inline_quotient(VM::vmcode& code, const compiler_options& options);

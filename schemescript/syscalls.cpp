@@ -14,7 +14,7 @@
 
 COMPILER_BEGIN
 
-int _skiwi_close(int const fd)
+int _scheme_close(int const fd)
   {
   if (fd < 0)
     return 0;
@@ -25,7 +25,7 @@ int _skiwi_close(int const fd)
 #endif
   }
 
-int _skiwi_read(int const fd, void* const buffer, unsigned const buffer_size)
+int _scheme_read(int const fd, void* const buffer, unsigned const buffer_size)
   {
   if (fd < 0)
     return 0;
@@ -36,7 +36,7 @@ int _skiwi_read(int const fd, void* const buffer, unsigned const buffer_size)
 #endif
   }
 
-int _skiwi_write(int fd, const void* buffer, unsigned int count)
+int _scheme_write(int fd, const void* buffer, unsigned int count)
   {
   if (fd < 0)
     return 0;
@@ -47,7 +47,7 @@ int _skiwi_write(int fd, const void* buffer, unsigned int count)
 #endif
   }
 
-const char* _skiwi_getenv(const char* name)
+const char* _scheme_getenv(const char* name)
   {
   static std::string env_value;
 #ifdef _WIN32
@@ -64,7 +64,7 @@ const char* _skiwi_getenv(const char* name)
 #endif
   }
 
-int _skiwi_putenv(const char* name, const char* value)
+int _scheme_putenv(const char* name, const char* value)
   {
 #ifdef _WIN32
   std::string sname(name);
@@ -77,7 +77,7 @@ int _skiwi_putenv(const char* name, const char* value)
 #endif
   }
 
-int _skiwi_file_exists(const char* filename)
+int _scheme_file_exists(const char* filename)
   {
 #ifdef _WIN32
   int res = 0;
@@ -102,25 +102,25 @@ int _skiwi_file_exists(const char* filename)
 #endif
   }
 
-uint64_t _skiwi_current_seconds()
+uint64_t _scheme_current_seconds()
   {
   uint64_t secondsUTC = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   return secondsUTC;
   }
 
-uint64_t _skiwi_current_milliseconds()
+uint64_t _scheme_current_milliseconds()
   {
   uint64_t millisecondsUTC = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   return millisecondsUTC;
   }
 
-uint64_t _skiwi_sprintf_floating(char * a, const char * b, double c)
+uint64_t _scheme_sprintf_floating(char * a, const char * b, double c)
 {
     int value = sprintf(a, b, c);
     return (uint64_t)value;
 }
 
-uint64_t _skiwi_sprintf(char * a, const char * b, const char* c)
+uint64_t _scheme_sprintf(char * a, const char * b, const char* c)
 {
     int value = sprintf(a, b, c);
     return (uint64_t)value;
@@ -173,8 +173,8 @@ void add_system_calls(std::map<std::string, external_function>& externals)
   externals[ef.name] = ef;
   
   ef.arguments.clear();
-  ef.name = "_skiwi_sprintf";
-  ef.address = (uint64_t)&_skiwi_sprintf;
+  ef.name = "_scheme_sprintf";
+  ef.address = (uint64_t)&_scheme_sprintf;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
@@ -182,8 +182,8 @@ void add_system_calls(std::map<std::string, external_function>& externals)
   externals[ef.name] = ef;
     
 ef.arguments.clear();
-ef.name = "_skiwi_sprintf_floating";
-ef.address = (uint64_t)&_skiwi_sprintf_floating;
+ef.name = "_scheme_sprintf_floating";
+ef.address = (uint64_t)&_scheme_sprintf_floating;
 ef.return_type = external_function::T_INT64;
 ef.arguments.push_back(external_function::T_CHAR_POINTER);
 ef.arguments.push_back(external_function::T_CHAR_POINTER);
@@ -191,24 +191,15 @@ ef.arguments.push_back(external_function::T_DOUBLE);
 externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_close";
-  ef.address = (uint64_t)&_skiwi_close;
+  ef.name = "_scheme_close";
+  ef.address = (uint64_t)&_scheme_close;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_INT64);
   externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_read";
-  ef.address = (uint64_t)&_skiwi_read;
-  ef.return_type = external_function::T_INT64;
-  ef.arguments.push_back(external_function::T_INT64);
-  ef.arguments.push_back(external_function::T_CHAR_POINTER);
-  ef.arguments.push_back(external_function::T_INT64);
-  externals[ef.name] = ef;
-
-  ef.arguments.clear();
-  ef.name = "_skiwi_write";
-  ef.address = (uint64_t)&_skiwi_write;
+  ef.name = "_scheme_read";
+  ef.address = (uint64_t)&_scheme_read;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_INT64);
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
@@ -216,36 +207,45 @@ externals[ef.name] = ef;
   externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_getenv";
-  ef.address = (uint64_t)&_skiwi_getenv;
+  ef.name = "_scheme_write";
+  ef.address = (uint64_t)&_scheme_write;
+  ef.return_type = external_function::T_INT64;
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  externals[ef.name] = ef;
+
+  ef.arguments.clear();
+  ef.name = "_scheme_getenv";
+  ef.address = (uint64_t)&_scheme_getenv;
   ef.return_type = external_function::T_CHAR_POINTER;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
   externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_putenv";
-  ef.address = (uint64_t)&_skiwi_putenv;
+  ef.name = "_scheme_putenv";
+  ef.address = (uint64_t)&_scheme_putenv;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
   externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_file_exists";
-  ef.address = (uint64_t)&_skiwi_file_exists;
+  ef.name = "_scheme_file_exists";
+  ef.address = (uint64_t)&_scheme_file_exists;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
   externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_current_seconds";
-  ef.address = (uint64_t)&_skiwi_current_seconds;
+  ef.name = "_scheme_current_seconds";
+  ef.address = (uint64_t)&_scheme_current_seconds;
   ef.return_type = external_function::T_INT64;
   externals[ef.name] = ef;
 
   ef.arguments.clear();
-  ef.name = "_skiwi_current_milliseconds";
-  ef.address = (uint64_t)&_skiwi_current_milliseconds;
+  ef.name = "_scheme_current_milliseconds";
+  ef.address = (uint64_t)&_scheme_current_milliseconds;
   ef.return_type = external_function::T_INT64;
   externals[ef.name] = ef;
 /*

@@ -1796,7 +1796,7 @@ void compile_string_fill(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV8, vmcode::MEM_RCX, 7, vmcode::RDX);
   code.add(vmcode::LABEL, done);
 
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
   code.add(vmcode::JMP, CONTINUE);
 
   if (ops.safe_primitives)
@@ -1836,7 +1836,7 @@ void compile_vector_fill(vmcode& code, const compiler_options& ops)
   code.add(vmcode::DEC, vmcode::RAX);
   code.add(vmcode::JMP, repeat);
   code.add(vmcode::LABEL, done);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
   code.add(vmcode::JMP, CONTINUE);
 
   if (ops.safe_primitives)
@@ -1876,7 +1876,7 @@ void compile_make_vector(vmcode& code, const compiler_options& ops)
   code.add(vmcode::CMP, vmcode::RCX, vmcode::NUMBER, 0);
   code.add(vmcode::JE, done);
   code.add(vmcode::ADD, ALLOC, vmcode::NUMBER, CELLS(1));
-  code.add(vmcode::MOV, MEM_ALLOC, vmcode::NUMBER, skiwi_undefined);
+  code.add(vmcode::MOV, MEM_ALLOC, vmcode::NUMBER, scheme_undefined);
   code.add(vmcode::DEC, vmcode::RCX);
   code.add(vmcode::JMP, fill_undefined);
   code.add(vmcode::LABEL, fill);
@@ -5856,7 +5856,7 @@ void compile_peek_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_RCX, CELLS(3)); // filehandle
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_read);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   
 
@@ -5938,7 +5938,7 @@ void compile_read_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::SAR, vmcode::RCX, vmcode::NUMBER, 1);
 
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_read);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_read);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
 
@@ -6038,7 +6038,7 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
 
   
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
   code.add(vmcode::POP, vmcode::R8);
@@ -6062,14 +6062,14 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R15);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::POP, vmcode::RDX);
   code.add(vmcode::POP, vmcode::RCX);
 
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
   code.add(vmcode::JMP, CONTINUE); // done
 
   code.add(vmcode::LABEL, noflush);
@@ -6102,7 +6102,7 @@ void compile_write_string(vmcode& code, const compiler_options& ops)
   code.add(vmcode::JMP, repeat);
   code.add(vmcode::LABEL, done);
 
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
 
   code.add(vmcode::JMP, CONTINUE);
 
@@ -6156,7 +6156,7 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
   code.add(vmcode::POP, vmcode::R8);
@@ -6177,7 +6177,7 @@ void compile_write_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::SHL, vmcode::R11, vmcode::NUMBER, 1);
   code.add(vmcode::MOV, vmcode::MEM_RDX, CELLS(5), vmcode::R11); //update index
 
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
 
   code.add(vmcode::JMP, CONTINUE);
 
@@ -6232,7 +6232,7 @@ void compile_flush_output_port(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R11);
   code.add(vmcode::ADD, vmcode::RDX, vmcode::NUMBER, CELLS(1));
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_write);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_write);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
 
@@ -6240,7 +6240,7 @@ void compile_flush_output_port(vmcode& code, const compiler_options& ops)
   code.add(vmcode::POP, vmcode::RDX);
 
   code.add(vmcode::LABEL, skip);
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
   code.add(vmcode::JMP, CONTINUE);
 
   if (ops.safe_primitives)
@@ -6280,7 +6280,7 @@ void compile_close_file(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
 #endif
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_close);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_close);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
 #ifndef WIN32
@@ -6330,24 +6330,15 @@ void compile_open_file(vmcode& code, const compiler_options& ops)
 #endif
   code.add(vmcode::LABEL, is_output);
   /*
-  Windows:
   rcx
   rdx
   r8
-
-  Linux:
-  rdi
-  rsi
-  rdx
   */
   
   code.add(vmcode::PUSH, vmcode::R8);
   
 #ifdef _WIN32
-
   code.add(vmcode::MOV, vmcode::R8, vmcode::NUMBER, _S_IREAD | _S_IWRITE);
-
-
 #elif defined(unix)
   code.add(vmcode::MOV, vmcode::R8, vmcode::NUMBER, __S_IREAD | __S_IWRITE);
 #elif defined(__APPLE__)
@@ -6361,7 +6352,6 @@ void compile_open_file(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&open);
 #endif  
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-
 
   code.add(vmcode::POP, vmcode::R8);
   code.add(vmcode::SAL, vmcode::RAX, vmcode::NUMBER, 1);
@@ -6535,7 +6525,7 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RCX, BUFFER);
 
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf_floating);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_sprintf_floating);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 
   code.add(vmcode::POP, vmcode::R8);
@@ -6565,7 +6555,7 @@ void compile_num2str(vmcode& code, const compiler_options& ops)
   code.add(vmcode::MOV, vmcode::RDX, vmcode::R15);
   code.add(vmcode::MOV, vmcode::RCX, BUFFER);
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_sprintf);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_sprintf);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   
 
@@ -7526,13 +7516,13 @@ void compile_make_promise(vmcode& code, const compiler_options& ops)
 
 void compile_undefined(vmcode& code, const compiler_options&)
   {
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_undefined);
   code.add(vmcode::JMP, CONTINUE);
   }
 
-void compile_skiwi_quiet_undefined(vmcode& code, const compiler_options&)
+void compile_scheme_quiet_undefined(vmcode& code, const compiler_options&)
   {
-  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, scheme_quiet_undefined);
   code.add(vmcode::JMP, CONTINUE);
   }
 
@@ -7659,7 +7649,7 @@ rdi
 
 void compile_current_seconds(VM::vmcode& code, const compiler_options& /*options*/)
   {
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_current_seconds);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_current_seconds);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::JMP, CONTINUE);
@@ -7667,7 +7657,7 @@ void compile_current_seconds(VM::vmcode& code, const compiler_options& /*options
 
 void compile_current_milliseconds(VM::vmcode& code, const compiler_options& /*options*/)
   {
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_current_milliseconds);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_current_milliseconds);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 1);
   code.add(vmcode::JMP, CONTINUE);
@@ -7701,7 +7691,7 @@ rdi
   code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
 #endif
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_getenv);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_getenv);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
 #ifndef WIN32
   code.add(vmcode::POP, vmcode::RDI);
@@ -7812,7 +7802,7 @@ rsi:
   code.add(vmcode::MOV, vmcode::RSI, vmcode::RDX);
 #endif
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_putenv);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_putenv);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   
 #ifndef WIN32
@@ -7864,7 +7854,7 @@ rdi:
   code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
 #endif
 
-  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_skiwi_file_exists);
+  code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&_scheme_file_exists);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
   
 #ifndef WIN32

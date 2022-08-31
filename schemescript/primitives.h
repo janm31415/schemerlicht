@@ -156,7 +156,7 @@ void compile_flonum_to_fixnum(VM::vmcode& code, const compiler_options& options)
 void compile_string_copy(VM::vmcode& code, const compiler_options& options);
 void compile_symbol_to_string(VM::vmcode& code, const compiler_options& options);
 void compile_undefined(VM::vmcode& code, const compiler_options& options);
-void compile_skiwi_quiet_undefined(VM::vmcode& code, const compiler_options& options);
+void compile_scheme_quiet_undefined(VM::vmcode& code, const compiler_options& options);
 
 void compile_member_cmp_eq(VM::vmcode& code, const compiler_options&);
 void compile_member_cmp_eqv(VM::vmcode& code, const compiler_options&);

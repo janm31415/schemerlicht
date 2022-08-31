@@ -1169,12 +1169,12 @@ void inline_fixnum_to_flonum(VM::vmcode& code, const compiler_options&)
 
 void inline_undefined(VM::vmcode& code, const compiler_options&)
   {
-  code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, skiwi_undefined);
+  code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, scheme_undefined);
   }
 
-void inline_skiwi_quiet_undefined(VM::vmcode& code, const compiler_options&)
+void inline_scheme_quiet_undefined(VM::vmcode& code, const compiler_options&)
   {
-  code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, skiwi_quiet_undefined);
+  code.add(VM::vmcode::MOV, VM::vmcode::RAX, VM::vmcode::NUMBER, scheme_quiet_undefined);
   }
 
 void inline_arithmetic_shift(VM::vmcode& code, const compiler_options&)

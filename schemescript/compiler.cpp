@@ -34,7 +34,7 @@ function_map generate_function_map()
   fm.insert(std::pair<std::string, fun_ptr>("%slot-ref", &compile_slot_ref));
   fm.insert(std::pair<std::string, fun_ptr>("%slot-set!", &compile_slot_set));
   fm.insert(std::pair<std::string, fun_ptr>("%undefined", &compile_undefined));
-  fm.insert(std::pair<std::string, fun_ptr>("%quiet-undefined", &compile_skiwi_quiet_undefined));
+  fm.insert(std::pair<std::string, fun_ptr>("%quiet-undefined", &compile_scheme_quiet_undefined));
   fm.insert(std::pair<std::string, fun_ptr>("add1", &compile_add1));
   fm.insert(std::pair<std::string, fun_ptr>("%apply", &compile_apply));
   fm.insert(std::pair<std::string, fun_ptr>("arithmetic-shift", &compile_arithmetic_shift));
@@ -193,7 +193,7 @@ namespace
     fm.insert(std::pair<std::string, fun_ptr>("##quotient", &inline_quotient));
     fm.insert(std::pair<std::string, fun_ptr>("##arithmetic-shift", &inline_arithmetic_shift));
     fm.insert(std::pair<std::string, fun_ptr>("##%undefined", &inline_undefined));
-    fm.insert(std::pair<std::string, fun_ptr>("##%quiet-undefined", &inline_skiwi_quiet_undefined));
+    fm.insert(std::pair<std::string, fun_ptr>("##%quiet-undefined", &inline_scheme_quiet_undefined));
     fm.insert(std::pair<std::string, fun_ptr>("##vector-length", &inline_vector_length));
     fm.insert(std::pair<std::string, fun_ptr>("##fixnum->flonum", &inline_fixnum_to_flonum));
     fm.insert(std::pair<std::string, fun_ptr>("##flonum->fixnum", &inline_flonum_to_fixnum));
@@ -362,7 +362,7 @@ namespace
   inline void compile_nop(vmcode& code, vmcode::operand target)
     {
     assert(target_is_valid(target));
-    code.add(vmcode::MOV, target, vmcode::NUMBER, skiwi_undefined);
+    code.add(vmcode::MOV, target, vmcode::NUMBER, scheme_undefined);
     }
 
   inline void compile_fixnum(registered_functions&, environment_map&, repl_data&, compile_data&, vmcode& code, const Fixnum& f, const compiler_options&, vmcode::operand target)
@@ -912,7 +912,7 @@ namespace
       {
       code.add(vmcode::COMMENT, "Start debug info");
       code.add(vmcode::COMMENT, "\tCycling the call stack");
-      for (int i = SKIWI_VARIABLE_DEBUG_STACK_SIZE - 2; i >= 0; --i) // move items on the stack further down
+      for (int i = SCHEME_VARIABLE_DEBUG_STACK_SIZE - 2; i >= 0; --i) // move items on the stack further down
         {
         code.add(vmcode::MOV, vmcode::R15, LAST_GLOBAL_VARIABLE_USED + CELLS(i));
         code.add(vmcode::MOV, LAST_GLOBAL_VARIABLE_USED + CELLS(i + 1), vmcode::R15);

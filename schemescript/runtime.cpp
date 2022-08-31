@@ -203,12 +203,12 @@ namespace
           str << "#\\" << std::fixed << std::setfill('0') << std::setw(3) << int(ch) << std::defaultfloat;
         texts.push_back(str.str());
         }
-      else if (rax == skiwi_undefined)
+      else if (rax == scheme_undefined)
         {
         str << "#undefined";
         texts.push_back(str.str());
         }
-      else if (rax == skiwi_quiet_undefined)
+      else if (rax == scheme_quiet_undefined)
         {
         }
       else if (rax == eof_tag)
@@ -431,7 +431,7 @@ void print_last_global_variable_used(std::ostream& out, std::shared_ptr<environm
     return;
 
   out << "\ncall stack:\n";
-  for (int stack_item = SKIWI_VARIABLE_DEBUG_STACK_SIZE - 1; stack_item >= 0; --stack_item)
+  for (int stack_item = SCHEME_VARIABLE_DEBUG_STACK_SIZE - 1; stack_item >= 0; --stack_item)
     {
     uint64_t pos = p_ctxt->last_global_variable_used[stack_item];
     std::pair<std::string, environment_entry> res;
