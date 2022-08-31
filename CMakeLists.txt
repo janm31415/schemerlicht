@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-project (schemescript)
+project (schemerlicht)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
@@ -11,8 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-add_subdirectory(schemescript)
-add_subdirectory(schemescript.tests)
+add_subdirectory(schemerlicht)
+add_subdirectory(schemerlicht.tests)
 add_subdirectory(vm)
 add_subdirectory(vm.tests)
 
