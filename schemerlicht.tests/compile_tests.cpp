@@ -2,6 +2,7 @@
 #include "test_assert.h"
 
 #include "vm/vm.h"
+#include "vm/peephole.h"
 
 #include <iomanip>
 #include <iostream>
@@ -65,9 +66,16 @@ namespace
     std::map<std::string, COMPILER::external_function> externals;
     std::vector<VM::external_function> externals_for_vm;
     std::ostream* vm_output = nullptr;
+    
+    bool apply_peephole;
+    std::vector<vmcode::operand> temporary_operands;
 
     compile_fixture()
       {
+      apply_peephole = true;
+      //temporary_operands.push_back(vmcode::operand::RAX);
+      //temporary_operands.push_back(vmcode::operand::R11);
+      //temporary_operands.push_back(vmcode::operand::R15);
       add_system_calls(externals);
       convert_externals_to_vm();
       ops = g_ops;
@@ -80,6 +88,8 @@ namespace
       try
         {
         compile_primitives_library(pm, rd, env, ctxt, code, ops);
+        if (apply_peephole)
+          peephole_optimization(code, temporary_operands);
         uint64_t size;
         first_pass_data d;
         uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -153,6 +163,8 @@ namespace
       try
         {
         compile(env, rd, md, ctxt, code, prog, pm, externals, ops);
+        if (apply_peephole)
+          peephole_optimization(code, temporary_operands);
         }
       catch (std::logic_error e)
         {
@@ -204,6 +216,8 @@ namespace
         {
         if (load_string_to_symbol(env, rd, md, ctxt, code, pm, ops))
           {
+          if (apply_peephole)
+            peephole_optimization(code, temporary_operands);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -227,6 +241,8 @@ namespace
         {
         if (load_callcc(env, rd, md, ctxt, code, pm, ops))
           {
+          if (apply_peephole)
+            peephole_optimization(code, temporary_operands);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -250,6 +266,8 @@ namespace
         {
         if (load_apply(env, rd, md, ctxt, code, pm, ops))
           {
+          if (apply_peephole)
+            peephole_optimization(code, temporary_operands);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -273,6 +291,8 @@ namespace
         {
         if (load_r5rs(env, rd, md, ctxt, code, pm, ops))
           {
+          if (apply_peephole)
+            peephole_optimization(code, temporary_operands);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -296,6 +316,8 @@ namespace
         {
         if (load_lib("r5rs/values.scm", env, rd, md, ctxt, code, pm, ops))
           {
+          if (apply_peephole)
+            peephole_optimization(code, temporary_operands);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -333,6 +355,8 @@ namespace
       try
         {
         compile_primitives_library(pm, rd, env, ctxt, code, ops);
+        if (apply_peephole)
+          peephole_optimization(code, temporary_operands);
         uint64_t size;
         first_pass_data d;
         uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -4845,7 +4869,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 1; ++i)
     {
     g_ops = compiler_options();
     switch (i)
@@ -4864,7 +4888,7 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 0
+#if 1
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -4979,7 +5003,9 @@ void run_all_compile_tests()
     minmax_test().test();
     make_port_test().test();
     make_port2_test().test();
+#ifdef _WIN32
     make_port3_test().test();
+#endif
     writetests().test();
     char_comp().test();
     fx_comp().test();

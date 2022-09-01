@@ -1,4 +1,5 @@
 set(HDRS
+peephole.h
 vm_api.h
 vmcode.h
 namespace.h
@@ -6,6 +7,7 @@ vm.h
 )
 	
 set(SRCS
+peephole.cpp
 vmcode.cpp
 vm.cpp
 )
