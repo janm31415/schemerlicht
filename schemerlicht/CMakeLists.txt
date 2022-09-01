@@ -1,4 +1,5 @@
 set(HDRS
+load_eval.h
 cinput_data.h
 cinput_conversion.h
 load_lib.h
@@ -63,6 +64,7 @@ visitor.h
 )
 	
 set(SRCS
+load_eval.cpp
 cinput_conversion.cpp
 compiler.cpp
 runtime.cpp
