@@ -4819,7 +4819,16 @@ to /* and */ in c/c++
     int sz = (int)std::distance(p_ls->env->begin(), p_ls->env->end());
     printf("Environment has %d elements\n", sz);
     }
-    
+
+  struct macros : public compile_fixture
+    {
+    void test()
+      {
+      build_string_to_symbol();
+      TEST_EQ("8", run("(define-macro (eight) '(+ 3 5))  (eight)"));
+      }
+    };
+
   }
   
 COMPILER_END
@@ -4827,7 +4836,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 1; ++i)
     {
     g_ops = compiler_options();
     switch (i)
@@ -4846,7 +4855,7 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 1
+#if 0
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -5003,5 +5012,6 @@ void run_all_compile_tests()
     current_seconds_test().test();
     current_milliseconds_test().test();
 #endif
+    macros().test();
     }
   }
