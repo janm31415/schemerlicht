@@ -45,6 +45,7 @@ struct compiler_options
   bool fast_expression_targetting;
   bool parallel;
   bool keep_variable_stack; // default true: adds last used globals to a debug stack for better error reporting
+  bool do_peephole;
   };
 
 COMPILER_END

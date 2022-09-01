@@ -38,6 +38,8 @@ compiler_options::compiler_options()
   fast_expression_targetting = true;
   parallel = true;
   keep_variable_stack = true;
+  
+  do_peephole = true;
   }
 
 COMPILER_END

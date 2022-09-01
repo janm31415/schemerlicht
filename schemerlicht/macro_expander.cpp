@@ -373,7 +373,6 @@ namespace
       std::map<std::string, external_function> externals;
 
       compile(env, rd, md, ctxt, code, prog, pm, externals, ops); // they need to be inside the global environment, because of gc
-
       first_pass_data d;
       registers reg;
       uint64_t fie_size;

@@ -9,6 +9,8 @@
 #include "compile_data.h"
 #include "compiler.h"
 
+#include "vm/peephole.h"
+
 #include <sstream>
 
 COMPILER_BEGIN
@@ -93,6 +95,9 @@ void compile_primitives_library(primitive_map& pm, repl_data& rd, environment_ma
   compile_assoc_cmp_equal(code, options);
   compile_apply_fake_cps_identity(code, options);
   code.pop();
+  
+  if (options.do_peephole)
+    peephole_optimization(code);
   }
 
 void assign_primitive_addresses(primitive_map& pm, const VM::first_pass_data& d, uint64_t address_start)

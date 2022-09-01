@@ -11,6 +11,9 @@
 #include "primitives.h"
 #include "inlines.h"
 #include "cinput_data.h"
+
+#include "vm/peephole.h"
+
 #include <sstream>
 
 COMPILER_BEGIN
@@ -1823,6 +1826,9 @@ void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt,
   else
     code.add(vmcode::JMP, "L_finish");
   code.pop();
+  
+  if (options.do_peephole)
+    peephole_optimization(code);
   }
 
 COMPILER_END

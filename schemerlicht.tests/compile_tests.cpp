@@ -66,12 +66,9 @@ namespace
     std::map<std::string, COMPILER::external_function> externals;
     std::vector<VM::external_function> externals_for_vm;
     std::ostream* vm_output = nullptr;
-    
-    bool apply_peephole;
 
     compile_fixture()
       {
-      apply_peephole = true;
       add_system_calls(externals);
       convert_externals_to_vm();
       ops = g_ops;
@@ -84,8 +81,6 @@ namespace
       try
         {
         compile_primitives_library(pm, rd, env, ctxt, code, ops);
-        if (apply_peephole)
-          peephole_optimization(code);
         uint64_t size;
         first_pass_data d;
         uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -159,8 +154,6 @@ namespace
       try
         {
         compile(env, rd, md, ctxt, code, prog, pm, externals, ops);
-        if (apply_peephole)
-          peephole_optimization(code);
         }
       catch (std::logic_error e)
         {
@@ -212,8 +205,6 @@ namespace
         {
         if (load_string_to_symbol(env, rd, md, ctxt, code, pm, ops))
           {
-          if (apply_peephole)
-            peephole_optimization(code);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -237,8 +228,6 @@ namespace
         {
         if (load_callcc(env, rd, md, ctxt, code, pm, ops))
           {
-          if (apply_peephole)
-            peephole_optimization(code);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -262,8 +251,6 @@ namespace
         {
         if (load_apply(env, rd, md, ctxt, code, pm, ops))
           {
-          if (apply_peephole)
-            peephole_optimization(code);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -287,8 +274,6 @@ namespace
         {
         if (load_r5rs(env, rd, md, ctxt, code, pm, ops))
           {
-          if (apply_peephole)
-            peephole_optimization(code);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -312,8 +297,6 @@ namespace
         {
         if (load_lib("r5rs/values.scm", env, rd, md, ctxt, code, pm, ops))
           {
-          if (apply_peephole)
-            peephole_optimization(code);
           first_pass_data d;
           uint64_t size;
           uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
@@ -351,8 +334,6 @@ namespace
       try
         {
         compile_primitives_library(pm, rd, env, ctxt, code, ops);
-        if (apply_peephole)
-          peephole_optimization(code);
         uint64_t size;
         first_pass_data d;
         uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
