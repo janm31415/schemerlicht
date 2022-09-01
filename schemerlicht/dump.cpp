@@ -105,7 +105,7 @@ namespace
           }
         return true;
         }
-      void VisitLetPostBindings(Expression& e)
+      void VisitLetPostBindings(Expression&)
         {
         str << ") ";
         }
@@ -114,30 +114,30 @@ namespace
         str << "( ";
         return true;
         }
-      bool PreVisitCase(Expression& e)
+      bool PreVisitCase(Expression&)
         {
         str << "( case ";
         return true;
         }
-      void VisitCaseElse(Expression& e)
+      void VisitCaseElse(Expression&)
         {
         str << sbl << " else ";
         }
-      bool PreVisitCond(Expression& e)
+      bool PreVisitCond(Expression&)
         {
         str << "( cond ";
         return true;
         }
-      bool PreVisitDo(Expression& e)
+      bool PreVisitDo(Expression&)
         {
         str << "( do ( ";
         return true;
         }
-      void VisitDoPostBindings(Expression& e)
+      void VisitDoPostBindings(Expression&)
         {
         str << ") ( ";
         }
-      void VisitDoPostTest(Expression& e)
+      void VisitDoPostTest(Expression&)
         {
         str << ") ( ";
         }

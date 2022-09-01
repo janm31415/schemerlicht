@@ -15,9 +15,9 @@ namespace
     repl_data* rd;
     context* p_ctxt;
 
-    bool PreVisitSet(Expression& e)
+    bool PreVisitSet(Expression& expr)
       {
-      Set& s = std::get<Set>(e);
+      Set& s = std::get<Set>(expr);
       if (s.originates_from_define)
         {
         environment_entry e;

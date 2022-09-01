@@ -64,7 +64,7 @@ COMPILER_BEGIN
       bool PreVisitCond(Expression&) { return true; }
       void PostVisitCond(Expression&) { }
       
-      bool PreVisitDo(Expression& e) { return true; }
+      bool PreVisitDo(Expression&) { return true; }
       void VisitDoPostBindings(Expression&) { }
       void VisitDoPostTest(Expression&) { }
       void PostVisitDo(Expression&) { }

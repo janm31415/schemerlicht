@@ -191,8 +191,6 @@ namespace
           }
         else if (std::holds_alternative<Set>(e))
           {
-          Set& s = std::get<Set>(e);
-
           expressions.push_back(&std::get<Set>(e).value.front());
           }
         else if (std::holds_alternative<If>(e))

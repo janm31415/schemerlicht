@@ -4824,8 +4824,17 @@ to /* and */ in c/c++
     {
     void test()
       {
-      build_string_to_symbol();
+      build_libs();
       TEST_EQ("8", run("(define-macro (eight) '(+ 3 5))  (eight)"));
+      TEST_EQ("7", run("(define-macro (sum x y) `(+ ,x ,y))  (sum 3 4)"));
+      TEST_EQ("10", run("(sum (+ 4 5) (- 4 3))"));
+      TEST_EQ("10", run("(define-macro (when2 test . args) `(if ,test (begin ,@args) #f))  (when2 (> 5 2) 7 8 9 10)"));
+      TEST_EQ("#f", run("(when2 (< 5 2) 7 8 9 10)"));
+      TEST_EQ("10", run("(define x 2) (define y 1) (when2 (< y x) 7 8 9 10)"));
+      //TEST_EQ("\"I love ham with brie.\"", run("(define-macro (sandwich TOPPING FILLING please) `(format \"I love ~a with ~a.\" ',FILLING ',TOPPING)) (sandwich brie ham now)"));
+      //TEST_EQ("\"I love bacon with banana.\"", run("(sandwich banana bacon please)"));
+      //TEST_EQ("error:1:2: No matching case for calling pattern in macro: sandwich", run("(sandwich brie ham)")); TOCHECK
+      TEST_EQ("95", run("(define-macro (sub5 x) `(begin (define-macro (subtract a b) `(- ,a ,b)) (subtract ,x 5) ) )  (sub5 100)"));
       }
     };
 
@@ -4836,7 +4845,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 1; ++i)
+  for (int i = 0; i < 3; ++i)
     {
     g_ops = compiler_options();
     switch (i)
