@@ -2245,10 +2245,6 @@ namespace
   struct fib_perf_test : public compile_fixture {
     void test()
       {
-      ops.primitives_inlined = true;
-      ops.safe_primitives = false;
-      ops.standard_bindings = true;
-
       run("(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) ");
       //run("(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) ");
       auto tic = std::chrono::high_resolution_clock::now();
@@ -4846,7 +4842,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 1; ++i)
+  for (int i = 0; i < 3; ++i)
     {
     g_ops = compiler_options();
     switch (i)
@@ -4857,6 +4853,8 @@ void run_all_compile_tests()
         g_ops.primitives_inlined = false;
         break;
       case 2:
+        g_ops.standard_bindings = true;
+        g_ops.primitives_inlined = true;
         g_ops.safe_cons = false;
         g_ops.safe_flonums = false;
         g_ops.safe_promises = false;
