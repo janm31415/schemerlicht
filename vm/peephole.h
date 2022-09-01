@@ -8,6 +8,6 @@
 
 VM_BEGIN
 
-VM_API void peephole_optimization(VM::vmcode& code, const std::vector<vmcode::operand>& temporary_operands);
+VM_API void peephole_optimization(VM::vmcode& code);
 
 VM_END
