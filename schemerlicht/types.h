@@ -8,7 +8,7 @@ The machine registers are used in the following manner:
     --------------------------------------+--------------------------------------
      rax, r11, r15                          Temporary registers
      r10                                    Pointer to context
-     rdx, rsi, rdi, r8, r9, r12             Argument registers
+     rcx,rdx, rsi, rdi, r8, r9, r12, r14    Argument registers
      rbx                                    Holds currently executing closure
      rcx                                    Holds current continuation
      rbp                                    Allocation-pointer

@@ -4834,6 +4834,19 @@ to /* and */ in c/c++
       TEST_EQ("95", run("(define-macro (sub5 x) `(begin (define-macro (subtract a b) `(- ,a ,b)) (subtract ,x 5) ) )  (sub5 100)"));
       }
     };
+    
+  struct load_eval : public compile_fixture
+    {
+    void test()
+      {
+      #ifdef _WIN32
+        run("(load \"data\\\\load_test_1.scm\")");
+      #else
+        run("(load \"./data/load_test_1.scm\")");
+      #endif
+      TEST_EQ("9", run("result"));
+      }
+    };
 
   }
   
@@ -4842,7 +4855,7 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 1; ++i)
     {
     g_ops = compiler_options();
     switch (i)
@@ -4863,7 +4876,7 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 1
+#if 0
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -5021,7 +5034,9 @@ void run_all_compile_tests()
     c_input_test_8doubles().test();
     current_seconds_test().test();
     current_milliseconds_test().test();
-#endif
     macros().test();
+#endif
+
+    load_eval().test();
     }
   }

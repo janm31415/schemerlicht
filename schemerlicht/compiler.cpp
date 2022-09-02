@@ -1203,6 +1203,15 @@ namespace
     auto pm_it = pm.find(prim.primitive_name);
     if (pm_it == pm.end())
       throw_error(prim.line_nr, prim.column_nr, prim.filename, primitive_unknown, prim.primitive_name);
+    if (prim.primitive_name == "load" || prim.primitive_name == "eval") // special case, add compiler data as argument
+      {
+      uint64_t context_address = (uint64_t)(data.p_ctxt);
+      uint64_t repl_data_address = (uint64_t)(&rd);
+      uint64_t env_address = *(reinterpret_cast<uint64_t*>(&env));
+      code.add(vmcode::MOV, vmcode::RDX, vmcode::NUMBER, context_address);
+      code.add(vmcode::MOV, vmcode::R8, vmcode::NUMBER, repl_data_address);
+      code.add(vmcode::MOV, vmcode::R9, vmcode::NUMBER, env_address);
+      }
     code.add(vmcode::COMMENT, "jump to " + pm_it->first);
     code.add(vmcode::MOV, vmcode::RAX, vmcode::NUMBER, pm_it->second.address);
     code.add(vmcode::JMP, vmcode::RAX);

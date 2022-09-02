@@ -10,7 +10,7 @@
 #include <fstream>
 #include <chrono>
 #include "file_utils.h"
-//#include "c_prim_decl.h"
+#include "load_eval.h"
 
 COMPILER_BEGIN
 
@@ -248,12 +248,15 @@ externals[ef.name] = ef;
   ef.address = (uint64_t)&_scheme_current_milliseconds;
   ef.return_type = external_function::T_INT64;
   externals[ef.name] = ef;
-/*
+
   ef.arguments.clear();
   ef.name = "c_prim_load";
   ef.address = (uint64_t)&c_prim_load;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_INT64);      
   externals[ef.name] = ef;
 
   ef.arguments.clear();
@@ -261,8 +264,11 @@ externals[ef.name] = ef;
   ef.address = (uint64_t)&c_prim_eval;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_INT64);
+  ef.arguments.push_back(external_function::T_INT64);
   externals[ef.name] = ef;
-*/
+
   }
 
 namespace {
