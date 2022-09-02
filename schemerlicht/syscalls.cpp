@@ -253,10 +253,7 @@ externals[ef.name] = ef;
   ef.name = "c_prim_load";
   ef.address = (uint64_t)&c_prim_load;
   ef.return_type = external_function::T_INT64;
-  ef.arguments.push_back(external_function::T_CHAR_POINTER);
-  ef.arguments.push_back(external_function::T_INT64);
-  ef.arguments.push_back(external_function::T_INT64);
-  ef.arguments.push_back(external_function::T_INT64);      
+  ef.arguments.push_back(external_function::T_CHAR_POINTER);   
   externals[ef.name] = ef;
 
   ef.arguments.clear();
@@ -264,9 +261,6 @@ externals[ef.name] = ef;
   ef.address = (uint64_t)&c_prim_eval;
   ef.return_type = external_function::T_INT64;
   ef.arguments.push_back(external_function::T_CHAR_POINTER);
-  ef.arguments.push_back(external_function::T_INT64);
-  ef.arguments.push_back(external_function::T_INT64);
-  ef.arguments.push_back(external_function::T_INT64);
   externals[ef.name] = ef;
 
   }

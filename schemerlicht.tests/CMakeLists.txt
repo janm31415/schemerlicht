@@ -4,6 +4,7 @@ conversion_tests.h
 format_tests.h
 parse_tests.h
 preprocess_tests.h
+schemerlicht_tests.h
 test_assert.h
 tokenize_tests.h
     )
@@ -14,6 +15,7 @@ conversion_tests.cpp
 format_tests.cpp
 parse_tests.cpp
 preprocess_tests.cpp
+schemerlicht_tests.cpp
 test.cpp
 test_assert.cpp
 tokenize_tests.cpp

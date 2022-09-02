@@ -51,6 +51,7 @@ reg_alloc_map.h
 remove_single_begins.h
 repl_data.h
 runtime.h
+schemerlicht.h
 schemerlicht_api.h
 simplify_to_core.h
 single_begin_conversion.h
@@ -108,6 +109,7 @@ reg_alloc_map.cpp
 remove_single_begins.cpp
 repl_data.cpp
 runtime.cpp
+schemerlicht.cpp
 simplify_to_core.cpp
 single_begin_conversion.cpp
 syscalls.cpp
