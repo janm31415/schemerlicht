@@ -1408,9 +1408,10 @@ namespace
         }
       }
 
-
+    save_before_foreign_call(code);
     code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, ext.address);
     code.add(vmcode::CALLEXTERNAL, vmcode::R11);
+    restore_after_foreign_call(code);
 
     switch (ext.return_type)
       {
@@ -1759,7 +1760,8 @@ void compile(environment_map& env, repl_data& rd, macro_data& md, context& ctxt,
   if (rd.global_index > data.globals_stack) // too many globals declared
     throw_error(too_many_globals);
     
-    
+  code.add(vmcode::GLOBAL, "scheme_entry");
+
   if constexpr (rsp_offset)
     code.add(VM::vmcode::SUB, VM::vmcode::RSP, VM::vmcode::NUMBER, rsp_offset);
     

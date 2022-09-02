@@ -2,6 +2,8 @@
 
 #include "schemerlicht/schemerlicht.h"
 
+#include "schemerlicht/file_utils.h"
+
 #include "test_assert.h"
 
 #include <iostream>
@@ -255,16 +257,26 @@ namespace
     };
   }
 
+struct getenvtest : public compile_fixture_schemerlicht
+  {
+  void test()
+    {
+    std::string modulepath = std::string("\"") + get_folder(get_executable_path()) + std::string("scm/") + std::string("\"");
+    TEST_EQ(modulepath, run("(getenv \"SCHEMERLICHT_MODULE_PATH\")"));
+    }
+  };
+
 COMPILER_END
 
 
 void run_all_schemerlicht_tests()
   {
   using namespace COMPILER;
+  getenvtest().test();
   is_procedure().test();
-  //long_apply_2_test().test();
-  //callcc_test().test();
-  //calcc_extended().test();
-  //basic_string_ports().test();
-  //format_tests().test();
+  long_apply_2_test().test();
+  callcc_test().test();
+  calcc_extended().test();
+  basic_string_ports().test();
+  format_tests().test();
   }

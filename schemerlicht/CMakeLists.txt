@@ -16,7 +16,6 @@ context.h
 context_defs.h
 cps_conversion.h
 define_conversion.h
-defines.h
 dump.h
 environment.h
 file_utils.h
@@ -92,7 +91,6 @@ inlines.cpp
 lambda_to_let_conversion.cpp
 linear_scan.cpp
 linear_scan_index.cpp
-load_eval.cpp
 load_lib.cpp
 macro_data.cpp
 macro_expander.cpp
@@ -149,7 +147,6 @@ add_custom_command(TARGET schemerlicht POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/scm" "${CMAKE_CURRENT_BINARY_DIR}/scm")
 endif (WIN32)
 
-if (UNIX)
+
 add_custom_command(TARGET schemerlicht POST_BUILD 
    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/scm" "$<TARGET_FILE_DIR:vm.tests>/scm")
-endif (UNIX)

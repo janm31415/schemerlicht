@@ -53,7 +53,5 @@ add_custom_command(TARGET schemerlicht.tests POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/data" ${CMAKE_CURRENT_BINARY_DIR}/data)
 endif (WIN32)
 
-if (UNIX)
 add_custom_command(TARGET schemerlicht.tests POST_BUILD 
    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/data" "$<TARGET_FILE_DIR:schemerlicht.tests>/data")
-endif (UNIX)

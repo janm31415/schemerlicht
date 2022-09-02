@@ -43,4 +43,7 @@ void string_length(VM::vmcode& code, VM::vmcode::operand string_reg);
 void push(VM::vmcode& code, VM::vmcode::operand reg);
 void pop(VM::vmcode& code, VM::vmcode::operand reg);
 
+void save_before_foreign_call(VM::vmcode& code);
+void restore_after_foreign_call(VM::vmcode& code);
+
 COMPILER_END

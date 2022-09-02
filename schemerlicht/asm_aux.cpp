@@ -40,6 +40,43 @@ std::string label_to_string(uint64_t lab)
   }
 
 
+void save_before_foreign_call(vmcode& code)
+  {
+  code.add(vmcode::MOV, ALLOC_SAVED, ALLOC); // this line is here so that our foreign calls can access free heap memory
+
+  //code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, CELLS(8));
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(0), vmcode::RBX);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(1), vmcode::RCX);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(2), vmcode::RDX);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(3), vmcode::RSI);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(4), vmcode::RDI);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(5), vmcode::R8);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(6), vmcode::R9);
+  //code.add(vmcode::MOV, vmcode::MEM_RSP, CELLS(7), vmcode::R10);
+
+
+  code.add(vmcode::MOV, STACK, STACK_REGISTER); // We save the current stack position in the context, so that any load or eval functions start from the correct stack position.
+                                                 // This is important for the garbage collector.
+  }
+
+void restore_after_foreign_call(vmcode& code)
+  { 
+  //code.add(vmcode::MOV, vmcode::R10, vmcode::MEM_RSP, CELLS(7));
+  //code.add(vmcode::MOV, vmcode::R9, vmcode::MEM_RSP, CELLS(6));
+  //code.add(vmcode::MOV, vmcode::R8, vmcode::MEM_RSP, CELLS(5));
+  //code.add(vmcode::MOV, vmcode::RDI, vmcode::MEM_RSP, CELLS(4));
+  //code.add(vmcode::MOV, vmcode::RSI, vmcode::MEM_RSP, CELLS(3));
+  //code.add(vmcode::MOV, vmcode::RDX, vmcode::MEM_RSP, CELLS(2));
+  //code.add(vmcode::MOV, vmcode::RCX, vmcode::MEM_RSP, CELLS(1));
+  //code.add(vmcode::MOV, vmcode::RBX, vmcode::MEM_RSP, CELLS(0));
+  //code.add(vmcode::ADD, vmcode::RSP, vmcode::NUMBER, CELLS(8));
+
+
+  code.add(vmcode::MOV, STACK_REGISTER, STACK); // We update the stack register with the current stack position. The external function might have called load or eval which
+                                                 // might update the scheme stack. This is important for the garbage collector.
+  code.add(vmcode::MOV, ALLOC, ALLOC_SAVED); // foreign calls should have updated free heap memory if they used some
+  }
+
 void store_registers(vmcode& code)
   {
   code.add(vmcode::MOV, RSP_STORE, vmcode::RSP);

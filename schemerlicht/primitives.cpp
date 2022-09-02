@@ -7545,8 +7545,10 @@ void compile_load(vmcode& code, const compiler_options& ops)
     }
   code.add(vmcode::ADD, vmcode::RCX, vmcode::NUMBER, CELLS(1));
 
+  save_before_foreign_call(code);
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&c_prim_load);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
+  restore_after_foreign_call(code);
   
   // now check whether rax contains an error: if so we jump to ERROR
   code.add(vmcode::MOV, vmcode::RCX, vmcode::RAX);
@@ -7565,8 +7567,7 @@ void compile_load(vmcode& code, const compiler_options& ops)
 
 
 void compile_eval(vmcode& code, const compiler_options& ops)
-  {
-  /*
+  {  
   std::string error;
   if (ops.safe_primitives)
     {
@@ -7581,43 +7582,17 @@ void compile_eval(vmcode& code, const compiler_options& ops)
     jump_if_arg_does_not_point_to_string(code, vmcode::RCX, vmcode::R11, error);
     }
   code.add(vmcode::ADD, vmcode::RCX, vmcode::NUMBER, CELLS(1));
-*/
-  /*
-Windows:
-rcx
-Linux:
-rdi
-*/
-/*
-#ifndef WIN32
-  code.add(vmcode::PUSH, vmcode::RDI);
-  code.add(vmcode::MOV, vmcode::RDI, vmcode::RCX);
-#endif
 
-  code.add(vmcode::MOV, ALLOC_SAVED, ALLOC); // this line is here so that our foreign calls can access free heap memory
   save_before_foreign_call(code);
-  align_stack(code);
-  code.add(vmcode::MOV, vmcode::R15, CONTEXT); // r15 should be saved by the callee but r10 not, so we save the context in r15
-#ifdef _WIN32
-  code.add(vmcode::SUB, vmcode::RSP, vmcode::NUMBER, 32);
-#else
-  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
-#endif  
   code.add(vmcode::MOV, vmcode::R11, vmcode::NUMBER, (uint64_t)&c_prim_eval);
   code.add(vmcode::CALLEXTERNAL, vmcode::R11);
-  code.add(vmcode::MOV, CONTEXT, vmcode::R15); // now we restore the context
-  restore_stack(code);
   restore_after_foreign_call(code);
-  code.add(vmcode::MOV, ALLOC, ALLOC_SAVED); // foreign calls should have updated free heap memory if they used some
-#ifndef WIN32
-  code.add(vmcode::POP, vmcode::RDI);
-#endif
+
   code.add(vmcode::JMP, CONTINUE);
   if (ops.safe_primitives)
     {
     error_label(code, error, re_eval_contract_violation);
     }
-  */
   }
 
 void compile_current_seconds(VM::vmcode& code, const compiler_options& /*options*/)

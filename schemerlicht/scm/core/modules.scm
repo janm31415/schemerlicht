@@ -21,10 +21,10 @@
 ;;   
 (define (module-name->path name)
   (let ((file (module-name->file name))
-        (module-path (getenv "SKIWI_MODULE_PATH")))
+        (module-path (getenv "SCHEMERLICHT_MODULE_PATH")))
     (if module-path
         (string-append module-path file)  
-        (begin (error "invalid skiwi module path") #f)
+        (begin (error "invalid schemerlicht module path") #f)
     )
   )
 ) 

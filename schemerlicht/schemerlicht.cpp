@@ -66,6 +66,7 @@ namespace
 
   struct compiler_data_memento
     {
+    void* rsp;
     uint64_t* rsp_save; // state of RSP should be preserved, as it might contain RET information and so on
     uint64_t* stack_save; // stack_save contains the stack position at the beginning of the scheme call. After the scheme call the stack should be at this position again. Therefore this value needs to be preserved.
     uint64_t* error_label; // Each scheme call has its error label to which to jump in case of error. It should thus be preserved.
@@ -79,7 +80,7 @@ namespace
     std::string help_text;
     };
 
-  static std::string help = R"(This is Skiwi. You are interacting with the REPL.
+  static std::string help = R"(This is Schemerlicht. You are interacting with the REPL.
 Enter scheme commands or one of the following:
 
 ,asm
@@ -91,7 +92,7 @@ Enter scheme commands or one of the following:
 ,unresolved
 
 )";
-  static std::string welcome_message = "\nWelcome to Skiwi\nType ,? for help.\n";
+  static std::string welcome_message = "\nWelcome to Schemerlicht\nType ,? for help.\n";
   static std::string prompt = "schemerlicht> ";
   static compiler_data cd;
   static std::vector<external_primitive> external_primitives;
@@ -359,6 +360,12 @@ Enter scheme commands or one of the following:
     try
       {
       compile(env, rd, cd.md, cd.ctxt, code, prog, cd.pm, cd.externals, cd.ops);
+      //std::ofstream fl("debug3.txt");
+      //dump(fl, prog);
+      //fl.close();
+      //std::ofstream fl("debug.txt");
+      //code.stream(fl);
+      //fl.close();
       first_pass_data d;
       uint8_t* f = (uint8_t*)vm_bytecode(size, d, code);
       return f;
@@ -391,7 +398,9 @@ Enter scheme commands or one of the following:
       {
       registers reg;
       reg.rcx = (uint64_t)(&cd.ctxt);
-
+      //std::ofstream fl("debug2.txt");      
+      //run_bytecode(f, size, reg, cd.externals_for_vm, &fl);
+      //fl.close();
       run_bytecode(f, size, reg, cd.externals_for_vm);
       result = reg.rax;
       cd.compiled_bytecode.emplace_back(f, size);
@@ -532,7 +541,7 @@ Enter scheme commands or one of the following:
     {
     using namespace COMPILER;
     if (!cd.initialized)
-      throw std::runtime_error("Skiwi is not initialized");
+      throw std::runtime_error("Schemerlicht is not initialized");
     vmcode code;
     std::string filename = get_filename(scheme_file);
     std::string folder = get_folder(scheme_file);
@@ -591,19 +600,17 @@ void* scheme_with_schemerlicht(void* (*func)(void*), void* data, schemerlicht_pa
   using namespace COMPILER;
 
   if (cd.initialized)
-    throw std::runtime_error("Skiwi is already initialized");
+    throw std::runtime_error("Schemerlicht is already initialized");
 
   std::string modulepath = get_folder(get_executable_path()) + std::string("scm/");
 
-  putenv(std::string("SKIWI_MODULE_PATH"), modulepath);
+  putenv(std::string("SCHEMERLICHT_MODULE_PATH"), modulepath);
 
   cd = compiler_data(); // this step is necessary to clear any potential content in cd if this is the second instantiation of schemerlicht
 
   cd.initialized = true;
   add_system_calls(cd.externals);
-#ifdef _SKIWI_FOR_ARM
   cd.externals_for_vm = convert_externals_to_vm(cd.externals);
-#endif
   cd.ctxt = create_context(params.heap_size, params.globals_stack, params.local_stack, params.scheme_stack);
   cd.env = std::make_shared<environment<environment_entry>>(nullptr);
   cd.trace = params.trace;
@@ -616,7 +623,7 @@ void* scheme_with_schemerlicht(void* (*func)(void*), void* data, schemerlicht_pa
   compile_call_cc();
 
   compile_r5rs();
-  //compile_modules();
+  compile_modules();
 
   if (!func)
     return nullptr;
@@ -627,7 +634,7 @@ std::string schemerlicht_expand(const std::string& scheme_expression)
   {
   using namespace COMPILER;
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
   auto env_copy = make_deep_copy(cd.env);
   auto rd_copy = make_deep_copy(cd.rd);
   Program prog;
@@ -666,7 +673,7 @@ std::string schemerlicht_assembly(const std::string& scheme_expression)
   {
   using namespace COMPILER;
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
   auto env_copy = make_deep_copy(cd.env);
   auto rd_copy = make_deep_copy(cd.rd);
   vmcode code;
@@ -745,7 +752,7 @@ void schemerlicht_destroy_clone_context(void* ctxt)
 uint64_t schemerlicht_run_raw(const std::string& scheme_expression)
   {
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
   return compile_and_run(scheme_expression, cd.env, cd.rd);
   }
 
@@ -863,7 +870,7 @@ void schemerlicht_repl(int argc, char** argv)
   {
   using namespace COMPILER;
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
 
   for (int i = 1; i < argc; ++i)
     {
@@ -954,7 +961,7 @@ std::string schemerlicht_last_global_variable_used()
   {
   using namespace COMPILER;
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
   std::stringstream ss;
   print_last_global_variable_used(ss, cd.env, cd.rd, &cd.ctxt);
   return ss.str();
@@ -964,7 +971,7 @@ void schemerlicht_quit()
   {
   using namespace COMPILER;
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
   destroy_macro_data(cd.md);
   for (auto& f : cd.compiled_bytecode)
     free_bytecode((void*)f.first, f.second);
@@ -976,7 +983,7 @@ void register_external_primitive(const std::string& name, void* func_ptr, extern
   {
   using namespace COMPILER;
   if (!cd.initialized)
-    throw std::runtime_error("Skiwi is not initialized");
+    throw std::runtime_error("Schemerlicht is not initialized");
   external_function ef;
   ef.name = name;
   ef.address = (uint64_t)func_ptr;
@@ -984,9 +991,7 @@ void register_external_primitive(const std::string& name, void* func_ptr, extern
   for (auto arg : arguments)
     ef.arguments.push_back(_convert(arg));
   cd.externals[ef.name] = ef;
-#ifdef _SKIWI_FOR_ARM
   cd.externals_for_vm.push_back(convert_external_to_vm(ef));
-#endif
   std::stringstream ss;
   ss << "(define (" << ef.name;
   int max_pars = (int)arguments.size();
@@ -1433,6 +1438,7 @@ void set_help_text(const std::string& help_text)
 void save_compiler_data()
   {
   compiler_data_memento cdm;
+  cdm.rsp = cd.ctxt.rsp;
   cdm.rsp_save = cd.ctxt.rsp_save; // state of RSP should be preserved, as it might contain RET information and so on
   cdm.stack_save = cd.ctxt.stack_save; // stack_save contains the stack position at the beginning of the scheme call. After the scheme call the stack should be at this position again. Therefore this value needs to be preserved.
   cdm.error_label = cd.ctxt.error_label; // Each scheme call has its error label to which to jump in case of error. It should thus be preserved.
@@ -1447,6 +1453,140 @@ void restore_compiler_data()
   cd.ctxt.rsp_save = cdm.rsp_save;
   cd.ctxt.stack_save = cdm.stack_save;
   cd.ctxt.error_label = cdm.error_label;
+  cd.ctxt.rsp = cdm.rsp;
   }
 
 COMPILER_END
+
+uint64_t c_prim_load(const char* filename)
+  {
+  using namespace COMPILER;
+
+  save_compiler_data();
+
+  /*
+   Before loading the script, we first make a list of global variables that are still dangling.
+   We remove those out of our environment.
+   Possible the script we load will resolve these variables.
+   So after the script we run over this list of dangling globals again, and see whether some variables can be resolved.
+   */
+
+  auto it = cd.env->begin();
+  auto it_end = cd.env->end();
+
+  struct variables_data
+    {
+    std::string name;
+    alpha_conversion_data acd;
+    environment_entry e;
+    };
+
+  std::vector<variables_data> unresolved_variables;
+  std::vector<variables_data> reserved_variables;
+
+  for (; it != it_end; ++it)
+    {
+    if (it->second.st == environment_entry::st_global)
+      {
+      uint64_t* addr = cd.ctxt.globals + (it->second.pos >> 3);
+      if (*addr == unresolved_tag)
+        {
+        std::string var_name = get_variable_name_before_alpha(it->first);
+        variables_data uvd;
+        uvd.name = var_name;
+        bool res = cd.rd.alpha_conversion_env->find(uvd.acd, var_name);
+        if (!res)
+          throw std::runtime_error("compiler error in c_prim_load");
+        res = cd.env->find(uvd.e, uvd.acd.name);
+        if (!res)
+          throw std::runtime_error("compiler error in c_prim_load");
+        unresolved_variables.push_back(uvd);
+        cd.rd.alpha_conversion_env->remove(var_name);
+        }
+      else if (*addr == reserved_tag)
+        {
+        std::string var_name = get_variable_name_before_alpha(it->first);
+        variables_data uvd;
+        uvd.name = var_name;
+        bool res = cd.rd.alpha_conversion_env->find(uvd.acd, var_name);
+        if (!res)
+          throw std::runtime_error("compiler error in c_prim_load");
+        res = cd.env->find(uvd.e, uvd.acd.name);
+        if (!res)
+          throw std::runtime_error("compiler error in c_prim_load");
+        reserved_variables.push_back(uvd);
+        cd.rd.alpha_conversion_env->remove(var_name);
+        }
+      else if (*addr == unalloc_tag)
+        {
+        throw std::runtime_error("compiler error in c_prim_load");
+        }
+      }
+    }
+
+  for (const auto& pr : unresolved_variables)
+    cd.env->remove(pr.acd.name);
+  for (const auto& pr : reserved_variables)
+    cd.env->remove(pr.acd.name);
+  //bool gc = cd.ops.garbage_collection;
+  //cd.ops.garbage_collection = false;
+  uint64_t res = schemerlicht_runf_raw(filename, cd.env, cd.rd);
+  //cd.ops.garbage_collection = gc;
+  /*
+   We run over the dangling variables and update the variables that were resolved by loading 'filename'.
+   */
+  for (auto unresolved : unresolved_variables)
+    {
+    environment_entry new_e;
+    alpha_conversion_data new_acd;
+
+    if (cd.rd.alpha_conversion_env->find(new_acd, unresolved.name))
+      {
+      // the variable can be resolved and updated with a new value
+      if (!cd.env->find(new_e, new_acd.name))
+        throw std::runtime_error("compiler error in c_prim_load");
+      uint64_t* unresolved_addr_in_parent = cd.ctxt.globals + (unresolved.e.pos >> 3);
+      uint64_t* addr_in_child = cd.ctxt.globals + (new_e.pos >> 3);
+      *unresolved_addr_in_parent = *addr_in_child;
+      }
+    else
+      {
+      // We could not resolve the variable. However, we push it back to the environment, as we removed it earlier on before calling the actual load.
+      cd.rd.alpha_conversion_env->push(unresolved.name, unresolved.acd);
+      cd.env->push(unresolved.acd.name, unresolved.e);
+      }
+    }
+
+  for (auto reserved : reserved_variables)
+    {
+    cd.rd.alpha_conversion_env->push(reserved.name, reserved.acd);
+    cd.env->push(reserved.acd.name, reserved.e);
+    }
+
+  restore_compiler_data();
+  return res;
+  }
+
+
+uint64_t c_prim_eval(const char* script)
+  {
+  uint64_t return_value = scheme_undefined;
+  using namespace COMPILER;
+
+  save_compiler_data();
+
+  if (!cd.initialized)
+    throw std::runtime_error("Schemerlicht is not initialized");
+  uint64_t size;
+  auto f = compile(size, script, cd.env, cd.rd);
+  if (f)
+    {
+    registers reg;
+    reg.rcx = (uint64_t)(&cd.ctxt);
+    run_bytecode(f, size, reg);
+    cd.compiled_bytecode.emplace_back(f, size);
+    return_value = reg.rax;
+    }
+  restore_compiler_data();
+  return return_value;
+  }
