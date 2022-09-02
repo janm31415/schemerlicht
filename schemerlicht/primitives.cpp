@@ -5877,6 +5877,7 @@ void compile_peek_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::AND, vmcode::R15, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8); // get address to string
   code.add(vmcode::ADD, vmcode::R11, vmcode::NUMBER, 8); // increase 8 for header
   code.add(vmcode::ADD, vmcode::R15, vmcode::R11);
+  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
   code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_R15);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::OR, vmcode::RAX, vmcode::NUMBER, char_tag);
@@ -5958,6 +5959,7 @@ void compile_read_char(vmcode& code, const compiler_options& ops)
   code.add(vmcode::AND, vmcode::R15, vmcode::NUMBER, 0xFFFFFFFFFFFFFFF8); // get address to string
   code.add(vmcode::ADD, vmcode::R11, vmcode::NUMBER, 8); // increase 8 for header
   code.add(vmcode::ADD, vmcode::R15, vmcode::R11);
+  code.add(vmcode::XOR, vmcode::RAX, vmcode::RAX);
   code.add(vmcode::MOV8, vmcode::RAX, vmcode::MEM_R15);
   code.add(vmcode::SHL, vmcode::RAX, vmcode::NUMBER, 8);
   code.add(vmcode::OR, vmcode::RAX, vmcode::NUMBER, char_tag);
