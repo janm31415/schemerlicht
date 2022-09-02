@@ -19,7 +19,7 @@
 (define-module srfi-28 (srfi srfi28))
 
 ;; slib
-(define-module slib (slib skiwi-slib))
+(define-module slib (slib schemerlicht-slib))
 
 ;; test
 (define-module test-r4rs (test r4rstest))

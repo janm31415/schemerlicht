@@ -1,4 +1,4 @@
-;;;"skiwi.init" Initialization for SLIB for skiwi
+;;;"schemerlicht.init" Initialization for SLIB for schemerlicht
 ;;; Author: Jan Maes
 ;;;
 ;;; This code is in the public domain.
@@ -16,7 +16,7 @@
 
 ;;; (scheme-implementation-type) should return the name of the scheme
 ;;; implementation loading this file.
-(define (scheme-implementation-type) 'skiwi)
+(define (scheme-implementation-type) 'schemerlicht)
 
 ;;; (scheme-implementation-home-page) should return a (string) URI
 ;;; (Uniform Resource Identifier) for this scheme implementation's home
@@ -33,7 +33,7 @@
 ;;; the directory where any auxillary files to your Scheme
 ;;; implementation reside.
 (define implementation-vicinity
-  (let ((impl-path (getenv "SKIWI_MODULE_PATH")))
+  (let ((impl-path (getenv "SCHEMERLICHT_MODULE_PATH")))
     (lambda () impl-path)))
 
 ;;; (library-vicinity) should be defined to be the pathname of the
@@ -228,7 +228,7 @@
 			 (string-append "slib_" (number->string cntr)))))
 			 
 ;;; (FILE-EXISTS? <string>)
-;; Already in skiwi
+;; Already in schemerlicht
 
 ;;; (DELETE-FILE <string>)
 (define (delete-file name) #f)

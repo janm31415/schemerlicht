@@ -655,6 +655,7 @@
   (define f-3.25 (string->number "-3.25"))
   (define f.25 (string->number ".25"))
   (define f4.5 (string->number "4.5"))
+  (define f5.0 (string->number "5.0"))
   (define f3.5 (string->number "3.5"))
   (define f0.0 (string->number "0.0"))
   (define f0.8 (string->number "0.8"))
@@ -702,14 +703,14 @@
   (test f4.0 exact->inexact f4.0)
   (test 4 inexact->exact 4)
   (test 4 inexact->exact f4.0)
-  (test (- f4.0) round (- f4.5))
+  (test (- f5.0) round (- f4.5)) ;;[JanM] changed test result to round away from zero
   (test (- f4.0) round (- f3.5))
   (test (- f4.0) round (- f3.9))
   (test f0.0 round f0.0)
   (test f0.0 round f.25)
   (test f1.0 round f0.8)
   (test f4.0 round f3.5)
-  (test f4.0 round f4.5)
+  (test f5.0 round f4.5) ;;[JanM] changed test result to round away from zero
 
   ;;(test f1.0 expt f0.0 f0.0)
   ;;(test f1.0 expt f0.0 0)
