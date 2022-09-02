@@ -4863,7 +4863,7 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 0
+#if 1
     fixnums().test();
     bools().test();
     test_for_nil().test();
