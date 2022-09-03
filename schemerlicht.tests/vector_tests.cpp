@@ -134,6 +134,59 @@ namespace
     TEST_EQ(15.0, *schemerlicht_vector_at(&ctxt, &v, 4, double));
     schemerlicht_vector_destroy(&ctxt, &v);
     }
+
+  void test_iterator()
+    {
+    schemerlicht_context ctxt;
+    schemerlicht_vector v;
+    schemerlicht_vector_init(&ctxt, &v, double);
+    TEST_EQ(0, v.vector_size);
+    TEST_EQ(8, v.vector_capacity);
+    schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
+    TEST_EQ(1, v.vector_size);
+    TEST_EQ(8, v.vector_capacity);
+    schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
+    TEST_EQ(2, v.vector_size);
+    TEST_EQ(8, v.vector_capacity);
+    double* it = schemerlicht_vector_begin(&v, double);
+    double* it_end = schemerlicht_vector_end(&v, double);
+    int counter = 0;
+    for (; it != it_end; ++it, ++counter)
+      {
+      if (counter == 0)
+        TEST_EQ(7.0, *it);
+      if (counter == 1)
+        TEST_EQ(9.0, *it);
+      }
+    TEST_EQ(2, counter);    
+    schemerlicht_vector_destroy(&ctxt, &v);
+    }
+
+  void test_iterator_2()
+    {
+    schemerlicht_context ctxt;
+    schemerlicht_vector v;
+    schemerlicht_vector_init(&ctxt, &v, double);
+    TEST_EQ(0, v.vector_size);
+    TEST_EQ(8, v.vector_capacity);
+    schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
+    TEST_EQ(1, v.vector_size);
+    TEST_EQ(8, v.vector_capacity);
+    schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
+    TEST_EQ(2, v.vector_size);
+    TEST_EQ(8, v.vector_capacity);
+    double* it = schemerlicht_vector_begin(&v, double);
+    double* it_end = schemerlicht_vector_end(&v, double);
+    int counter = 0;
+    for (; it != it_end; ++it, ++counter)
+      {
+      *it = (double)counter;
+      }
+    TEST_EQ(2, counter);
+    TEST_EQ(0.0, *schemerlicht_vector_at(&ctxt, &v, 0, double));
+    TEST_EQ(1.0, *schemerlicht_vector_at(&ctxt, &v, 1, double));
+    schemerlicht_vector_destroy(&ctxt, &v);
+    }
   }
 
 void run_all_vector_tests()
@@ -144,4 +197,6 @@ void run_all_vector_tests()
   test_pop_back();
   test_push_back();
   test_push_back_2();
+  test_iterator();
+  test_iterator_2();
   }

@@ -28,7 +28,7 @@ typedef struct schemerlicht_vector
   schemerlicht_realloc(ctxt, (vec)->vector_ptr, (vec)->vector_capacity*(vec)->element_size, 0)
 
 #define schemerlicht_vector_at(ctxt, vec, index, element_type) \
-  cast(element_type*, (cast(schemerlicht_byte*, (vec)->vector_ptr) + (index)*(vec)->element_size))
+  (cast(element_type*, (vec)->vector_ptr) + (index))
 
 #define schemerlicht_vector_pop_back(vec) \
   if ((vec)->vector_size > 0) --((vec)->vector_size)
@@ -38,5 +38,10 @@ typedef struct schemerlicht_vector
   *schemerlicht_vector_at(ctxt, vec, (vec)->vector_size, element_type) = element_value; \
   ++((vec)->vector_size)
 
+#define schemerlicht_vector_begin(vec, element_type) \
+  cast(element_type*, (vec)->vector_ptr)
+
+#define schemerlicht_vector_end(vec, element_type) \
+  (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size)
 
 #endif //SCHEMERLICHT_VECTOR_H
