@@ -5,6 +5,7 @@ serror.h
 slimits.h
 smemory.h
 sobject.h
+sstring.h
 stoken.h
 svector.h
 )
@@ -14,8 +15,8 @@ scontext.c
 serror.c
 smemory.c
 sobject.c
+sstring.c
 stoken.c
-svector.c
 )
 
 if (WIN32)

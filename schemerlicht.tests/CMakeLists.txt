@@ -1,9 +1,11 @@
 set(HDRS
+string_tests.h
 test_assert.h
 vector_tests.h
 )
 	
 set(SRCS
+string_tests.cpp
 test.cpp
 test_assert.cpp
 vector_tests.cpp

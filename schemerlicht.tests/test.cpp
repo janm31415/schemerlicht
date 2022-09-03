@@ -1,4 +1,5 @@
 #include "test_assert.h"
+#include "string_tests.h"
 #include "vector_tests.h"
 
 #include <ctime>
@@ -8,6 +9,7 @@ int main(int /*argc*/, const char* /*argv*/[])
   InitTestEngine();
 
   auto tic = std::clock();
+  run_all_string_tests();
   run_all_vector_tests();
   auto toc = std::clock();
 
