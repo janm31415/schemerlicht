@@ -21,7 +21,7 @@ SCHEMERLICHT_API void* schemerlicht_realloc(schemerlicht_context* ctxt, void* ch
 void* schemerlicht_growvector_aux(schemerlicht_context* ctxt, void* chunk, schemerlicht_memsize* size, schemerlicht_memsize element_size);
 
 #define schemerlicht_growvector(ctxt, vec, number_of_elements, vector_size, element_type) \
-          if (((number_of_elements)+1) > (vector_size)) \
-            ((vec)=cast(element_type*, schemerlicht_growvector_aux(ctxt, vec, &(vector_size), sizeof(schemerlicht_growvector_aux))))
+          if ((number_of_elements) > (vector_size)) \
+            ((vec)=cast(element_type*, schemerlicht_growvector_aux(ctxt, vec, &(vector_size), sizeof(element_type))))
 
 #endif //SCHEMERLICHT_MEMORY_H

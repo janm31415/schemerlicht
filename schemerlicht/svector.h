@@ -16,21 +16,27 @@ typedef struct schemerlicht_vector
   (vec)->vector_ptr = schemerlicht_newvector(ctxt, size, element_type); \
   (vec)->vector_capacity = cast(schemerlicht_memsize, size); \
   (vec)->vector_size = cast(schemerlicht_memsize, size); \
-  (vec)->element_size = sizeof(element_type);
+  (vec)->element_size = sizeof(element_type)
 
 #define schemerlicht_vector_init(ctxt, vec, element_type) \
   (vec)->vector_ptr = schemerlicht_newvector(ctxt, 8, element_type); \
   (vec)->vector_capacity = cast(schemerlicht_memsize, 8); \
   (vec)->vector_size = 0; \
-  (vec)->element_size = sizeof(element_type);
+  (vec)->element_size = sizeof(element_type)
 
 #define schemerlicht_vector_destroy(ctxt, vec) \
-  schemerlicht_realloc(ctxt, (vec)->vector_ptr, (vec)->vector_capacity*(vec)->element_size, 0);
+  schemerlicht_realloc(ctxt, (vec)->vector_ptr, (vec)->vector_capacity*(vec)->element_size, 0)
 
 #define schemerlicht_vector_at(ctxt, vec, index, element_type) \
   cast(element_type*, (cast(schemerlicht_byte*, (vec)->vector_ptr) + (index)*(vec)->element_size))
 
-#define schemerlicht_vector_popback(vec) \
-  if ((vec)->vector_size > 0) --(vec)->vector_size;
+#define schemerlicht_vector_pop_back(vec) \
+  if ((vec)->vector_size > 0) --((vec)->vector_size)
+
+#define schemerlicht_vector_push_back(ctxt, vec, element_value, element_type) \
+  schemerlicht_growvector(ctxt, (vec)->vector_ptr, (vec)->vector_size+1, (vec)->vector_capacity, element_type); \
+  *schemerlicht_vector_at(ctxt, vec, (vec)->vector_size, element_type) = element_value; \
+  ++((vec)->vector_size)
+
 
 #endif //SCHEMERLICHT_VECTOR_H
