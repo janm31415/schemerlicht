@@ -721,12 +721,11 @@ uint64_t disassemble_bytecode(vmcode::operation& op,
     const uint8_t op1 = bytecode[sz++];
     const uint8_t op2 = bytecode[sz++];
 
-#if 0
+#if 1
     const uint8_t op1mem = bytecode[sz] & 15;
-    const uint8_t op2mem = bytecode[sz] >> 4;
+    const uint8_t op2mem = bytecode[sz++] >> 4;
     operand1 = (vmcode::operand)op1;
     operand2 = (vmcode::operand)op2;
-    ++sz;
 
     switch (op1mem)
       {
@@ -785,14 +784,6 @@ uint64_t disassemble_bytecode(vmcode::operation& op,
     const uint8_t op1 = bytecode[sz++];
     const uint8_t op2 = bytecode[sz++];
     const uint8_t op3 = bytecode[sz++];
-    /*
-    // see bit layout for memory in explanation above for super operators
-    if (op1mem == 2) // 16bit
-      op1mem = 3; // make 32 bit
-    uint8_t op1memstorage = op1mem;
-    if (op1memstorage >= 3)
-      --op1memstorage;
-    */
     uint8_t op1mem = bytecode[sz] & 3;
     // see bit layout for memory in explanation above for super operators
     if (op1mem >= 2)

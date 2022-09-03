@@ -2261,6 +2261,7 @@ namespace
       //expand_and_format("(define FIB (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (FIB (fx- n 2)) (FIB(fx- n 1)))]))) ");
       }
     };
+
   struct primitive_of_2_args_inlined : public compile_fixture {
     void test()
       {
@@ -4835,6 +4836,18 @@ to /* and */ in c/c++
       }
     };
 
+  struct ack_perf_test : public compile_fixture {
+    void test()
+      {
+      run("(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1))))))");      
+      auto tic = std::chrono::high_resolution_clock::now();
+      vm_output = &std::cout;
+      TEST_EQ("4093", run("(ack 3 9)"));      
+      auto toc = std::chrono::high_resolution_clock::now();
+      std::cout << "ack: " << std::chrono::duration<double>(toc - tic).count() << "s\n";
+      }
+    };
+
   }
   
 COMPILER_END
@@ -5023,5 +5036,6 @@ void run_all_compile_tests()
     current_milliseconds_test().test();
     macros().test();
 #endif
+    //ack_perf_test().test();
     }
   }
