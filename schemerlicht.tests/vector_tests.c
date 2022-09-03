@@ -22,7 +22,7 @@ void test_construction_destruction_2()
   schemerlicht_vector v;
   schemerlicht_vector_init(&ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   TEST_EQ_INT(sizeof(double), v.element_size);
   schemerlicht_vector_destroy(&ctxt, &v);
   }
@@ -79,13 +79,13 @@ void test_push_back()
   schemerlicht_vector v;
   schemerlicht_vector_init(&ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
   TEST_EQ_INT(1, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
   TEST_EQ_INT(2, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   TEST_EQ_DOUBLE(7.0, *schemerlicht_vector_at(&ctxt, &v, 0, double));
   TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_at(&ctxt, &v, 1, double));
   schemerlicht_vector_destroy(&ctxt, &v);
@@ -100,21 +100,21 @@ void test_push_back_2()
   TEST_EQ_INT(0, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
   TEST_EQ_INT(1, v.vector_size);
-  TEST_EQ_INT(4, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
   TEST_EQ_INT(2, v.vector_size);
-  TEST_EQ_INT(4, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   TEST_EQ_DOUBLE(7.0, *schemerlicht_vector_at(&ctxt, &v, 0, double));
   TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_at(&ctxt, &v, 1, double));
   schemerlicht_vector_push_back(&ctxt, &v, 11.0, double);
   TEST_EQ_INT(3, v.vector_size);
-  TEST_EQ_INT(4, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   TEST_EQ_DOUBLE(7.0, *schemerlicht_vector_at(&ctxt, &v, 0, double));
   TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_at(&ctxt, &v, 1, double));
   TEST_EQ_DOUBLE(11.0, *schemerlicht_vector_at(&ctxt, &v, 2, double));
   schemerlicht_vector_push_back(&ctxt, &v, 13.0, double);
   TEST_EQ_INT(4, v.vector_size);
-  TEST_EQ_INT(4, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   TEST_EQ_DOUBLE(7.0, *schemerlicht_vector_at(&ctxt, &v, 0, double));
   TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_at(&ctxt, &v, 1, double));
   TEST_EQ_DOUBLE(11.0, *schemerlicht_vector_at(&ctxt, &v, 2, double));
@@ -136,13 +136,13 @@ void test_iterator()
   schemerlicht_vector v;
   schemerlicht_vector_init(&ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
   TEST_EQ_INT(1, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
   TEST_EQ_INT(2, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   double* it = schemerlicht_vector_begin(&v, double);
   double* it_end = schemerlicht_vector_end(&v, double);
   int counter = 0;
@@ -163,13 +163,13 @@ void test_iterator_2()
   schemerlicht_vector v;
   schemerlicht_vector_init(&ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
   TEST_EQ_INT(1, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
   TEST_EQ_INT(2, v.vector_size);
-  TEST_EQ_INT(8, v.vector_capacity);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
   double* it = schemerlicht_vector_begin(&v, double);
   double* it_end = schemerlicht_vector_end(&v, double);
   int counter = 0;
@@ -183,6 +183,23 @@ void test_iterator_2()
   schemerlicht_vector_destroy(&ctxt, &v);
   }
 
+void test_back()
+  {
+  schemerlicht_context ctxt;
+  schemerlicht_vector v;
+  schemerlicht_vector_init(&ctxt, &v, double);
+  TEST_EQ_INT(0, v.vector_size);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
+  schemerlicht_vector_push_back(&ctxt, &v, 7.0, double);
+  TEST_EQ_INT(1, v.vector_size);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
+  schemerlicht_vector_push_back(&ctxt, &v, 9.0, double);
+  TEST_EQ_INT(2, v.vector_size);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
+  TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_back(&ctxt, &v, double));
+  schemerlicht_vector_destroy(&ctxt, &v);
+  }
+
 void run_all_vector_tests()
   {
   test_construction_destruction_1();
@@ -193,4 +210,5 @@ void run_all_vector_tests()
   test_push_back_2();
   test_iterator();
   test_iterator_2();
+  test_back();
   }

@@ -49,14 +49,12 @@ void* schemerlicht_realloc(schemerlicht_context* ctxt, void* chunk, schemerlicht
   return chunk;
   }
 
-#define MINSIZEARRAY	4
-
 void* schemerlicht_growvector_aux(schemerlicht_context* ctxt, void* chunk, schemerlicht_memsize* size, schemerlicht_memsize element_size)
   {
   void* newblock;
   schemerlicht_memsize newsize = (*size) * 2;
-  if (newsize < MINSIZEARRAY)
-    newsize = MINSIZEARRAY;  /* minimum size */
+  if (newsize < MINSIZEVECTOR)
+    newsize = MINSIZEVECTOR;  /* minimum size */
   newblock = schemerlicht_realloc(ctxt, chunk,
     *size * element_size,
     newsize * element_size);

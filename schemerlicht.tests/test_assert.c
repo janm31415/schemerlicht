@@ -58,8 +58,6 @@ void InitTestEngine()
   _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 #endif
 
-  // clang-format off
-
 #if defined(MEMORY_LEAK_TRACKING_MSVC)
   // For more thorough checking:
   // _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF

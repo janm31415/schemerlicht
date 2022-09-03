@@ -19,8 +19,8 @@ typedef struct schemerlicht_vector
   (vec)->element_size = sizeof(element_type)
 
 #define schemerlicht_vector_init(ctxt, vec, element_type) \
-  (vec)->vector_ptr = schemerlicht_newvector(ctxt, 8, element_type); \
-  (vec)->vector_capacity = cast(schemerlicht_memsize, 8); \
+  (vec)->vector_ptr = schemerlicht_newvector(ctxt, MINSIZEVECTOR, element_type); \
+  (vec)->vector_capacity = cast(schemerlicht_memsize, MINSIZEVECTOR); \
   (vec)->vector_size = 0; \
   (vec)->element_size = sizeof(element_type)
 
@@ -43,5 +43,8 @@ typedef struct schemerlicht_vector
 
 #define schemerlicht_vector_end(vec, element_type) \
   (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size)
+
+#define schemerlicht_vector_back(ctxt, vec, element_type) \
+  (cast(element_type*, (vec)->vector_ptr) + ((vec)->vector_size - 1))
 
 #endif //SCHEMERLICHT_VECTOR_H
