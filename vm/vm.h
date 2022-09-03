@@ -37,7 +37,6 @@ VM_API uint64_t disassemble_bytecode(vmcode::operation& op,
 #define sign_flag 64
 #define zero_flag 128
 
-#define operand_has_8bit_mem 128
 #define vm_stack_size 512
 
 struct registers

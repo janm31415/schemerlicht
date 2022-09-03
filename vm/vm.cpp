@@ -418,15 +418,8 @@ namespace
       {
       bool savemem = true;
       get_memory_size_type(op1mem, savemem, instr.oper, instr.operand1, instr.operand1_mem);
-      if (savemem)
-        {
-        opcode_stream[sz++] = (uint8_t)instr.operand1;
-        opcode_stream[sz++] = op1mem;
-        }
-      else
-        {
-        opcode_stream[sz++] = (uint8_t)instr.operand1 | operand_has_8bit_mem;
-        }
+      opcode_stream[sz++] = (uint8_t)instr.operand1;
+      opcode_stream[sz++] = op1mem;
       }
     else if (nr_ops == 2)
       {
@@ -434,17 +427,9 @@ namespace
       bool savemem2 = true;
       get_memory_size_type(op1mem, savemem1, instr.oper, instr.operand1, instr.operand1_mem);
       get_memory_size_type(op2mem, savemem2, instr.oper, instr.operand2, instr.operand2_mem);
-      if (savemem1 || savemem2)
-        {
-        opcode_stream[sz++] = (uint8_t)instr.operand1;
-        opcode_stream[sz++] = (uint8_t)instr.operand2;
-        opcode_stream[sz++] = (uint8_t)(op2mem << 4) | op1mem;
-        }
-      else
-        {
-        opcode_stream[sz++] = (uint8_t)instr.operand1 | operand_has_8bit_mem;
-        opcode_stream[sz++] = (uint8_t)instr.operand2 | operand_has_8bit_mem;
-        }
+      opcode_stream[sz++] = (uint8_t)instr.operand1;
+      opcode_stream[sz++] = (uint8_t)instr.operand2;
+      opcode_stream[sz++] = (uint8_t)(op2mem << 4) | op1mem;
       }
     else if (nr_ops == 3)
       {
@@ -454,25 +439,17 @@ namespace
       get_memory_size_type(op1mem, savemem1, instr.oper, instr.operand1, instr.operand1_mem);
       get_memory_size_type(op2mem, savemem2, instr.oper, instr.operand2, instr.operand2_mem);
       get_memory_size_type(op3mem, savemem3, instr.oper, instr.operand3, instr.operand3_mem);
-      if (savemem1 || savemem2 || savemem3)
-        {
-        // see bit layout for memory in explanation above for super operators
-        if (op1mem == 2) // 16bit
-          op1mem = 3; // make 32 bit
-        uint8_t op1memstorage = op1mem;
-        if (op1memstorage >= 3)
-          --op1memstorage;
-        opcode_stream[sz++] = (uint8_t)instr.operand1;
-        opcode_stream[sz++] = (uint8_t)instr.operand2;
-        opcode_stream[sz++] = (uint8_t)instr.operand3;
-        opcode_stream[sz++] = (uint8_t)(op3mem << 5) | (uint8_t)(op2mem << 2) | op1memstorage;
-        }
-      else
-        {
-        opcode_stream[sz++] = (uint8_t)instr.operand1 | operand_has_8bit_mem;
-        opcode_stream[sz++] = (uint8_t)instr.operand2 | operand_has_8bit_mem;
-        opcode_stream[sz++] = (uint8_t)instr.operand3 | operand_has_8bit_mem;
-        }
+      // see bit layout for memory in explanation above for super operators
+      if (op1mem == 2) // 16bit
+        op1mem = 3; // make 32 bit
+      uint8_t op1memstorage = op1mem;
+      if (op1memstorage >= 3)
+        --op1memstorage;
+      opcode_stream[sz++] = (uint8_t)instr.operand1;
+      opcode_stream[sz++] = (uint8_t)instr.operand2;
+      opcode_stream[sz++] = (uint8_t)instr.operand3;
+      opcode_stream[sz++] = (uint8_t)(op3mem << 5) | (uint8_t)(op2mem << 2) | op1memstorage;
+
       }
     switch (op1mem)
       {
@@ -877,16 +854,10 @@ uint64_t disassemble_bytecode(vmcode::operation& op,
     case 1:
     {
     const uint8_t op1 = bytecode[sz++];
-    if ((op1 & operand_has_8bit_mem) == 0)
-      {
-      op1mem = bytecode[sz++];
-      operand1 = (vmcode::operand)op1;
-      }
-    else
-      {
-      operand1 = (vmcode::operand)(op1 & ~operand_has_8bit_mem);
-      op1mem = get_memory_size_type_fast(op, operand1);
-      }
+
+    op1mem = bytecode[sz++];
+    operand1 = (vmcode::operand)op1;
+
     switch (op1mem)
       {
       case 1: operand1_mem = (int8_t)bytecode[sz++]; break;
@@ -902,21 +873,13 @@ uint64_t disassemble_bytecode(vmcode::operation& op,
     assert(nr_ops == 2);
     const uint8_t op1 = bytecode[sz++];
     const uint8_t op2 = bytecode[sz++];
-    if ((op1 & operand_has_8bit_mem) == 0)
-      {
-      op1mem = bytecode[sz] & 15;
-      op2mem = bytecode[sz] >> 4;
-      operand1 = (vmcode::operand)op1;
-      operand2 = (vmcode::operand)op2;
-      ++sz;
-      }
-    else
-      {
-      operand1 = (vmcode::operand)(op1 & ~operand_has_8bit_mem);
-      operand2 = (vmcode::operand)(op2 & ~operand_has_8bit_mem);
-      op1mem = get_memory_size_type_fast(op, operand1);
-      op2mem = get_memory_size_type_fast(op, operand2);
-      }
+
+    op1mem = bytecode[sz] & 15;
+    op2mem = bytecode[sz] >> 4;
+    operand1 = (vmcode::operand)op1;
+    operand2 = (vmcode::operand)op2;
+    ++sz;
+
     switch (op1mem)
       {
       case 1: operand1_mem = (int8_t)bytecode[sz++]; break;
@@ -941,36 +904,25 @@ uint64_t disassemble_bytecode(vmcode::operation& op,
     const uint8_t op1 = bytecode[sz++];
     const uint8_t op2 = bytecode[sz++];
     const uint8_t op3 = bytecode[sz++];
-    if ((op1 & operand_has_8bit_mem) == 0)
-      {
-      /*
-      // see bit layout for memory in explanation above for super operators
-      if (op1mem == 2) // 16bit
-        op1mem = 3; // make 32 bit
-      uint8_t op1memstorage = op1mem;
-      if (op1memstorage >= 3)
-        --op1memstorage;
-      */
-      op1mem = bytecode[sz] & 3;
-      // see bit layout for memory in explanation above for super operators
-      if (op1mem >= 2)
-        ++op1mem;
-      op2mem = (bytecode[sz] >> 2) & 7;
-      op3mem = (bytecode[sz] >> 5) & 7;
-      operand1 = (vmcode::operand)op1;
-      operand2 = (vmcode::operand)op2;
-      operand3 = (vmcode::operand)op3;
-      ++sz;
-      }
-    else
-      {
-      operand1 = (vmcode::operand)(op1 & ~operand_has_8bit_mem);
-      operand2 = (vmcode::operand)(op2 & ~operand_has_8bit_mem);
-      operand3 = (vmcode::operand)(op3 & ~operand_has_8bit_mem);
-      op1mem = get_memory_size_type_fast(op, operand1);
-      op2mem = get_memory_size_type_fast(op, operand2);
-      op3mem = get_memory_size_type_fast(op, operand3);
-      }
+    /*
+    // see bit layout for memory in explanation above for super operators
+    if (op1mem == 2) // 16bit
+      op1mem = 3; // make 32 bit
+    uint8_t op1memstorage = op1mem;
+    if (op1memstorage >= 3)
+      --op1memstorage;
+    */
+    op1mem = bytecode[sz] & 3;
+    // see bit layout for memory in explanation above for super operators
+    if (op1mem >= 2)
+      ++op1mem;
+    op2mem = (bytecode[sz] >> 2) & 7;
+    op3mem = (bytecode[sz] >> 5) & 7;
+    operand1 = (vmcode::operand)op1;
+    operand2 = (vmcode::operand)op2;
+    operand3 = (vmcode::operand)op3;
+    ++sz;
+
     switch (op1mem)
       {
       case 1: operand1_mem = (int8_t)bytecode[sz++]; break;

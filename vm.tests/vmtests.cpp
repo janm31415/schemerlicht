@@ -21,10 +21,10 @@ namespace
 
     uint64_t size;
     uint8_t* f = (uint8_t*)vm_bytecode(size, code);
-    TEST_EQ(3, size);
+    TEST_EQ(4, size);
     TEST_EQ((int)vmcode::MOV, (int)f[0]);
-    TEST_EQ((int)vmcode::RAX | operand_has_8bit_mem, (int)f[1]);
-    TEST_EQ((int)vmcode::RCX | operand_has_8bit_mem, (int)f[2]);
+    TEST_EQ((int)vmcode::RAX, (int)f[1]);
+    TEST_EQ((int)vmcode::RCX, (int)f[2]);
 
     vmcode::operation op;
     vmcode::operand operand1;
@@ -34,7 +34,7 @@ namespace
     uint64_t operand2_mem;
     uint64_t operand3_mem;
     uint64_t sz = disassemble_bytecode(op, operand1, operand2, operand3, operand1_mem, operand2_mem, operand3_mem, f);
-    TEST_EQ(3, sz);
+    TEST_EQ(4, sz);
     TEST_EQ(vmcode::MOV, op);
     TEST_EQ(vmcode::RAX, operand1);
     TEST_EQ(vmcode::RCX, operand2);
@@ -53,11 +53,11 @@ namespace
 
     uint64_t size;
     uint8_t* f = (uint8_t*)vm_bytecode(size, code);
-    TEST_EQ(4, size);
+    TEST_EQ(5, size);
     TEST_EQ((int)vmcode::MOVADD, (int)f[0]);
-    TEST_EQ((int)vmcode::RAX | operand_has_8bit_mem, (int)f[1]);
-    TEST_EQ((int)vmcode::RCX | operand_has_8bit_mem, (int)f[2]);
-    TEST_EQ((int)vmcode::RDX | operand_has_8bit_mem, (int)f[3]);
+    TEST_EQ((int)vmcode::RAX, (int)f[1]);
+    TEST_EQ((int)vmcode::RCX, (int)f[2]);
+    TEST_EQ((int)vmcode::RDX, (int)f[3]);
 
     vmcode::operation op;
     vmcode::operand operand1;
@@ -67,7 +67,7 @@ namespace
     uint64_t operand2_mem;
     uint64_t operand3_mem;
     uint64_t sz = disassemble_bytecode(op, operand1, operand2, operand3, operand1_mem, operand2_mem, operand3_mem, f);
-    TEST_EQ(4, sz);
+    TEST_EQ(5, sz);
     TEST_EQ(vmcode::MOVADD, op);
     TEST_EQ(vmcode::RAX, operand1);
     TEST_EQ(vmcode::RCX, operand2);
