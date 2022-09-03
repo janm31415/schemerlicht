@@ -1,72 +1,53 @@
-#pragma once
+#ifndef TEST_ASSERT_H
+#define TEST_ASSERT_H
 
-#include <sstream>
-#include <string>
+#define _CRT_SECURE_NO_WARNINGS
 
-#define TEST_OUTPUT_LINE(...) \
-      { printf(__VA_ARGS__); printf("\n"); }
-
-#define TEST_EQ_STR(exp, val) TestEqStr(exp, val, __FILE__, __LINE__)
-
-#ifdef _WIN32
-#define TEST_ASSERT(val) TestEq(true, val, __FILE__, __LINE__, __FUNCTION__)
-#define TEST_EQ(exp, val) TestEq(exp, val, __FILE__, __LINE__, __FUNCTION__)
-#define TEST_EQ_CLOSE(exp, val, tol) TestEqClose(exp, val, tol, __FILE__, __LINE__, __FUNCTION__)
-#else
-#define TEST_ASSERT(val) TestEq(true, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
-#define TEST_EQ(exp, val) TestEq(exp, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
-#define TEST_EQ_CLOSE(exp, val, tol) TestEqClose(exp, val, tol, __FILE__, __LINE__, __PRETTY_FUNCTION__)
-#endif
+#include <stdio.h>
 
 extern int testing_fails;
 extern int testing_success;
 
-// Listener of TestFail, like 'gtest::OnTestPartResult' event handler.
-// Called in TestFail after a failed assertion.
-typedef bool(*TestFailEventListener)(const char *expval, const char *val,
-  const char *file, int line, const char *func);
+#define TEST_OUTPUT_LINE(...) \
+      { printf(__VA_ARGS__); printf("\n"); }
 
-// Prepare test engine (MSVC assertion setup, etc).
-// listener - this function will be notified on each TestFail call.
-void InitTestEngine(TestFailEventListener listener = nullptr);
+void TestFail(const char* expval, const char* val, const char* file, int line, const char* func);
+void InitTestEngine();
+int CloseTestEngine(int force_report);
 
-// Release all test-engine resources.
-// Prints or schedule a debug report if all test passed.
-// Returns 0 if all tests passed or 1 otherwise.
-// Memory leak report: MEMORY_LEAK_TRACKING && _MSC_VER && !NDEBUG.
-int CloseTestEngine(bool force_report = false);
-
-// Write captured state to a log and terminate test run.
-void TestFail(const char *expval, const char *val, const char *file, int line, const char *func = 0);
-
-void TestEqStr(const char *expval, const char *val, const char *file, int line);
-
-template<typename T, typename U>
-void TestEq(T expval, U val, const char *file, int line, const char *func = 0)
-  {
-  if (U(expval) != val)
-    {
-    std::stringstream ss1;
-    ss1 << expval;
-    std::stringstream ss2;
-    ss2 << val;
-    TestFail(ss1.str().c_str(), ss2.str().c_str(), file, line, func);
+#define TestEqInt(expval, val, file, line, func) \
+  if ((int)(expval) != (int)(val)) \
+    { \
+    char expval_str[256]; \
+    char val_str[256]; \
+    sprintf(expval_str, "%d", (int)(expval)); \
+    sprintf(val_str, "%d", (int)(val)); \
+    TestFail(expval_str, val_str, file, line, func); \
+    } \
+  else \
+    { \
+    ++testing_success; \
     }
-  else
-    ++testing_success;
-  }
 
-template<typename T, typename U, typename V>
-void TestEqClose(T expval, U val, V tol, const char *file, int line, const char *func = 0)
-  {
-  if (std::abs(V(expval) - V(val)) > tol)
-    {
-    std::stringstream ss1;
-    ss1 << expval;
-    std::stringstream ss2;
-    ss2 << val;
-    TestFail(ss1.str().c_str(), ss2.str().c_str(), file, line, func);
+#define TestEqDouble(expval, val, file, line, func) \
+  if ((double)(expval) != (double)(val)) \
+    { \
+    char expval_str[256]; \
+    char val_str[256]; \
+    sprintf(expval_str, "%f", (double)(expval)); \
+    sprintf(val_str, "%f", (double)(val)); \
+    TestFail(expval_str, val_str, file, line, func); \
+    } \
+  else \
+    { \
+    ++testing_success; \
     }
-  else
-    ++testing_success;
-  }
+
+#ifdef _WIN32
+#define TEST_EQ_INT(exp, val) TestEqInt(exp, val, __FILE__, __LINE__, __FUNCTION__)
+#define TEST_EQ_DOUBLE(exp, val) TestEqDouble(exp, val, __FILE__, __LINE__, __FUNCTION__)
+#else
+#define TEST_EQ_INT(exp, val) TestEqInt(exp, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define TEST_EQ_DOUBLE(exp, val) TestEqDouble(exp, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#endif
+#endif // TEST_ASSERT_H

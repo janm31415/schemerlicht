@@ -1,3 +1,6 @@
-#pragma once
+#ifndef SCHEMERLICHT_STRING_TESTS_H
+#define SCHEMERLICHT_STRING_TESTS_H
 
 void run_all_string_tests();
+
+#endif //SCHEMERLICHT_STRING_TESTS_H

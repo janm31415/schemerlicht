@@ -8,11 +8,17 @@
 #else
 #include <string.h>
 #endif
+
+#if defined(MEMORY_LEAK_TRACKING) && defined(_MSC_VER)
+#ifndef NDEBUG
+#define MEMORY_LEAK_TRACKING_MSVC
+#endif
+#endif  
+
 int testing_fails = 0;
 int testing_success = 0;
-static TestFailEventListener fail_listener_ = nullptr;
 
-void TestFail(const char *expval, const char *val, const char *file, int line, const char *func)
+void TestFail(const char* expval, const char* val, const char* file, int line, const char* func)
   {
   TEST_OUTPUT_LINE("VALUE:\n%s", val);
   TEST_OUTPUT_LINE("EXPECTED:\n%s", expval);
@@ -25,31 +31,9 @@ void TestFail(const char *expval, const char *val, const char *file, int line, c
     TEST_OUTPUT_LINE("%s(%d): error: expected %s but was %s", file, line, expval, val);
     }
   ++testing_fails;
-
-  // Notify, emulate 'gtest::OnTestPartResult' event handler.
-  if (fail_listener_)
-    (*fail_listener_)(expval, val, file, line, func);
-
-  //assert(0);  // ignored in Release if NDEBUG defined
   }
 
-void TestEqStr(const char *expval, const char *val, const char *file, int line)
-  {
-  if (strcmp(expval, val) != 0)
-    {
-    TestFail(expval, val, file, line);
-    }
-  else
-    ++testing_success;
-  }
-
-#if defined(MEMORY_LEAK_TRACKING) && defined(_MSC_VER)
-#ifndef NDEBUG
-#define MEMORY_LEAK_TRACKING_MSVC
-#endif
-#endif  
-
-void InitTestEngine(TestFailEventListener listener)
+void InitTestEngine()
   {
   testing_fails = 0;
   // Disable stdout buffering to prevent information lost on assertion or core
@@ -79,22 +63,18 @@ void InitTestEngine(TestFailEventListener listener)
 #if defined(MEMORY_LEAK_TRACKING_MSVC)
   // For more thorough checking:
   // _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF
-  auto flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+  int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
   _CrtSetDbgFlag(flags | _CRTDBG_ALLOC_MEM_DF);
 #endif
-
-  // clang-format on
-
-  fail_listener_ = listener;
   }
 
-int CloseTestEngine(bool force_report)
+int CloseTestEngine(int force_report)
   {
   if (!testing_fails || force_report)
     {
 
 #if defined(MEMORY_LEAK_TRACKING_MSVC)
-    auto flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+    int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
     flags &= ~_CRTDBG_DELAY_FREE_MEM_DF;
     flags |= _CRTDBG_LEAK_CHECK_DF;
     _CrtSetDbgFlag(flags);

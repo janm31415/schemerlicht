@@ -1,3 +1,6 @@
-#pragma once
+#ifndef SCHEMERLICHT_VECTOR_TESTS_H
+#define SCHEMERLICHT_VECTOR_TESTS_H
 
 void run_all_vector_tests();
+
+#endif //SCHEMERLICHT_VECTOR_TESTS_H
