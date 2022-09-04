@@ -5,6 +5,7 @@ serror.h
 slimits.h
 smemory.h
 sobject.h
+sstream.h
 sstring.h
 stoken.h
 svector.h
@@ -15,6 +16,7 @@ scontext.c
 serror.c
 smemory.c
 sobject.c
+sstream.c
 sstring.c
 stoken.c
 )

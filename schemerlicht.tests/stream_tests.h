@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_STREAM_TESTS_H
+#define SCHEMERLICHT_STREAM_TESTS_H
+
+void run_all_stream_tests();
+
+#endif //SCHEMERLICHT_STREAM_TESTS_H

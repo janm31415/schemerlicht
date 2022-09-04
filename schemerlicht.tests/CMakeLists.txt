@@ -1,10 +1,12 @@
 set(HDRS
+stream_tests.h
 string_tests.h
 test_assert.h
 vector_tests.h
 )
 	
 set(SRCS
+stream_tests.c
 string_tests.c
 test.c
 test_assert.c
