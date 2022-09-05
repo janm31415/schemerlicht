@@ -19,6 +19,7 @@ void schemerlicht_stream_init(schemerlicht_context* ctxt, schemerlicht_stream* s
   stream->data = cast(char*, schemerlicht_malloc(ctxt, capac));  
   stream->length = 0;
   stream->position = 0;
+  stream->capacity = capac;
   }
 
 void schemerlicht_stream_close(schemerlicht_context* ctxt, schemerlicht_stream* stream)
