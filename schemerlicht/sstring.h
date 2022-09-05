@@ -23,12 +23,18 @@ SCHEMERLICHT_API char* schemerlicht_string_begin(schemerlicht_string* str);
 
 SCHEMERLICHT_API char* schemerlicht_string_end(schemerlicht_string* str);
 
+SCHEMERLICHT_API char* schemerlicht_string_front(schemerlicht_string* str);
+
 SCHEMERLICHT_API char* schemerlicht_string_back(schemerlicht_string* str);
+
+SCHEMERLICHT_API void schemerlicht_string_push_front(schemerlicht_context* ctxt, schemerlicht_string* str, char ch);
 
 SCHEMERLICHT_API void schemerlicht_string_push_back(schemerlicht_context* ctxt, schemerlicht_string* str, char ch);
 
 SCHEMERLICHT_API void schemerlicht_string_pop_back(schemerlicht_string* str);
 
 SCHEMERLICHT_API void schemerlicht_string_append(schemerlicht_context* ctxt, schemerlicht_string* str, schemerlicht_string* append);
+
+SCHEMERLICHT_API void schemerlicht_string_clear(schemerlicht_string* str);
 
 #endif // SCHEMERLICHT_STRING_H
