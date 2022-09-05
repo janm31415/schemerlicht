@@ -21,6 +21,7 @@ set(CMAKE_C_FLAGS_RELEASE "/W4 /MP /GF /O2 /Ob2 /Oi /Ot /MD /Zi /DNDEBUG")
 endif(WIN32)
 
 add_definitions(-DMEMORY_LEAK_TRACKING)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 add_executable(schemerlicht.tests ${HDRS} ${SRCS})
 source_group("Header Files" FILES ${hdrs})

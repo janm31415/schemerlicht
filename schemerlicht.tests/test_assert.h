@@ -1,8 +1,6 @@
 #ifndef TEST_ASSERT_H
 #define TEST_ASSERT_H
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
 
 extern int testing_fails;
