@@ -54,4 +54,6 @@ token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value);
 */
 schemerlicht_vector tokenize(schemerlicht_context* ctxt, schemerlicht_stream* str);
 
+void destroy_tokens_vector(schemerlicht_context* ctxt, schemerlicht_vector* tokens);
+
 #endif //SCHEMERLICHT_TOKEN_H
