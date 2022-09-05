@@ -7,6 +7,7 @@
 #include "svector.h"
 
 schemerlicht_flonum to_flonum(const char* value);
+schemerlicht_fixnum to_fixnum(const char* value);
 int is_number(int* is_real, int* is_scientific, const char* value);
 
 enum token_type
@@ -44,6 +45,7 @@ typedef struct token
   } token;
 
 token make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, schemerlicht_string* value);
+token make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value);
 token make_token_flonum(int line_nr, int column_nr, schemerlicht_flonum value);
 token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value);
 

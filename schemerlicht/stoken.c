@@ -12,6 +12,11 @@ schemerlicht_flonum to_flonum(const char* value)
   return cast(schemerlicht_flonum, atof(value));
   }
 
+schemerlicht_fixnum to_fixnum(const char* value)
+  {
+  return cast(schemerlicht_fixnum, atoi(value));
+  }
+
 int is_number(int* is_real, int* is_scientific, const char* value)
   {
   if (value[0] == '\0')
@@ -70,6 +75,16 @@ token make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_n
   return t;
   }
 
+token make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value)
+  {
+  token t;
+  t.type = type;
+  t.line_nr = line_nr;
+  t.column_nr = column_nr;
+  schemerlicht_string_init(ctxt, &t.info.value, value);
+  return t;
+  }
+
 token make_token_flonum(int line_nr, int column_nr, schemerlicht_flonum value)
   {
   token t;
@@ -90,11 +105,39 @@ token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value)
   return t;
   }
 
+static void replace_escape_chars(schemerlicht_context* ctxt, schemerlicht_string* s)
+  {
+  /*
+  auto pos = s.find_first_of('\\');
+  if (pos == std::string::npos)
+    return s;
+
+  std::stringstream str;
+  while (pos != std::string::npos)
+    {
+    str << s.substr(0, pos);
+    switch (s[pos + 1])
+      {
+      case 'a': str << '\a'; break;
+      case 'b': str << '\b'; break;
+      case 'n': str << '\n'; break;
+      case 'r': str << '\r'; break;
+      case 't': str << '\t'; break;
+      default: str << s[pos + 1]; break;
+      }
+    s = s.substr(pos + 2);
+    pos = s.find_first_of('\\');
+    }
+  str << s;
+  return str.str();
+  */
+  }
+
 static void treat_buffer(schemerlicht_context* ctxt, schemerlicht_string* buff, schemerlicht_vector* tokens, int line_nr, int column_nr, int* is_a_symbol)
   {
-  if (is_a_symbol)
+  if (*is_a_symbol)
     {
-    is_a_symbol = 0;
+    *is_a_symbol = 0;
     if (buff->string_length == 0) // empty
       {
       token t = make_token(ctxt, T_BAD, line_nr, column_nr, buff);
@@ -130,7 +173,7 @@ static void treat_buffer(schemerlicht_context* ctxt, schemerlicht_string* buff, 
         }
       else
         {
-        schemerlicht_fixnum value = cast(schemerlicht_fixnum, to_flonum(buff->string_ptr));
+        schemerlicht_fixnum value = to_fixnum(buff->string_ptr);
         token t = make_token_fixnum(line_nr, column_nr - (int)buff->string_length, value);
         schemerlicht_vector_push_back(ctxt, tokens, t, token);
         }
@@ -164,7 +207,7 @@ schemerlicht_vector tokenize(schemerlicht_context* ctxt, schemerlicht_stream* st
 
   while (s < s_end)
     {
-    if (ignore_character(&s))
+    if (ignore_character(*s))
       {
       treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
       is_a_character = 0;
@@ -187,11 +230,56 @@ schemerlicht_vector tokenize(schemerlicht_context* ctxt, schemerlicht_stream* st
       {
       switch (*s)
         {
+        case '(':
+        {
+        if (is_a_symbol && buff.string_length==0) // #(
+          {
+          is_a_symbol = 0;
+          token t = make_token_cstr(ctxt, T_LEFT_ROUND_BRACKET, line_nr, column_nr, "#(");
+          schemerlicht_vector_push_back(ctxt, &tokens, t, token);
+          ++s;
+          ++column_nr;
+          break;
+          }
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        token t = make_token_cstr(ctxt, T_LEFT_ROUND_BRACKET, line_nr, column_nr, "(");
+        schemerlicht_vector_push_back(ctxt, &tokens, t, token);        
+        ++s;
+        ++column_nr;
+        break;
+        }
+        case ')':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        token t = make_token_cstr(ctxt, T_RIGHT_ROUND_BRACKET, line_nr, column_nr, ")");
+        schemerlicht_vector_push_back(ctxt, &tokens, t, token);        
+        ++s;
+        ++column_nr;
+        break;
+        }
+        case '[':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        token t = make_token_cstr(ctxt, T_LEFT_SQUARE_BRACKET, line_nr, column_nr, "[");
+        schemerlicht_vector_push_back(ctxt, &tokens, t, token);        
+        ++s;
+        ++column_nr;
+        break;
+        }
+        case ']':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        token t = make_token_cstr(ctxt, T_RIGHT_SQUARE_BRACKET, line_nr, column_nr, "]");
+        schemerlicht_vector_push_back(ctxt, &tokens, t, token);
+        ++s;
+        ++column_nr;
+        break;
+        }
         case '#':
         {
         if (is_a_symbol)
           break;
-        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, is_a_symbol);
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
         const char* t = s;
         ++t;
         if (t && *t == ';') //treat as comment
@@ -232,6 +320,100 @@ schemerlicht_vector tokenize(schemerlicht_context* ctxt, schemerlicht_stream* st
           }
         break;
         }
+        case ';':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        while (*s && *s != '\n') // comment, so skip till end of the line
+          ++s;
+        ++s;
+        ++line_nr;
+        column_nr = 1;
+        break;
+        }
+        case '\'':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        token t = make_token_cstr(ctxt, T_QUOTE, line_nr, column_nr, "'");
+        schemerlicht_vector_push_back(ctxt, &tokens, t, token);        
+        ++s;
+        ++column_nr;
+        break;
+        }
+        case '`':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        token t = make_token_cstr(ctxt, T_BACKQUOTE, line_nr, column_nr, "`");
+        schemerlicht_vector_push_back(ctxt, &tokens, t, token);
+        ++s;
+        ++column_nr;
+        break;
+        }
+        case ',':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        const char* t = s;
+        ++t;
+        if (*t && *t == '@')
+          {
+          token tok = make_token_cstr(ctxt, T_UNQUOTE_SPLICING, line_nr, column_nr, ",@");
+          schemerlicht_vector_push_back(ctxt, &tokens, tok, token);          
+          ++s;
+          ++column_nr;
+          }
+        else
+          {
+          token tok = make_token_cstr(ctxt, T_UNQUOTE, line_nr, column_nr, ",");
+          schemerlicht_vector_push_back(ctxt, &tokens, tok, token);          
+          }
+        ++s;
+        ++column_nr;
+        break;
+        }
+        case '"':
+        {
+        treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
+        int temp_column_nr = column_nr;
+        int temp_line_nr = line_nr;
+        const char* t = s;
+        ++t;
+        ++column_nr;
+        while (*t && *t != '"')
+          {
+          if (*t == '\n')
+            {
+            ++line_nr;
+            column_nr = 0;
+            }
+          if (*t == '\\') // escape syntax
+            {
+            ++t;
+            if (!*t)
+              {
+              schemerlicht_string tmp;
+              schemerlicht_string_init_ranged(ctxt, &tmp, s, t);
+              token tok = make_token(ctxt, T_BAD, temp_line_nr, temp_column_nr, &tmp);
+              schemerlicht_vector_push_back(ctxt, &tokens, tok, token);
+              schemerlicht_string_destroy(ctxt, &tmp);              
+              break;
+              }
+            }
+          ++t;
+          ++column_nr;
+          }
+        if (*t)
+          {
+          ++t;
+          ++column_nr;
+          }
+        schemerlicht_string tmp;
+        schemerlicht_string_init_ranged(ctxt, &tmp, s, t);
+        replace_escape_chars(ctxt, &tmp);
+        token tok = make_token(ctxt, T_STRING, temp_line_nr, temp_column_nr, &tmp);
+        schemerlicht_vector_push_back(ctxt, &tokens, tok, token);
+        schemerlicht_string_destroy(ctxt, &tmp);        
+        s = t;
+        break;
+        }
         } // switch (*s)
     }
 
@@ -245,7 +427,7 @@ schemerlicht_vector tokenize(schemerlicht_context* ctxt, schemerlicht_stream* st
     is_a_character = (is_a_symbol && buff.string_length == 1 && buff.string_ptr[0] == '\\');
     }
 
-  treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, is_a_symbol);
+  treat_buffer(ctxt, &buff, &tokens, line_nr, column_nr, &is_a_symbol);
 
   schemerlicht_string_destroy(ctxt, &buff);
   return tokens;

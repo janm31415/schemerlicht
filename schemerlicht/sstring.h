@@ -13,6 +13,8 @@ typedef struct schemerlicht_string
 
 SCHEMERLICHT_API void schemerlicht_string_init(schemerlicht_context* ctxt, schemerlicht_string* str, const char* txt);
 
+SCHEMERLICHT_API void schemerlicht_string_init_ranged(schemerlicht_context* ctxt, schemerlicht_string* str, const char* from, const char* to);
+
 SCHEMERLICHT_API void schemerlicht_string_destroy(schemerlicht_context* ctxt, schemerlicht_string* str);
 
 SCHEMERLICHT_API char* schemerlicht_string_at(schemerlicht_string* str, schemerlicht_memsize index);
