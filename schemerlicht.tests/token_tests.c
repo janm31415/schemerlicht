@@ -94,6 +94,34 @@ void tokenize_fixnum_real()
   destroy_tokens_vector(&ctxt, &tokens);
   }
 
+void tokenize_string_w_escape_chars()
+  {
+  schemerlicht_context ctxt;
+  schemerlicht_vector tokens = script2tokens(&ctxt, "(print\"line1\\nline2\")");
+  TEST_EQ_INT(4, tokens.vector_size);
+  TEST_EQ_INT(T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&ctxt, &tokens, 0, token)->type);
+  TEST_EQ_INT(T_ID, schemerlicht_vector_at(&ctxt, &tokens, 1, token)->type);
+  TEST_EQ_INT(T_STRING, schemerlicht_vector_at(&ctxt, &tokens, 2, token)->type);
+  schemerlicht_string s = schemerlicht_vector_at(&ctxt, &tokens, 2, token)->info.value;
+  TEST_EQ_INT(13, s.string_length);
+  TEST_EQ_INT(T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&ctxt, &tokens, 3, token)->type);
+  destroy_tokens_vector(&ctxt, &tokens);
+  }
+
+void tokenize_string_w_escape_chars_2()
+  {
+  schemerlicht_context ctxt;
+  schemerlicht_vector tokens = script2tokens(&ctxt, "(print\"oh\\a\\b\\n\\t\\r\")");
+  TEST_EQ_INT(4, tokens.vector_size);
+  TEST_EQ_INT(T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&ctxt, &tokens, 0, token)->type);
+  TEST_EQ_INT(T_ID, schemerlicht_vector_at(&ctxt, &tokens, 1, token)->type);
+  TEST_EQ_INT(T_STRING, schemerlicht_vector_at(&ctxt, &tokens, 2, token)->type);
+  schemerlicht_string s = schemerlicht_vector_at(&ctxt, &tokens, 2, token)->info.value;
+  TEST_EQ_INT(9, s.string_length);
+  TEST_EQ_INT(T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&ctxt, &tokens, 3, token)->type);
+  destroy_tokens_vector(&ctxt, &tokens);
+  }
+
 void run_all_token_tests()
   {
   test_number_recognition();
@@ -101,4 +129,6 @@ void run_all_token_tests()
   tokenize_list();
   tokenize_string();
   tokenize_fixnum_real();
+  tokenize_string_w_escape_chars();
+  tokenize_string_w_escape_chars_2();
   }

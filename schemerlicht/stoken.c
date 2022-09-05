@@ -14,7 +14,7 @@ schemerlicht_flonum to_flonum(const char* value)
 
 schemerlicht_fixnum to_fixnum(const char* value)
   {
-  return cast(schemerlicht_fixnum, atoi(value));
+  return cast(schemerlicht_fixnum, _atoi64(value));
   }
 
 int is_number(int* is_real, int* is_scientific, const char* value)
@@ -105,32 +105,36 @@ token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value)
   return t;
   }
 
-static void replace_escape_chars(schemerlicht_context* ctxt, schemerlicht_string* s)
+static void replace_escape_chars(schemerlicht_context* ctxt, schemerlicht_string* str)
   {
-  /*
-  auto pos = s.find_first_of('\\');
-  if (pos == std::string::npos)
-    return s;
-
-  std::stringstream str;
-  while (pos != std::string::npos)
+  if (str->string_length == 0)
+    return;
+  char* s = str->string_ptr;
+  int escapes = 0;
+  int char_index = 0;
+  while (*s)
     {
-    str << s.substr(0, pos);
-    switch (s[pos + 1])
+    if (*s == '\\')
       {
-      case 'a': str << '\a'; break;
-      case 'b': str << '\b'; break;
-      case 'n': str << '\n'; break;
-      case 'r': str << '\r'; break;
-      case 't': str << '\t'; break;
-      default: str << s[pos + 1]; break;
+      char* t = s;
+      ++t;
+      switch (*t)
+        {
+        case 'a': *s = '\a'; ++escapes; memmove(t, t+1, str->string_length-escapes-char_index); break;
+        case 'b': *s = '\b'; ++escapes; memmove(t, t+1, str->string_length-escapes-char_index); break;
+        case 'n': *s = '\n'; ++escapes; memmove(t, t+1, str->string_length-escapes-char_index); break;
+        case 'r': *s = '\r'; ++escapes; memmove(t, t+1, str->string_length-escapes-char_index); break;
+        case 't': *s = '\t'; ++escapes; memmove(t, t+1, str->string_length-escapes-char_index); break;
+        default:
+          ++s; ++char_index; break;
+        }
       }
-    s = s.substr(pos + 2);
-    pos = s.find_first_of('\\');
-    }
-  str << s;
-  return str.str();
-  */
+    else
+      {
+      ++s;
+      ++char_index;
+      }
+    } 
   }
 
 static void treat_buffer(schemerlicht_context* ctxt, schemerlicht_string* buff, schemerlicht_vector* tokens, int line_nr, int column_nr, int* is_a_symbol)
