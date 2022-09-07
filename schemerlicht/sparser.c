@@ -3,6 +3,8 @@
 #include "stoken.h"
 #include "serror.h"
 
+#include <string.h>
+
 int schemerlicht_current_token_type(token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
@@ -37,6 +39,33 @@ void schemerlicht_token_next(schemerlicht_context* ctxt, token** token_it, token
     }
   }
 
+void schemerlicht_token_require(schemerlicht_context* ctxt, token** token_it, token** token_it_end, const char* required)
+  {
+  if (*token_it == *token_it_end)
+    {
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    }
+  else
+    {
+    if (strcmp((*token_it)->info.value.string_ptr, required) != 0)
+      {
+      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, required);
+      }
+    ++(*token_it);
+    }
+  }
+
+int schemerlicht_next_token_equals(token** token_it, token** token_it_end, const char* expected)
+  {
+  if (*token_it == *token_it_end)
+    return 0;
+  token* it = *token_it;
+  ++it;
+  if (it == *token_it_end)
+    return 0;
+  return strcmp(it->info.value.string_ptr, expected) == 0;
+  }
+
 schemerlicht_expression schemerlicht_make_literal(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
@@ -47,6 +76,19 @@ schemerlicht_expression schemerlicht_make_literal(schemerlicht_context* ctxt, to
     }
   switch (schemerlicht_current_token_type(token_it, token_it_end))
     {
+    case SCHEMERLICHT_T_LEFT_ROUND_BRACKET:
+    {
+    schemerlicht_parsed_nil n;
+    n.line_nr = (*token_it)->line_nr;
+    n.column_nr = (*token_it)->column_nr;
+    schemerlicht_expression expr;
+    expr.type = schemerlicht_type_literal;
+    expr.expr.lit.type = schemerlicht_type_nil;
+    expr.expr.lit.lit.nil = n;
+    schemerlicht_token_next(ctxt, token_it, token_it_end);
+    schemerlicht_token_require(ctxt, token_it, token_it_end, ")");
+    return expr;
+    }
     case SCHEMERLICHT_T_FIXNUM:
     {
     schemerlicht_parsed_fixnum f;
@@ -91,9 +133,35 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
 
   switch (schemerlicht_current_token_type(token_it, token_it_end))
     {
+    case SCHEMERLICHT_T_LEFT_ROUND_BRACKET:
+    {
+    if (schemerlicht_next_token_equals(token_it, token_it_end, ")"))
+      {
+      return schemerlicht_make_literal(ctxt, token_it, token_it_end);
+      }
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+    *token_it = *token_it_end;
+    return schemerlicht_make_empty_expression();
+    }
+    case SCHEMERLICHT_T_RIGHT_ROUND_BRACKET:
+    {
+    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    *token_it = *token_it_end;
+    return schemerlicht_make_empty_expression();
+    }
+    case SCHEMERLICHT_T_BAD:
+    {
+    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    *token_it = *token_it_end;
+    return schemerlicht_make_empty_expression();
+    }
     case SCHEMERLICHT_T_FIXNUM:
       return schemerlicht_make_literal(ctxt, token_it, token_it_end);
     case SCHEMERLICHT_T_FLONUM:
+      return schemerlicht_make_literal(ctxt, token_it, token_it_end);
+    case SCHEMERLICHT_T_STRING:
+      return schemerlicht_make_literal(ctxt, token_it, token_it_end);
+    case SCHEMERLICHT_T_SYMBOL:
       return schemerlicht_make_literal(ctxt, token_it, token_it_end);
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
