@@ -6,7 +6,7 @@
 int schemerlicht_current_token_type(token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    return T_BAD;
+    return SCHEMERLICHT_T_BAD;
   return (*token_it)->type;
   }
 
@@ -47,7 +47,7 @@ schemerlicht_expression schemerlicht_make_literal(schemerlicht_context* ctxt, to
     }
   switch (schemerlicht_current_token_type(token_it, token_it_end))
     {
-    case T_FIXNUM:
+    case SCHEMERLICHT_T_FIXNUM:
     {
     schemerlicht_parsed_fixnum f;
     f.line_nr = (*token_it)->line_nr;
@@ -57,6 +57,19 @@ schemerlicht_expression schemerlicht_make_literal(schemerlicht_context* ctxt, to
     expr.type = schemerlicht_type_literal;
     expr.expr.lit.type = schemerlicht_type_fixnum;
     expr.expr.lit.lit.fx = f;
+    schemerlicht_token_next(ctxt, token_it, token_it_end);
+    return expr;
+    }
+    case SCHEMERLICHT_T_FLONUM:
+    {
+    schemerlicht_parsed_flonum f;
+    f.line_nr = (*token_it)->line_nr;
+    f.column_nr = (*token_it)->column_nr;
+    f.value = (*token_it)->info.flonum;
+    schemerlicht_expression expr;
+    expr.type = schemerlicht_type_literal;
+    expr.expr.lit.type = schemerlicht_type_flonum;
+    expr.expr.lit.lit.fl = f;
     schemerlicht_token_next(ctxt, token_it, token_it_end);
     return expr;
     }
@@ -78,7 +91,9 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
 
   switch (schemerlicht_current_token_type(token_it, token_it_end))
     {
-    case T_FIXNUM:
+    case SCHEMERLICHT_T_FIXNUM:
+      return schemerlicht_make_literal(ctxt, token_it, token_it_end);
+    case SCHEMERLICHT_T_FLONUM:
       return schemerlicht_make_literal(ctxt, token_it, token_it_end);
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
