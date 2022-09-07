@@ -1,4 +1,5 @@
 #include "test_assert.h"
+#include "parser_tests.h"
 #include "stream_tests.h"
 #include "string_tests.h"
 #include "token_tests.h"
@@ -13,6 +14,7 @@ int main(int argc, const char* argv[])
   InitTestEngine();
   clock_t start_t, end_t;
   start_t = clock();
+  run_all_parser_tests();
   run_all_stream_tests();
   run_all_string_tests();
   run_all_token_tests();

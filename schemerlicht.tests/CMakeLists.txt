@@ -1,4 +1,5 @@
 set(HDRS
+parser_tests.h
 stream_tests.h
 string_tests.h
 test_assert.h
@@ -7,6 +8,7 @@ vector_tests.h
 )
 	
 set(SRCS
+parser_tests.c
 stream_tests.c
 string_tests.c
 test.c
