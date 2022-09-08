@@ -11,10 +11,10 @@ typedef union
   schemerlicht_flonum fl;  
   } schemerlicht_value;
 
-typedef struct schemerlicht_cell
+typedef struct schemerlicht_object
   {
   int type;
   schemerlicht_value value;
-  } schemerlicht_cell;
+  } schemerlicht_object;
 
 #endif //SCHEMERLICHT_OBJECT_H

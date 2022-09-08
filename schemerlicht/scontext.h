@@ -6,7 +6,7 @@
 
 struct schemerlicht_context 
   {
-  schemerlicht_cell* cells;
+  schemerlicht_object* objects;
   };
 
 #endif //SCHEMERLICHT_CONTEXT_H

@@ -3,6 +3,7 @@ schemerlicht.h
 scontext.h
 serror.h
 slimits.h
+smap.h
 smemory.h
 sobject.h
 sparser.h
@@ -15,6 +16,7 @@ svector.h
 set(SRCS
 scontext.c
 serror.c
+smap.c
 smemory.c
 sobject.c
 sparser.c
