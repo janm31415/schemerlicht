@@ -12,11 +12,11 @@ enum schemerlicht_visitor_entry_type
   SCHEMERLICHT_VISITOR_LITERAL
   };
 
-typedef struct schemerlicht_visitory_entry
+typedef struct schemerlicht_visitor_entry
   {
   schemerlicht_expression* expr;
   enum schemerlicht_visitor_entry_type type;
-  } schemerlicht_visitory_entry;
+  } schemerlicht_visitor_entry;
 
 typedef struct schemerlicht_visitor schemerlicht_visitor;
 
@@ -40,6 +40,7 @@ struct schemerlicht_visitor
 schemerlicht_visitor* schemerlicht_visitor_new(schemerlicht_context* ctxt, void* impl);
 
 
-void visit(schemerlicht_context* ctxt, schemerlicht_visitory_entry entry, schemerlicht_visitor* vis);
+void schemerlicht_visit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* vis, schemerlicht_expression* expr);
+void schemerlicht_visit_program(schemerlicht_context* ctxt, schemerlicht_visitor* vis, schemerlicht_program* p);
 
 #endif //SCHEMERLICHT_VISITOR_H

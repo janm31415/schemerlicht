@@ -13,6 +13,9 @@ static void dump_fixnum()
   
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
 
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  printf("%s\n", dumper->s.string_ptr);
 
   schemerlicht_dump_visitor_free(ctxt, dumper);
 

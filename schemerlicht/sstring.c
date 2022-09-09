@@ -90,9 +90,20 @@ void schemerlicht_string_pop_back(schemerlicht_string* str)
 
 void schemerlicht_string_append(schemerlicht_context* ctxt, schemerlicht_string* str, schemerlicht_string* append)
   {
-  schemerlicht_growvector(ctxt, str->string_ptr, str->string_length + append->string_length + 1, str->string_capacity, char);
+  //schemerlicht_growvector(ctxt, str->string_ptr, str->string_length + append->string_length + 1, str->string_capacity, char);
+  schemerlicht_reallocvector(ctxt, str->string_ptr, str->string_capacity, str->string_length + append->string_length + 1, char);
   memcpy(str->string_ptr + str->string_length, append->string_ptr, (append->string_length+1) * sizeof(char));
+  str->string_capacity = str->string_length + append->string_length + 1;
   str->string_length += append->string_length;
+  }
+
+void schemerlicht_string_append_cstr(schemerlicht_context* ctxt, schemerlicht_string* str, const char* append)
+  {
+  schemerlicht_memsize append_length = cast(schemerlicht_memsize, strlen(append));
+  schemerlicht_reallocvector(ctxt, str->string_ptr, str->string_capacity, str->string_length + append_length + 1, char);
+  memcpy(str->string_ptr + str->string_length, append, (append_length + 1) * sizeof(char));
+  str->string_capacity = str->string_length + append_length + 1;
+  str->string_length += append_length;  
   }
 
 void schemerlicht_string_clear(schemerlicht_string* str)

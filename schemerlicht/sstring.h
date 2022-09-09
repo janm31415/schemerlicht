@@ -39,6 +39,8 @@ SCHEMERLICHT_API void schemerlicht_string_pop_back(schemerlicht_string* str);
 
 SCHEMERLICHT_API void schemerlicht_string_append(schemerlicht_context* ctxt, schemerlicht_string* str, schemerlicht_string* append);
 
+SCHEMERLICHT_API void schemerlicht_string_append_cstr(schemerlicht_context* ctxt, schemerlicht_string* str, const char* append);
+
 SCHEMERLICHT_API void schemerlicht_string_clear(schemerlicht_string* str);
 
 #endif // SCHEMERLICHT_STRING_H
