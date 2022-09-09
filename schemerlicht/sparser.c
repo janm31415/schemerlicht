@@ -275,6 +275,8 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
       if (current_token_equals(token_it, "#undefined"))
         return make_nop();
       return make_literal(ctxt, token_it, token_it_end);
+    //case SCHEMERLICHT_T_ID:
+
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       //*token_it = *token_it_end;

@@ -156,27 +156,27 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
     schemerlicht_assert(ctxt->global->dummy_node->next == NULL);
     }
   if (nasize > oldasize)  /* array part must grow? */
-    schemerlicht_create_array_vector(ctxt, t, nasize);    
+    schemerlicht_create_array_vector(ctxt, t, nasize);
   /* create new hash part with appropriate size */
-  schemerlicht_create_node_vector(ctxt, t, nhsize);    
+  schemerlicht_create_node_vector(ctxt, t, nhsize);
   /* re-insert elements */
-  if (nasize < oldasize) 
+  if (nasize < oldasize)
     {  /* array part must shrink? */
     t->array_size = nasize;
     /* re-insert elements from vanishing slice */
-    for (i = nasize; i < oldasize; ++i) 
+    for (i = nasize; i < oldasize; ++i)
       {
       if (t->array[i].type != schemerlicht_object_type_nil)
         {
-        schemerlicht_object* obj = schemerlicht_map_insert_indexed(ctxt, t, i+1);
+        schemerlicht_object* obj = schemerlicht_map_insert_indexed(ctxt, t, i + 1);
         set_object(obj, &t->array[i]);
         }
       }
     /* shrink array */
-    schemerlicht_reallocvector(ctxt, t->array, oldasize, nasize, schemerlicht_object);    
+    schemerlicht_reallocvector(ctxt, t->array, oldasize, nasize, schemerlicht_object);
     }
   /* re-insert elements in hash part */
-  for (i = twoto(oldhsize); i >= 1; --i) 
+  for (i = twoto(oldhsize); i >= 1; --i)
     {
     schemerlicht_map_node* old = nold + i - 1;
     if (get_value(old)->type != schemerlicht_object_type_nil)
@@ -242,6 +242,23 @@ static schemerlicht_map_node* schemerlicht_hash_pointer(const schemerlicht_map* 
   return hashmod(m, (schemerlicht_memsize)ptr);
   }
 
+static schemerlicht_memsize hash_string(const char* str)
+  {
+  int l = strlen(str);
+  schemerlicht_memsize h = cast(schemerlicht_memsize, l);
+  int step = (l >> 5) + 1; // if string is too long, don't hash all its chars
+  for (int i = l; i >= step; i -= step)
+    h = h ^ ((h << 5) + (h >> 2) + (unsigned char)(str[i - 1]));
+  return h;
+  }
+
+static schemerlicht_map_node* schemerlicht_hash_string(const schemerlicht_map* m, const char* str)
+  {
+  schemerlicht_memsize h = hash_string(str);
+  schemerlicht_assert((node_size(m) & (node_size(m) - 1)) == 0);
+  return get_node(m, h & (node_size(m) - 1));
+  }
+
 static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map* m, const schemerlicht_object* key)
   {
   switch (key->type)
@@ -250,6 +267,8 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
       return schemerlicht_hash_fixnum(m, key->value.fx);
     case schemerlicht_object_type_flonum:
       return schemerlicht_hash_flonum(m, key->value.fl);
+    case schemerlicht_object_type_string:
+      return schemerlicht_hash_string(m, key->value.s.string_ptr);
     case schemerlicht_object_type_pointer:
       return schemerlicht_hash_pointer(m, key->value.ptr);
     default:
@@ -296,10 +315,25 @@ static schemerlicht_object* schemerlicht_map_get_any(schemerlicht_map* map, cons
     }
   }
 
+schemerlicht_object* schemerlicht_map_get_string(schemerlicht_map* map, const char* str)
+  {
+  schemerlicht_map_node* n = schemerlicht_hash_string(map, str);
+  do
+    {
+    if ((get_key(n)->type == schemerlicht_object_type_string) && (strcmp(get_key(n)->value.s.string_ptr, str)==0))
+      return get_value(n);
+    else
+      n = n->next;
+    } while (n);
+    return NULL;
+  }
+
 schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerlicht_object* key)
   {
   switch (key->type)
     {
+    case schemerlicht_object_type_string:
+      return schemerlicht_map_get_string(map, key->value.s.string_ptr);
     case schemerlicht_object_type_fixnum:
     {
     schemerlicht_memsize index = (schemerlicht_memsize)key->value.fx;

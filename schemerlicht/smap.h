@@ -38,5 +38,6 @@ schemerlicht_object* schemerlicht_map_insert_indexed(schemerlicht_context* ctxt,
 schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key);
 schemerlicht_object* schemerlicht_map_get_indexed(schemerlicht_map* map, schemerlicht_memsize index);
 schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerlicht_object* key);
+schemerlicht_object* schemerlicht_map_get_string(schemerlicht_map* map, const char* str);
 
 #endif //SCHEMERLICHT_MAP_H

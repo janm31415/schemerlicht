@@ -50,3 +50,27 @@ int schemerlicht_log2(uint32_t x)
     return -1;  /* special `log' for 0 */
     }
   }
+
+schemerlicht_object make_schemerlicht_object_fixnum(schemerlicht_fixnum fx)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_fixnum;
+  obj.value.fx = fx;
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_flonum(schemerlicht_flonum fl)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_flonum;
+  obj.value.fl = fl;
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, const char* s)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_string;
+  schemerlicht_string_init(ctxt, &(obj.value.s), s);
+  return obj;
+  }

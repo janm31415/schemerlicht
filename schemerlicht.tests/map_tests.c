@@ -133,6 +133,20 @@ static void test_map_4()
   schemerlicht_close(ctxt);
   }
 
+static void test_map_with_string_keys()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 4);
+
+  schemerlicht_object key_alpha = make_schemerlicht_object_string(ctxt, "alpha");
+  
+  schemerlicht_object* obj_alpha = schemerlicht_map_insert(ctxt, m, &key_alpha);
+
+  schemerlicht_string_destroy(ctxt, &key_alpha.value.s);
+  schemerlicht_map_free(ctxt, m);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_map_tests()
   {
   test_map_construction();
@@ -140,4 +154,5 @@ void run_all_map_tests()
   test_map_2();
   test_map_3();
   test_map_4();
+  test_map_with_string_keys();
   }
