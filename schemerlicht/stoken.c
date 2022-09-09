@@ -159,7 +159,7 @@ static void treat_buffer(schemerlicht_context* ctxt, schemerlicht_string* buff, 
       else
         {
         schemerlicht_string_push_front(ctxt, buff, '#');
-        token t = make_token(ctxt, SCHEMERLICHT_T_SYMBOL, line_nr, column_nr - (int)buff->string_length - 1, buff);
+        token t = make_token(ctxt, SCHEMERLICHT_T_SYMBOL, line_nr, column_nr - (int)buff->string_length, buff);
         schemerlicht_vector_push_back(ctxt, tokens, t, token);
         }
       }
