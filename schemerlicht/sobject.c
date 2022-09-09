@@ -74,3 +74,17 @@ schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, 
   schemerlicht_string_init(ctxt, &(obj.value.s), s);
   return obj;
   }
+
+void destroy_schemerlicht_object(schemerlicht_context* ctxt, schemerlicht_object* obj)
+  {
+  switch (obj->type)
+    {
+    case schemerlicht_object_type_string:
+    {
+    schemerlicht_string_destroy(ctxt, &(obj->value.s));
+    break;
+    }
+    default:
+      break;
+    }
+  }

@@ -36,6 +36,7 @@ schemerlicht_map* schemerlicht_map_new(schemerlicht_context* ctxt, schemerlicht_
 void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map);
 schemerlicht_object* schemerlicht_map_insert_indexed(schemerlicht_context* ctxt, schemerlicht_map* map, schemerlicht_memsize index);
 schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key);
+schemerlicht_object* schemerlicht_map_insert_string(schemerlicht_context* ctxt, schemerlicht_map* map, const char* str);
 schemerlicht_object* schemerlicht_map_get_indexed(schemerlicht_map* map, schemerlicht_memsize index);
 schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerlicht_object* key);
 schemerlicht_object* schemerlicht_map_get_string(schemerlicht_map* map, const char* str);

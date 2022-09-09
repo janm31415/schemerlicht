@@ -138,11 +138,14 @@ static void test_map_with_string_keys()
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 4);
 
-  schemerlicht_object key_alpha = make_schemerlicht_object_string(ctxt, "alpha");
-  
-  schemerlicht_object* obj_alpha = schemerlicht_map_insert(ctxt, m, &key_alpha);
+  schemerlicht_object* obj_alpha = schemerlicht_map_insert_string(ctxt, m, "alpha");
+  obj_alpha->type = schemerlicht_object_type_fixnum;
+  obj_alpha->value.fx = 2000;
 
-  schemerlicht_string_destroy(ctxt, &key_alpha.value.s);
+  schemerlicht_object* obj_find_alpha = schemerlicht_map_get_string(m, "alpha");
+  TEST_EQ_INT(schemerlicht_object_type_fixnum, obj_find_alpha->type);
+  TEST_EQ_INT(2000, obj_find_alpha->value.fx);
+
   schemerlicht_map_free(ctxt, m);
   schemerlicht_close(ctxt);
   }

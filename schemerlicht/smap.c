@@ -169,7 +169,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
       if (t->array[i].type != schemerlicht_object_type_nil)
         {
         schemerlicht_object* obj = schemerlicht_map_insert_indexed(ctxt, t, i + 1);
-        set_object(obj, &t->array[i]);
+        set_object(ctxt, obj, &t->array[i]);
         }
       }
     /* shrink array */
@@ -182,7 +182,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
     if (get_value(old)->type != schemerlicht_object_type_nil)
       {
       schemerlicht_object* obj = schemerlicht_map_insert(ctxt, t, get_key(old));
-      set_object(obj, get_value(old));
+      set_object(ctxt, obj, get_value(old));
       }
     }
   if (oldhsize)
@@ -212,6 +212,12 @@ schemerlicht_map* schemerlicht_map_new(schemerlicht_context* ctxt, schemerlicht_
 
 void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map)
   {
+  schemerlicht_memsize size = node_size(map);
+  for (schemerlicht_memsize i = 0; i < size; ++i)
+    {
+    if (map->node[i].key.type == schemerlicht_object_type_string)
+      schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
+    }
   schemerlicht_freevector(ctxt, map->node, node_size(map), schemerlicht_map_node);
   schemerlicht_freevector(ctxt, map->array, map->array_size, schemerlicht_object);
   schemerlicht_delete(ctxt, map);
@@ -372,7 +378,7 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
       main = n;
       }
     }
-  set_object(get_key(main), key);
+  set_object(ctxt, get_key(main), key);
   schemerlicht_assert(get_value(main)->type == schemerlicht_object_type_nil);
   for (;;) // set first_free correctly
     {
@@ -417,4 +423,18 @@ schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemer
       schemerlicht_runerror(ctxt, "table index is nil");
     return new_key(ctxt, map, key);
     }
+  }
+
+schemerlicht_object* schemerlicht_map_insert_string(schemerlicht_context* ctxt, schemerlicht_map* map, const char* str)
+  {
+  schemerlicht_object* p = schemerlicht_map_get_string(map, str);
+  if (p != NULL)
+    return p;
+  else
+    {
+    schemerlicht_object key = make_schemerlicht_object_string(ctxt, str);
+    schemerlicht_object* obj = new_key(ctxt, map, &key);
+    destroy_schemerlicht_object(ctxt, &key);
+    return obj;
+    }  
   }
