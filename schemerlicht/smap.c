@@ -342,7 +342,7 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
   schemerlicht_assert(get_value(main)->type == schemerlicht_object_type_nil);
   for (;;) // set first_free correctly
     {
-    if (get_key(map->first_free) == schemerlicht_object_type_nil) // map still has a free place
+    if (get_key(map->first_free)->type == schemerlicht_object_type_nil) // map still has a free place
       return get_value(main);
     else if (map->first_free == map->node) //cannot decrement from here
       break;
