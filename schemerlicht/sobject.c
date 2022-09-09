@@ -21,7 +21,7 @@ int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlic
 
 int schemerlicht_log2(uint32_t x)
   {
-  static const uint8_t log_8[255] = {
+  static const schemerlicht_byte log_8[255] = {
     0,
     1,1,
     2,2,2,2,

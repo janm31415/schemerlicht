@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 schemerlicht_flonum to_flonum(const char* value)
   {
@@ -105,7 +106,7 @@ token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value)
   return t;
   }
 
-static void replace_escape_chars(schemerlicht_context* ctxt, schemerlicht_string* str)
+static void replace_escape_chars(schemerlicht_string* str)
   {
   if (str->string_length == 0)
     return;
@@ -411,7 +412,7 @@ schemerlicht_vector tokenize(schemerlicht_context* ctxt, schemerlicht_stream* st
           }
         schemerlicht_string tmp;
         schemerlicht_string_init_ranged(ctxt, &tmp, s, t);
-        replace_escape_chars(ctxt, &tmp);
+        replace_escape_chars(&tmp);
         token tok = make_token(ctxt, SCHEMERLICHT_T_STRING, temp_line_nr, temp_column_nr, &tmp);
         schemerlicht_vector_push_back(ctxt, &tokens, tok, token);
         schemerlicht_string_destroy(ctxt, &tmp);

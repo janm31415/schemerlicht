@@ -12,7 +12,7 @@ SCHEMERLICHT_API void* schemerlicht_realloc(schemerlicht_context* ctxt, void* ch
 #define schemerlicht_delete(ctxt, chunk) schemerlicht_realloc(ctxt, (chunk), sizeof(*(chunk)), 0)
 #define schemerlicht_freevector(ctxt, chunk, vector_size, element_type)	schemerlicht_realloc(ctxt, (chunk), cast(schemerlicht_memsize, vector_size)*cast(schemerlicht_memsize, sizeof(element_type)), 0)
 
-#define schemerlicht_malloc(ctxt, t) schemerlicht_realloc(ctxt, NULL, 0, (t))
+#define schemerlicht_malloc(ctxt, size) schemerlicht_realloc(ctxt, NULL, 0, (size))
 #define schemerlicht_new(ctxt, element_type) cast(element_type*, schemerlicht_malloc(ctxt, sizeof(element_type)))
 #define schemerlicht_newvector(ctxt, vector_size, element_type) cast(element_type*, schemerlicht_malloc(ctxt, cast(schemerlicht_memsize, vector_size)*cast(schemerlicht_memsize, sizeof(element_type))))
 
