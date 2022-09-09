@@ -136,15 +136,39 @@ static void test_map_4()
 static void test_map_with_string_keys()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 4);
+  schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 1);
 
   schemerlicht_object* obj_alpha = schemerlicht_map_insert_string(ctxt, m, "alpha");
   obj_alpha->type = schemerlicht_object_type_fixnum;
   obj_alpha->value.fx = 2000;
 
+  schemerlicht_object* obj_beta = schemerlicht_map_insert_string(ctxt, m, "beta");
+  obj_beta->type = schemerlicht_object_type_fixnum;
+  obj_beta->value.fx = 2001;
+
+  schemerlicht_object* obj_gamma = schemerlicht_map_insert_string(ctxt, m, "gamma");
+  obj_gamma->type = schemerlicht_object_type_fixnum;
+  obj_gamma->value.fx = 2002;
+
+  schemerlicht_object* obj_delta = schemerlicht_map_insert_string(ctxt, m, "delta");
+  obj_delta->type = schemerlicht_object_type_fixnum;
+  obj_delta->value.fx = 2003;
+
   schemerlicht_object* obj_find_alpha = schemerlicht_map_get_string(m, "alpha");
   TEST_EQ_INT(schemerlicht_object_type_fixnum, obj_find_alpha->type);
   TEST_EQ_INT(2000, obj_find_alpha->value.fx);
+
+  schemerlicht_object* obj_find_beta = schemerlicht_map_get_string(m, "beta");
+  TEST_EQ_INT(schemerlicht_object_type_fixnum, obj_find_beta->type);
+  TEST_EQ_INT(2001, obj_find_beta->value.fx);
+
+  schemerlicht_object* obj_find_gamma = schemerlicht_map_get_string(m, "gamma");
+  TEST_EQ_INT(schemerlicht_object_type_fixnum, obj_find_gamma->type);
+  TEST_EQ_INT(2002, obj_find_gamma->value.fx);
+
+  schemerlicht_object* obj_find_delta = schemerlicht_map_get_string(m, "delta");
+  TEST_EQ_INT(schemerlicht_object_type_fixnum, obj_find_delta->type);
+  TEST_EQ_INT(2003, obj_find_delta->value.fx);
 
   schemerlicht_map_free(ctxt, m);
   schemerlicht_close(ctxt);

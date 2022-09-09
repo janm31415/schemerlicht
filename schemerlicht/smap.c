@@ -169,7 +169,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
       if (t->array[i].type != schemerlicht_object_type_nil)
         {
         schemerlicht_object* obj = schemerlicht_map_insert_indexed(ctxt, t, i + 1);
-        set_object(ctxt, obj, &t->array[i]);
+        set_object(obj, &t->array[i]);
         }
       }
     /* shrink array */
@@ -182,7 +182,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
     if (get_value(old)->type != schemerlicht_object_type_nil)
       {
       schemerlicht_object* obj = schemerlicht_map_insert(ctxt, t, get_key(old));
-      set_object(ctxt, obj, get_value(old));
+      set_object(obj, get_value(old));
       }
     }
   if (oldhsize)
@@ -378,7 +378,7 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
       main = n;
       }
     }
-  set_object(ctxt, get_key(main), key);
+  set_object(get_key(main), key);
   schemerlicht_assert(get_value(main)->type == schemerlicht_object_type_nil);
   for (;;) // set first_free correctly
     {
@@ -434,7 +434,6 @@ schemerlicht_object* schemerlicht_map_insert_string(schemerlicht_context* ctxt, 
     {
     schemerlicht_object key = make_schemerlicht_object_string(ctxt, str);
     schemerlicht_object* obj = new_key(ctxt, map, &key);
-    destroy_schemerlicht_object(ctxt, &key);
     return obj;
     }  
   }
