@@ -4,7 +4,7 @@
 #include "schemerlicht/sstream.h"
 #include "schemerlicht/scontext.h"
 
-void test_stream_construction()
+static void test_stream_construction()
   {
   schemerlicht_stream str;
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -16,7 +16,7 @@ void test_stream_construction()
   schemerlicht_close(ctxt);
   }
 
-void test_stream_write_read()
+static void test_stream_write_read()
   {
   schemerlicht_stream str;
   schemerlicht_context* ctxt = schemerlicht_open();

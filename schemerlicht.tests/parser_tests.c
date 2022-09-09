@@ -8,7 +8,7 @@
 
 #include "token_tests.h"
 
-void parse_fixnum_1()
+static void parse_fixnum_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "5");
@@ -25,7 +25,7 @@ void parse_fixnum_1()
   schemerlicht_close(ctxt);
   }
 
-void parse_fixnum_2()
+static void parse_fixnum_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "-5555");
@@ -42,7 +42,7 @@ void parse_fixnum_2()
   schemerlicht_close(ctxt);
   }
 
-void parse_flonum()
+static void parse_flonum()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "3.14");
@@ -59,7 +59,7 @@ void parse_flonum()
   schemerlicht_close(ctxt);
   }
 
-void parse_nil()
+static void parse_nil()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "()");
@@ -75,7 +75,7 @@ void parse_nil()
   schemerlicht_close(ctxt);
   }
 
-void parse_true()
+static void parse_true()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "#t");
@@ -91,7 +91,7 @@ void parse_true()
   schemerlicht_close(ctxt);
   }
 
-void parse_false()
+static void parse_false()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "#f");
@@ -107,7 +107,7 @@ void parse_false()
   schemerlicht_close(ctxt);
   }
 
-void parse_string()
+static void parse_string()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "\"test\"");
@@ -123,7 +123,7 @@ void parse_string()
   schemerlicht_close(ctxt);
   }
 
-void parse_character()
+static void parse_character()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "#\\45");
@@ -140,7 +140,7 @@ void parse_character()
   schemerlicht_close(ctxt);
   }
 
-void parse_character_2()
+static void parse_character_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "#\\space");

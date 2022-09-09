@@ -1,6 +1,7 @@
 set(HDRS
 schemerlicht.h
 scontext.h
+sdump.h
 serror.h
 slimits.h
 smap.h
@@ -11,10 +12,12 @@ sstream.h
 sstring.h
 stoken.h
 svector.h
+svisitor.h
 )
 	
 set(SRCS
 scontext.c
+sdump.c
 serror.c
 smap.c
 smemory.c
@@ -23,6 +26,7 @@ sparser.c
 sstream.c
 sstring.c
 stoken.c
+svisitor.c
 )
 
 if (WIN32)

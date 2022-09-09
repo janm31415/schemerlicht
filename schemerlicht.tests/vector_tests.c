@@ -5,7 +5,7 @@
 #include "schemerlicht/svector.h"
 #include "schemerlicht/scontext.h"
 
-void test_construction_destruction_1()
+static void test_construction_destruction_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -17,7 +17,7 @@ void test_construction_destruction_1()
   schemerlicht_close(ctxt);
   }
 
-void test_construction_destruction_2()
+static void test_construction_destruction_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -29,7 +29,7 @@ void test_construction_destruction_2()
   schemerlicht_close(ctxt);
   }
 
-void test_access()
+static void test_access()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -48,7 +48,7 @@ void test_access()
   schemerlicht_close(ctxt);
   }
 
-void test_pop_back()
+static void test_pop_back()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -77,7 +77,7 @@ void test_pop_back()
   schemerlicht_close(ctxt);
   }
 
-void test_push_back()
+static void test_push_back()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -96,7 +96,7 @@ void test_push_back()
   schemerlicht_close(ctxt);
   }
 
-void test_push_back_2()
+static void test_push_back_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -136,7 +136,7 @@ void test_push_back_2()
   schemerlicht_close(ctxt);
   }
 
-void test_iterator()
+static void test_iterator()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -164,7 +164,7 @@ void test_iterator()
   schemerlicht_close(ctxt);
   }
 
-void test_iterator_2()
+static void test_iterator_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;
@@ -191,7 +191,7 @@ void test_iterator_2()
   schemerlicht_close(ctxt);
   }
 
-void test_back()
+static void test_back()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector v;

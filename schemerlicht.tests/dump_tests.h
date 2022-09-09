@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_DUMP_TESTS_H
+#define SCHEMERLICHT_DUMP_TESTS_H
+
+void run_all_dump_tests();
+
+#endif //SCHEMERLICHT_DUMP_TESTS_H

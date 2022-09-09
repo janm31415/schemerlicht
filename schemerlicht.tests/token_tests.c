@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-void test_number_recognition()
+static void test_number_recognition()
   {
   schemerlicht_flonum fl = to_flonum("1.2");
   TEST_EQ_DOUBLE(1.2, fl);
@@ -44,7 +44,7 @@ schemerlicht_vector script2tokens(schemerlicht_context* ctxt, const char* script
   return tokens;
   }
 
-void tokenize_symbol()
+static void tokenize_symbol()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "#f");
@@ -55,7 +55,7 @@ void tokenize_symbol()
   schemerlicht_close(ctxt);
   }
 
-void tokenize_list()
+static void tokenize_list()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(list a b)");
@@ -69,7 +69,7 @@ void tokenize_list()
   schemerlicht_close(ctxt);
   }
 
-void tokenize_string()
+static void tokenize_string()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(print\"spaghetti () \")");
@@ -84,7 +84,7 @@ void tokenize_string()
   schemerlicht_close(ctxt);
   }
 
-void tokenize_fixnum_real()
+static void tokenize_fixnum_real()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(+ 1 2.0)");
@@ -98,7 +98,7 @@ void tokenize_fixnum_real()
   schemerlicht_close(ctxt);
   }
 
-void tokenize_string_w_escape_chars()
+static void tokenize_string_w_escape_chars()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(print\"line1\\nline2\")");
@@ -113,7 +113,7 @@ void tokenize_string_w_escape_chars()
   schemerlicht_close(ctxt);
   }
 
-void tokenize_string_w_escape_chars_2()
+static void tokenize_string_w_escape_chars_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(print\"oh\\a\\b\\n\\t\\r\")");

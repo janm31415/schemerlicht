@@ -5,7 +5,7 @@
 #include "schemerlicht/sstring.h"
 #include "schemerlicht/scontext.h"
 
-void test_string_init()
+static void test_string_init()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_string s;
@@ -16,7 +16,7 @@ void test_string_init()
   schemerlicht_close(ctxt);
   }
 
-void test_string_functions()
+static void test_string_functions()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_string s;
@@ -33,7 +33,7 @@ void test_string_functions()
   schemerlicht_close(ctxt);
   }
 
-void test_string_push_back()
+static void test_string_push_back()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_string s;
@@ -49,7 +49,7 @@ void test_string_push_back()
   schemerlicht_close(ctxt);
   }
 
-void test_string_append()
+static void test_string_append()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_string s1;

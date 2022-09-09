@@ -4,7 +4,7 @@
 #include "schemerlicht/scontext.h"
 #include "schemerlicht/smap.h"
 
-void test_map_construction()
+static void test_map_construction()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
@@ -16,7 +16,7 @@ void test_map_construction()
   schemerlicht_close(ctxt);
   }
 
-void test_map()
+static void test_map()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
@@ -39,7 +39,7 @@ void test_map()
   schemerlicht_close(ctxt);
   }
 
-void test_map_2()
+static void test_map_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
@@ -62,7 +62,7 @@ void test_map_2()
   schemerlicht_close(ctxt);
   }
 
-void test_map_3()
+static void test_map_3()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
@@ -85,7 +85,7 @@ void test_map_3()
   schemerlicht_close(ctxt);
   }
 
-void test_map_4()
+static void test_map_4()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 1);
