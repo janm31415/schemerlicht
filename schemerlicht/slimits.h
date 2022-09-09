@@ -2,6 +2,7 @@
 #define SCHEMERLICHT_LIMITS_H
 
 #include "schemerlicht.h"
+#include <cassert>
 
 #ifndef UNUSED
 #define UNUSED(x) ((void)(x)) /* to avoid warnings */
@@ -12,7 +13,7 @@
 #endif
 
 #ifndef schemerlicht_assert
-#define schemerlicht_assert(c)  /* empty */
+#define schemerlicht_assert(c) assert(c)
 #endif
 
 #ifndef SCHEMERLICHT_ALIGNMENT
@@ -23,6 +24,14 @@ typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
 
 #ifndef schemerlicht_memsize
 #define schemerlicht_memsize uint32_t
+#endif
+
+#ifndef schemerlicht_mem_bits
+#define schemerlicht_mem_bits 32
+#endif
+
+#ifndef schemerlicht_mem_invalid_size
+#define schemerlicht_mem_invalid_size ((schemerlicht_memsize)(-1))
 #endif
 
 #endif //SCHEMERLICHT_LIMITS_H

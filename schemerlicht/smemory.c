@@ -23,7 +23,7 @@
 
 void* schemerlicht_realloc(schemerlicht_context* ctxt, void* chunk, schemerlicht_memsize old_size, schemerlicht_memsize new_size)
   {
-  UNUSED(old_size)
+  UNUSED(old_size);
   schemerlicht_assert((old_size == 0) == (chunk == NULL));
   if (new_size == 0)
     {

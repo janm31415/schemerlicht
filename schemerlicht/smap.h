@@ -1,6 +1,10 @@
 #ifndef SCHEMERLICHT_MAP_H
 #define SCHEMERLICHT_MAP_H
 
+/*
+Based on table from LUA
+*/
+
 #include "schemerlicht.h"
 #include "sobject.h"
 #include "slimits.h"
@@ -15,15 +19,24 @@ typedef struct schemerlicht_map_node
 
 typedef struct schemerlicht_map 
   {
-  schemerlicht_memsize log_size_node;  /* log2 of size of `node' array */
+  schemerlicht_memsize log_node_size;  /* log2 of size of `node' array */
   schemerlicht_object* array;  /* array part */
-  schemerlicht_map_node* hash;
+  schemerlicht_map_node* node;
   schemerlicht_map_node* first_free;  /* this position is free; all positions after it are full */
-  schemerlicht_memsize size_array;  /* size of `array' array */
+  schemerlicht_memsize array_size;  /* size of `array' array */
   } schemerlicht_map;
 
 
-schemerlicht_map* schemerlicht_map_new(schemerlicht_context* ctxt, schemerlicht_memsize array_size, schemerlicht_memsize log_hash_size);
+#define node_size(m) (1<<((m)->log_node_size))
+#define get_node(m, i)  (&(m)->node[i])
+#define get_key(n) (&(n)->key)
+#define get_value(n) (&(n)->value)
+
+schemerlicht_map* schemerlicht_map_new(schemerlicht_context* ctxt, schemerlicht_memsize array_size, schemerlicht_memsize log_node_size);
 void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map);
+schemerlicht_object* schemerlicht_map_insert_indexed(schemerlicht_context* ctxt, schemerlicht_map* map, schemerlicht_memsize index);
+schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key);
+schemerlicht_object* schemerlicht_map_get_indexed(schemerlicht_map* map, schemerlicht_memsize index);
+schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerlicht_object* key);
 
 #endif //SCHEMERLICHT_MAP_H
