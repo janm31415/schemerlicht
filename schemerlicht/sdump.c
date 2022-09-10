@@ -139,7 +139,7 @@ static void postvisit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* 
   }
 static int previsit_foreigncall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
-  schemerlicht_parsed_primitive_call* f = &(e->expr.foreign);
+  schemerlicht_parsed_foreign_call* f = &(e->expr.foreign);
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
   schemerlicht_string_append_cstr(ctxt, &(d->s), "( ");
   schemerlicht_string_append(ctxt, &(d->s), &(f->name));
@@ -213,7 +213,21 @@ static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
     }
   return 1;
   }
-static void visit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+static int previsit_let_binding(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_let_binding* b)
+  {
+  schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
+  schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+  schemerlicht_string_append(ctxt, &(d->s), &b->binding_name);
+  schemerlicht_string_push_back(ctxt, &(d->s), ' ');
+  return 1;
+  }
+static void postvisit_let_binding(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_let_binding* b)
+  {
+  UNUSED(b);
+  schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
+  schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");  
+  }
+static void postvisit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(e);
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
@@ -257,7 +271,9 @@ schemerlicht_dump_visitor* schemerlicht_dump_visitor_new(schemerlicht_context* c
   v->visitor->previsit_lambda = previsit_lambda;
   v->visitor->postvisit_lambda = postvisit_lambda;
   v->visitor->previsit_let = previsit_let;
-  v->visitor->visit_let_bindings = visit_let_bindings;
+  v->visitor->postvisit_let_bindings = postvisit_let_bindings;
+  v->visitor->previsit_let_binding = previsit_let_binding;
+  v->visitor->postvisit_let_binding = postvisit_let_binding;
   v->visitor->postvisit_let = postvisit_let;
   return v;
   }

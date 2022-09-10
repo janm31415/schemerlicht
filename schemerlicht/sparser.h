@@ -285,4 +285,10 @@ SCHEMERLICHT_API void schemerlicht_program_destroy(schemerlicht_context* ctxt, s
 
 schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt);
 
+typedef struct schemerlicht_let_binding
+  {
+  schemerlicht_string binding_name;
+  schemerlicht_expression binding_expr;
+  } schemerlicht_let_binding;
+
 #endif // SCHEMERLICHT_PARSER_H

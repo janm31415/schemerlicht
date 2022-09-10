@@ -139,6 +139,44 @@ static void dump_lambda()
   schemerlicht_close(ctxt);
   }
 
+static void dump_lambda_nested_begins()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(lambda (x) ( begin ( begin ( begin (+ 5 7 ) ) ) ) )");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( lambda ( x ) ( begin ( + 5 7 ) ) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void dump_let()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let ((x 2) (y 3)) (+ x y))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( let ( [ x 2 ] [ y 3 ] ) ( begin ( + x y ) ) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_dump_tests()
   {
   dump_fixnum();
@@ -148,4 +186,6 @@ void run_all_dump_tests()
   dump_variable();
   dump_set();
   dump_lambda();
+  dump_lambda_nested_begins();
+  dump_let();
   }
