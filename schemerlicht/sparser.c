@@ -3,6 +3,7 @@
 #include "stoken.h"
 #include "serror.h"
 #include "scontext.h"
+#include "svisitor.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -451,35 +452,44 @@ schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vecto
   return prog;
   }
 
-static void literal_destroy(schemerlicht_context* ctxt, schemerlicht_literal* lit)
+static void postvisit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
   {
-  switch (lit->type)
-    {
-    case schemerlicht_type_string:
-      schemerlicht_string_destroy(ctxt, &lit->lit.str.value);
-      break;
-    }
+  UNUSED(v);
+  schemerlicht_vector_destroy(ctxt, &p->expressions);
+  }
+static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {  
+  UNUSED(v);
+  schemerlicht_vector_destroy(ctxt, &e->expr.beg.arguments);
+  }
+static void visit_string(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &(e->expr.lit.lit.str.value));
+  }
+static void visit_symbol(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &(e->expr.lit.lit.sym.value));
   }
 
-static void expression_destroy(schemerlicht_context* ctxt, schemerlicht_expression* e)
+typedef struct schemerlicht_program_destroy_visitor
   {
-  switch (e->type)
-    {
-    case schemerlicht_type_literal:
-      literal_destroy(ctxt, &e->expr.lit);
-      break;
-    }
-  }
+  schemerlicht_visitor* visitor;
+  } schemerlicht_program_destroy_visitor;
 
 void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_program* p)
   {
-  schemerlicht_expression* expr_it = schemerlicht_vector_begin(&p->expressions, schemerlicht_expression);
-  schemerlicht_expression* expr_it_end = schemerlicht_vector_end(&p->expressions, schemerlicht_expression);
-  for (; expr_it != expr_it_end; ++expr_it)
-    {
-    expression_destroy(ctxt, expr_it);
-    }
-  schemerlicht_vector_destroy(ctxt, &p->expressions);
+  schemerlicht_program_destroy_visitor destroyer;
+  destroyer.visitor = schemerlicht_visitor_new(ctxt, &destroyer);
+
+  destroyer.visitor->visit_string = visit_string;
+  destroyer.visitor->visit_symbol = visit_symbol;
+  destroyer.visitor->postvisit_begin = postvisit_begin;
+  destroyer.visitor->postvisit_program = postvisit_program;
+  schemerlicht_visit_program(ctxt, destroyer.visitor, p);
+
+  destroyer.visitor->destroy(ctxt, destroyer.visitor);  
   }
 
 static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, enum schemerlicht_expression_type value)
