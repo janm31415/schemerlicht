@@ -189,11 +189,24 @@ typedef struct schemerlicht_parsed_quote
   schemerlicht_string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
   } schemerlicht_parsed_quote;
 
+enum schemerlicht_binding_type
+  {
+  schemerlicht_bt_let,
+  schemerlicht_bt_letrec,
+  schemerlicht_bt_let_star
+  };
+
 typedef struct schemerlicht_parsed_let
   {
   int line_nr, column_nr;
   int tail_position; // true if expr is in tail position. boolean is set by tail_call_analysis.  
   schemerlicht_string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
+  schemerlicht_vector bindings;
+  schemerlicht_vector body;
+  enum schemerlicht_binding_type bt;
+  schemerlicht_vector assignable_variables;
+  int named_let;
+  schemerlicht_string let_name;
   } schemerlicht_parsed_let;
 
 typedef struct schemerlicht_parsed_lambda
@@ -201,6 +214,10 @@ typedef struct schemerlicht_parsed_lambda
   int line_nr, column_nr;
   int tail_position; // true if expr is in tail position. boolean is set by tail_call_analysis.  
   schemerlicht_string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
+  schemerlicht_vector body;
+  schemerlicht_vector variables;
+  schemerlicht_vector free_variables;
+  schemerlicht_vector assignable_variables;
   } schemerlicht_parsed_lambda;
 
 typedef struct schemerlicht_parsed_funcall

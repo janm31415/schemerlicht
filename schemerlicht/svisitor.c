@@ -382,6 +382,199 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
       }
     break;
     }
+    case SCHEMERLICHT_VISITOR_NOP:
+    {
+    vis->visit_nop(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_VARIABLE:
+    {
+    vis->visit_variable(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_QUOTE:
+    {
+    vis->visit_quote(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_FUNCALL_PRE:
+    {
+    if (vis->previsit_funcall(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FUNCALL_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.funcall.arguments);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      arg = &(e->expr->expr.funcall.fun);
+      expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      expr_rit = expr_it_end - 1;
+      expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_FUNCALL_POST:
+    {
+    vis->postvisit_funcall(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_PRIMCALL_PRE:
+    {
+    if (vis->previsit_primcall(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_PRIMCALL_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.prim.arguments);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }     
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_PRIMCALL_POST:
+    {
+    vis->postvisit_primcall(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_FOREIGNCALL_PRE:
+    {
+    if (vis->previsit_primcall(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FOREIGNCALL_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.foreign.arguments);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_FOREIGNCALL_POST:
+    {
+    vis->postvisit_foreigncall(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_IF_PRE:
+    {
+    if (vis->previsit_if(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_IF_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.i.arguments);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_IF_POST:
+    {
+    vis->postvisit_if(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_LAMBDA_PRE:
+    {
+    if (vis->previsit_lambda(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LAMBDA_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.lambda.body);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_LAMBDA_POST:
+    {
+    vis->postvisit_lambda(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_SET_PRE:
+    {
+    if (vis->previsit_set(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_SET_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.set.value);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_SET_POST:
+    {
+    vis->postvisit_set(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_LET_PRE:
+    {
+    if (vis->previsit_let(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LET_BINDINGS), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e->expr->expr.let.bindings);
+      schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+      schemerlicht_expression* expr_rit = expr_it_end - 1;
+      schemerlicht_expression* expr_rit_end = expr_it - 1;
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_LET_BINDINGS:
+    {
+    vis->visit_let_bindings(ctxt, vis, e->expr);
+    schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LET_POST), schemerlicht_visitor_entry);
+    schemerlicht_vector* arg = &(e->expr->expr.let.body);
+    schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
+    schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
+    schemerlicht_expression* expr_rit = expr_it_end - 1;
+    schemerlicht_expression* expr_rit_end = expr_it - 1;
+    for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_LET_POST:
+    {
+    vis->postvisit_let(ctxt, vis, e->expr);
+    break;
+    }
     }
   }
 

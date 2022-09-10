@@ -26,6 +26,7 @@ static void visit_flonum(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
 
 static int previsit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(e);
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
   schemerlicht_string_append_cstr(ctxt, &(d->s), "( begin ");
   return 1;
@@ -33,10 +34,10 @@ static int previsit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
 
 static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(e);
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
   schemerlicht_string_append_cstr(ctxt, &(d->s), ") ");
   }
-
 
 schemerlicht_dump_visitor* schemerlicht_dump_visitor_new(schemerlicht_context* ctxt)
   {
