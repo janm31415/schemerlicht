@@ -39,8 +39,6 @@ typedef struct token
 
 token make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, schemerlicht_string* value);
 token make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value);
-token make_token_flonum(schemerlicht_context* ctxt, int line_nr, int column_nr, schemerlicht_string* value);
-token make_token_fixnum(schemerlicht_context* ctxt, int line_nr, int column_nr, schemerlicht_string* value);
 
 /*
 * return vector contains token types

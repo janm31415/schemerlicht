@@ -98,10 +98,10 @@ schemerlicht_cell schemerlicht_make_nil_sym_cell(schemerlicht_context* ctxt)
 static schemerlicht_cell get_vector(schemerlicht_context* ctxt, schemerlicht_vector* v)
   {
   schemerlicht_cell c;
-  c.type = schemerlicht_ct_vector;  
+  c.type = schemerlicht_ct_vector;
   schemerlicht_cell* it = schemerlicht_vector_begin(v, schemerlicht_cell);
   schemerlicht_cell* it_end = schemerlicht_vector_end(v, schemerlicht_cell);
-  schemerlicht_vector_init_with_size(ctxt, &c.value.vector, (it_end-it), schemerlicht_cell);
+  schemerlicht_vector_init_with_size(ctxt, &c.value.vector, (it_end - it), schemerlicht_cell);
   c.value.vector.vector_size = 0;
   for (; it != it_end; ++it)
     {
@@ -112,7 +112,87 @@ static schemerlicht_cell get_vector(schemerlicht_context* ctxt, schemerlicht_vec
 
 static schemerlicht_cell get_pair(schemerlicht_context* ctxt, schemerlicht_vector* v)
   {
-  return schemerlicht_make_nil_sym_cell(ctxt);
+  int recurse = 1;
+  int iter = 0;
+  schemerlicht_cell global_out;
+  schemerlicht_cell* last_cell = NULL;
+  schemerlicht_cell* it = schemerlicht_vector_begin(v, schemerlicht_cell);
+  schemerlicht_cell* it_end = schemerlicht_vector_end(v, schemerlicht_cell);
+  while (recurse)
+    {
+    recurse = 0;
+    schemerlicht_cell out;
+    size_t sz = cast(size_t, it_end - it);
+    if (sz == 0)
+      out = schemerlicht_make_nil_sym_cell(ctxt);
+    else if (sz == 1)
+      {
+      schemerlicht_cell c;
+      c.type = schemerlicht_ct_pair;
+      schemerlicht_vector_init(ctxt, &c.value.vector, schemerlicht_cell);
+      if (it->type != schemerlicht_ct_pair && it->type != schemerlicht_ct_vector && strcmp(it->value.str.string_ptr, ".") == 0)
+        {
+        schemerlicht_vector_push_back(ctxt, &c.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
+        schemerlicht_string_destroy(ctxt, &it->value.str);
+        }
+      else
+        {
+        schemerlicht_vector_push_back(ctxt, &c.value.vector, *it, schemerlicht_cell);
+        }
+      schemerlicht_vector_push_back(ctxt, &c.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
+      out = c;
+      }
+    else
+      {
+      schemerlicht_cell c;
+      c.type = schemerlicht_ct_pair;
+      schemerlicht_vector_init(ctxt, &c.value.vector, schemerlicht_cell);
+      if (it->type != schemerlicht_ct_pair && it->type != schemerlicht_ct_vector && strcmp(it->value.str.string_ptr, ".") == 0)
+        {
+        schemerlicht_vector_push_back(ctxt, &c.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
+        schemerlicht_string_destroy(ctxt, &it->value.str);
+        }
+      else
+        {
+        schemerlicht_vector_push_back(ctxt, &c.value.vector, *it, schemerlicht_cell);
+        }
+      ++it;
+      schemerlicht_cell* next_it = it;
+      if (it->type != schemerlicht_ct_pair && it->type != schemerlicht_ct_vector && strcmp(it->value.str.string_ptr, ".") == 0)
+        {
+        size_t sz2 = cast(size_t, it_end - it + 1);
+        if (sz2 == 0)
+          {
+          schemerlicht_vector_push_back(ctxt, &c.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
+          }
+        else if (sz2 == 1)
+          {
+          schemerlicht_vector_push_back(ctxt, &c.value.vector, *(it+1), schemerlicht_cell);
+          }
+        else
+          {
+          recurse = 1;
+          next_it = it + 1;
+          }
+        }
+      else
+        recurse = 1;
+      it = next_it;
+      out = c;
+      }
+    if (iter)
+      {
+      schemerlicht_vector_push_back(ctxt, &last_cell->value.vector, out, schemerlicht_cell);
+      last_cell = schemerlicht_vector_back(ctxt, &last_cell->value.vector, schemerlicht_cell);
+      }
+    else
+      {
+      global_out = out;
+      last_cell = &global_out;
+      }
+    ++iter;
+    }
+  return global_out;
   }
 
 static schemerlicht_cell atom(schemerlicht_context* ctxt, token* t)
@@ -123,14 +203,28 @@ static schemerlicht_cell atom(schemerlicht_context* ctxt, token* t)
     {
     schemerlicht_cell c;
     c.type = schemerlicht_ct_fixnum;
-    schemerlicht_string_init(ctxt, &c.value.str, &t->value);
+    schemerlicht_string_init(ctxt, &c.value.str, t->value.string_ptr);
     return c;
     }
     case SCHEMERLICHT_T_FLONUM:
     {
     schemerlicht_cell c;
     c.type = schemerlicht_ct_flonum;
-    schemerlicht_string_init(ctxt, &c.value.str, &t->value);
+    schemerlicht_string_init(ctxt, &c.value.str, t->value.string_ptr);
+    return c;
+    }
+    case SCHEMERLICHT_T_STRING:
+    {
+    schemerlicht_cell c;
+    c.type = schemerlicht_ct_string;
+    schemerlicht_string_init(ctxt, &c.value.str, t->value.string_ptr);
+    return c;
+    }
+    default:
+    {
+    schemerlicht_cell c;
+    c.type = schemerlicht_ct_symbol;
+    schemerlicht_string_init(ctxt, &c.value.str, t->value.string_ptr);
     return c;
     }
     }
@@ -161,10 +255,70 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
     }
   else
     {
-    schemerlicht_cell c = atom(ctxt, *token_it);
-    ++(*token_it);
-    return c;
+    if (quasiquote && ((*token_it)->type == SCHEMERLICHT_T_QUOTE || (*token_it)->type == SCHEMERLICHT_T_BACKQUOTE || (*token_it)->type == SCHEMERLICHT_T_UNQUOTE || (*token_it)->type == SCHEMERLICHT_T_UNQUOTE_SPLICING))
+      {
+      schemerlicht_cell c;
+      c.type = schemerlicht_ct_pair;
+      schemerlicht_cell p1;
+      p1.type = schemerlicht_ct_symbol;
+      switch ((*token_it)->type)
+        {
+        case SCHEMERLICHT_T_QUOTE:
+          schemerlicht_string_init(ctxt, &p1.value.str, "quote"); break;
+        case SCHEMERLICHT_T_BACKQUOTE:
+          schemerlicht_string_init(ctxt, &p1.value.str, "quasiquote"); break;
+        case SCHEMERLICHT_T_UNQUOTE:
+          schemerlicht_string_init(ctxt, &p1.value.str, "unquote"); break;
+        case SCHEMERLICHT_T_UNQUOTE_SPLICING:
+          schemerlicht_string_init(ctxt, &p1.value.str, "unquote-splicing"); break;
+        }
+      schemerlicht_vector_init(ctxt, &c.value.vector, schemerlicht_cell);
+      schemerlicht_vector_push_back(ctxt, &c.value.vector, p1, schemerlicht_cell);
+      schemerlicht_cell p2;
+      p2.type = schemerlicht_ct_pair;
+      schemerlicht_vector_init(ctxt, &p2.value.vector, schemerlicht_cell);
+      ++(*token_it);
+      schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_read_quote(ctxt, token_it, token_it_end, 1), schemerlicht_cell);
+      schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
+      schemerlicht_vector_push_back(ctxt, &c.value.vector, p2, schemerlicht_cell);
+      return c;
+      }
+    else
+      {
+      if ((*token_it)->type == SCHEMERLICHT_T_QUOTE || (*token_it)->type == SCHEMERLICHT_T_BACKQUOTE || (*token_it)->type == SCHEMERLICHT_T_UNQUOTE || (*token_it)->type == SCHEMERLICHT_T_UNQUOTE_SPLICING)
+        {
+        schemerlicht_cell c;
+        c.type = schemerlicht_ct_pair;
+        schemerlicht_cell p1;
+        p1.type = schemerlicht_ct_symbol;
+        switch ((*token_it)->type)
+          {
+          case SCHEMERLICHT_T_QUOTE:
+            schemerlicht_string_init(ctxt, &p1.value.str, "quote"); break;
+          case SCHEMERLICHT_T_BACKQUOTE:
+            schemerlicht_string_init(ctxt, &p1.value.str, "quasiquote"); break;
+          case SCHEMERLICHT_T_UNQUOTE:
+            schemerlicht_string_init(ctxt, &p1.value.str, "unquote"); break;
+          case SCHEMERLICHT_T_UNQUOTE_SPLICING:
+            schemerlicht_string_init(ctxt, &p1.value.str, "unquote-splicing"); break;
+          }
+        schemerlicht_vector_init(ctxt, &c.value.vector, schemerlicht_cell);
+        schemerlicht_vector_push_back(ctxt, &c.value.vector, p1, schemerlicht_cell);
+        schemerlicht_cell p2;
+        p2.type = schemerlicht_ct_pair;
+        schemerlicht_vector_init(ctxt, &p2.value.vector, schemerlicht_cell);
+        ++(*token_it);
+        schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_read_quote(ctxt, token_it, token_it_end, 0), schemerlicht_cell);
+        schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
+        schemerlicht_vector_push_back(ctxt, &c.value.vector, p2, schemerlicht_cell);
+        return c;
+        }
+      else
+        {
+        schemerlicht_cell c = atom(ctxt, *token_it);
+        ++(*token_it);
+        return c;
+        }
+      }
     }
-
-  return schemerlicht_make_nil_sym_cell(ctxt);
   }

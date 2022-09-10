@@ -56,8 +56,28 @@ static void test_read_vector_cells()
   schemerlicht_close(ctxt);
   }
 
+static void test_read_pair_cells_1()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(1 2 3)");
+
+  token* token_it = schemerlicht_vector_begin(&tokens, token);
+  token* token_it_end = schemerlicht_vector_end(&tokens, token);
+
+  schemerlicht_cell c = schemerlicht_read_quote(ctxt, &token_it, &token_it_end, 0);
+
+  TEST_EQ_INT(schemerlicht_ct_pair, c.type);
+  TEST_EQ_INT(2, c.value.vector.vector_size);
+
+  schemerlicht_destroy_cell(ctxt, &c);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_reader_tests()
   {
   test_sym_cells();
   test_read_vector_cells();
+  test_read_pair_cells_1();
   }
