@@ -2,6 +2,7 @@
 #define TEST_ASSERT_H
 
 #include <stdio.h>
+#include <string.h>
 
 extern int testing_fails;
 extern int testing_success;

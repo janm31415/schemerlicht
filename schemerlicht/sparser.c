@@ -261,10 +261,40 @@ static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** toke
 
 static schemerlicht_expression make_primitive_call(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
-  UNUSED(token_it);
-  UNUSED(token_it_end);
-  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  return make_nop();
+  if (*token_it == *token_it_end)
+    {
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    }
+  if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
+    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+  schemerlicht_parsed_primitive_call p;
+  p.as_object = 0;
+  schemerlicht_vector_init(ctxt, &p.arguments, schemerlicht_expression);
+  p.filename = make_empty_string();
+  p.line_nr = (*token_it)->line_nr;
+  p.column_nr = (*token_it)->column_nr;
+  schemerlicht_string_copy(ctxt, &p.name, &((*token_it)->info.value));
+  if (popped_token.type != SCHEMERLICHT_T_LEFT_ROUND_BRACKET)
+    {    
+    token_next(ctxt, token_it, token_it_end);
+    p.as_object = 1;
+    schemerlicht_expression expr;
+    expr.type = schemerlicht_type_primitive_call;
+    expr.expr.prim = p;
+    return expr;
+    }
+  token_next(ctxt, token_it, token_it_end);
+  while (!current_token_equals(token_it, ")"))
+    {
+    schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
+    schemerlicht_vector_push_back(ctxt, &p.arguments, e, schemerlicht_expression);
+    if (*token_it == *token_it_end)
+      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, p.line_nr, p.column_nr, ")");
+    }
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_primitive_call;
+  expr.expr.prim = p;
+  return expr;
   }
 
 static schemerlicht_expression make_set(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
@@ -649,6 +679,58 @@ static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v,
   schemerlicht_vector_destroy(ctxt, &e->expr.beg.arguments);
   schemerlicht_string_destroy(ctxt, &e->expr.beg.filename);
   }
+static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+  schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
+  schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+  }
+static void visit_fixnum(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.fx.filename);
+  }
+static void visit_flonum(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.fl.filename);
+  }
+static void visit_nil(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.nil.filename);
+  }
+static void visit_true(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.t.filename);
+  }
+static void visit_false(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.f.filename);
+  }
+static void visit_nop(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.nop.filename);
+  }
+static void visit_character(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.ch.filename);
+  }
+static void visit_variable(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.var.filename);
+  }
+static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.quote.filename);
+  }
 static void visit_string(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(v);
@@ -661,6 +743,36 @@ static void visit_symbol(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   schemerlicht_string_destroy(ctxt, &(e->expr.lit.lit.sym.value));
   schemerlicht_string_destroy(ctxt, &e->expr.lit.lit.sym.filename);
   }
+static void postvisit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.funcall.filename);
+  }
+static void postvisit_foreigncall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.foreign.filename);
+  }
+static void postvisit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.i.filename);
+  }
+static void postvisit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.set.filename);
+  }
+static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.lambda.filename);
+  }
+static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(v);
+  schemerlicht_string_destroy(ctxt, &e->expr.let.filename);
+  }
 
 typedef struct schemerlicht_program_destroy_visitor
   {
@@ -671,11 +783,27 @@ void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_progr
   {
   schemerlicht_program_destroy_visitor destroyer;
   destroyer.visitor = schemerlicht_visitor_new(ctxt, &destroyer);
-
+  
+  destroyer.visitor->postvisit_program = postvisit_program;  
+  destroyer.visitor->visit_fixnum = visit_fixnum;
+  destroyer.visitor->visit_flonum = visit_flonum;
+  destroyer.visitor->visit_nil = visit_nil;
   destroyer.visitor->visit_string = visit_string;
   destroyer.visitor->visit_symbol = visit_symbol;
-  destroyer.visitor->postvisit_begin = postvisit_begin;
-  destroyer.visitor->postvisit_program = postvisit_program;
+  destroyer.visitor->visit_true = visit_true;
+  destroyer.visitor->visit_false = visit_false;
+  destroyer.visitor->visit_nop = visit_nop;
+  destroyer.visitor->visit_character = visit_character;
+  destroyer.visitor->visit_variable = visit_variable;
+  destroyer.visitor->visit_quote = visit_quote;  
+  destroyer.visitor->postvisit_primcall = postvisit_primcall;  
+  destroyer.visitor->postvisit_funcall = postvisit_funcall;  
+  destroyer.visitor->postvisit_foreigncall = postvisit_foreigncall;  
+  destroyer.visitor->postvisit_begin = postvisit_begin;  
+  destroyer.visitor->postvisit_if = postvisit_if;  
+  destroyer.visitor->postvisit_set = postvisit_set;  
+  destroyer.visitor->postvisit_lambda = postvisit_lambda;
+  destroyer.visitor->postvisit_let = postvisit_let;
   schemerlicht_visit_program(ctxt, destroyer.visitor, p);
 
   destroyer.visitor->destroy(ctxt, destroyer.visitor);
