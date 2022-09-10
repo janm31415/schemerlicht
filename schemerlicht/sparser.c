@@ -367,10 +367,10 @@ static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** t
     token_next(ctxt, token_it, token_it_end);
     }
   schemerlicht_expression begin = make_begin(ctxt, token_it, token_it_end, 1);
-  while (begin.expr.beg.arguments.vector_size == 1 && schemerlicht_vector_at(ctxt, &begin.expr.beg.arguments, 0, schemerlicht_expression)->type == schemerlicht_type_begin)
+  while (begin.expr.beg.arguments.vector_size == 1 && schemerlicht_vector_at(&begin.expr.beg.arguments, 0, schemerlicht_expression)->type == schemerlicht_type_begin)
     {
     schemerlicht_expression tmp = begin;
-    begin = *schemerlicht_vector_at(ctxt, &tmp.expr.beg.arguments, 0, schemerlicht_expression);
+    begin = *schemerlicht_vector_at(&tmp.expr.beg.arguments, 0, schemerlicht_expression);
     schemerlicht_vector_destroy(ctxt, &tmp.expr.beg.arguments);
     schemerlicht_string_destroy(ctxt, &tmp.expr.beg.filename);
     }
@@ -444,10 +444,10 @@ static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** toke
     }
   token_next(ctxt, token_it, token_it_end);
   schemerlicht_expression begin = make_begin(ctxt, token_it, token_it_end, 1);
-  while (begin.expr.beg.arguments.vector_size == 1 && schemerlicht_vector_at(ctxt, &begin.expr.beg.arguments, 0, schemerlicht_expression)->type == schemerlicht_type_begin)
+  while (begin.expr.beg.arguments.vector_size == 1 && schemerlicht_vector_at(&begin.expr.beg.arguments, 0, schemerlicht_expression)->type == schemerlicht_type_begin)
     {
     schemerlicht_expression tmp = begin;
-    begin = *schemerlicht_vector_at(ctxt, &tmp.expr.beg.arguments, 0, schemerlicht_expression);
+    begin = *schemerlicht_vector_at(&tmp.expr.beg.arguments, 0, schemerlicht_expression);
     schemerlicht_vector_destroy(ctxt, &tmp.expr.beg.arguments);
     schemerlicht_string_destroy(ctxt, &tmp.expr.beg.filename);
     }
@@ -783,7 +783,7 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
       schemerlicht_expression output_expr;
       output_expr.type = schemerlicht_type_funcall;
       output_expr.expr.funcall = f;
-      schemerlicht_expression* fun_expr = schemerlicht_vector_at(ctxt, &f.fun, 0, schemerlicht_expression);
+      schemerlicht_expression* fun_expr = schemerlicht_vector_at(&f.fun, 0, schemerlicht_expression);
       if (f.arguments.vector_size == 0 && fun_expr->type == schemerlicht_type_literal)
         {
         // this is a literal, not a function

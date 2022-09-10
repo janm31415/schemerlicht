@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_READER_TESTS_H
+#define SCHEMERLICHT_READER_TESTS_H
+
+void run_all_reader_tests();
+
+#endif //SCHEMERLICHT_READER_TESTS_H

@@ -2,6 +2,7 @@ set(HDRS
 dump_tests.h
 map_tests.h
 parser_tests.h
+reader_tests.h
 stream_tests.h
 string_tests.h
 test_assert.h
@@ -13,6 +14,7 @@ set(SRCS
 dump_tests.c
 map_tests.c
 parser_tests.c
+reader_tests.c
 stream_tests.c
 string_tests.c
 test.c

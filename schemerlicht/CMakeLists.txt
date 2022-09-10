@@ -8,6 +8,7 @@ smap.h
 smemory.h
 sobject.h
 sparser.h
+sreader.h
 sstream.h
 sstring.h
 stoken.h
@@ -23,6 +24,7 @@ smap.c
 smemory.c
 sobject.c
 sparser.c
+sreader.c
 sstream.c
 sstring.c
 stoken.c

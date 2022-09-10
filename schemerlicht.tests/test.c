@@ -2,6 +2,7 @@
 #include "dump_tests.h"
 #include "map_tests.h"
 #include "parser_tests.h"
+#include "reader_tests.h"
 #include "stream_tests.h"
 #include "string_tests.h"
 #include "token_tests.h"
@@ -19,6 +20,7 @@ int main(int argc, const char* argv[])
   run_all_dump_tests();
   run_all_map_tests();
   run_all_parser_tests();
+  run_all_reader_tests();
   run_all_stream_tests();
   run_all_string_tests();
   run_all_token_tests();
