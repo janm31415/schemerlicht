@@ -10,6 +10,7 @@
 #define SCHEMERLICHT_ERROR_EXPECTED_KEYWORD 5
 #define SCHEMERLICHT_ERROR_RUNERROR 6
 #define SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS 7
+#define SCHEMERLICHT_ERROR_INVALID_ARGUMENT 8
 
 void schemerlicht_throw(schemerlicht_context* ctxt, int errorcode);
 void schemerlicht_throw_parser(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr);

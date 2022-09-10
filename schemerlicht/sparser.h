@@ -212,6 +212,7 @@ typedef struct schemerlicht_parsed_let
 typedef struct schemerlicht_parsed_lambda
   {
   int line_nr, column_nr;
+  int variable_arity;
   int tail_position; // true if expr is in tail position. boolean is set by tail_call_analysis.  
   schemerlicht_string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
   schemerlicht_vector body;
