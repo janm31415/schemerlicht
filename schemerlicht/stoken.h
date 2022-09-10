@@ -28,17 +28,10 @@ enum token_type
   SCHEMERLICHT_T_ID
   };
 
-typedef union 
-  {
-  schemerlicht_flonum flonum;
-  schemerlicht_fixnum fixnum;
-  schemerlicht_string value;
-  } semantics_info;
-
 
 typedef struct token 
   {
-  semantics_info info;
+  schemerlicht_string value;
   int type;
   int line_nr;
   int column_nr;
@@ -46,8 +39,8 @@ typedef struct token
 
 token make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, schemerlicht_string* value);
 token make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value);
-token make_token_flonum(int line_nr, int column_nr, schemerlicht_flonum value);
-token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value);
+token make_token_flonum(schemerlicht_context* ctxt, int line_nr, int column_nr, schemerlicht_string* value);
+token make_token_fixnum(schemerlicht_context* ctxt, int line_nr, int column_nr, schemerlicht_string* value);
 
 /*
 * return vector contains token types

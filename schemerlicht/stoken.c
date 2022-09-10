@@ -72,7 +72,7 @@ token make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_n
   t.type = type;
   t.line_nr = line_nr;
   t.column_nr = column_nr;
-  schemerlicht_string_init(ctxt, &t.info.value, value->string_ptr);
+  schemerlicht_string_init(ctxt, &t.value, value->string_ptr);
   return t;
   }
 
@@ -82,27 +82,27 @@ token make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int col
   t.type = type;
   t.line_nr = line_nr;
   t.column_nr = column_nr;
-  schemerlicht_string_init(ctxt, &t.info.value, value);
+  schemerlicht_string_init(ctxt, &t.value, value);
   return t;
   }
 
-token make_token_flonum(int line_nr, int column_nr, schemerlicht_flonum value)
+token make_token_flonum(schemerlicht_context* ctxt, int line_nr, int column_nr, schemerlicht_string* value)
   {
   token t;
   t.type = SCHEMERLICHT_T_FLONUM;
   t.line_nr = line_nr;
   t.column_nr = column_nr;
-  t.info.flonum = value;
+  schemerlicht_string_init(ctxt, &t.value, value->string_ptr);
   return t;
   }
 
-token make_token_fixnum(int line_nr, int column_nr, schemerlicht_fixnum value)
+token make_token_fixnum(schemerlicht_context* ctxt, int line_nr, int column_nr, schemerlicht_string* value)
   {
   token t;
   t.type = SCHEMERLICHT_T_FIXNUM;
   t.line_nr = line_nr;
   t.column_nr = column_nr;
-  t.info.fixnum = value;
+  schemerlicht_string_init(ctxt, &t.value, value->string_ptr);
   return t;
   }
 
@@ -171,15 +171,13 @@ static void treat_buffer(schemerlicht_context* ctxt, schemerlicht_string* buff, 
     if (is_number(&is_real, &is_scientific, buff->string_ptr))
       {
       if (is_real)
-        {
-        schemerlicht_flonum value = to_flonum(buff->string_ptr);
-        token t = make_token_flonum(line_nr, column_nr - (int)buff->string_length, value);
+        {        
+        token t = make_token_flonum(ctxt, line_nr, column_nr - (int)buff->string_length, buff);
         schemerlicht_vector_push_back(ctxt, tokens, t, token);
         }
       else
         {
-        schemerlicht_fixnum value = to_fixnum(buff->string_ptr);
-        token t = make_token_fixnum(line_nr, column_nr - (int)buff->string_length, value);
+        token t = make_token_fixnum(ctxt, line_nr, column_nr - (int)buff->string_length, buff);
         schemerlicht_vector_push_back(ctxt, tokens, t, token);
         }
       }
@@ -444,9 +442,9 @@ void destroy_tokens_vector(schemerlicht_context* ctxt, schemerlicht_vector* toke
   token* it_end = schemerlicht_vector_end(tokens, token);
   for (; it != it_end; ++it)
     {
-    if (it->type != SCHEMERLICHT_T_FLONUM && it->type != SCHEMERLICHT_T_FIXNUM)
+    //if (it->type != SCHEMERLICHT_T_FLONUM && it->type != SCHEMERLICHT_T_FIXNUM)
       {
-      schemerlicht_string_destroy(ctxt, &it->info.value);
+      schemerlicht_string_destroy(ctxt, &it->value);
       }
     }
   schemerlicht_vector_destroy(ctxt, tokens);

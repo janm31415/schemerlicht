@@ -77,7 +77,7 @@ static void tokenize_string()
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_ID, schemerlicht_vector_at(&tokens, 1, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_STRING, schemerlicht_vector_at(&tokens, 2, token)->type);  
-  schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->info.value;
+  schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->value;
   TEST_EQ_INT(15, s.string_length);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 3, token)->type);
   destroy_tokens_vector(ctxt, &tokens);
@@ -106,7 +106,7 @@ static void tokenize_string_w_escape_chars()
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_ID, schemerlicht_vector_at(&tokens, 1, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_STRING, schemerlicht_vector_at(&tokens, 2, token)->type);
-  schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->info.value;
+  schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->value;
   TEST_EQ_INT(13, s.string_length);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 3, token)->type);
   destroy_tokens_vector(ctxt, &tokens);
@@ -121,7 +121,7 @@ static void tokenize_string_w_escape_chars_2()
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_ID, schemerlicht_vector_at(&tokens, 1, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_STRING, schemerlicht_vector_at(&tokens, 2, token)->type);
-  schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->info.value;
+  schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->value;
   TEST_EQ_INT(9, s.string_length);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 3, token)->type);
   destroy_tokens_vector(ctxt, &tokens);

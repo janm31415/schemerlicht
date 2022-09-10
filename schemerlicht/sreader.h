@@ -4,6 +4,7 @@
 #include "schemerlicht.h"
 #include "svector.h"
 #include "sstring.h"
+#include "stoken.h"
 
 enum schemerlicht_cell_type
   {
@@ -30,8 +31,10 @@ int schemerlicht_cell_equals(const schemerlicht_cell* left, const schemerlicht_c
 
 void schemerlicht_destroy_cell(schemerlicht_context* ctxt, schemerlicht_cell* c);
 
-schemerlicht_cell make_false_sym_cell(schemerlicht_context* ctxt);
-schemerlicht_cell make_true_sym_cell(schemerlicht_context* ctxt);
-schemerlicht_cell make_nil_sym_cell(schemerlicht_context* ctxt);
+schemerlicht_cell schemerlicht_make_false_sym_cell(schemerlicht_context* ctxt);
+schemerlicht_cell schemerlicht_make_true_sym_cell(schemerlicht_context* ctxt);
+schemerlicht_cell schemerlicht_make_nil_sym_cell(schemerlicht_context* ctxt);
+
+schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** token_it, token** token_it_end, int quasiquote);
 
 #endif //SCHEMERLICHT_READER_H
