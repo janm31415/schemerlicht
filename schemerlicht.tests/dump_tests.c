@@ -62,9 +62,30 @@ static void dump_primcall()
   schemerlicht_close(ctxt);
   }
 
+
+static void dump_if()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(if (> 2 3) 1.5  8.9)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( if ( > 2 3 ) 1.500000 8.900000 ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_dump_tests()
   {
   dump_fixnum();
   dump_begin();
   dump_primcall();
+  dump_if();
   }
