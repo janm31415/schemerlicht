@@ -8,7 +8,7 @@
 static void dump_fixnum()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "5");
+  schemerlicht_vector tokens = script2tokens(ctxt, "(begin 5 3.14)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);

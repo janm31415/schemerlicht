@@ -1,5 +1,6 @@
 #include "scontext.h"
 #include "smemory.h"
+#include "sparser.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {
@@ -26,6 +27,7 @@ schemerlicht_context* schemerlicht_open()
     get_value(g->dummy_node)->type = schemerlicht_object_type_nil;
     g->dummy_node->next = NULL;
     g->main_context = ctxt;
+    g->expression_map = generate_expression_map(ctxt);
     ctxt->error_jmp = NULL;
     }
   return ctxt;
@@ -34,6 +36,7 @@ schemerlicht_context* schemerlicht_open()
 void schemerlicht_close(schemerlicht_context* ctxt)
   {
   ctxt = ctxt->global->main_context;
+  schemerlicht_map_free(ctxt, ctxt->global->expression_map);
   schemerlicht_free(ctxt, ctxt->global, sizeof(schemerlicht_global_context));
   context_free(NULL, ctxt);
   }

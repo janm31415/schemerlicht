@@ -1,6 +1,209 @@
 #include "svisitor.h"
 #include "smemory.h"
 
+static int previsit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(p);
+  return 1;
+  }
+static void postvisit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(p);
+  }
+static int previsit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_fixnum(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_flonum(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_nil(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_string(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_symbol(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_true(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_false(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_nop(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_character(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_variable(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_foreigncall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_foreigncall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void visit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+
 static schemerlicht_visitor_entry make_entry(schemerlicht_expression* e, enum schemerlicht_visitor_entry_type t)
   {
   schemerlicht_visitor_entry entry;
@@ -22,38 +225,38 @@ schemerlicht_visitor* schemerlicht_visitor_new(schemerlicht_context* ctxt, void*
   {
   schemerlicht_visitor* v = schemerlicht_new(ctxt, schemerlicht_visitor);
   v->impl = impl;
-  v->previsit_program = NULL;
-  v->postvisit_program = NULL;
-  v->previsit_expression = NULL;
-  v->postvisit_expression = NULL;
-  v->visit_fixnum = NULL;
-  v->visit_flonum = NULL;
-  v->visit_nil = NULL;
-  v->visit_string = NULL;
-  v->visit_symbol = NULL;
-  v->visit_true = NULL;
-  v->visit_false = NULL;
-  v->visit_nop = NULL;
-  v->visit_character = NULL;
-  v->visit_variable = NULL;
-  v->visit_quote = NULL;
-  v->previsit_primcall = NULL;
-  v->postvisit_primcall = NULL;
-  v->previsit_funcall = NULL;
-  v->postvisit_funcall = NULL;
-  v->previsit_foreigncall = NULL;
-  v->postvisit_foreigncall = NULL;
-  v->previsit_begin = NULL;
-  v->postvisit_begin = NULL;
-  v->previsit_if = NULL;
-  v->postvisit_if = NULL;
-  v->previsit_set = NULL;
-  v->postvisit_set = NULL;
-  v->previsit_lambda = NULL;
-  v->postvisit_lambda = NULL;
-  v->previsit_let = NULL;
-  v->visit_let_bindings = NULL;
-  v->postvisit_let = NULL;
+  v->previsit_program = previsit_program;
+  v->postvisit_program = postvisit_program;
+  v->previsit_expression = previsit_expression;
+  v->postvisit_expression = postvisit_expression;
+  v->visit_fixnum = visit_fixnum;
+  v->visit_flonum = visit_flonum;
+  v->visit_nil = visit_nil;
+  v->visit_string = visit_string;
+  v->visit_symbol = visit_symbol;
+  v->visit_true = visit_true;
+  v->visit_false = visit_false;
+  v->visit_nop = visit_nop;
+  v->visit_character = visit_character;
+  v->visit_variable = visit_variable;
+  v->visit_quote = visit_quote;
+  v->previsit_primcall = previsit_primcall;
+  v->postvisit_primcall = postvisit_primcall;
+  v->previsit_funcall = previsit_funcall;
+  v->postvisit_funcall = postvisit_funcall;
+  v->previsit_foreigncall = previsit_foreigncall;
+  v->postvisit_foreigncall = postvisit_foreigncall;
+  v->previsit_begin = previsit_begin;
+  v->postvisit_begin = postvisit_begin;
+  v->previsit_if = previsit_if;
+  v->postvisit_if = postvisit_if;
+  v->previsit_set = previsit_set;
+  v->postvisit_set = postvisit_set;
+  v->previsit_lambda = previsit_lambda;
+  v->postvisit_lambda = postvisit_lambda;
+  v->previsit_let = previsit_let;
+  v->visit_let_bindings = visit_let_bindings;
+  v->postvisit_let = postvisit_let;
 
   v->destroy = destroy;
   schemerlicht_vector_init(ctxt, &(v->v), schemerlicht_visitor_entry);
@@ -66,7 +269,7 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     {
     case SCHEMERLICHT_VISITOR_EXPRESSION_PRE:
     {
-    if (vis->previsit_expression != NULL && vis->previsit_expression(ctxt, vis, e->expr))
+    if (vis->previsit_expression(ctxt, vis, e->expr))
       {
       schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_EXPRESSION_POST), schemerlicht_visitor_entry);
       switch (e->expr->type)
@@ -124,13 +327,12 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_EXPRESSION_POST:
     {
-    if (vis->postvisit_expression)
-      vis->postvisit_expression(ctxt, vis, e->expr);
+    vis->postvisit_expression(ctxt, vis, e->expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_BEGIN_PRE:
     {
-    if (vis->previsit_begin != NULL && vis->previsit_begin(ctxt, vis, e->expr))
+    if (vis->previsit_begin(ctxt, vis, e->expr))
       {
       schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_BEGIN_POST), schemerlicht_visitor_entry);
       schemerlicht_vector* arg = &(e->expr->expr.beg.arguments);
@@ -138,15 +340,16 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
       schemerlicht_expression* expr_rit_end = expr_it - 1;
-      for (; expr_rit != expr_rit_end; --expr_rit)
+      for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
+        {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
       }
     break;
     }
     case SCHEMERLICHT_VISITOR_BEGIN_POST:
     {
-    if (vis->postvisit_begin)
-      vis->postvisit_begin(ctxt, vis, e->expr);
+    vis->postvisit_begin(ctxt, vis, e->expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_LITERAL:
@@ -155,32 +358,26 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     switch (lit->type)
       {
       case schemerlicht_type_fixnum:
-        if (vis->visit_fixnum != NULL)
-          vis->visit_fixnum(ctxt, vis, e->expr);
+        vis->visit_fixnum(ctxt, vis, e->expr);
         break;
       case schemerlicht_type_flonum:
-        if (vis->visit_flonum != NULL)
-          vis->visit_flonum(ctxt, vis, e->expr);
+        vis->visit_flonum(ctxt, vis, e->expr);
         break;
       case schemerlicht_type_character:
-        if (vis->visit_character != NULL)
-          vis->visit_character(ctxt, vis, e->expr);
+        vis->visit_character(ctxt, vis, e->expr);
         break;
       case schemerlicht_type_false:
         if (vis->visit_false != NULL)
           vis->visit_false(ctxt, vis, e->expr);
         break;
       case schemerlicht_type_true:
-        if (vis->visit_true != NULL)
-          vis->visit_true(ctxt, vis, e->expr);
+        vis->visit_true(ctxt, vis, e->expr);
         break;
       case schemerlicht_type_string:
-        if (vis->visit_string != NULL)
-          vis->visit_string(ctxt, vis, e->expr);
+        vis->visit_string(ctxt, vis, e->expr);
         break;
       case schemerlicht_type_symbol:
-        if (vis->visit_symbol != NULL)
-          vis->visit_symbol(ctxt, vis, e->expr);
+        vis->visit_symbol(ctxt, vis, e->expr);
         break;
       }
     break;
@@ -207,7 +404,7 @@ void schemerlicht_visit_expression(schemerlicht_context* ctxt, schemerlicht_visi
 
 void schemerlicht_visit_program(schemerlicht_context* ctxt, schemerlicht_visitor* vis, schemerlicht_program* p)
   {
-  if (vis->previsit_program != NULL && vis->previsit_program(ctxt, vis, p))
+  if (vis->previsit_program(ctxt, vis, p))
     {
     schemerlicht_expression* expr_it = schemerlicht_vector_begin(&p->expressions, schemerlicht_expression);
     schemerlicht_expression* expr_it_end = schemerlicht_vector_end(&p->expressions, schemerlicht_expression);
@@ -219,7 +416,6 @@ void schemerlicht_visit_program(schemerlicht_context* ctxt, schemerlicht_visitor
       schemerlicht_vector_push_back(ctxt, &(vis->v), e, schemerlicht_visitor_entry);
       }
     visit(ctxt, vis);
-    if (vis->postvisit_program != NULL)
-      vis->postvisit_program(ctxt, vis, p);
+    vis->postvisit_program(ctxt, vis, p);
     }
   }

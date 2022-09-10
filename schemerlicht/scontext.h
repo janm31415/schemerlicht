@@ -20,6 +20,7 @@ typedef struct schemerlicht_global_context
   {
   schemerlicht_map_node dummy_node[1]; //common node array for all empty tables
   schemerlicht_context* main_context;
+  schemerlicht_map* expression_map;
   } schemerlicht_global_context; 
 
 // per thread state

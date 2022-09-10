@@ -4,6 +4,7 @@
 #include "schemerlicht.h"
 #include "sstring.h"
 #include "svector.h"
+#include "smap.h"
 
 #define schemerlicht_type_fixnum 0
 #define schemerlicht_type_flonum 1
@@ -263,4 +264,7 @@ typedef struct schemerlicht_program
 
 SCHEMERLICHT_API schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vector* tokens);
 SCHEMERLICHT_API void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_program* p);
+
+schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt);
+
 #endif // SCHEMERLICHT_PARSER_H
