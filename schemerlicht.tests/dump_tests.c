@@ -82,10 +82,31 @@ static void dump_if()
   schemerlicht_close(ctxt);
   }
 
+
+static void dump_variable()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define x 7)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( define x 7 ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_dump_tests()
   {
   dump_fixnum();
   dump_begin();
   dump_primcall();
   dump_if();
+  dump_variable();
   }

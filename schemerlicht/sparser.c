@@ -335,10 +335,22 @@ static schemerlicht_expression make_set(schemerlicht_context* ctxt, token** toke
 
 static schemerlicht_expression make_variable(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
-  UNUSED(token_it);
-  UNUSED(token_it_end);
-  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  return make_nop();
+  if (*token_it == *token_it_end)
+    {
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    }
+  if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
+    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+  schemerlicht_parsed_variable v;  
+  v.filename = make_empty_string();
+  v.line_nr = (*token_it)->line_nr;
+  v.column_nr = (*token_it)->column_nr;
+  schemerlicht_string_copy(ctxt, &v.name, &((*token_it)->info.value));
+  token_next(ctxt, token_it, token_it_end);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_variable;
+  expr.expr.var = v;
+  return expr;
   }
 
 static schemerlicht_expression make_fun(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
@@ -354,8 +366,6 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
   if (*token_it == *token_it_end)
     {
     schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
-    //*token_it = *token_it_end;
-    //return make_nop();
     }
   switch (current_token_type(token_it, token_it_end))
     {
@@ -517,7 +527,7 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
 static enum schemerlicht_expression_type find_current_expression_type(schemerlicht_context* ctxt, token** token_it)
   {
   schemerlicht_object* obj = schemerlicht_map_get_string(ctxt->global->expression_map, (*token_it)->info.value.string_ptr);
-  if (obj->type == schemerlicht_object_type_nil)
+  if (obj == NULL || obj->type == schemerlicht_object_type_nil)
     return schemerlicht_et_funcall_or_variable;
   schemerlicht_assert(obj->type == schemerlicht_object_type_fixnum);
   return obj->value.fx;
