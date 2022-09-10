@@ -41,11 +41,23 @@ int CloseTestEngine(int force_report);
     ++testing_success; \
     }
 
+#define TestEqString(expval, val, file, line, func) \
+  if (strcmp(expval, val) != 0) \
+    { \
+    TestFail(expval, val, file, line, func); \
+    } \
+  else \
+    { \
+    ++testing_success; \
+    }
+
 #ifdef _WIN32
 #define TEST_EQ_INT(exp, val) TestEqInt(exp, val, __FILE__, __LINE__, __FUNCTION__)
 #define TEST_EQ_DOUBLE(exp, val) TestEqDouble(exp, val, __FILE__, __LINE__, __FUNCTION__)
+#define TEST_EQ_STRING(exp, val) TestEqString(exp, val, __FILE__, __LINE__, __FUNCTION__)
 #else
 #define TEST_EQ_INT(exp, val) TestEqInt(exp, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
 #define TEST_EQ_DOUBLE(exp, val) TestEqDouble(exp, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define TEST_EQ_STRING(exp, val) TestEqString(exp, val, __FILE__, __LINE__, __PRETTY_FUNCTION__)
 #endif
 #endif // TEST_ASSERT_H
