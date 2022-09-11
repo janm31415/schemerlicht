@@ -160,14 +160,15 @@ static schemerlicht_cell get_pair(schemerlicht_context* ctxt, schemerlicht_vecto
       schemerlicht_cell* next_it = it;
       if (it->type != schemerlicht_ct_pair && it->type != schemerlicht_ct_vector && strcmp(it->value.str.string_ptr, ".") == 0)
         {
-        size_t sz2 = cast(size_t, it_end - it + 1);
+        schemerlicht_string_destroy(ctxt, &it->value.str);
+        size_t sz2 = cast(size_t, it_end - (it + 1));
         if (sz2 == 0)
           {
           schemerlicht_vector_push_back(ctxt, &c.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
           }
         else if (sz2 == 1)
           {
-          schemerlicht_vector_push_back(ctxt, &c.value.vector, *(it+1), schemerlicht_cell);
+          schemerlicht_vector_push_back(ctxt, &c.value.vector, *(it + 1), schemerlicht_cell);
           }
         else
           {
@@ -250,6 +251,7 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
       c = get_vector(ctxt, &items);
     else
       c = get_pair(ctxt, &items);
+    ++(*token_it);
     schemerlicht_vector_destroy(ctxt, &items);
     return c;
     }
@@ -320,5 +322,70 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
         return c;
         }
       }
+    }
+  }
+
+void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_cell* c, schemerlicht_string* s)
+  {
+  switch (c->type)
+    {
+    case schemerlicht_ct_fixnum:
+    case schemerlicht_ct_flonum:
+    case schemerlicht_ct_string:
+    case schemerlicht_ct_symbol:
+      schemerlicht_string_append(ctxt, s, &c->value.str);
+      break;
+    case schemerlicht_ct_vector:
+    {
+    schemerlicht_string_append_cstr(ctxt, s, "#(");
+    schemerlicht_cell* it = schemerlicht_vector_begin(&c->value.vector, schemerlicht_cell);
+    schemerlicht_cell* it_end = schemerlicht_vector_end(&c->value.vector, schemerlicht_cell);
+    for (; it != it_end; ++it)
+      {
+      schemerlicht_dump_cell_to_string(ctxt, it, s);
+      if (it + 1 != it_end)
+        schemerlicht_string_append_cstr(ctxt, s, " ");
+      }
+    schemerlicht_string_append_cstr(ctxt, s, ")");
+    break;
+    }
+    case schemerlicht_ct_pair:
+    {
+    if (c->value.vector.vector_size == 0)
+      {
+      schemerlicht_string_append_cstr(ctxt, s, "()");
+      break;
+      }
+    schemerlicht_string_push_back(ctxt, s, '(');
+    schemerlicht_cell* p0 = schemerlicht_vector_at(&c->value.vector, 0, schemerlicht_cell);
+    schemerlicht_cell* p1 = schemerlicht_vector_at(&c->value.vector, 1, schemerlicht_cell);
+    schemerlicht_dump_cell_to_string(ctxt, p0, s);
+    if (p1->type == schemerlicht_ct_pair)
+      {
+      while ((p1->type == schemerlicht_ct_pair) &&
+        !schemerlicht_cell_equals(p1, &ctxt->global->nil_sym) &&
+        (schemerlicht_vector_at(&p1->value.vector, 1, schemerlicht_cell)->type == schemerlicht_ct_pair))
+        {
+        schemerlicht_string_push_back(ctxt, s, ' ');
+        schemerlicht_dump_cell_to_string(ctxt, schemerlicht_vector_at(&p1->value.vector, 0, schemerlicht_cell), s);
+        p1 = schemerlicht_vector_at(&p1->value.vector, 1, schemerlicht_cell);
+        }
+      if (!schemerlicht_cell_equals(p1, &ctxt->global->nil_sym))
+        {
+        schemerlicht_string_push_back(ctxt, s, ' ');
+        schemerlicht_dump_cell_to_string(ctxt, schemerlicht_vector_at(&p1->value.vector, 0, schemerlicht_cell), s);
+        schemerlicht_string_append_cstr(ctxt, s, " . ");
+        schemerlicht_dump_cell_to_string(ctxt, schemerlicht_vector_at(&p1->value.vector, 1, schemerlicht_cell), s);
+        }
+      schemerlicht_string_push_back(ctxt, s, ')');
+      }
+    else
+      {
+      schemerlicht_string_append_cstr(ctxt, s, " . ");
+      schemerlicht_dump_cell_to_string(ctxt, p1, s);
+      schemerlicht_string_push_back(ctxt, s, ')');
+      }
+    break;
+    }
     }
   }
