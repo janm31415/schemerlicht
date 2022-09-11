@@ -1,5 +1,6 @@
 #include "sdump.h"
 #include "smemory.h"
+#include "sreader.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -120,9 +121,16 @@ static void visit_variable(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   }
 static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
-  UNUSED(ctxt);
-  UNUSED(v);
-  UNUSED(e);
+  schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
+  switch (e->expr.quote.qt)
+    {
+    case schemerlicht_qt_quote: schemerlicht_string_append_cstr(ctxt, &(d->s), "( quote "); break;
+    case schemerlicht_qt_backquote: schemerlicht_string_append_cstr(ctxt, &(d->s), "( quasiquote "); break;
+    case schemerlicht_qt_unquote: schemerlicht_string_append_cstr(ctxt, &(d->s), "( unquote "); break;
+    case schemerlicht_qt_unquote_splicing: schemerlicht_string_append_cstr(ctxt, &(d->s), "( unquote-splicing "); break;
+    }
+  schemerlicht_dump_cell_to_string(ctxt, &e->expr.quote.arg, &(d->s));
+  schemerlicht_string_append_cstr(ctxt, &(d->s), " ) ");
   }
 static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {

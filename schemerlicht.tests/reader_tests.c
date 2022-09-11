@@ -103,19 +103,19 @@ static void test_dump_cell(const char* script)
 
 void run_all_reader_tests()
   {
-  //test_sym_cells();
-  //test_read_vector_cells();
-  //test_read_pair_cells_1();
-  //test_dump_cell("(1 2 3)");
-  //test_dump_cell("#(1 2 3)");
-  //test_dump_cell("#t");
-  //test_dump_cell("#f");
-  //test_dump_cell("()");
-  //test_dump_cell("30531");
-  //test_dump_cell("3.14");
-  //test_dump_cell("(1 2 3 4 5)");
-  //test_dump_cell("(#(2 1) 4)");
-  //test_dump_cell("(1 2 #(2 1) 4 5)");
-  //test_dump_cell("(1 . 2)");
-  test_dump_cell("(1 2 #(2 1) . 4 5)");
+  test_sym_cells();
+  test_read_vector_cells();
+  test_read_pair_cells_1();
+  test_dump_cell("(1 2 3)");
+  test_dump_cell("#(1 2 3)");
+  test_dump_cell("#t");
+  test_dump_cell("#f");
+  test_dump_cell("()");
+  test_dump_cell("30531");
+  test_dump_cell("3.14");
+  test_dump_cell("(1 2 3 4 5)");
+  test_dump_cell("(#(2 1) 4)");
+  test_dump_cell("(1 2 #(2 1) 4 5)");
+  test_dump_cell("(1 . 2)");
+  test_dump_cell("(1 2 #(2 1) . #(4 5))");
   }

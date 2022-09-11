@@ -196,6 +196,43 @@ static void dump_let_2()
   schemerlicht_close(ctxt);
   }
 
+static void dump_let_3()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 5]) x) ");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( let ( [ x 5 ] ) ( begin x ) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void dump_let_4()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let () 12)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( let ( ) ( begin 12 ) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
 
 static void dump_foreign()
   {
@@ -216,6 +253,82 @@ static void dump_foreign()
   schemerlicht_close(ctxt);
   }
 
+static void dump_quote()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "'(a b c)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( quote (a b c) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void dump_quasiquote()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "`(a b c)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( quasiquote (a b c) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void dump_quasiquote_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "`(list ,(+ 1 2) 4)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( quasiquote (list (unquote (+ 1 2)) 4) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void dump_quasiquote_3()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "`(a ,(+ 1 2) ,@(map abs '(4 -5 6)) b)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+
+  TEST_EQ_STRING("( quasiquote (a (unquote (+ 1 2)) (unquote-splicing (map abs (quote (4 -5 6)))) b) ) ", dumper->s.string_ptr);
+
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_dump_tests()
   {
   dump_fixnum();
@@ -228,5 +341,11 @@ void run_all_dump_tests()
   dump_lambda_nested_begins();
   dump_let();
   dump_let_2();
+  dump_let_3();
+  dump_let_4();
   dump_foreign();
+  dump_quote();
+  dump_quasiquote();
+  dump_quasiquote_2();
+  dump_quasiquote_3();
   }

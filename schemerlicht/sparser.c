@@ -186,34 +186,86 @@ static schemerlicht_expression make_begin(schemerlicht_context* ctxt, token** to
 
 static schemerlicht_expression make_quote(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
-  UNUSED(token_it);
-  UNUSED(token_it_end);
-  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  return make_nop();
+  if (*token_it == *token_it_end)    
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+  if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_QUOTE)    
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "'");
+  schemerlicht_parsed_quote q;
+  q.line_nr = (*token_it)->line_nr;
+  q.column_nr = (*token_it)->column_nr;
+  q.filename = make_empty_string();
+  q.qt = schemerlicht_qt_quote;
+  if ((strcmp((*token_it)->value.string_ptr, "quote") != 0) && (strcmp((*token_it)->value.string_ptr, "'") != 0))
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+  token_next(ctxt, token_it, token_it_end);
+  q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 0);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = q;
+  return expr;
   }
 
 static schemerlicht_expression make_quasiquote(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
-  UNUSED(token_it);
-  UNUSED(token_it_end);
-  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  return make_nop();
+  if (*token_it == *token_it_end)
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+  if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_BACKQUOTE)
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "`");
+  schemerlicht_parsed_quote q;
+  q.line_nr = (*token_it)->line_nr;
+  q.column_nr = (*token_it)->column_nr;
+  q.filename = make_empty_string();
+  q.qt = schemerlicht_qt_backquote;
+  if ((strcmp((*token_it)->value.string_ptr, "quasiquote") != 0) && (strcmp((*token_it)->value.string_ptr, "`") != 0))
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+  token_next(ctxt, token_it, token_it_end);
+  q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = q;
+  return expr;
   }
 
 static schemerlicht_expression make_unquote(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
-  UNUSED(token_it);
-  UNUSED(token_it_end);
-  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  return make_nop();
+  if (*token_it == *token_it_end)
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+  if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_UNQUOTE)
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ",");
+  schemerlicht_parsed_quote q;
+  q.line_nr = (*token_it)->line_nr;
+  q.column_nr = (*token_it)->column_nr;
+  q.filename = make_empty_string();
+  q.qt = schemerlicht_qt_unquote;
+  if ((strcmp((*token_it)->value.string_ptr, "unquote") != 0) && (strcmp((*token_it)->value.string_ptr, ",") != 0))
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+  token_next(ctxt, token_it, token_it_end);
+  q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = q;
+  return expr;
   }
 
 static schemerlicht_expression make_unquote_splicing(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
-  UNUSED(token_it);
-  UNUSED(token_it_end);
-  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  return make_nop();
+  if (*token_it == *token_it_end)
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+  if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_UNQUOTE_SPLICING)
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ",@");
+  schemerlicht_parsed_quote q;
+  q.line_nr = (*token_it)->line_nr;
+  q.column_nr = (*token_it)->column_nr;
+  q.filename = make_empty_string();
+  q.qt = schemerlicht_qt_unquote_splicing;
+  if ((strcmp((*token_it)->value.string_ptr, "unquote-splicing") != 0) && (strcmp((*token_it)->value.string_ptr, ",@") != 0))
+    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+  token_next(ctxt, token_it, token_it_end);
+  q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = q;
+  return expr;
   }
 
 static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
@@ -982,6 +1034,7 @@ static void visit_variable(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
 static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(v);
+  schemerlicht_destroy_cell(ctxt, &e->expr.quote.arg);
   schemerlicht_string_destroy(ctxt, &e->expr.quote.filename);
   }
 static void visit_string(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)

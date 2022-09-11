@@ -5,6 +5,7 @@
 #include "sstring.h"
 #include "svector.h"
 #include "smap.h"
+#include "sreader.h"
 
 #define schemerlicht_type_fixnum 0
 #define schemerlicht_type_flonum 1
@@ -182,11 +183,21 @@ typedef struct schemerlicht_parsed_case
   schemerlicht_string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
   } schemerlicht_parsed_case;
 
+enum schemerlicht_quote_type
+  {
+  schemerlicht_qt_quote,
+  schemerlicht_qt_backquote,
+  schemerlicht_qt_unquote,
+  schemerlicht_qt_unquote_splicing
+  };
+
 typedef struct schemerlicht_parsed_quote
   {
   int line_nr, column_nr;
   int tail_position; // true if expr is in tail position. boolean is set by tail_call_analysis.  
   schemerlicht_string filename; // the name of the file where this expression is read (if load is used, empty otherwise)
+  enum schemerlicht_quote_type qt;
+  schemerlicht_cell arg;
   } schemerlicht_parsed_quote;
 
 enum schemerlicht_binding_type
