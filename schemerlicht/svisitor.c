@@ -404,6 +404,9 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
       case schemerlicht_type_symbol:
         vis->visit_symbol(ctxt, vis, e->expr);
         break;
+      case schemerlicht_type_nil:
+        vis->visit_nil(ctxt, vis, e->expr);
+        break;
       }
     break;
     }
