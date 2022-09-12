@@ -197,6 +197,8 @@ static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   schemerlicht_string* it_end = schemerlicht_vector_end(&(l->variables), schemerlicht_string);
   for (; it != it_end; ++it)
     {
+    if (l->variable_arity && (it + 1) == it_end)
+      schemerlicht_string_append_cstr(ctxt, &(d->s), ". ");    
     schemerlicht_string_append(ctxt, &(d->s), it);
     schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     }

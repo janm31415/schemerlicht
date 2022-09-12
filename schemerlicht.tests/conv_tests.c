@@ -84,7 +84,7 @@ static void test_convert_define_5()
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( set! foo ( lambda ( x ) ( begin ( * x x ) ) ) ) ", dumper->s.string_ptr);
+  TEST_EQ_STRING("( set! f ( lambda ( . x ) ( begin ( apply + x ) ) ) ) ( f 1 2 3 4 5 ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
 
   destroy_tokens_vector(ctxt, &tokens);
@@ -151,6 +151,6 @@ void run_all_conv_tests()
   test_convert_define_2();
   test_convert_define_3();
   test_convert_define_4();
-  //test_convert_define_5();
+  test_convert_define_5();
   test_convert_define_6();
   }
