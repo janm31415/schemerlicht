@@ -1147,6 +1147,36 @@ void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_progr
   destroyer.visitor->destroy(ctxt, destroyer.visitor);
   }
 
+void schemerlicht_expression_destroy(schemerlicht_context* ctxt, schemerlicht_expression* e)
+  {
+  schemerlicht_program_destroy_visitor destroyer;
+  destroyer.visitor = schemerlicht_visitor_new(ctxt, &destroyer);
+
+  destroyer.visitor->postvisit_program = postvisit_program;
+  destroyer.visitor->visit_fixnum = visit_fixnum;
+  destroyer.visitor->visit_flonum = visit_flonum;
+  destroyer.visitor->visit_nil = visit_nil;
+  destroyer.visitor->visit_string = visit_string;
+  destroyer.visitor->visit_symbol = visit_symbol;
+  destroyer.visitor->visit_true = visit_true;
+  destroyer.visitor->visit_false = visit_false;
+  destroyer.visitor->visit_nop = visit_nop;
+  destroyer.visitor->visit_character = visit_character;
+  destroyer.visitor->visit_variable = visit_variable;
+  destroyer.visitor->visit_quote = visit_quote;
+  destroyer.visitor->postvisit_primcall = postvisit_primcall;
+  destroyer.visitor->postvisit_funcall = postvisit_funcall;
+  destroyer.visitor->postvisit_foreigncall = postvisit_foreigncall;
+  destroyer.visitor->postvisit_begin = postvisit_begin;
+  destroyer.visitor->postvisit_if = postvisit_if;
+  destroyer.visitor->postvisit_set = postvisit_set;
+  destroyer.visitor->postvisit_lambda = postvisit_lambda;
+  destroyer.visitor->postvisit_let = postvisit_let;
+  schemerlicht_visit_expression(ctxt, destroyer.visitor, e);
+
+  destroyer.visitor->destroy(ctxt, destroyer.visitor);
+  }
+
 static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, enum schemerlicht_expression_type value)
   {
   schemerlicht_object* obj = schemerlicht_map_insert_string(ctxt, m, str);
@@ -1339,5 +1369,21 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
     schemerlicht_expression expr;
     expr.type = schemerlicht_type_let;
     expr.expr.let = *l;
+    return expr;
+    }
+
+  schemerlicht_expression schemerlicht_make_lambda_expression(schemerlicht_parsed_lambda* l)
+    {
+    schemerlicht_expression expr;
+    expr.type = schemerlicht_type_lambda;
+    expr.expr.lambda = *l;
+    return expr;
+    }
+
+  schemerlicht_expression schemerlicht_make_begin_expression(schemerlicht_parsed_begin* b)
+    {
+    schemerlicht_expression expr;
+    expr.type = schemerlicht_type_begin;
+    expr.expr.beg = *b;
     return expr;
     }

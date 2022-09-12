@@ -56,16 +56,56 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_express
       f = first_arg->expr.funcall;
     else
       {
-      f.filename = make_null_string();
+      f.filename = make_null_string();      
       schemerlicht_vector_init(ctxt, &f.fun, schemerlicht_expression);
       schemerlicht_parsed_variable v;
       v.filename = make_null_string();
       v.name = first_arg->expr.prim.name;
       schemerlicht_expression e = schemerlicht_make_variable_expression(&v);
       schemerlicht_vector_push_back(ctxt, &f.fun, e, schemerlicht_expression);
-
+      f.arguments = first_arg->expr.prim.arguments;
+      schemerlicht_string_destroy(ctxt, &first_arg->expr.prim.filename);
       }
-    assert(0); // todo
+    schemerlicht_expression* var = schemerlicht_vector_at(&f.fun, 0, schemerlicht_expression);
+    if (var->type != schemerlicht_type_variable)
+      schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr);
+    schemerlicht_parsed_lambda lam;
+    schemerlicht_vector_init(ctxt, &lam.body, schemerlicht_expression);
+    schemerlicht_vector_init(ctxt, &lam.variables, schemerlicht_string);
+    schemerlicht_vector_init(ctxt, &lam.free_variables, schemerlicht_string);
+    schemerlicht_vector_init(ctxt, &lam.assignable_variables, schemerlicht_string);
+    lam.filename = make_null_string();
+    if (f.arguments.vector_size >= 2 && schemerlicht_vector_at(&f.arguments, f.arguments.vector_size-2, schemerlicht_expression)->type == schemerlicht_type_literal)
+      {
+      assert(0);
+      }
+    else
+      {
+      schemerlicht_expression* it = schemerlicht_vector_begin(&f.arguments, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&f.arguments, schemerlicht_expression);
+      for (; it != it_end; ++it)
+        {
+        if (!is_name(it))
+          schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr);
+        schemerlicht_vector_push_back(ctxt, &lam.variables, get_name(ctxt, it), schemerlicht_string);
+        schemerlicht_expression_destroy(ctxt, it);
+        }
+      }
+    schemerlicht_parsed_begin beg;
+    schemerlicht_vector_init(ctxt, &beg.arguments, schemerlicht_expression);
+    beg.filename = make_null_string();
+    schemerlicht_expression* it = schemerlicht_vector_begin(&beg.arguments, schemerlicht_expression);
+    schemerlicht_expression* p_it = schemerlicht_vector_begin(&expr->expr.prim.arguments, schemerlicht_expression) + 1;
+    schemerlicht_expression* p_it_end = schemerlicht_vector_end(&expr->expr.prim.arguments, schemerlicht_expression);
+    schemerlicht_vector_insert(ctxt, &beg.arguments, &it, &p_it, &p_it_end, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &lam.body, schemerlicht_make_begin_expression(&beg), schemerlicht_expression);
+    expr->expr.prim.arguments.vector_size = 0;
+    schemerlicht_vector_push_back(ctxt, &expr->expr.prim.arguments, *var, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &expr->expr.prim.arguments, schemerlicht_make_lambda_expression(&lam), schemerlicht_expression);
+    
+    schemerlicht_string_destroy(ctxt, &f.filename);
+    schemerlicht_vector_destroy(ctxt, &f.fun);
+    schemerlicht_vector_destroy(ctxt, &f.arguments);
     }
   }
 

@@ -293,6 +293,7 @@ typedef struct schemerlicht_program
 
 SCHEMERLICHT_API schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vector* tokens);
 SCHEMERLICHT_API void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_program* p);
+SCHEMERLICHT_API void schemerlicht_expression_destroy(schemerlicht_context* ctxt, schemerlicht_expression* e);
 
 schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt);
 
@@ -305,5 +306,7 @@ typedef struct schemerlicht_let_binding
 
 schemerlicht_expression schemerlicht_make_variable_expression(schemerlicht_parsed_variable* v);
 schemerlicht_expression schemerlicht_make_let_expression(schemerlicht_parsed_let* l);
+schemerlicht_expression schemerlicht_make_lambda_expression(schemerlicht_parsed_lambda* l);
+schemerlicht_expression schemerlicht_make_begin_expression(schemerlicht_parsed_begin* b);
 
 #endif // SCHEMERLICHT_PARSER_H
