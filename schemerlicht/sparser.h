@@ -312,5 +312,7 @@ schemerlicht_expression schemerlicht_make_literal_expression(schemerlicht_litera
 
 schemerlicht_expression schemerlicht_init_let(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_begin(schemerlicht_context* ctxt);
+schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt);
+schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt);
 
 #endif // SCHEMERLICHT_PARSER_H

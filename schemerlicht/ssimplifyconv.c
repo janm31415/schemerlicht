@@ -72,7 +72,18 @@ static schemerlicht_expression make_var(schemerlicht_context* ctxt, const char* 
   expr.expr.var = v;
   return expr;
   }
-
+/*
+static schemerlicht_expression make_var_string(schemerlicht_context* ctxt, schemerlicht_string* s)
+  {
+  schemerlicht_parsed_variable v;
+  v.filename = make_null_string();
+  v.name = *s;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_variable;
+  expr.expr.var = v;
+  return expr;
+  }
+*/
 static void convert_and(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
    /*
@@ -160,6 +171,60 @@ static void convert_or(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
     }
   }
 
+static void convert_letrec(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_letrec);
+  /*
+   (letrec([x1 e1] ...[xn en]) body)
+
+   becomes:
+   (let([x1 undefined] ...[xn undefined])
+   (let([t1 e1] ...[tn en])
+   (set! x1 t1)
+   ...
+   (set! xn tn))
+   body)
+   */
+  schemerlicht_expression internal_let = schemerlicht_init_let(ctxt);
+  schemerlicht_expression internal_begin = schemerlicht_init_begin(ctxt);
+  schemerlicht_let_binding* it = schemerlicht_vector_begin(&e->expr.let.bindings, schemerlicht_let_binding);
+  schemerlicht_let_binding* it_end = schemerlicht_vector_end(&e->expr.let.bindings, schemerlicht_let_binding);
+  char buffer[20];
+  for (; it != it_end; ++it)
+    {   
+    memset(buffer, 0, 20 * sizeof(char));
+    sprintf(buffer, "%lld", cast(schemerlicht_simplify_to_core_forms_visitor*, v->impl)->letrec_index);
+    schemerlicht_string str;
+    schemerlicht_string_init(ctxt, &str, "#%t");
+    schemerlicht_string_append_cstr(ctxt, &str, buffer);
+    schemerlicht_let_binding b;
+    b.binding_name = str;
+    b.binding_expr = it->binding_expr;
+    schemerlicht_vector_push_back(ctxt, &internal_let.expr.let.bindings, b, schemerlicht_let_binding);
+    schemerlicht_expression set = schemerlicht_init_set(ctxt);
+    schemerlicht_string_copy(ctxt, &set.expr.set.name, &it->binding_name);
+    schemerlicht_vector_push_back(ctxt, &set.expr.set.value, make_var(ctxt, str.string_ptr), schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &internal_begin.expr.beg.arguments, set, schemerlicht_expression);
+    it->binding_expr = schemerlicht_init_nop(ctxt);
+    ++(cast(schemerlicht_simplify_to_core_forms_visitor*, v->impl)->letrec_index);
+    }
+  schemerlicht_vector_push_back(ctxt, &internal_let.expr.let.body, internal_begin, schemerlicht_expression);
+  schemerlicht_expression* beg = schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression);
+  schemerlicht_assert(beg->type == schemerlicht_type_begin);
+  schemerlicht_vector_push_front(ctxt, &beg->expr.beg.arguments, internal_let, schemerlicht_expression);
+  e->expr.let.bt = schemerlicht_bt_let;
+  }
+
+static void convert_let_star(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_let_star);
+  }
+
+static void convert_named_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->expr.let.named_let);
+  }
+
 static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   switch (e->type)
@@ -175,6 +240,19 @@ static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visito
         }
       break;
     case schemerlicht_type_let:
+      switch (e->expr.let.bt)
+        {
+        case schemerlicht_bt_letrec:
+          convert_letrec(ctxt, v, e);
+          break;
+        case schemerlicht_bt_let_star:
+          convert_let_star(ctxt, v, e);
+          break;
+        }
+      if (e->expr.let.named_let)
+        {
+        convert_named_let(ctxt, v, e);
+        }
       break;
     case schemerlicht_type_cond:
       break;

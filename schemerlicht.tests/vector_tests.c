@@ -96,6 +96,25 @@ static void test_push_back()
   schemerlicht_close(ctxt);
   }
 
+static void test_push_front()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector v;
+  schemerlicht_vector_init(ctxt, &v, double);
+  TEST_EQ_INT(0, v.vector_size);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
+  schemerlicht_vector_push_front(ctxt, &v, 7.0, double);
+  TEST_EQ_INT(1, v.vector_size);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
+  schemerlicht_vector_push_front(ctxt, &v, 9.0, double);
+  TEST_EQ_INT(2, v.vector_size);
+  TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
+  TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_at(&v, 0, double));
+  TEST_EQ_DOUBLE(7.0, *schemerlicht_vector_at(&v, 1, double));
+  schemerlicht_vector_destroy(ctxt, &v);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_push_back_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -388,4 +407,5 @@ void run_all_vector_tests()
   test_erase_2();
   test_insert();
   test_insert_2();
+  test_push_front();
   }

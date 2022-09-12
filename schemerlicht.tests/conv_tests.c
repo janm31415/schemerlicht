@@ -246,6 +246,23 @@ static void simplify_to_core_conversion_or_3()
   schemerlicht_close(ctxt);
   }
 
+static void simplify_to_core_conversion_letrec()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(letrec ([f (lambda () 5)]) (- 20 (f)))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( let ( [ f #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( ) ( begin 5 ) ) ] ) ( begin ( set! f #%t0 ) ) ) ( - 20 ( f ) ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -262,4 +279,5 @@ void run_all_conv_tests()
   simplify_to_core_conversion_or();
   simplify_to_core_conversion_or_2();
   simplify_to_core_conversion_or_3();
+  simplify_to_core_conversion_letrec();
   }

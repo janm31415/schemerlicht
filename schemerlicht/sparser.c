@@ -460,6 +460,32 @@ schemerlicht_expression schemerlicht_init_begin(schemerlicht_context* ctxt)
   return expr;
   }
 
+schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_set s;
+  s.filename = make_null_string();
+  s.name = make_null_string();
+  s.line_nr = -1;
+  s.column_nr = -1;
+  schemerlicht_vector_init(ctxt, &s.value, schemerlicht_expression);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_set;
+  expr.expr.set = s;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_nop n;
+  n.filename = make_null_string();
+  n.line_nr = -1;
+  n.column_nr = -1;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_nop;
+  expr.expr.nop = n;
+  return expr;
+  }
+
 static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** token_it, token** token_it_end, enum schemerlicht_binding_type bt)
   {
   if (*token_it == *token_it_end)    
