@@ -429,6 +429,37 @@ static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** t
   return expr;
   }
 
+schemerlicht_expression schemerlicht_init_let(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_let l;
+  l.filename = make_null_string();
+  l.line_nr = -1;
+  l.column_nr = -1;
+  l.bt = schemerlicht_bt_let;
+  l.named_let = 0;
+  l.let_name = make_null_string();
+  schemerlicht_vector_init(ctxt, &l.bindings, schemerlicht_let_binding);
+  schemerlicht_vector_init(ctxt, &l.body, schemerlicht_expression);
+  schemerlicht_vector_init(ctxt, &l.assignable_variables, schemerlicht_string);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_let;
+  expr.expr.let = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_begin(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_begin b;
+  b.filename = make_null_string();
+  b.line_nr = -1;
+  b.column_nr = -1;
+  schemerlicht_vector_init(ctxt, &b.arguments, schemerlicht_expression);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_begin;
+  expr.expr.beg = b;
+  return expr;
+  }
+
 static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** token_it, token** token_it_end, enum schemerlicht_binding_type bt)
   {
   if (*token_it == *token_it_end)    

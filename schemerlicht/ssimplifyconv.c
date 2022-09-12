@@ -62,6 +62,17 @@ static schemerlicht_expression make_if(schemerlicht_context* ctxt, schemerlicht_
   return expr;
   }
 
+static schemerlicht_expression make_var(schemerlicht_context* ctxt, const char* name)
+  {
+  schemerlicht_parsed_variable v;
+  v.filename = make_null_string();
+  schemerlicht_string_init(ctxt, &v.name, name);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_variable;
+  expr.expr.var = v;
+  return expr;
+  }
+
 static void convert_and(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
    /*
@@ -102,6 +113,53 @@ static void convert_and(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
     }
   }
 
+static void convert_or(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  /*
+   (or expr ...)
+
+   If no exprs are provided, then result is #f.
+   If a single expr is provided, then it is in tail position, so the results of the or expression are the results of the expr.
+   Otherwise, the first expr is evaluated. If it produces a value other than #f, that result is the result of the or expression. Otherwise, the result is the same as an or expression with the remaining exprs in tail position with respect to the original or form.
+   */
+  schemerlicht_assert(strcmp(e->expr.prim.name.string_ptr, "or") == 0);
+  if (e->expr.prim.arguments.vector_size == 0)
+    {
+    schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
+    *e = make_false();
+    }
+  else if (e->expr.prim.arguments.vector_size == 1)
+    {
+    schemerlicht_expression expr = *schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression);
+    schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
+    *e = expr;
+    }
+  else
+    {
+    schemerlicht_expression l = schemerlicht_init_let(ctxt);
+    schemerlicht_expression beg = schemerlicht_init_begin(ctxt);
+    schemerlicht_let_binding binding;
+    schemerlicht_string_init(ctxt, &binding.binding_name, "#%x");
+    binding.binding_expr = *schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &l.expr.let.bindings, binding, schemerlicht_let_binding);
+
+    schemerlicht_expression a = make_var(ctxt, "#%x");
+    schemerlicht_expression b = make_var(ctxt, "#%x");
+    schemerlicht_expression c = make_primitive_call(ctxt, "or", schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression) + 1, schemerlicht_vector_end(&e->expr.prim.arguments, schemerlicht_expression));
+    schemerlicht_vector_push_back(ctxt, &beg.expr.beg.arguments, make_if(ctxt, &a, &b, &c), schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &l.expr.let.body, beg, schemerlicht_expression);
+    schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
+    *e = l;
+    schemerlicht_visit_expression(ctxt, v, e);
+    }
+  }
+
 static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   switch (e->type)
@@ -110,6 +168,10 @@ static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visito
       if (strcmp(e->expr.prim.name.string_ptr, "and")==0)
         {
         convert_and(ctxt, v, e);
+        }
+      else if (strcmp(e->expr.prim.name.string_ptr, "or") == 0)
+        {
+        convert_or(ctxt, v, e);
         }
       break;
     case schemerlicht_type_let:
