@@ -4,6 +4,7 @@
 #include "schemerlicht/stoken.h"
 #include "schemerlicht/sbegconv.h"
 #include "schemerlicht/sdefconv.h"
+#include "schemerlicht/ssimplifyconv.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -143,6 +144,57 @@ static void test_single_begin_conv_2()
   schemerlicht_close(ctxt);
   }
 
+static void simplify_to_core_conversion_and()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(and)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("#t ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void simplify_to_core_conversion_and_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(and 3)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("3 ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void simplify_to_core_conversion_and_3()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(and 3 4)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( if 3 4 #f ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -153,4 +205,7 @@ void run_all_conv_tests()
   test_convert_define_4();
   test_convert_define_5();
   test_convert_define_6();
+  simplify_to_core_conversion_and();
+  simplify_to_core_conversion_and_2();
+  simplify_to_core_conversion_and_3();
   }

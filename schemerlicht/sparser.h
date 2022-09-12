@@ -308,5 +308,6 @@ schemerlicht_expression schemerlicht_make_variable_expression(schemerlicht_parse
 schemerlicht_expression schemerlicht_make_let_expression(schemerlicht_parsed_let* l);
 schemerlicht_expression schemerlicht_make_lambda_expression(schemerlicht_parsed_lambda* l);
 schemerlicht_expression schemerlicht_make_begin_expression(schemerlicht_parsed_begin* b);
+schemerlicht_expression schemerlicht_make_literal_expression(schemerlicht_literal* l);
 
 #endif // SCHEMERLICHT_PARSER_H

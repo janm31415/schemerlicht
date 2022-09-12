@@ -1387,3 +1387,11 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
     expr.expr.beg = *b;
     return expr;
     }
+
+  schemerlicht_expression schemerlicht_make_literal_expression(schemerlicht_literal* l)
+    {
+    schemerlicht_expression expr;
+    expr.type = schemerlicht_type_literal;
+    expr.expr.lit = *l;
+    return expr;
+    }

@@ -11,6 +11,7 @@ smemory.h
 sobject.h
 sparser.h
 sreader.h
+ssimplifyconv.h
 sstream.h
 sstring.h
 stoken.h
@@ -29,6 +30,7 @@ smemory.c
 sobject.c
 sparser.c
 sreader.c
+ssimplifyconv.c
 sstream.c
 sstring.c
 stoken.c
