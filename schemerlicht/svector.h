@@ -47,4 +47,9 @@ typedef struct schemerlicht_vector
 #define schemerlicht_vector_back(ctxt, vec, element_type) \
   (cast(element_type*, (vec)->vector_ptr) + ((vec)->vector_size - 1))
 
+#define schemerlicht_vector_erase(ctxt, vec, iterator, element_type) \
+  { element_type* it_end_obfuscate_asdfasdfds = (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size); \
+  memmove(iterator, iterator+1, (size_t)(it_end_obfuscate_asdfasdfds-iterator-1)*sizeof(element_type)); }\
+  --((vec)->vector_size)
+
 #endif //SCHEMERLICHT_VECTOR_H

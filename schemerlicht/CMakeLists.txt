@@ -1,6 +1,8 @@
 set(HDRS
+sbegconv.h
 schemerlicht.h
 scontext.h
+sdefconv.h
 sdump.h
 serror.h
 slimits.h
@@ -17,7 +19,9 @@ svisitor.h
 )
 	
 set(SRCS
+sbegconv.c
 scontext.c
+sdefconv.c
 sdump.c
 serror.c
 smap.c
