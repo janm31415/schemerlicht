@@ -477,7 +477,7 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_FOREIGNCALL_PRE:
     {
-    if (vis->previsit_primcall(ctxt, vis, e->expr))
+    if (vis->previsit_foreigncall(ctxt, vis, e->expr))
       {
       schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FOREIGNCALL_POST), schemerlicht_visitor_entry);
       schemerlicht_vector* arg = &(e->expr->expr.foreign.arguments);

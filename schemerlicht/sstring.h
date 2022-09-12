@@ -43,4 +43,6 @@ SCHEMERLICHT_API void schemerlicht_string_append_cstr(schemerlicht_context* ctxt
 
 SCHEMERLICHT_API void schemerlicht_string_clear(schemerlicht_string* str);
 
+SCHEMERLICHT_API schemerlicht_string make_null_string();
+
 #endif // SCHEMERLICHT_STRING_H

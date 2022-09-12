@@ -77,9 +77,7 @@ void schemerlicht_single_begin_conversion(schemerlicht_context* ctxt, schemerlic
   if (program->expressions.vector_size > 1)
     {
     schemerlicht_parsed_begin b;
-    b.filename.string_capacity = 0;
-    b.filename.string_length = 0;
-    b.filename.string_ptr = NULL;
+    b.filename = make_null_string();
     b.arguments = program->expressions;
     program->expressions.vector_ptr = NULL;
     program->expressions.vector_size = 0;
@@ -90,6 +88,8 @@ void schemerlicht_single_begin_conversion(schemerlicht_context* ctxt, schemerlic
     expr.expr.beg = b;
     schemerlicht_vector_push_back(ctxt, &program->expressions, expr, schemerlicht_expression);
     }
+
+  schemerlicht_assert(program->expressions.vector_size <= 1);  
   }
 
 void schemerlicht_remove_nested_begin_expressions(schemerlicht_context* ctxt, schemerlicht_program* program)

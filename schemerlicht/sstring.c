@@ -114,3 +114,12 @@ void schemerlicht_string_clear(schemerlicht_string* str)
     str->string_length = 0;
     }
   }
+
+schemerlicht_string make_null_string()
+  {
+  schemerlicht_string s;
+  s.string_capacity = 0;
+  s.string_length = 0;
+  s.string_ptr = NULL;
+  return s;
+  }

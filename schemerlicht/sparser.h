@@ -302,4 +302,8 @@ typedef struct schemerlicht_let_binding
   schemerlicht_expression binding_expr;
   } schemerlicht_let_binding;
 
+
+schemerlicht_expression schemerlicht_make_variable_expression(schemerlicht_parsed_variable* v);
+schemerlicht_expression schemerlicht_make_let_expression(schemerlicht_parsed_let* l);
+
 #endif // SCHEMERLICHT_PARSER_H
