@@ -18,8 +18,33 @@ static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v,
     if (it->type == schemerlicht_type_begin)
       {
       schemerlicht_parsed_begin* b2 = &it->expr.beg;
-      assert(0); // todo
+      schemerlicht_expression* it2 = schemerlicht_vector_begin(&b2->arguments, schemerlicht_expression);
+      schemerlicht_expression* it2_end = schemerlicht_vector_end(&b2->arguments, schemerlicht_expression);
+      schemerlicht_vector_erase(ctxt, &b->arguments, &it, schemerlicht_expression);
+      schemerlicht_vector_insert(ctxt, &b->arguments, &it, &it2, &it2_end, schemerlicht_expression);
       }
+    else
+      ++it;
+    }
+  }
+
+static void postvisit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
+  {
+  UNUSED(v);
+  schemerlicht_expression* it = schemerlicht_vector_begin(&p->expressions, schemerlicht_expression);
+  schemerlicht_expression* it_end = schemerlicht_vector_end(&p->expressions, schemerlicht_expression);
+  while (it != it_end)
+    {
+    if (it->type == schemerlicht_type_begin)
+      {
+      schemerlicht_parsed_begin* b2 = &it->expr.beg;
+      schemerlicht_expression* it2 = schemerlicht_vector_begin(&b2->arguments, schemerlicht_expression);
+      schemerlicht_expression* it2_end = schemerlicht_vector_end(&b2->arguments, schemerlicht_expression);
+      schemerlicht_vector_erase(ctxt, &p->expressions, &it, schemerlicht_expression);
+      schemerlicht_vector_insert(ctxt, &p->expressions, &it, &it2, &it2_end, schemerlicht_expression);
+      }
+    else
+      ++it;
     }
   }
 
@@ -28,6 +53,7 @@ static schemerlicht_remove_nested_begin_visitor* schemerlicht_remove_nested_begi
   schemerlicht_remove_nested_begin_visitor* v = schemerlicht_new(ctxt, schemerlicht_remove_nested_begin_visitor);
   v->visitor = schemerlicht_visitor_new(ctxt, v); 
   v->visitor->postvisit_begin = postvisit_begin;  
+  v->visitor->postvisit_program = postvisit_program;
   return v;
   }
 
