@@ -23,7 +23,25 @@ static void test_single_begin_conv()
   schemerlicht_close(ctxt);
   }
 
+static void test_single_begin_conv_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(begin (define x 5)) (begin (begin (define y 6)))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( begin ( define x 5 ) ( define y 6 ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
+  test_single_begin_conv_2();
   }
