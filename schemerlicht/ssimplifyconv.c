@@ -238,6 +238,43 @@ static void convert_let_star(schemerlicht_context* ctxt, schemerlicht_visitor* v
 static void convert_named_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->expr.let.named_let);
+  schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_let);
+  /*
+   (let <variable 0> ([<variable 1> <init 1>] ...) <body>)
+   ==
+   ((letrec ([<variable 0> (lambda (<variable 1> ...) <body>)]) <variable 0>) <init 1> ...)
+   */
+  schemerlicht_expression lambda = schemerlicht_init_lambda(ctxt);
+  schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+  schemerlicht_vector_destroy(ctxt, &lambda.expr.lambda.body);
+  lambda.expr.lambda.body = e->expr.let.body;
+  schemerlicht_let_binding* it = schemerlicht_vector_begin(&e->expr.let.bindings, schemerlicht_let_binding);
+  schemerlicht_let_binding* it_end = schemerlicht_vector_end(&e->expr.let.bindings, schemerlicht_let_binding);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_vector_push_back(ctxt, &lambda.expr.lambda.variables, it->binding_name, schemerlicht_string);
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, it->binding_expr, schemerlicht_expression);
+    }
+
+  schemerlicht_expression letr = schemerlicht_init_let(ctxt);
+  letr.expr.let.bt = schemerlicht_bt_letrec;
+  schemerlicht_let_binding bind;
+  bind.binding_name = e->expr.let.let_name;
+  bind.binding_expr = lambda;
+  schemerlicht_vector_push_back(ctxt, &letr.expr.let.bindings, bind, schemerlicht_let_binding);
+  schemerlicht_expression beg = schemerlicht_init_begin(ctxt);
+  schemerlicht_vector_push_back(ctxt, &beg.expr.beg.arguments, make_var(ctxt, e->expr.let.let_name.string_ptr), schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &letr.expr.let.body, beg, schemerlicht_expression);
+  
+  convert_letrec(ctxt, v, &letr);
+
+  schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, letr, schemerlicht_expression);  
+  
+  schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables);
+  schemerlicht_vector_destroy(ctxt, &e->expr.let.bindings);
+  schemerlicht_string_destroy(ctxt, &e->expr.let.filename);  
+
+  *e = f;
   }
 
 static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)

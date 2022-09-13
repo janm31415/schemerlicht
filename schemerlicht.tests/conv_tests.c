@@ -295,7 +295,7 @@ static void simplify_to_core_conversion_named_let()
 
   schemerlicht_string_clear(&dumper->s);
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( define ( number->list n ) ( let loop ( [ n n ] [ acc ( quote () ) ] ) ( begin ( if ( < n 10 ) ( cons n acc ) ( loop ( quotient n 10 ) ( cons ( remainder n 10 ) acc ) ) ) ) ) ) ", dumper->s.string_ptr);
+  TEST_EQ_STRING("( define ( number->list n ) ( ( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( n acc ) ( begin ( if ( < n 10 ) ( cons n acc ) ( loop ( quotient n 10 ) ( cons ( remainder n 10 ) acc ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) loop ) ) n ( quote () ) ) ) ", dumper->s.string_ptr);
 
   schemerlicht_dump_visitor_free(ctxt, dumper);
 

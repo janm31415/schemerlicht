@@ -460,6 +460,37 @@ schemerlicht_expression schemerlicht_init_begin(schemerlicht_context* ctxt)
   return expr;
   }
 
+schemerlicht_expression schemerlicht_init_lambda(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_lambda l;
+  l.filename = make_null_string();
+  l.line_nr = -1;
+  l.column_nr = -1;
+  l.variable_arity = 0;
+  schemerlicht_vector_init(ctxt, &l.body, schemerlicht_expression);
+  schemerlicht_vector_init(ctxt, &l.variables, schemerlicht_string);
+  schemerlicht_vector_init(ctxt, &l.free_variables, schemerlicht_string);
+  schemerlicht_vector_init(ctxt, &l.assignable_variables, schemerlicht_string);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_lambda;
+  expr.expr.lambda = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_funcall f;
+  f.filename = make_null_string();
+  f.line_nr = -1;
+  f.column_nr = -1;
+  schemerlicht_vector_init(ctxt, &f.fun, schemerlicht_expression);
+  schemerlicht_vector_init(ctxt, &f.arguments, schemerlicht_expression);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_funcall;
+  expr.expr.funcall = f;
+  return expr;
+  }
+
 schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_set s;
