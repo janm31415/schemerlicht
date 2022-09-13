@@ -5,6 +5,7 @@
 #include "schemerlicht/begconv.h"
 #include "schemerlicht/defconv.h"
 #include "schemerlicht/simplifyconv.h"
+#include "schemerlicht/tailcall.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -280,7 +281,6 @@ static void simplify_to_core_conversion_let_star()
   schemerlicht_close(ctxt);
   }
 
-
 static void simplify_to_core_conversion_named_let()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -299,6 +299,31 @@ static void simplify_to_core_conversion_named_let()
 
   schemerlicht_dump_visitor_free(ctxt, dumper);
 
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void tail_call_analysis()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define fact (lambda (x) (if (= x 0) 1 ( * x ( fact (- x 1))))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(0, only_tails);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+static void tail_call_analysis_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define fact (lambda (x) (define fact-tail (lambda (x accum) (if (= x 0) accum (fact-tail (- x 1) (* x accum))))) (fact-tail x 1) ) )");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(1, only_tails);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -323,4 +348,6 @@ void run_all_conv_tests()
   simplify_to_core_conversion_letrec();
   simplify_to_core_conversion_let_star();
   simplify_to_core_conversion_named_let();
+  tail_call_analysis();
+  tail_call_analysis_2();
   }

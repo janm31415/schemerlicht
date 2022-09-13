@@ -56,7 +56,7 @@ typedef struct schemerlicht_vector
 #define schemerlicht_vector_end(vec, element_type) \
   (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size)
 
-#define schemerlicht_vector_back(ctxt, vec, element_type) \
+#define schemerlicht_vector_back(vec, element_type) \
   (cast(element_type*, (vec)->vector_ptr) + ((vec)->vector_size - 1))
 
 #define schemerlicht_vector_erase(ctxt, vec, iterator, element_type) \

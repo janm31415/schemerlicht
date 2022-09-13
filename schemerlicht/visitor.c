@@ -713,7 +713,7 @@ static void visit(schemerlicht_context* ctxt, schemerlicht_visitor* vis)
   {
   while (vis->v.vector_size > 0)
     {
-    schemerlicht_visitor_entry* e = schemerlicht_vector_back(ctxt, &(vis->v), schemerlicht_visitor_entry);
+    schemerlicht_visitor_entry* e = schemerlicht_vector_back(&(vis->v), schemerlicht_visitor_entry);
     schemerlicht_vector_pop_back(&(vis->v));
     visit_entry(ctxt, vis, e);
     }

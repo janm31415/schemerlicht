@@ -223,7 +223,7 @@ static void test_back()
   schemerlicht_vector_push_back(ctxt, &v, 9.0, double);
   TEST_EQ_INT(2, v.vector_size);
   TEST_EQ_INT(MINSIZEVECTOR, v.vector_capacity);
-  TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_back(ctxt, &v, double));
+  TEST_EQ_DOUBLE(9.0, *schemerlicht_vector_back(&v, double));
   schemerlicht_vector_destroy(ctxt, &v);
   schemerlicht_close(ctxt);
   }

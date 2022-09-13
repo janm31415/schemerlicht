@@ -184,7 +184,7 @@ static schemerlicht_cell get_pair(schemerlicht_context* ctxt, schemerlicht_vecto
     if (iter)
       {
       schemerlicht_vector_push_back(ctxt, &last_cell->value.vector, out, schemerlicht_cell);
-      last_cell = schemerlicht_vector_back(ctxt, &last_cell->value.vector, schemerlicht_cell);
+      last_cell = schemerlicht_vector_back(&last_cell->value.vector, schemerlicht_cell);
       }
     else
       {
