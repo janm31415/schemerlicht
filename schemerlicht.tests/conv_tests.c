@@ -405,6 +405,42 @@ static void cps_4()
 static void cps_5()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(f 1 2 3)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 1 2 3 ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(1, only_tails);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void cps_6()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(f 1 (g 2) 3)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( let ( [ #%k1 f ] ) ( begin ( let ( [ #%k6 g ] ) ( begin ( #%k6 ( lambda ( #%k3 ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 1 #%k3 3 ) ) ) 2 ) ) ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(1, only_tails);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void cps_50()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(+ 22 (f x) 33 (g y))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_continuation_passing_style(ctxt, &prog);
@@ -445,4 +481,6 @@ void run_all_conv_tests()
   cps_2();
   cps_3();
   cps_4();
+  cps_5();
+  cps_6();
   }
