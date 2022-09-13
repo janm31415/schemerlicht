@@ -438,7 +438,7 @@ static void cps_6()
   schemerlicht_close(ctxt);
   }
 
-static void cps_50()
+static void cps_7()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "(+ 22 (f x) 33 (g y))");
@@ -483,4 +483,5 @@ void run_all_conv_tests()
   cps_4();
   cps_5();
   cps_6();
+  cps_7();
   }
