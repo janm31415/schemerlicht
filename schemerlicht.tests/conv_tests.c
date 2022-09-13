@@ -263,7 +263,6 @@ static void simplify_to_core_conversion_letrec()
   schemerlicht_close(ctxt);
   }
 
-
 static void simplify_to_core_conversion_let_star()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -274,6 +273,30 @@ static void simplify_to_core_conversion_let_star()
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( let ( [ x ( + 1 2 ) ] ) ( begin ( let ( [ y ( + 3 4 ) ] ) ( begin ( + x y ) ) ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+
+static void simplify_to_core_conversion_named_let()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define (number->list n) (let loop((n n) (acc '())) (if (< n 10) (cons n acc) (loop(quotient n 10) (cons(remainder n 10) acc)))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);  
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( define ( number->list n ) ( let loop ( [ n n ] [ acc ( quote () ) ] ) ( begin ( if ( < n 10 ) ( cons n acc ) ( loop ( quotient n 10 ) ( cons ( remainder n 10 ) acc ) ) ) ) ) ) ", dumper->s.string_ptr);
+
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_string_clear(&dumper->s);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( define ( number->list n ) ( let loop ( [ n n ] [ acc ( quote () ) ] ) ( begin ( if ( < n 10 ) ( cons n acc ) ( loop ( quotient n 10 ) ( cons ( remainder n 10 ) acc ) ) ) ) ) ) ", dumper->s.string_ptr);
+
   schemerlicht_dump_visitor_free(ctxt, dumper);
 
   destroy_tokens_vector(ctxt, &tokens);
@@ -299,4 +322,5 @@ void run_all_conv_tests()
   simplify_to_core_conversion_or_3();
   simplify_to_core_conversion_letrec();
   simplify_to_core_conversion_let_star();
+  simplify_to_core_conversion_named_let();
   }

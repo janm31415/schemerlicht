@@ -531,6 +531,8 @@ static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** toke
     if (bt != schemerlicht_bt_let)
       schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "(");
     l.named_let = 1;
+    schemerlicht_string_clear(&l.let_name);
+    schemerlicht_string_append(ctxt, &l.let_name, &(*token_it)->value);
     token_next(ctxt, token_it, token_it_end);
     }
   token_require(ctxt, token_it, token_it_end, "(");

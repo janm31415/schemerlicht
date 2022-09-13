@@ -217,10 +217,16 @@ static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
   switch (l->bt)
     {
-    case schemerlicht_bt_let: schemerlicht_string_append_cstr(ctxt, &(d->s), "( let ( "); break;
-    case schemerlicht_bt_let_star: schemerlicht_string_append_cstr(ctxt, &(d->s), "( let* ( "); break;
-    case schemerlicht_bt_letrec: schemerlicht_string_append_cstr(ctxt, &(d->s), "( letrec ( "); break;
+    case schemerlicht_bt_let: schemerlicht_string_append_cstr(ctxt, &(d->s), "( let "); break;
+    case schemerlicht_bt_let_star: schemerlicht_string_append_cstr(ctxt, &(d->s), "( let* "); break;
+    case schemerlicht_bt_letrec: schemerlicht_string_append_cstr(ctxt, &(d->s), "( letrec "); break;
     }
+  if (l->named_let)
+    {
+    schemerlicht_string_append(ctxt, &(d->s), &l->let_name);
+    schemerlicht_string_append_cstr(ctxt, &(d->s), " ");
+    }
+  schemerlicht_string_append_cstr(ctxt, &(d->s), "( ");
   return 1;
   }
 static int previsit_let_binding(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_let_binding* b)
