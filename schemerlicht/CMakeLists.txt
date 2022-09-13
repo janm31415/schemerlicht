@@ -2,6 +2,7 @@ set(HDRS
 begconv.h
 schemerlicht.h
 context.h
+cps.h
 defconv.h
 dump.h
 error.h
@@ -23,6 +24,7 @@ visitor.h
 set(SRCS
 begconv.c
 context.c
+cps.c
 defconv.c
 dump.c
 error.c

@@ -24,6 +24,12 @@ typedef struct schemerlicht_vector
   (vec)->vector_size = 0; \
   (vec)->element_size = sizeof(element_type)
 
+#define schemerlicht_vector_init_reserve(ctxt, vec, size, element_type) \
+  (vec)->vector_ptr = schemerlicht_newvector(ctxt, size, element_type); \
+  (vec)->vector_capacity = cast(schemerlicht_memsize, size); \
+  (vec)->vector_size = 0; \
+  (vec)->element_size = sizeof(element_type)
+
 #define schemerlicht_vector_destroy(ctxt, vec) \
   schemerlicht_realloc(ctxt, (vec)->vector_ptr, (vec)->vector_capacity*(vec)->element_size, 0)
 

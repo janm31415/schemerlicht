@@ -19,4 +19,7 @@ A tail position is defined recursively as follows:
 void schemerlicht_tail_call_analysis(schemerlicht_context* ctxt, schemerlicht_program* program);
 int schemerlicht_program_only_has_tail_calls(schemerlicht_context* ctxt, schemerlicht_program* program);
 
+void schemerlicht_expression_tail_call_analysis(schemerlicht_context* ctxt, schemerlicht_expression* e);
+int schemerlicht_expression_only_has_tail_calls(schemerlicht_context* ctxt, schemerlicht_expression* e);
+
 #endif // SCHEMERLICHT_TAILCALL_H

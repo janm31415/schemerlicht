@@ -278,3 +278,23 @@ int schemerlicht_program_only_has_tail_calls(schemerlicht_context* ctxt, schemer
   schemerlicht_has_tail_call_visitor_free(ctxt, v);
   return res;
   }
+
+void schemerlicht_expression_tail_call_analysis(schemerlicht_context* ctxt, schemerlicht_expression* e)
+  {
+  schemerlicht_init_tail_call_visitor* v = schemerlicht_init_tail_call_visitor_new(ctxt);
+  schemerlicht_visit_expression(ctxt, v->visitor, e);
+  schemerlicht_init_tail_call_visitor_free(ctxt, v);
+  schemerlicht_analyse_tail_call_visitor* v2 = schemerlicht_analyse_tail_call_visitor_new(ctxt);
+  schemerlicht_visit_expression(ctxt, v2->visitor, e);
+  schemerlicht_analyse_tail_call_visitor_free(ctxt, v2);
+  }
+
+int schemerlicht_expression_only_has_tail_calls(schemerlicht_context* ctxt, schemerlicht_expression* e)
+  {
+  schemerlicht_has_tail_call_visitor* v = schemerlicht_has_tail_call_visitor_new(ctxt);
+  v->so_far_all_tail_calls = 1;
+  schemerlicht_visit_expression(ctxt, v->visitor, e);
+  int res = v->so_far_all_tail_calls;
+  schemerlicht_has_tail_call_visitor_free(ctxt, v);
+  return res;
+  }
