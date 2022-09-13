@@ -21,7 +21,7 @@ static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_string_destroy(ctxt, &b2.filename);
       schemerlicht_expression* it2 = schemerlicht_vector_begin(&b2.arguments, schemerlicht_expression);
       schemerlicht_expression* it2_end = schemerlicht_vector_end(&b2.arguments, schemerlicht_expression);
-      schemerlicht_vector_erase(ctxt, &b->arguments, &it, schemerlicht_expression);
+      schemerlicht_vector_erase(&b->arguments, &it, schemerlicht_expression);
       schemerlicht_vector_insert(ctxt, &b->arguments, &it, &it2, &it2_end, schemerlicht_expression);
       schemerlicht_vector_destroy(ctxt, &b2.arguments);
       }
@@ -43,7 +43,7 @@ static void postvisit_program(schemerlicht_context* ctxt, schemerlicht_visitor* 
       schemerlicht_string_destroy(ctxt, &b2.filename);
       schemerlicht_expression* it2 = schemerlicht_vector_begin(&b2.arguments, schemerlicht_expression);
       schemerlicht_expression* it2_end = schemerlicht_vector_end(&b2.arguments, schemerlicht_expression);
-      schemerlicht_vector_erase(ctxt, &p->expressions, &it, schemerlicht_expression);
+      schemerlicht_vector_erase(&p->expressions, &it, schemerlicht_expression);
       schemerlicht_vector_insert(ctxt, &p->expressions, &it, &it2, &it2_end, schemerlicht_expression);
       schemerlicht_vector_destroy(ctxt, &b2.arguments);
       }

@@ -65,10 +65,15 @@ typedef struct schemerlicht_vector
 #define schemerlicht_vector_back(vec, element_type) \
   (cast(element_type*, (vec)->vector_ptr) + ((vec)->vector_size - 1))
 
-#define schemerlicht_vector_erase(ctxt, vec, iterator, element_type) \
+#define schemerlicht_vector_erase(vec, iterator, element_type) \
   { element_type* it_end_obfuscate_asdfasdfds = (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size); \
   memmove(*(iterator), cast(element_type*, *(iterator))+1, (size_t)(it_end_obfuscate_asdfasdfds-cast(element_type*, *(iterator))-1)*sizeof(element_type)); }\
   --((vec)->vector_size)
+
+#define schemerlicht_vector_erase_range(vec, first, last, element_type) \
+  { element_type* it_end_obfuscate_asdfasdfds = (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size); \
+  memmove(*(first), *(last), (size_t)(it_end_obfuscate_asdfasdfds-*(last))*sizeof(element_type)); }\
+  (vec)->vector_size -= cast(schemerlicht_memsize, *(last)-*(first));
 
 #define schemerlicht_vector_insert(ctxt, vec, iterator, range_it_begin, range_it_end, element_type) \
   { schemerlicht_memsize range_size = cast(schemerlicht_memsize, cast(element_type*, *(range_it_end))-cast(element_type*, *(range_it_begin))); \

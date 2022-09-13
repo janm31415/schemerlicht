@@ -330,15 +330,15 @@ static void tail_call_analysis_2()
   schemerlicht_close(ctxt);
   }
 
-static void cps_1()
+static void cps(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "15");
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k0 15 ] ) ( begin ( halt #%k0 ) ) ) ", dumper->s.string_ptr);
+  TEST_EQ_STRING(expected, dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
   schemerlicht_tail_call_analysis(ctxt, &prog);
   int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
@@ -348,148 +348,26 @@ static void cps_1()
   schemerlicht_close(ctxt);
   }
 
-static void cps_2()
+static void test_cps()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(+ 22 (- x 3) x)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k0 ( + 22 ( - x 3 ) x ) ] ) ( begin ( halt #%k0 ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_3()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(+ 1 2 3)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k0 ( + 1 2 3 ) ] ) ( begin ( halt #%k0 ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_4()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(f 3)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 3 ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_5()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(f 1 2 3)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 1 2 3 ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_6()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(f 1 (g 2) 3)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k1 f ] ) ( begin ( let ( [ #%k6 g ] ) ( begin ( #%k6 ( lambda ( #%k3 ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 1 #%k3 3 ) ) ) 2 ) ) ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_7()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(+ 22 (f x) 33 (g y))");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k10 f ] ) ( begin ( #%k10 ( lambda ( #%k2 ) ( begin ( let ( [ #%k6 g ] ) ( begin ( #%k6 ( lambda ( #%k4 ) ( begin ( let ( [ #%k0 ( + 22 #%k2 33 #%k4 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) y ) ) ) ) ) x ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_8()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(set! x 5)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k0 ( set! x 5 ) ] ) ( begin ( halt #%k0 ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
-  }
-
-static void cps_9()
-  {
-  schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(set! x (f))");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING("( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( #%k1 ) ( begin ( let ( [ #%k0 ( set! x #%k1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ", dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
-  schemerlicht_tail_call_analysis(ctxt, &prog);
-  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
-  TEST_EQ_INT(1, only_tails);
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_close(ctxt);
+  cps("(15)", "( let ( [ #%k0 15 ] ) ( begin ( halt #%k0 ) ) ) ");
+  cps("(+ 22 (- x 3) x)", "( let ( [ #%k0 ( + 22 ( - x 3 ) x ) ] ) ( begin ( halt #%k0 ) ) ) ");
+  cps("(+ 22 (f x) 33 (g y))", "( let ( [ #%k10 f ] ) ( begin ( #%k10 ( lambda ( #%k2 ) ( begin ( let ( [ #%k6 g ] ) ( begin ( #%k6 ( lambda ( #%k4 ) ( begin ( let ( [ #%k0 ( + 22 #%k2 33 #%k4 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) y ) ) ) ) ) x ) ) ) ");
+  cps("(set! x 5)", "( let ( [ #%k0 ( set! x 5 ) ] ) ( begin ( halt #%k0 ) ) ) ");
+  cps("(+ 1 2 3)", "( let ( [ #%k0 ( + 1 2 3 ) ] ) ( begin ( halt #%k0 ) ) ) ");
+  cps("(f 3)", "( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 3 ) ) ) ");
+  cps("(f 1 2 3)", "( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 1 2 3 ) ) ) ");
+  cps("(f 1 (g 2) 3)", "( let ( [ #%k1 f ] ) ( begin ( let ( [ #%k6 g ] ) ( begin ( #%k6 ( lambda ( #%k3 ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) 1 #%k3 3 ) ) ) 2 ) ) ) ) ) ");
+  cps("(set! x (f))", "( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( #%k1 ) ( begin ( let ( [ #%k0 ( set! x #%k1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ");
+  cps("(begin 1 2)", "( begin ( let ( [ #%k0 1 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k0 2 ] ) ( begin ( halt #%k0 ) ) ) ) ");
+  cps("(begin (a) (b))", "( begin ( let ( [ #%k1 a ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ( let ( [ #%k1 b ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ");
+  cps("(begin (a) 2)", "( begin ( let ( [ #%k1 a ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ( let ( [ #%k0 2 ] ) ( begin ( halt #%k0 ) ) ) ) ");
+  cps("(begin 4 3 (a) 2)", "( begin ( let ( [ #%k0 4 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k0 3 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k1 a ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ( let ( [ #%k0 2 ] ) ( begin ( halt #%k0 ) ) ) ) ");
+  cps("(begin 1 2 (a))", "( begin ( let ( [ #%k0 1 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k0 2 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k1 a ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ");
+  cps("(+ 1 (f) 3)", "( let ( [ #%k5 f ] ) ( begin ( #%k5 ( lambda ( #%k2 ) ( begin ( let ( [ #%k0 ( + 1 #%k2 3 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ");
+  cps("(begin (begin 1 2 3))", "( begin ( begin 1 2 ( let ( [ #%k0 3 ] ) ( begin ( halt #%k0 ) ) ) ) ) ");
+  cps("(begin (begin 1 2 (f)))", "( begin ( begin 1 2 ( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ");
+  cps("(begin (begin 1 (f) 3))", "( begin ( begin 1 ( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( #%k1 ) ( begin ( let ( [ #%k0 3 ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ) ) ");
   }
 
 void run_all_conv_tests()
@@ -513,13 +391,5 @@ void run_all_conv_tests()
   simplify_to_core_conversion_named_let();
   tail_call_analysis();
   tail_call_analysis_2();
-  cps_1();
-  cps_2();
-  cps_3();
-  cps_4();
-  cps_5();
-  cps_6();
-  cps_7();
-  cps_8();
-  cps_9();
+  test_cps();
   }

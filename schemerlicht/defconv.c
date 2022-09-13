@@ -162,7 +162,7 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
       {
       schemerlicht_memsize index = *rit;
       schemerlicht_expression* begin_args_it_at_index = schemerlicht_vector_begin(begin_args, schemerlicht_expression) + index;
-      schemerlicht_vector_erase(ctxt, begin_args, &begin_args_it_at_index, schemerlicht_expression);
+      schemerlicht_vector_erase(begin_args, &begin_args_it_at_index, schemerlicht_expression);
       }
     schemerlicht_parsed_let let;
     let.bt = schemerlicht_bt_letrec;
