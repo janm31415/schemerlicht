@@ -1,7 +1,7 @@
 #ifndef TOKEN_TESTS_H
 #define TOKEN_TESTS_H
 
-#include "schemerlicht/svector.h"
+#include "schemerlicht/vector.h"
 
 struct schemerlicht_context;
 

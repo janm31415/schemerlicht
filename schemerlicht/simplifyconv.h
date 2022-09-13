@@ -2,7 +2,7 @@
 #define SCHEMERLICHT_SIMPLIFY_H
 
 #include "schemerlicht.h"
-#include "sparser.h"
+#include "parser.h"
 
 void schemerlicht_simplify_to_core_forms(schemerlicht_context* ctxt, schemerlicht_program* program);
 

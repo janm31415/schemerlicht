@@ -2,10 +2,10 @@
 #define SCHEMERLICHT_PARSER_H
 
 #include "schemerlicht.h"
-#include "sstring.h"
-#include "svector.h"
-#include "smap.h"
-#include "sreader.h"
+#include "string.h"
+#include "vector.h"
+#include "map.h"
+#include "reader.h"
 
 #define schemerlicht_type_fixnum 0
 #define schemerlicht_type_flonum 1

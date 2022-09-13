@@ -2,7 +2,7 @@
 #define SCHEMERLICHT_BEGCONV_H
 
 #include "schemerlicht.h"
-#include "sparser.h"
+#include "parser.h"
 
 void schemerlicht_single_begin_conversion(schemerlicht_context* ctxt, schemerlicht_program* program);
 

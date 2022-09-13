@@ -1,8 +1,8 @@
 #include "token_tests.h"
 
-#include "schemerlicht/stoken.h"
-#include "schemerlicht/scontext.h"
-#include "schemerlicht/sstream.h"
+#include "schemerlicht/token.h"
+#include "schemerlicht/context.h"
+#include "schemerlicht/stream.h"
 
 #include "test_assert.h"
 

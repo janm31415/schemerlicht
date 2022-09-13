@@ -2,8 +2,8 @@
 #define SCHEMERLICHT_DUMP_H
 
 #include "schemerlicht.h"
-#include "svisitor.h"
-#include "sstring.h"
+#include "visitor.h"
+#include "string.h"
 
 typedef struct schemerlicht_dump_visitor 
   {

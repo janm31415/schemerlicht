@@ -2,8 +2,8 @@
 #define SCHEMERLICHT_VISITOR_H
 
 #include "schemerlicht.h"
-#include "sparser.h"
-#include "svector.h"
+#include "parser.h"
+#include "vector.h"
 
 enum schemerlicht_visitor_entry_type
   {

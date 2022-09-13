@@ -1,8 +1,8 @@
-#include "smap.h"
-#include "smemory.h"
-#include "slimits.h"
-#include "serror.h"
-#include "scontext.h"
+#include "map.h"
+#include "memory.h"
+#include "limits.h"
+#include "error.h"
+#include "context.h"
 
 #include <string.h>
 

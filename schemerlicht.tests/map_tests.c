@@ -1,8 +1,8 @@
 #include "map_tests.h"
 #include "test_assert.h"
 
-#include "schemerlicht/scontext.h"
-#include "schemerlicht/smap.h"
+#include "schemerlicht/context.h"
+#include "schemerlicht/map.h"
 
 static void test_map_construction()
   {

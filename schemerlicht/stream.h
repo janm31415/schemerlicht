@@ -2,7 +2,7 @@
 #define SCHEMERLICHT_STREAM_H
 
 #include "schemerlicht.h"
-#include "smemory.h"
+#include "memory.h"
 
 /* end of stream */
 #define END_OF_STREAM (cast(schemerlicht_memsize, -1))	

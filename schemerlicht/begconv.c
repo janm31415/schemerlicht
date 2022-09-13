@@ -1,6 +1,6 @@
-#include "sbegconv.h"
-#include "svisitor.h"
-#include "scontext.h"
+#include "begconv.h"
+#include "visitor.h"
+#include "context.h"
 
 typedef struct schemerlicht_remove_nested_begin_visitor
   {

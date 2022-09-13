@@ -1,8 +1,8 @@
-#include "ssimplifyconv.h"
-#include "scontext.h"
-#include "svisitor.h"
-#include "smemory.h"
-#include "sparser.h"
+#include "simplifyconv.h"
+#include "context.h"
+#include "visitor.h"
+#include "memory.h"
+#include "parser.h"
 
 #include <string.h>
 

@@ -1,9 +1,9 @@
-#include "sparser.h"
-#include "svector.h"
-#include "stoken.h"
-#include "serror.h"
-#include "scontext.h"
-#include "svisitor.h"
+#include "parser.h"
+#include "vector.h"
+#include "token.h"
+#include "error.h"
+#include "context.h"
+#include "visitor.h"
 
 #include <string.h>
 #include <stdlib.h>

@@ -1,9 +1,9 @@
-#include "sdefconv.h"
-#include "scontext.h"
-#include "svisitor.h"
-#include "sbegconv.h"
-#include "sparser.h"
-#include "serror.h"
+#include "defconv.h"
+#include "context.h"
+#include "visitor.h"
+#include "begconv.h"
+#include "parser.h"
+#include "error.h"
 
 static schemerlicht_parsed_variable make_var(schemerlicht_context* ctxt, const char* name)
   {

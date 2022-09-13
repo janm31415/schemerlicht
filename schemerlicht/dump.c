@@ -1,6 +1,6 @@
-#include "sdump.h"
-#include "smemory.h"
-#include "sreader.h"
+#include "dump.h"
+#include "memory.h"
+#include "reader.h"
 
 #include <string.h>
 #include <stdio.h>

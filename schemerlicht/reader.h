@@ -2,9 +2,9 @@
 #define SCHEMERLICHT_READER_H
 
 #include "schemerlicht.h"
-#include "svector.h"
-#include "sstring.h"
-#include "stoken.h"
+#include "vector.h"
+#include "string.h"
+#include "token.h"
 
 enum schemerlicht_cell_type
   {

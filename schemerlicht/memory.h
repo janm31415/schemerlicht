@@ -2,7 +2,7 @@
 #define SCHEMERLICHT_MEMORY_H
 
 #include "schemerlicht.h"
-#include "slimits.h"
+#include "limits.h"
 
 #define MINSIZEVECTOR 4
 

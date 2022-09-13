@@ -1,6 +1,6 @@
-#include "stoken.h"
-#include "slimits.h"
-#include "sstring.h"
+#include "token.h"
+#include "limits.h"
+#include "string.h"
 
 #include <inttypes.h>
 #include <stdio.h>

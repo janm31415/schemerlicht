@@ -1,5 +1,5 @@
-#include "svisitor.h"
-#include "smemory.h"
+#include "visitor.h"
+#include "memory.h"
 
 static int previsit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
   {

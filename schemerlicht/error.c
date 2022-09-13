@@ -1,6 +1,6 @@
-#include "serror.h"
-#include "slimits.h"
-#include "scontext.h"
+#include "error.h"
+#include "limits.h"
+#include "context.h"
 
 #include <stdlib.h>
 #include <setjmp.h>

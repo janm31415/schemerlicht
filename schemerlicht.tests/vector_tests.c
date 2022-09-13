@@ -2,8 +2,8 @@
 #include "test_assert.h"
 
 #include "schemerlicht/schemerlicht.h"
-#include "schemerlicht/svector.h"
-#include "schemerlicht/scontext.h"
+#include "schemerlicht/vector.h"
+#include "schemerlicht/context.h"
 
 static void test_construction_destruction_1()
   {

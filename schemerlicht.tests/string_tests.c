@@ -2,8 +2,8 @@
 #include "test_assert.h"
 
 #include "schemerlicht/schemerlicht.h"
-#include "schemerlicht/sstring.h"
-#include "schemerlicht/scontext.h"
+#include "schemerlicht/string.h"
+#include "schemerlicht/context.h"
 
 static void test_string_init()
   {

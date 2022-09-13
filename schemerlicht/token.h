@@ -2,9 +2,9 @@
 #define SCHEMERLICHT_TOKEN_H
 
 #include "schemerlicht.h"
-#include "sstring.h"
-#include "sstream.h"
-#include "svector.h"
+#include "string.h"
+#include "stream.h"
+#include "vector.h"
 
 SCHEMERLICHT_API schemerlicht_flonum to_flonum(const char* value);
 SCHEMERLICHT_API schemerlicht_fixnum to_fixnum(const char* value);

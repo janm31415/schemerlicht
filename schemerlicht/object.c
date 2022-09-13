@@ -1,4 +1,4 @@
-#include "sobject.h"
+#include "object.h"
 
 
 int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlicht_object* obj2)

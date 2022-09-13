@@ -1,7 +1,7 @@
 #include "dump_tests.h"
-#include "schemerlicht/sdump.h"
-#include "schemerlicht/scontext.h"
-#include "schemerlicht/stoken.h"
+#include "schemerlicht/dump.h"
+#include "schemerlicht/context.h"
+#include "schemerlicht/token.h"
 #include "test_assert.h"
 #include "token_tests.h"
 

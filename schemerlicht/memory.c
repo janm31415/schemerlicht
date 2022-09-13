@@ -1,5 +1,5 @@
-#include "smemory.h"
-#include "serror.h"
+#include "memory.h"
+#include "error.h"
 
 #include <stdlib.h>
 

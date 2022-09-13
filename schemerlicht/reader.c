@@ -1,5 +1,5 @@
-#include "sreader.h"
-#include "scontext.h"
+#include "reader.h"
+#include "context.h"
 #include <string.h>
 
 int schemerlicht_cell_equals(const schemerlicht_cell* left, const schemerlicht_cell* right)

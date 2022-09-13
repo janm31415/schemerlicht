@@ -1,4 +1,4 @@
-#include "sstream.h"
+#include "stream.h"
 
 #include <string.h>
 #include <stdlib.h>

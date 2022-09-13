@@ -2,8 +2,8 @@
 #define SCHEMERLICHT_OBJECT_H
 
 #include "schemerlicht.h"
-#include "slimits.h"
-#include "sstring.h"
+#include "limits.h"
+#include "string.h"
 
 #define schemerlicht_object_type_nil 0
 #define schemerlicht_object_type_fixnum 1

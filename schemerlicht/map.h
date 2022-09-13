@@ -6,8 +6,8 @@ Based on table from LUA
 */
 
 #include "schemerlicht.h"
-#include "sobject.h"
-#include "slimits.h"
+#include "object.h"
+#include "limits.h"
 
 typedef struct schemerlicht_map_node 
   {

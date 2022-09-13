@@ -2,7 +2,7 @@
 #define SCHEMERLICHT_VECTOR_H
 
 #include "schemerlicht.h"
-#include "smemory.h"
+#include "memory.h"
 
 typedef struct schemerlicht_vector
   {

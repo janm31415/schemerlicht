@@ -2,10 +2,10 @@
 #include "test_assert.h"
 #include "token_tests.h"
 
-#include "schemerlicht/sreader.h"
-#include "schemerlicht/scontext.h"
-#include "schemerlicht/svector.h"
-#include "schemerlicht/stoken.h"
+#include "schemerlicht/reader.h"
+#include "schemerlicht/context.h"
+#include "schemerlicht/vector.h"
+#include "schemerlicht/token.h"
 
 static void test_sym_cells()
   {

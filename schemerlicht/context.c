@@ -1,6 +1,6 @@
-#include "scontext.h"
-#include "smemory.h"
-#include "sparser.h"
+#include "context.h"
+#include "memory.h"
+#include "parser.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {

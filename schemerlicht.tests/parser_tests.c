@@ -1,10 +1,10 @@
 #include "parser_tests.h"
 #include "test_assert.h"
 
-#include "schemerlicht/stoken.h"
-#include "schemerlicht/scontext.h"
-#include "schemerlicht/sstream.h"
-#include "schemerlicht/sparser.h"
+#include "schemerlicht/token.h"
+#include "schemerlicht/context.h"
+#include "schemerlicht/stream.h"
+#include "schemerlicht/parser.h"
 
 #include "token_tests.h"
 

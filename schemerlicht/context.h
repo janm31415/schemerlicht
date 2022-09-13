@@ -2,9 +2,9 @@
 #define SCHEMERLICHT_CONTEXT_H
 
 #include "schemerlicht.h"
-#include "sobject.h"
-#include "smap.h"
-#include "sreader.h"
+#include "object.h"
+#include "map.h"
+#include "reader.h"
 
 #include <setjmp.h>
 
