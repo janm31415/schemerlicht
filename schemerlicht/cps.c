@@ -414,6 +414,60 @@ static void cps_convert_begin(schemerlicht_context* ctxt, schemerlicht_expressio
     cps_convert_begin_nonsimple(ctxt, e, cps);
   }
 
+
+static void cps_convert_lambda(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_lambda);
+  schemerlicht_memsize idx_val = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) + 1;
+  schemerlicht_vector_push_back(ctxt, &cps->index, idx_val, schemerlicht_memsize);
+  schemerlicht_expression v = schemerlicht_init_variable(ctxt);
+  v.expr.var.name = make_var_name(ctxt, idx_val);
+  schemerlicht_vector_push_back(ctxt, &cps->continuation, v, schemerlicht_expression);
+  schemerlicht_assert(continuation_is_valid(ctxt, get_continuation(cps)));
+
+  cps_conversion_state st = init_conversion_state(e, state_step_1);
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
+
+  cps_conversion_state st2 = init_conversion_state(schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression), state_init);
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);
+  }
+
+static void cps_convert_lambda_step1(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_lambda);
+  schemerlicht_memsize ind = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize);
+  schemerlicht_vector_pop_back(&cps->index);
+  schemerlicht_string k_name = make_var_name(ctxt, *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) + 1);
+  *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) = ind;
+  schemerlicht_vector_pop_back(&cps->continuation);
+  schemerlicht_vector_push_front(ctxt, &e->expr.lambda.variables, k_name, schemerlicht_string);
+
+  if (continuation_is_lambda_with_one_parameter_without_free_vars(get_continuation(cps)))
+    {
+    schemerlicht_expression* lam = get_continuation(cps);
+    schemerlicht_expression let = schemerlicht_init_let(ctxt);
+    schemerlicht_let_binding bind;
+    bind.binding_name = *schemerlicht_vector_at(&lam->expr.lambda.variables, 0, schemerlicht_string);
+    bind.binding_expr = *e;
+    schemerlicht_vector_push_back(ctxt, &let.expr.let.bindings, bind, schemerlicht_let_binding);
+    schemerlicht_vector_push_back(ctxt, &let.expr.let.body, *schemerlicht_vector_at(&lam->expr.lambda.body, 0, schemerlicht_expression), schemerlicht_expression);
+    *e = let;
+    schemerlicht_vector_destroy(ctxt, &lam->expr.lambda.assignable_variables);
+    schemerlicht_vector_destroy(ctxt, &lam->expr.lambda.variables);
+    schemerlicht_vector_destroy(ctxt, &lam->expr.lambda.free_variables);
+    schemerlicht_vector_destroy(ctxt, &lam->expr.lambda.body);
+    schemerlicht_string_destroy(ctxt, &lam->expr.lambda.filename);
+    }
+  else
+    {
+    schemerlicht_expression* cont = get_continuation(cps);
+    schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, *cont, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, *e, schemerlicht_expression);
+    *e = f;
+    }
+  }
+
 static void cps_convert_prim_simple(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
@@ -1061,6 +1115,11 @@ static void treat_cps_state_step_init(schemerlicht_context* ctxt, cps_conversion
     cps_convert_begin(ctxt, cps_state->expr, cps);
     break;
     }
+    case schemerlicht_type_lambda:
+    {
+    cps_convert_lambda(ctxt, cps_state->expr, cps);
+    break;
+    }
     default: assert(0); // not implemented
     }
   }
@@ -1092,6 +1151,11 @@ static void treat_cps_state_step_1(schemerlicht_context* ctxt, cps_conversion_st
     case schemerlicht_type_begin:
     {
     cps_convert_begin_nonsimple_step1(ctxt, cps_state->expr, cps);
+    break;
+    }
+    case schemerlicht_type_lambda:
+    {
+    cps_convert_lambda_step1(ctxt, cps_state->expr, cps);
     break;
     }
     default: assert(0); // not implemented
