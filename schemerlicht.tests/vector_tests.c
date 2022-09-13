@@ -392,6 +392,42 @@ static void test_insert_2()
   schemerlicht_close(ctxt);
   }
 
+
+static void test_pop_front()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector v;
+  schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
+  *schemerlicht_vector_at(&v, 0, double) = 1.0;
+  *schemerlicht_vector_at(&v, 1, double) = 2.0;
+  *schemerlicht_vector_at(&v, 2, double) = 3.0;
+  *schemerlicht_vector_at(&v, 3, double) = 4.0;
+  *schemerlicht_vector_at(&v, 4, double) = 5.0;
+  schemerlicht_vector_pop_front(&v);
+  TEST_EQ_DOUBLE(2.0, *schemerlicht_vector_at(&v, 0, double));
+  TEST_EQ_DOUBLE(3.0, *schemerlicht_vector_at(&v, 1, double));
+  TEST_EQ_DOUBLE(4.0, *schemerlicht_vector_at(&v, 2, double));
+  TEST_EQ_DOUBLE(5.0, *schemerlicht_vector_at(&v, 3, double));
+  TEST_EQ_INT(4, v.vector_size);  
+  schemerlicht_vector_pop_front(&v);  
+  TEST_EQ_DOUBLE(3.0, *schemerlicht_vector_at(&v, 0, double));
+  TEST_EQ_DOUBLE(4.0, *schemerlicht_vector_at(&v, 1, double));
+  TEST_EQ_DOUBLE(5.0, *schemerlicht_vector_at(&v, 2, double));
+  TEST_EQ_INT(3, v.vector_size);
+  schemerlicht_vector_pop_front(&v);
+  TEST_EQ_DOUBLE(4.0, *schemerlicht_vector_at(&v, 0, double));
+  TEST_EQ_DOUBLE(5.0, *schemerlicht_vector_at(&v, 1, double));  
+  TEST_EQ_INT(2, v.vector_size);
+  schemerlicht_vector_pop_front(&v);
+  TEST_EQ_DOUBLE(5.0, *schemerlicht_vector_at(&v, 0, double));  
+  TEST_EQ_INT(1, v.vector_size);
+  schemerlicht_vector_pop_front(&v);
+  TEST_EQ_INT(0, v.vector_size);
+  schemerlicht_vector_pop_front(&v);
+  TEST_EQ_INT(0, v.vector_size);
+  schemerlicht_vector_destroy(ctxt, &v);
+  schemerlicht_close(ctxt);
+  }
 void run_all_vector_tests()
   {
   test_construction_destruction_1();
@@ -408,4 +444,5 @@ void run_all_vector_tests()
   test_insert();
   test_insert_2();
   test_push_front();
+  test_pop_front();
   }

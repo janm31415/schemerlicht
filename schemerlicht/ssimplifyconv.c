@@ -218,6 +218,21 @@ static void convert_letrec(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
 static void convert_let_star(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_let_star);
+  if (e->expr.let.bindings.vector_size <= 1)
+    {
+    e->expr.let.bt = schemerlicht_bt_let;
+    }
+  else
+    {
+    schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
+    schemerlicht_vector_push_back(ctxt, &new_let.expr.let.bindings, *schemerlicht_vector_at(&e->expr.let.bindings, 0, schemerlicht_expression), schemerlicht_expression);
+    schemerlicht_vector_pop_front(&e->expr.let.bindings);
+    schemerlicht_expression b = schemerlicht_init_begin(ctxt);
+    schemerlicht_vector_push_back(ctxt, &b.expr.beg.arguments, *e, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &new_let.expr.let.body, b, schemerlicht_expression);
+    *e = new_let;
+    convert_let_star(ctxt, v, schemerlicht_vector_at(&schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression)->expr.beg.arguments, 0, schemerlicht_expression));
+    }
   }
 
 static void convert_named_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)

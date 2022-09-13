@@ -33,6 +33,12 @@ typedef struct schemerlicht_vector
 #define schemerlicht_vector_pop_back(vec) \
   if ((vec)->vector_size > 0) --((vec)->vector_size)
 
+#define schemerlicht_vector_pop_front(vec) \
+  if ((vec)->vector_size > 0) { \
+    --((vec)->vector_size); \
+    memmove(cast(char*, (vec)->vector_ptr), cast(char*, (vec)->vector_ptr)+(vec)->element_size, (vec)->vector_size*(vec)->element_size); \
+  }
+
 #define schemerlicht_vector_push_back(ctxt, vec, element_value, element_type) \
   schemerlicht_growvector(ctxt, (vec)->vector_ptr, (vec)->vector_size+1, (vec)->vector_capacity, element_type); \
   *schemerlicht_vector_at(vec, (vec)->vector_size, element_type) = element_value; \
