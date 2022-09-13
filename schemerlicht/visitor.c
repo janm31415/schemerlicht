@@ -216,6 +216,45 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   UNUSED(v);
   UNUSED(e);
   }
+int previsit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+void postvisit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+int previsit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+void postvisit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+int previsit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+void postvisit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
 
 static schemerlicht_visitor_entry make_entry(schemerlicht_expression* e, enum schemerlicht_visitor_entry_type t)
   {
@@ -282,7 +321,12 @@ schemerlicht_visitor* schemerlicht_visitor_new(schemerlicht_context* ctxt, void*
   v->postvisit_let_binding = postvisit_let_binding;
   v->postvisit_let_bindings = postvisit_let_bindings;
   v->postvisit_let = postvisit_let;
-
+  v->previsit_case = previsit_case;
+  v->postvisit_case = postvisit_case;
+  v->previsit_cond = previsit_cond;
+  v->postvisit_cond = postvisit_cond;
+  v->previsit_do = previsit_do;
+  v->postvisit_do = postvisit_do;
   v->destroy = destroy;
   schemerlicht_vector_init(ctxt, &(v->v), schemerlicht_visitor_entry);
   return v;
@@ -564,6 +608,48 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     case SCHEMERLICHT_VISITOR_SET_POST:
     {
     vis->postvisit_set(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_CASE_PRE:
+    {
+    if (vis->previsit_case(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_CASE_POST), schemerlicht_visitor_entry);
+      assert(0); // todo
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_CASE_POST:
+    {
+    vis->postvisit_case(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_COND_PRE:
+    {
+    if (vis->previsit_cond(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_COND_POST), schemerlicht_visitor_entry);
+      assert(0); // todo
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_COND_POST:
+    {
+    vis->postvisit_cond(ctxt, vis, e->expr);
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_DO_PRE:
+    {
+    if (vis->previsit_do(ctxt, vis, e->expr))
+      {
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_DO_POST), schemerlicht_visitor_entry);
+      assert(0); // todo
+      }
+    break;
+    }
+    case SCHEMERLICHT_VISITOR_DO_POST:
+    {
+    vis->postvisit_do(ctxt, vis, e->expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_LET_PRE:

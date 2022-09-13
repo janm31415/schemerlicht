@@ -507,6 +507,7 @@ schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
 
 schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt)
   {
+  UNUSED(ctxt);
   schemerlicht_parsed_nop n;
   n.filename = make_null_string();
   n.line_nr = -1;
@@ -1201,6 +1202,27 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables);
   schemerlicht_string_destroy(ctxt, &e->expr.let.let_name);
   }
+static void postvisit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  assert(0); // todo
+  }
+static void postvisit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  assert(0); // todo
+  }
+static void postvisit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  assert(0); // todo
+  }
 
 typedef struct schemerlicht_program_destroy_visitor
   {
@@ -1232,6 +1254,9 @@ void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_progr
   destroyer.visitor->postvisit_set = postvisit_set;
   destroyer.visitor->postvisit_lambda = postvisit_lambda;
   destroyer.visitor->postvisit_let = postvisit_let;
+  destroyer.visitor->postvisit_case = postvisit_case;
+  destroyer.visitor->postvisit_cond = postvisit_cond;
+  destroyer.visitor->postvisit_do = postvisit_do;
   schemerlicht_visit_program(ctxt, destroyer.visitor, p);
 
   destroyer.visitor->destroy(ctxt, destroyer.visitor);

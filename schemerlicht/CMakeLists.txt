@@ -14,6 +14,7 @@ reader.h
 simplifyconv.h
 stream.h
 string.h
+tailcall.h
 token.h
 vector.h
 visitor.h
@@ -33,6 +34,7 @@ reader.c
 simplifyconv.c
 stream.c
 string.c
+tailcall.c
 token.c
 visitor.c
 )

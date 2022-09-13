@@ -33,6 +33,9 @@ enum schemerlicht_visitor_entry_type
   SCHEMERLICHT_VISITOR_COND_PRE,
   SCHEMERLICHT_VISITOR_CASE_PRE,
   SCHEMERLICHT_VISITOR_DO_PRE,
+  SCHEMERLICHT_VISITOR_COND_POST,
+  SCHEMERLICHT_VISITOR_CASE_POST,
+  SCHEMERLICHT_VISITOR_DO_POST,
   SCHEMERLICHT_VISITOR_LET_BINDING_PRE,
   SCHEMERLICHT_VISITOR_LET_BINDING_POST,
   };
@@ -86,6 +89,12 @@ struct schemerlicht_visitor
   void (*postvisit_let_binding)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_let_binding*);
   void (*postvisit_let_bindings)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
   void (*postvisit_let)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
+  int (*previsit_case)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
+  void (*postvisit_case)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
+  int (*previsit_cond)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
+  void (*postvisit_cond)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
+  int (*previsit_do)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
+  void (*postvisit_do)(schemerlicht_context*, schemerlicht_visitor*, schemerlicht_expression*);
 
   void (*destroy)(schemerlicht_context*, schemerlicht_visitor*);
   void* impl; // Implementation, for example schemerlicht_dump_visitor
