@@ -372,6 +372,8 @@ static void test_cps()
   cps("(foreign-call load-simulation addr \"13\")", "( let ( [ #%k0 ( foreign-call load-simulation addr \"13\" ) ] ) ( begin ( halt #%k0 ) ) ) ");
   cps("(lambda ( a b ) ( + a b))", "( let ( [ #%k0 ( lambda ( #%k1 a b ) ( begin ( #%k1 ( + a b ) ) ) ) ] ) ( begin ( halt #%k0 ) ) ) ");
   cps("(f)", "( let ( [ #%k1 f ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) ) ) ) ");
+  cps("(let ([x 3] [y 4]) ( + x y) )", "( let ( [ x 3 ] [ y 4 ] ) ( begin ( let ( [ #%k0 ( + x y ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ");
+  cps("(let ([x (f)] [y 4]) ( + x y) )", "( let ( [ y 4 ] ) ( begin ( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( x ) ( begin ( let ( [ #%k0 ( + x y ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ) ) ");
   }
 
 void run_all_conv_tests()

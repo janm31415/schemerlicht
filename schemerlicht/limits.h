@@ -34,4 +34,9 @@ typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
 #define schemerlicht_mem_invalid_size ((schemerlicht_memsize)(-1))
 #endif
 
+#define swap(a, b, type) \
+  { type tmp = (a); \
+  (a) = (b); \
+  (b) = tmp; }
+
 #endif //SCHEMERLICHT_LIMITS_H
