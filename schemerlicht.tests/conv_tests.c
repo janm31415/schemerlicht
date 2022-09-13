@@ -456,6 +456,42 @@ static void cps_7()
   schemerlicht_close(ctxt);
   }
 
+static void cps_8()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(set! x 5)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( let ( [ #%k0 ( set! x 5 ) ] ) ( begin ( halt #%k0 ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(1, only_tails);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void cps_9()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(set! x (f))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( #%k1 ) ( begin ( let ( [ #%k0 ( set! x #%k1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(1, only_tails);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -484,4 +520,6 @@ void run_all_conv_tests()
   cps_5();
   cps_6();
   cps_7();
+  cps_8();
+  cps_9();
   }
