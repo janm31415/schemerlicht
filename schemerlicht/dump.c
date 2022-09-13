@@ -149,7 +149,7 @@ static int previsit_foreigncall(schemerlicht_context* ctxt, schemerlicht_visitor
   {
   schemerlicht_parsed_foreign_call* f = &(e->expr.foreign);
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
-  schemerlicht_string_append_cstr(ctxt, &(d->s), "( ");
+  schemerlicht_string_append_cstr(ctxt, &(d->s), "( foreign-call ");
   schemerlicht_string_append(ctxt, &(d->s), &(f->name));
   schemerlicht_string_push_back(ctxt, &(d->s), ' ');
   return 1;

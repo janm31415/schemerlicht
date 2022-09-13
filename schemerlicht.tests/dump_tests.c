@@ -244,7 +244,7 @@ static void dump_foreign()
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
-  TEST_EQ_STRING("( load-simulation addr \"13\" ) ", dumper->s.string_ptr);
+  TEST_EQ_STRING("( foreign-call load-simulation addr \"13\" ) ", dumper->s.string_ptr);
 
   schemerlicht_dump_visitor_free(ctxt, dumper);
 

@@ -318,5 +318,6 @@ schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_primcall(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_variable(schemerlicht_context* ctxt);
+schemerlicht_expression schemerlicht_init_foreign(schemerlicht_context* ctxt);
 
 #endif // SCHEMERLICHT_PARSER_H
