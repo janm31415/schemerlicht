@@ -340,7 +340,7 @@ static void cps_convert_begin_nonsimple(schemerlicht_context* ctxt, schemerlicht
     schemerlicht_expression* last = first + first_non_simple_expr;
     schemerlicht_vector_insert(ctxt, &new_b.expr.beg.arguments, &insert_pos, &first, &last, schemerlicht_expression);
     schemerlicht_vector_erase_range(&e->expr.beg.arguments, &first, &last, schemerlicht_expression);
-    schemerlicht_vector_push_back(ctxt, &new_b.expr.beg.arguments, *e, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &new_b.expr.beg.arguments, *e, schemerlicht_expression);    
     *e = new_b;
     cps_conversion_state st = init_conversion_state(schemerlicht_vector_back(&e->expr.beg.arguments, schemerlicht_expression), state_init);
     schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
@@ -394,7 +394,7 @@ static void cps_convert_begin_nonsimple_step1(schemerlicht_context* ctxt, scheme
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);
   }
 
-static void cps_clean_up(schemerlicht_context* ctxt, cps_conversion_helper* cps)
+static void cps_clean_up(cps_conversion_helper* cps)
   {  
   schemerlicht_memsize ind = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize);
   schemerlicht_vector_pop_back(&cps->index);
@@ -531,6 +531,7 @@ static void cps_convert_let_nonsimple_step3(schemerlicht_context* ctxt, cps_conv
     schemerlicht_vector_destroy(ctxt, &state->expr->expr.let.bindings);
     schemerlicht_vector_destroy(ctxt, &state->expr->expr.let.body);
     schemerlicht_string_destroy(ctxt, &state->expr->expr.let.filename);
+    schemerlicht_string_destroy(ctxt, &state->expr->expr.let.let_name);
     *state->expr = bod;
     }
   }
@@ -1378,7 +1379,7 @@ static void treat_cps_state(schemerlicht_context* ctxt, cps_conversion_state* cp
     case state_step_3:
       treat_cps_state_step_3(ctxt, cps_state, cps); break;
     case state_step_clean_up:
-      cps_clean_up(ctxt, cps); break;
+      cps_clean_up(cps); break;
     }
   }
 
