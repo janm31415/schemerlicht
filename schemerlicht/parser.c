@@ -806,6 +806,32 @@ schemerlicht_expression schemerlicht_init_foreign(schemerlicht_context* ctxt)
   return expr;
   }
 
+schemerlicht_expression schemerlicht_init_if(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_if i;
+  i.filename = make_null_string();
+  i.line_nr = -1;
+  i.column_nr = -1;
+  schemerlicht_vector_init(ctxt, &i.arguments, schemerlicht_expression);
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_if;
+  expr.expr.i = i;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_quote(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_quote q;
+  q.filename = make_null_string();
+  q.line_nr = -1;
+  q.column_nr = -1;
+  q.qt = schemerlicht_qt_quote;  
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = q;
+  return expr;
+  }
+
 schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_set s;
