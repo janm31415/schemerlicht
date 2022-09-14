@@ -341,7 +341,6 @@ static void simplify_to_core_conversion_cond()
   schemerlicht_close(ctxt);
   }
 
-
 static void simplify_to_core_conversion_do()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -353,6 +352,24 @@ static void simplify_to_core_conversion_do()
   schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
 
   TEST_EQ_STRING("( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( vec i ) ( begin ( if ( = i 5 ) ( begin vec ) ( begin ( vector-set! vec i i ) ( loop vec ( + i 1 ) ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) ( loop ( make-vector 5 ) 0 ) ) ) ", s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void simplify_to_core_conversion_when()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(when (< x 2) (+ 1 2) (* 3 4))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+
+  TEST_EQ_STRING("( if ( < x 2 ) ( begin ( + 1 2 ) ( * 3 4 ) ) #undefined ) ", s.string_ptr);
 
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -476,6 +493,7 @@ void run_all_conv_tests()
   simplify_to_core_conversion_case();
   simplify_to_core_conversion_cond();
   simplify_to_core_conversion_do();
+  simplify_to_core_conversion_when();
   tail_call_analysis();
   tail_call_analysis_2();
   test_cps();
