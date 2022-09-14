@@ -376,6 +376,7 @@ static void test_cps()
   cps("(let ([x (f)] [y 4]) ( + x y) )", "( let ( [ y 4 ] ) ( begin ( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( x ) ( begin ( let ( [ #%k0 ( + x y ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ) ) ");
   cps("(let ([x (f)] [y (g)]) ( + x y) )", "( let ( [ #%k5 f ] ) ( begin ( #%k5 ( lambda ( x ) ( begin ( let ( [ #%k2 g ] ) ( begin ( #%k2 ( lambda ( y ) ( begin ( let ( [ #%k0 ( + x y ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ) ) ) ) ) ");
   cps("(let ([square (lambda (x) (* x x))]) (write (+ (square 10) 1)))", "( let ( [ square ( lambda ( #%k12 x ) ( begin ( #%k12 ( * x x ) ) ) ) ] ) ( begin ( let ( [ #%k1 write ] ) ( begin ( let ( [ #%k7 square ] ) ( begin ( #%k7 ( lambda ( #%k4 ) ( begin ( let ( [ #%k2 ( + #%k4 1 ) ] ) ( begin ( #%k1 ( lambda ( #%k0 ) ( begin ( halt #%k0 ) ) ) #%k2 ) ) ) ) ) 10 ) ) ) ) ) ) ) ");
+  cps("(if #t 2 3)", "( if #t ( let ( [ #%k0 2 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k0 3 ] ) ( begin ( halt #%k0 ) ) ) ) ");
   }
 
 void run_all_conv_tests()

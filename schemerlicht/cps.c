@@ -3,6 +3,7 @@
 #include "parser.h"
 #include "tailcall.h"
 #include "limits.h"
+#include "copy.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -230,7 +231,7 @@ static void cps_convert_set_simple(schemerlicht_context* ctxt, schemerlicht_expr
 static void cps_convert_set_nonsimple(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_set);
-  
+
   schemerlicht_expression* e1 = schemerlicht_vector_at(&e->expr.set.value, 0, schemerlicht_expression);
   schemerlicht_memsize idx_val = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) + 1;
   schemerlicht_vector_push_back(ctxt, &cps->index, idx_val, schemerlicht_memsize);
@@ -247,7 +248,7 @@ static void cps_convert_set_nonsimple(schemerlicht_context* ctxt, schemerlicht_e
   v.expr.var.name = make_var_name(ctxt, idx_val);
   schemerlicht_vector_push_back(ctxt, &new_s.expr.set.value, v, schemerlicht_expression);
   schemerlicht_expression b = schemerlicht_init_begin(ctxt);
- 
+
 
   if (continuation_is_lambda_with_one_parameter_without_free_vars(get_continuation(cps)))
     {
@@ -273,10 +274,10 @@ static void cps_convert_set_nonsimple(schemerlicht_context* ctxt, schemerlicht_e
     schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, new_s, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &b.expr.beg.arguments, f, schemerlicht_expression);
     }
-  schemerlicht_vector_push_back(ctxt, &l.expr.lambda.body, b, schemerlicht_expression);  
+  schemerlicht_vector_push_back(ctxt, &l.expr.lambda.body, b, schemerlicht_expression);
   schemerlicht_vector_push_back(ctxt, &cps->continuation, l, schemerlicht_expression);
   schemerlicht_assert(continuation_is_valid(ctxt, get_continuation(cps)));
-  cps_conversion_state st = init_conversion_state(e, state_step_1);  
+  cps_conversion_state st = init_conversion_state(e, state_step_1);
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
 
   cps_conversion_state st2 = init_conversion_state(e1, state_init);
@@ -327,7 +328,7 @@ static void cps_convert_begin_nonsimple(schemerlicht_context* ctxt, schemerlicht
     if (!is_simple(ctxt, schemerlicht_vector_at(&e->expr.beg.arguments, first_non_simple_expr, schemerlicht_expression)))
       break;
     }
-  if (first_non_simple_expr == e->expr.beg.arguments.vector_size-1)
+  if (first_non_simple_expr == e->expr.beg.arguments.vector_size - 1)
     {
     cps_conversion_state st = init_conversion_state(schemerlicht_vector_back(&e->expr.beg.arguments, schemerlicht_expression), state_init);
     schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
@@ -340,7 +341,7 @@ static void cps_convert_begin_nonsimple(schemerlicht_context* ctxt, schemerlicht
     schemerlicht_expression* last = first + first_non_simple_expr;
     schemerlicht_vector_insert(ctxt, &new_b.expr.beg.arguments, &insert_pos, &first, &last, schemerlicht_expression);
     schemerlicht_vector_erase_range(&e->expr.beg.arguments, &first, &last, schemerlicht_expression);
-    schemerlicht_vector_push_back(ctxt, &new_b.expr.beg.arguments, *e, schemerlicht_expression);    
+    schemerlicht_vector_push_back(ctxt, &new_b.expr.beg.arguments, *e, schemerlicht_expression);
     *e = new_b;
     cps_conversion_state st = init_conversion_state(schemerlicht_vector_back(&e->expr.beg.arguments, schemerlicht_expression), state_init);
     schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
@@ -395,7 +396,7 @@ static void cps_convert_begin_nonsimple_step1(schemerlicht_context* ctxt, scheme
   }
 
 static void cps_clean_up(cps_conversion_helper* cps)
-  {  
+  {
   schemerlicht_memsize ind = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize);
   schemerlicht_vector_pop_back(&cps->index);
   *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) = ind;
@@ -474,7 +475,7 @@ static void cps_convert_let_nonsimple_step1(schemerlicht_context* ctxt, schemerl
   schemerlicht_assert(e->type == schemerlicht_type_let);
   cps_conversion_state st = init_conversion_state(e, state_step_2);
   st.var_index = e->expr.let.bindings.vector_size - 1;
-  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);  
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
   }
 
 static void cps_convert_let_nonsimple_step2(schemerlicht_context* ctxt, cps_conversion_state* state, cps_conversion_helper* cps)
@@ -539,7 +540,7 @@ static void cps_convert_let_nonsimple_step3(schemerlicht_context* ctxt, cps_conv
 static void cps_convert_let_nonsimple(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_let);
-  cps_conversion_state st = init_conversion_state(e, state_step_1);  
+  cps_conversion_state st = init_conversion_state(e, state_step_1);
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
 
   cps_conversion_state st2 = init_conversion_state(schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression), state_init);
@@ -549,7 +550,7 @@ static void cps_convert_let_nonsimple(schemerlicht_context* ctxt, schemerlicht_e
 static void cps_convert_let(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_let);
-  schemerlicht_vector simple;  
+  schemerlicht_vector simple;
   schemerlicht_vector_init_reserve(ctxt, &simple, e->expr.let.bindings.vector_size, int);
   int at_least_one_simple = 0;
   int all_simple = 1;
@@ -566,7 +567,7 @@ static void cps_convert_let(schemerlicht_context* ctxt, schemerlicht_expression*
     at_least_one_simple = 1;
     all_simple = 1;
     }
-  if (!at_least_one_simple)    
+  if (!at_least_one_simple)
     cps_convert_let_nonsimple(ctxt, e, cps);
   else if (all_simple)
     {
@@ -591,7 +592,7 @@ static void cps_convert_let(schemerlicht_context* ctxt, schemerlicht_expression*
         schemerlicht_vector_push_back(ctxt, &nonsimple_bindings, *schemerlicht_vector_at(&e->expr.let.bindings, j, schemerlicht_let_binding), schemerlicht_let_binding);
         }
       }
-    schemerlicht_expression new_let = schemerlicht_init_let(ctxt);    
+    schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
     swap(new_let.expr.let.bindings, nonsimple_bindings, schemerlicht_vector);
     swap(e->expr.let.body, new_let.expr.let.body, schemerlicht_vector);
     schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
@@ -609,11 +610,41 @@ static void cps_convert_let(schemerlicht_context* ctxt, schemerlicht_expression*
 static void cps_convert_if(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_if);
+  schemerlicht_assert(e->expr.i.arguments.vector_size == 3);
+
+  schemerlicht_expression* first = schemerlicht_vector_at(&e->expr.i.arguments, 0, schemerlicht_expression);
+
+  if (!is_simple(ctxt, first))
+    {
+    cps_conversion_state st = init_conversion_state(e, state_step_1);
+    schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
+    }
+
+  schemerlicht_expression* cont = get_continuation(cps);
+  schemerlicht_expression cont_copy = schemerlicht_expression_copy(ctxt, cont);
+  schemerlicht_vector_push_back(ctxt, &cps->continuation, cont_copy, schemerlicht_expression);
+
+  cps_conversion_state st2 = init_conversion_state(schemerlicht_vector_at(&e->expr.i.arguments, 1, schemerlicht_expression), state_init);
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);
+
+  cps_conversion_state st4 = init_conversion_state(e, state_step_3); // step 3 will pop the copy of the continuation
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st4, cps_conversion_state);
+
+  cps_conversion_state st3 = init_conversion_state(schemerlicht_vector_at(&e->expr.i.arguments, 2, schemerlicht_expression), state_init);
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st3, cps_conversion_state);
+  }
+
+static void cps_convert_if_step3(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_if);
+  schemerlicht_vector_pop_back(&cps->continuation); // pop our local copy of the continuation
   }
 
 static void cps_convert_if_step1(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_if);
+  schemerlicht_expression* first = schemerlicht_vector_at(&e->expr.i.arguments, 0, schemerlicht_expression);
+  assert(0);
   }
 
 static void cps_convert_if_step2(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
@@ -742,7 +773,7 @@ static void cps_convert_prim_nonsimple(schemerlicht_context* ctxt, schemerlicht_
   st.nonsimple_vars = nonsimple_vars;
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
 
-  cps_conversion_state st2 = init_conversion_state(schemerlicht_vector_at(&e->expr.prim.arguments, schemerlicht_vector_back(&nonsimple_vars, non_simple_var_struct)->index, schemerlicht_expression), state_init);  
+  cps_conversion_state st2 = init_conversion_state(schemerlicht_vector_at(&e->expr.prim.arguments, schemerlicht_vector_back(&nonsimple_vars, non_simple_var_struct)->index, schemerlicht_expression), state_init);
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);
 
   schemerlicht_vector_destroy(ctxt, &simple);
@@ -795,7 +826,7 @@ static void cps_convert_prim_nonsimple_step2(schemerlicht_context* ctxt, cps_con
   schemerlicht_vector_push_back(ctxt, &cps->index, idx_val, schemerlicht_memsize);
   schemerlicht_vector_push_back(ctxt, &cps->continuation, l, schemerlicht_expression);
   schemerlicht_assert(continuation_is_valid(ctxt, get_continuation(cps)));
-  cps_conversion_state st = init_conversion_state(schemerlicht_vector_at(&state->expr->expr.prim.arguments, it->index, schemerlicht_expression), state_init);  
+  cps_conversion_state st = init_conversion_state(schemerlicht_vector_at(&state->expr->expr.prim.arguments, it->index, schemerlicht_expression), state_init);
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
   }
 
@@ -805,7 +836,7 @@ static void cps_convert_prim_nonsimple_step3(schemerlicht_context* ctxt, cps_con
   schemerlicht_memsize ind = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize);
   schemerlicht_vector_pop_back(&cps->index);
   *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) = ind;
-  schemerlicht_vector_pop_back(&cps->continuation);  
+  schemerlicht_vector_pop_back(&cps->continuation);
   schemerlicht_expression e = *schemerlicht_vector_at(&state->expr->expr.prim.arguments, schemerlicht_vector_at(&state->nonsimple_vars, 0, non_simple_var_struct)->index, schemerlicht_expression);
   schemerlicht_string_destroy(ctxt, &state->expr->expr.prim.filename);
   schemerlicht_vector_destroy(ctxt, &state->expr->expr.prim.arguments);
@@ -1116,7 +1147,7 @@ static void cps_convert_funcall(schemerlicht_context* ctxt, schemerlicht_express
   st.nonsimple_vars = nonsimple_vars;
   st.nonsimple_fun_var = r0;
   schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st, cps_conversion_state);
-  
+
   cps_conversion_state st2 = init_conversion_state(NULL, state_init);
   if (nonsimple_vars.vector_size == 0)
     {
@@ -1126,7 +1157,7 @@ static void cps_convert_funcall(schemerlicht_context* ctxt, schemerlicht_express
     {
     st2.expr = schemerlicht_vector_at(&e->expr.funcall.arguments, schemerlicht_vector_back(&nonsimple_vars, non_simple_var_struct)->index, schemerlicht_expression);
     }
-  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);  
+  schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);
   schemerlicht_vector_destroy(ctxt, &simple);
   }
 
@@ -1143,7 +1174,7 @@ static void cps_convert_funcall_step1(schemerlicht_context* ctxt, cps_conversion
     cps_conversion_state st2 = init_conversion_state(state->expr, state_step_2);
     st2.nonsimple_vars = state->nonsimple_vars;
     st2.nonsimple_fun_var = state->nonsimple_fun_var;
-    st2.var_index = st.nonsimple_vars.vector_size-1;
+    st2.var_index = st.nonsimple_vars.vector_size - 1;
     schemerlicht_vector_push_back(ctxt, &cps->expressions_to_treat, st2, cps_conversion_state);
     }
   }
@@ -1189,7 +1220,7 @@ static void cps_convert_funcall_step2(schemerlicht_context* ctxt, cps_conversion
   cps_conversion_state st = init_conversion_state(NULL, state_init);
   if (state->var_index > 0)
     {
-    non_simple_var_struct* it2 = schemerlicht_vector_begin(&state->nonsimple_vars, non_simple_var_struct) + (state->var_index-1);
+    non_simple_var_struct* it2 = schemerlicht_vector_begin(&state->nonsimple_vars, non_simple_var_struct) + (state->var_index - 1);
     st.expr = schemerlicht_vector_at(&state->expr->expr.funcall.arguments, it2->index, schemerlicht_expression);
     }
   else
@@ -1390,6 +1421,11 @@ static void treat_cps_state_step_3(schemerlicht_context* ctxt, cps_conversion_st
     case schemerlicht_type_let:
     {
     cps_convert_let_nonsimple_step3(ctxt, cps_state, cps);
+    break;
+    }
+    case schemerlicht_type_if:
+    {
+    cps_convert_if_step3(ctxt, cps_state->expr, cps);
     break;
     }
     default: assert(0); // not implemented
