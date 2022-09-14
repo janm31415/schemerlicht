@@ -348,6 +348,26 @@ static void cps(const char* script, const char* expected)
   schemerlicht_close(ctxt);
   }
 
+static void test_cps_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define square (lambda (x) (* x x))) ( + (square 5) 1)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);  
+  TEST_EQ_STRING("( begin ( let ( [ #%k1 ( lambda ( #%k2 x ) ( begin ( #%k2 ( * x x ) ) ) ) ] ) ( begin ( let ( [ #%k0 ( set! square #%k1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ( let ( [ #%k4 square ] ) ( begin ( #%k4 ( lambda ( #%k1 ) ( begin ( let ( [ #%k0 ( + #%k1 1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) 5 ) ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  schemerlicht_tail_call_analysis(ctxt, &prog);
+  int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
+  TEST_EQ_INT(1, only_tails);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_cps()
   {
   cps("(15)", "( let ( [ #%k0 15 ] ) ( begin ( halt #%k0 ) ) ) ");
@@ -402,4 +422,5 @@ void run_all_conv_tests()
   tail_call_analysis();
   tail_call_analysis_2();
   test_cps();
+  test_cps_2();
   }
