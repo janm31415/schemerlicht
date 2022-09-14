@@ -26,6 +26,11 @@ typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
 #define schemerlicht_memsize uint32_t
 #endif
 
+#ifndef schemerlicht_memsize_sign_bit
+#define schemerlicht_memsize_sign_bit 0x80000000
+#endif
+
+
 #ifndef schemerlicht_mem_bits
 #define schemerlicht_mem_bits 32
 #endif

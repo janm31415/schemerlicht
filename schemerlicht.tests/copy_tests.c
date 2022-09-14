@@ -46,7 +46,14 @@ void run_all_copy_tests()
   test_copy("(lambda (x) (* x x))");
   test_copy("(let ([x 3] [y 4]) ( + x y) )");
   test_copy("(quote #t)");
-  test_copy("'(a b c 1 2 3)");
-  test_copy("'(a b c #(1 2 3))");
+  test_copy("(quote ())");
+  test_copy("(quote (1))");
+  test_copy("(quote (1 2))");
+  test_copy("(quote (1 2 3))");
+  test_copy("(quote #(1 2 3))");
+  test_copy("'(a b c 1 2 3)");  
   test_copy("'()");
+  test_copy("'(a b c #(1 2 3))");
+  test_copy("(quote 1 (2))");
+  test_copy("(quote (1 (2)))");
   }

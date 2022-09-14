@@ -389,8 +389,8 @@ void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_c
     }
     }
   }
-
-schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlicht_cell* c)
+/*
+schemerlicht_cell schemerlicht_cell_copy_recursive(schemerlicht_context* ctxt, schemerlicht_cell* c)
   {
   schemerlicht_cell out;
   out.type = c->type;
@@ -401,20 +401,99 @@ schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlich
     case schemerlicht_ct_string:
     case schemerlicht_ct_symbol:
     {
-      schemerlicht_string_copy(ctxt, &out.value.str, &c->value.str);
-      break;
+    schemerlicht_cell_copy_recursive(ctxt, &out.value.str, &c->value.str);
+    break;
     }
     case schemerlicht_ct_pair:
     case schemerlicht_ct_vector:
     {
-      schemerlicht_vector_init_reserve(ctxt, &out.value.vector, c->value.vector.vector_size, schemerlicht_cell);
-      for (schemerlicht_memsize j = 0; j < c->value.vector.vector_size; ++j)
-        {
-        schemerlicht_cell cc = schemerlicht_cell_copy(ctxt, schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell));
-        schemerlicht_vector_push_back(ctxt, &out.value.vector, cc, schemerlicht_cell);
-        }
-      break;
+    schemerlicht_vector_init_reserve(ctxt, &out.value.vector, c->value.vector.vector_size, schemerlicht_cell);
+    for (schemerlicht_memsize j = 0; j < c->value.vector.vector_size; ++j)
+      {
+      schemerlicht_cell cc = schemerlicht_cell_copy_recursive(ctxt, schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell));
+      schemerlicht_vector_push_back(ctxt, &out.value.vector, cc, schemerlicht_cell);
+      }
+    break;
     }
     }
   return out;
+  }
+  */
+
+schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlicht_cell* c_in)
+  {
+  schemerlicht_vector out, in;
+  schemerlicht_vector_init(ctxt, &out, schemerlicht_cell);
+  schemerlicht_vector_init(ctxt, &in, schemerlicht_cell*);
+  schemerlicht_vector_push_back(ctxt, &in, c_in, schemerlicht_cell*);
+  schemerlicht_vector counter;
+  schemerlicht_vector size;
+  schemerlicht_vector_init(ctxt, &counter, schemerlicht_memsize);
+  schemerlicht_vector_init(ctxt, &size, schemerlicht_memsize);
+  while (in.vector_size > 0)
+    {
+    if (counter.vector_size > 0)
+      {
+      schemerlicht_assert(*schemerlicht_vector_back(&counter, schemerlicht_memsize) > 0);
+      *schemerlicht_vector_back(&counter, schemerlicht_memsize) -= 1;
+      }
+    schemerlicht_cell* c = *schemerlicht_vector_back(&in, schemerlicht_cell*);
+    schemerlicht_vector_pop_back(&in);
+    switch (c->type)
+      {
+      case schemerlicht_ct_fixnum:
+      case schemerlicht_ct_flonum:
+      case schemerlicht_ct_string:
+      case schemerlicht_ct_symbol:
+      {
+      schemerlicht_cell c_copy;
+      c_copy.type = c->type;
+      schemerlicht_string_copy(ctxt, &c_copy.value.str, &c->value.str);
+      schemerlicht_vector_push_back(ctxt, &out, c_copy, schemerlicht_cell);
+      break;
+      }
+      case schemerlicht_ct_pair:
+      case schemerlicht_ct_vector:
+      {
+      schemerlicht_vector_push_back(ctxt, &counter, c->value.vector.vector_size, schemerlicht_memsize);
+      schemerlicht_memsize vec_size = c->value.vector.vector_size;
+      if (c->type == schemerlicht_ct_pair)
+        vec_size |= schemerlicht_memsize_sign_bit;
+      schemerlicht_vector_push_back(ctxt, &size, vec_size, schemerlicht_memsize);
+      for (schemerlicht_memsize j = 0; j < c->value.vector.vector_size; ++j)
+        {
+        schemerlicht_cell* cc = schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell);
+        schemerlicht_vector_push_back(ctxt, &in, cc, schemerlicht_cell*);
+        }
+      break;
+      }
+      } // switch (c->type)
+    while (counter.vector_size > 0 && *schemerlicht_vector_back(&counter, schemerlicht_memsize) == 0)
+      {
+      schemerlicht_cell c_copy;
+      schemerlicht_memsize sz = *schemerlicht_vector_back(&size, schemerlicht_memsize);
+      schemerlicht_vector_pop_back(&counter);
+      schemerlicht_vector_pop_back(&size);
+      if (sz & schemerlicht_memsize_sign_bit)
+        c_copy.type = schemerlicht_ct_pair;
+      else
+        c_copy.type = schemerlicht_ct_vector;
+      sz &= ~schemerlicht_memsize_sign_bit;
+      schemerlicht_vector_init_reserve(ctxt, &c_copy.value.vector, sz, schemerlicht_cell);
+      for (schemerlicht_memsize j = 0; j < sz; ++j)
+        {
+        schemerlicht_cell entry = *schemerlicht_vector_back(&out, schemerlicht_cell);
+        schemerlicht_vector_pop_back(&out);
+        schemerlicht_vector_push_back(ctxt, &c_copy.value.vector, entry, schemerlicht_cell);
+        }
+      schemerlicht_vector_push_back(ctxt, &out, c_copy, schemerlicht_cell);
+      }
+
+    }
+  schemerlicht_cell output = *schemerlicht_vector_back(&out, schemerlicht_cell);
+  schemerlicht_vector_destroy(ctxt, &in);
+  schemerlicht_vector_destroy(ctxt, &out);
+  schemerlicht_vector_destroy(ctxt, &counter);
+  schemerlicht_vector_destroy(ctxt, &size);
+  return output;
   }
