@@ -336,10 +336,9 @@ static void cps(const char* script, const char* expected)
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
-  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
-  TEST_EQ_STRING(expected, dumper->s.string_ptr);
-  schemerlicht_dump_visitor_free(ctxt, dumper);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
   schemerlicht_tail_call_analysis(ctxt, &prog);
   int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
   TEST_EQ_INT(1, only_tails);
