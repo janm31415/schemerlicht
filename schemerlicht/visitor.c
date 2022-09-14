@@ -513,7 +513,7 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
       for (; expr_rit != expr_rit_end; --expr_rit) // IMPORTANT: brackets necessary, as schemerlicht_vector_push_back is a C macro
         {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
-        }     
+        }
       }
     break;
     }
@@ -614,8 +614,32 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     {
     if (vis->previsit_case(ctxt, vis, e->expr))
       {
+      // note: all expressions essentially are dumped in the visitor, which is only of use for the deletion visitor.
+      // case should always be transformed to core forms.
       schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_CASE_POST), schemerlicht_visitor_entry);
-      assert(0); // todo
+      schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr->expr.cas.val_expr, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr->expr.cas.val_expr, schemerlicht_expression);
+      for (; it != it_end; ++it)
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      it = schemerlicht_vector_begin(&e->expr->expr.cas.else_body, schemerlicht_expression);
+      it_end = schemerlicht_vector_end(&e->expr->expr.cas.else_body, schemerlicht_expression);
+      for (; it != it_end; ++it)
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr->expr.cas.then_bodies, schemerlicht_vector);
+      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr->expr.cas.then_bodies, schemerlicht_vector);
+      for (; vit != vit_end; ++vit)
+        {
+        it = schemerlicht_vector_begin(vit, schemerlicht_expression);
+        it_end = schemerlicht_vector_end(vit, schemerlicht_expression);
+        for (; it != it_end; ++it)
+          {
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+          }
+        }
       }
     break;
     }
@@ -628,8 +652,20 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     {
     if (vis->previsit_cond(ctxt, vis, e->expr))
       {
+      // note: all expressions essentially are dumped in the visitor, which is only of use for the deletion visitor.
+      // cond should always be transformed to core forms.
       schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_COND_POST), schemerlicht_visitor_entry);
-      assert(0); // todo
+      schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr->expr.cond.arguments, schemerlicht_vector);
+      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr->expr.cond.arguments, schemerlicht_vector);
+      for (; vit != vit_end; ++vit)
+        {
+        schemerlicht_expression* it = schemerlicht_vector_begin(vit, schemerlicht_expression);
+        schemerlicht_expression* it_end = schemerlicht_vector_end(vit, schemerlicht_expression);
+        for (; it != it_end; ++it)
+          {
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+          }
+        }
       }
     break;
     }
@@ -642,8 +678,32 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     {
     if (vis->previsit_do(ctxt, vis, e->expr))
       {
+      // note: all expressions essentially are dumped in the visitor, which is only of use for the deletion visitor.
+      // do should always be transformed to core forms.
       schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_DO_POST), schemerlicht_visitor_entry);
-      assert(0); // todo
+      schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr->expr.d.test, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr->expr.d.test, schemerlicht_expression);
+      for (; it != it_end; ++it)
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      it = schemerlicht_vector_begin(&e->expr->expr.d.commands, schemerlicht_expression);
+      it_end = schemerlicht_vector_end(&e->expr->expr.d.commands, schemerlicht_expression);
+      for (; it != it_end; ++it)
+        {
+        schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+        }
+      schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr->expr.d.bindings, schemerlicht_vector);
+      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr->expr.d.bindings, schemerlicht_vector);
+      for (; vit != vit_end; ++vit)
+        {
+        it = schemerlicht_vector_begin(vit, schemerlicht_expression);
+        it_end = schemerlicht_vector_end(vit, schemerlicht_expression);
+        for (; it != it_end; ++it)
+          {
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
+          }
+        }
       }
     break;
     }
