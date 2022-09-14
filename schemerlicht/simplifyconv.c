@@ -426,6 +426,73 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
 static void convert_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {  
   schemerlicht_assert(e->type == schemerlicht_type_do);
+  schemerlicht_expression letr = schemerlicht_init_let(ctxt);
+  letr.expr.let.bt = schemerlicht_bt_letrec;
+  schemerlicht_expression letr_begin = schemerlicht_init_begin(ctxt);
+  schemerlicht_expression call_loop = schemerlicht_init_funcall(ctxt);
+  schemerlicht_vector_push_back(ctxt, &call_loop.expr.funcall.fun, make_var(ctxt, "loop"), schemerlicht_expression);
+  schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr.d.bindings, schemerlicht_vector);
+  schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr.d.bindings, schemerlicht_vector);
+  for (; vit != vit_end; ++vit)
+    {
+    schemerlicht_assert(vit->vector_size == 3); // if not, make_do in parser.c is incorrect
+    schemerlicht_vector_push_back(ctxt, &call_loop.expr.funcall.arguments, *schemerlicht_vector_at(vit, 1, schemerlicht_expression), schemerlicht_expression); // the inits
+    }
+  schemerlicht_vector_push_back(ctxt, &letr_begin.expr.beg.arguments, call_loop, schemerlicht_expression); 
+  schemerlicht_vector_push_back(ctxt, &letr.expr.let.body, letr_begin, schemerlicht_expression);
+  schemerlicht_expression lam = schemerlicht_init_lambda(ctxt);
+  vit = schemerlicht_vector_begin(&e->expr.d.bindings, schemerlicht_vector);
+  for (; vit != vit_end; ++vit)
+    {
+    schemerlicht_expression* v = schemerlicht_vector_at(vit, 0, schemerlicht_expression);
+    schemerlicht_assert(v->type == schemerlicht_type_variable); 
+    schemerlicht_vector_push_back(ctxt, &lam.expr.lambda.variables, v->expr.var.name, schemerlicht_string);
+    schemerlicht_string_destroy(ctxt, &v->expr.var.filename);
+    }
+  schemerlicht_expression lam_begin = schemerlicht_init_begin(ctxt);
+  schemerlicht_expression i = schemerlicht_init_if(ctxt);
+  schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, *schemerlicht_vector_at(&e->expr.d.test, 0, schemerlicht_expression), schemerlicht_expression);
+  schemerlicht_expression if_arg1 = schemerlicht_init_begin(ctxt);
+  for (schemerlicht_memsize j = 1; j < e->expr.d.test.vector_size; ++j)
+    {
+    schemerlicht_vector_push_back(ctxt, &if_arg1.expr.beg.arguments, *schemerlicht_vector_at(&e->expr.d.test, j, schemerlicht_expression), schemerlicht_expression);
+    }
+  schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, if_arg1, schemerlicht_expression);
+  schemerlicht_expression if_arg2 = schemerlicht_init_begin(ctxt);
+  schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.d.commands, schemerlicht_expression);
+  schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr.d.commands, schemerlicht_expression);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_vector_push_back(ctxt, &if_arg2.expr.beg.arguments, *it, schemerlicht_expression);
+    }
+  schemerlicht_expression call_loop2 = schemerlicht_init_funcall(ctxt);
+  schemerlicht_vector_push_back(ctxt, &call_loop2.expr.funcall.fun, make_var(ctxt, "loop"), schemerlicht_expression);
+  vit = schemerlicht_vector_begin(&e->expr.d.bindings, schemerlicht_vector);  
+  for (; vit != vit_end; ++vit)
+    {
+    schemerlicht_assert(vit->vector_size == 3); // if not, make_do in parser.c is incorrect
+    schemerlicht_vector_push_back(ctxt, &call_loop2.expr.funcall.arguments, *schemerlicht_vector_at(vit, 2, schemerlicht_expression), schemerlicht_expression); // the steps
+    }
+  schemerlicht_vector_push_back(ctxt, &if_arg2.expr.beg.arguments, call_loop2, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, if_arg2, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &lam_begin.expr.beg.arguments, i, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &lam.expr.lambda.body, lam_begin, schemerlicht_expression);
+  schemerlicht_let_binding bind;
+  schemerlicht_string_init(ctxt, &bind.binding_name, "loop");
+  bind.binding_expr = lam;
+  schemerlicht_vector_push_back(ctxt, &letr.expr.let.bindings, bind, schemerlicht_let_binding);
+
+  vit = schemerlicht_vector_begin(&e->expr.d.bindings, schemerlicht_vector);
+  for (; vit != vit_end; ++vit)
+    {
+    schemerlicht_vector_destroy(ctxt, vit);
+    }
+  schemerlicht_vector_destroy(ctxt, &e->expr.d.bindings);
+  schemerlicht_vector_destroy(ctxt, &e->expr.d.test);
+  schemerlicht_vector_destroy(ctxt, &e->expr.d.commands);
+  schemerlicht_string_destroy(ctxt, &e->expr.d.filename);
+
+  *e = letr;
   }
 
 static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)

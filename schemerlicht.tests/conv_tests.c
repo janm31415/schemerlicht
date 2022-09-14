@@ -475,7 +475,7 @@ void run_all_conv_tests()
   simplify_to_core_conversion_named_let();
   simplify_to_core_conversion_case();
   simplify_to_core_conversion_cond();
-  //simplify_to_core_conversion_do();
+  simplify_to_core_conversion_do();
   tail_call_analysis();
   tail_call_analysis_2();
   test_cps();
