@@ -207,6 +207,32 @@ static void convert_when(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   *e = i;
   }
 
+static void convert_unless(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  assert(e->type == schemerlicht_type_primitive_call);
+  assert(strcmp(e->expr.prim.name.string_ptr, "unless") == 0);
+  schemerlicht_expression i = schemerlicht_init_if(ctxt);
+  i.expr.i.line_nr = e->expr.prim.line_nr;
+  i.expr.i.column_nr = e->expr.prim.column_nr;
+  i.expr.i.filename = e->expr.prim.filename;
+  if (e->expr.prim.arguments.vector_size == 0)
+    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, i.expr.i.line_nr, i.expr.i.column_nr);
+  schemerlicht_expression np = schemerlicht_init_primcall(ctxt);
+  schemerlicht_string_init(ctxt, &np.expr.prim.name, "not");
+  schemerlicht_vector_push_back(ctxt, &np.expr.prim.arguments, *schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression), schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, np, schemerlicht_expression);  
+  schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
+  schemerlicht_expression* insert_pos = schemerlicht_vector_begin(&new_begin.expr.beg.arguments, schemerlicht_expression);
+  schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.prim.arguments, schemerlicht_expression) + 1;
+  schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr.prim.arguments, schemerlicht_expression);
+  schemerlicht_vector_insert(ctxt, &new_begin.expr.beg.arguments, &insert_pos, &it, &it_end, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, new_begin, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, schemerlicht_init_nop(ctxt), schemerlicht_expression);
+  schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+  schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+  *e = i;
+  }
+
 static void convert_letrec(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_letrec);
@@ -534,6 +560,10 @@ static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visito
       else if (strcmp(e->expr.prim.name.string_ptr, "when") == 0)
         {
         convert_when(ctxt, v, e);
+        }
+      else if (strcmp(e->expr.prim.name.string_ptr, "unless") == 0)
+        {
+        convert_unless(ctxt, v, e);
         }
       break;
     case schemerlicht_type_let:

@@ -377,6 +377,24 @@ static void simplify_to_core_conversion_when()
   schemerlicht_close(ctxt);
   }
 
+static void simplify_to_core_conversion_unless()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(unless (< x 2) (+ 1 2) (* 3 4))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+
+  TEST_EQ_STRING("( if ( not ( < x 2 ) ) ( begin ( + 1 2 ) ( * 3 4 ) ) #undefined ) ", s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void tail_call_analysis()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -494,6 +512,7 @@ void run_all_conv_tests()
   simplify_to_core_conversion_cond();
   simplify_to_core_conversion_do();
   simplify_to_core_conversion_when();
+  simplify_to_core_conversion_unless();
   tail_call_analysis();
   tail_call_analysis_2();
   test_cps();
