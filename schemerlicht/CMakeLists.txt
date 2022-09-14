@@ -3,6 +3,7 @@ begconv.h
 schemerlicht.h
 context.h
 cps.h
+copy.h
 defconv.h
 dump.h
 error.h
@@ -25,6 +26,7 @@ set(SRCS
 begconv.c
 context.c
 cps.c
+copy.c
 defconv.c
 dump.c
 error.c

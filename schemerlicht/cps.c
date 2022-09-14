@@ -606,6 +606,21 @@ static void cps_convert_let(schemerlicht_context* ctxt, schemerlicht_expression*
   schemerlicht_vector_destroy(ctxt, &simple);
   }
 
+static void cps_convert_if(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_if);
+  }
+
+static void cps_convert_if_step1(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_if);
+  }
+
+static void cps_convert_if_step2(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_if);
+  }
+
 static void cps_convert_prim_simple(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
@@ -1263,6 +1278,11 @@ static void treat_cps_state_step_init(schemerlicht_context* ctxt, cps_conversion
     cps_convert_let(ctxt, cps_state->expr, cps);
     break;
     }
+    case schemerlicht_type_if:
+    {
+    cps_convert_if(ctxt, cps_state->expr, cps);
+    break;
+    }
     default: assert(0); // not implemented
     }
   }
@@ -1306,6 +1326,11 @@ static void treat_cps_state_step_1(schemerlicht_context* ctxt, cps_conversion_st
     cps_convert_let_nonsimple_step1(ctxt, cps_state->expr, cps);
     break;
     }
+    case schemerlicht_type_if:
+    {
+    cps_convert_if_step1(ctxt, cps_state->expr, cps);
+    break;
+    }
     default: assert(0); // not implemented
     }
   }
@@ -1332,6 +1357,11 @@ static void treat_cps_state_step_2(schemerlicht_context* ctxt, cps_conversion_st
     case schemerlicht_type_let:
     {
     cps_convert_let_nonsimple_step2(ctxt, cps_state, cps);
+    break;
+    }
+    case schemerlicht_type_if:
+    {
+    cps_convert_if_step2(ctxt, cps_state->expr, cps);
     break;
     }
     default: assert(0); // not implemented

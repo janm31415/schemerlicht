@@ -14,4 +14,6 @@ typedef struct schemerlicht_dump_visitor
 schemerlicht_dump_visitor* schemerlicht_dump_visitor_new(schemerlicht_context* ctxt);
 void schemerlicht_dump_visitor_free(schemerlicht_context* ctxt, schemerlicht_dump_visitor* v);
 
+schemerlicht_string dump(schemerlicht_context* ctxt, schemerlicht_program* prog);
+
 #endif //SCHEMERLICHT_DUMP_H

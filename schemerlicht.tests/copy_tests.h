@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_COPY_TESTS_H
+#define SCHEMERLICHT_COPY_TESTS_H
+
+void run_all_copy_tests();
+
+#endif //SCHEMERLICHT_COPY_TESTS_H

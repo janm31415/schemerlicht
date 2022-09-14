@@ -1,5 +1,6 @@
 set(HDRS
 conv_tests.h
+copy_tests.h
 dump_tests.h
 map_tests.h
 parser_tests.h
@@ -13,6 +14,7 @@ vector_tests.h
 	
 set(SRCS
 conv_tests.c
+copy_tests.c
 dump_tests.c
 map_tests.c
 parser_tests.c

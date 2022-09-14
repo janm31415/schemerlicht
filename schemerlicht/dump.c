@@ -303,3 +303,13 @@ void schemerlicht_dump_visitor_free(schemerlicht_context* ctxt, schemerlicht_dum
     schemerlicht_delete(ctxt, v);
     }
   }
+
+schemerlicht_string dump(schemerlicht_context* ctxt, schemerlicht_program* prog)
+  {
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, prog);  
+  schemerlicht_string s;
+  schemerlicht_string_copy(ctxt, &s, &dumper->s);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+  return s;
+  }

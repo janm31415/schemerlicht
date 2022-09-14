@@ -1,5 +1,6 @@
 #include "test_assert.h"
 #include "conv_tests.h"
+#include "copy_tests.h"
 #include "dump_tests.h"
 #include "map_tests.h"
 #include "parser_tests.h"
@@ -19,6 +20,7 @@ int main(int argc, const char* argv[])
   clock_t start_t, end_t;
   start_t = clock();
   run_all_conv_tests();
+  run_all_copy_tests();
   run_all_dump_tests();
   run_all_map_tests();
   run_all_parser_tests();
