@@ -131,8 +131,7 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   INIT_FOR_COPYING;
   COPY_COMMON(quote);
   cp.expr.quote.qt = e->expr.quote.qt;
-  assert(0); // to do: copy for cells
-  cp.expr.quote.arg = e->expr.quote.arg;
+  cp.expr.quote.arg = schemerlicht_cell_copy(ctxt, &e->expr.quote.arg);
   PUSH_RESULT;
   }
 static void visit_string(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)

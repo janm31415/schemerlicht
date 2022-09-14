@@ -39,4 +39,6 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
 
 void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_cell* c, schemerlicht_string* s);
 
+SCHEMERLICHT_API schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlicht_cell* c);
+
 #endif //SCHEMERLICHT_READER_H

@@ -389,3 +389,32 @@ void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_c
     }
     }
   }
+
+schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlicht_cell* c)
+  {
+  schemerlicht_cell out;
+  out.type = c->type;
+  switch (c->type)
+    {
+    case schemerlicht_ct_fixnum:
+    case schemerlicht_ct_flonum:
+    case schemerlicht_ct_string:
+    case schemerlicht_ct_symbol:
+    {
+      schemerlicht_string_copy(ctxt, &out.value.str, &c->value.str);
+      break;
+    }
+    case schemerlicht_ct_pair:
+    case schemerlicht_ct_vector:
+    {
+      schemerlicht_vector_init_reserve(ctxt, &out.value.vector, c->value.vector.vector_size, schemerlicht_cell);
+      for (schemerlicht_memsize j = 0; j < c->value.vector.vector_size; ++j)
+        {
+        schemerlicht_cell cc = schemerlicht_cell_copy(ctxt, schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell));
+        schemerlicht_vector_push_back(ctxt, &out.value.vector, cc, schemerlicht_cell);
+        }
+      break;
+    }
+    }
+  return out;
+  }
