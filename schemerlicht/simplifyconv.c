@@ -233,6 +233,27 @@ static void convert_unless(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   *e = i;
   }
 
+static void convert_delay(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  assert(e->type == schemerlicht_type_primitive_call);
+  assert(strcmp(e->expr.prim.name.string_ptr, "delay") == 0);
+  if (e->expr.prim.arguments.vector_size != 1)
+    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr);
+  schemerlicht_expression lam = schemerlicht_init_lambda(ctxt);
+  schemerlicht_expression lam_begin = schemerlicht_init_begin(ctxt);
+  schemerlicht_expression* p_arg = schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &lam_begin.expr.beg.arguments, *p_arg, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &lam.expr.lambda.body, lam_begin, schemerlicht_expression);
+  schemerlicht_expression var = make_var(ctxt, "make-promise");
+  schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+  schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, var, schemerlicht_expression);
+  schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, lam, schemerlicht_expression);
+  schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+  schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+  schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
+  *e = f;
+  }
+
 static void convert_letrec(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_letrec);
@@ -564,6 +585,10 @@ static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visito
       else if (strcmp(e->expr.prim.name.string_ptr, "unless") == 0)
         {
         convert_unless(ctxt, v, e);
+        }
+      else if (strcmp(e->expr.prim.name.string_ptr, "delay") == 0)
+        {
+        convert_delay(ctxt, v, e);
         }
       break;
     case schemerlicht_type_let:
