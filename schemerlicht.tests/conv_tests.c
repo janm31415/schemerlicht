@@ -527,6 +527,20 @@ static void test_quasiquote_conversion()
   test_quasiquote("`(1 2)", "( quote (1 2) ) ");
   test_quasiquote("`let", "( quote let ) ");
   test_quasiquote("`( 1 ,(+ 2 3))", "( cons ( quote 1 ) ( cons ( + 2 3 ) ( quote () ) ) ) ");
+  test_quasiquote("(quasiquote ( 1 ,(+ 2 3)))", "( cons ( quote 1 ) ( cons ( + 2 3 ) ( quote () ) ) ) ");
+  test_quasiquote("`( ,(+ 2 3) 1)", "( cons ( + 2 3 ) ( quote (1) ) ) ");
+  test_quasiquote("(quasiquote( (unquote (+ 2 3)) 1))", "( cons ( + 2 3 ) ( quote (1) ) ) ");
+  test_quasiquote("`( 1 2 ,x )", "( cons ( quote 1 ) ( cons ( quote 2 ) ( cons x ( quote () ) ) ) ) ");
+  test_quasiquote("(quasiquote ( 1 2 (unquote x) ))", "( cons ( quote 1 ) ( cons ( quote 2 ) ( cons x ( quote () ) ) ) ) ");
+  test_quasiquote("`x", "( quote x ) ");
+  test_quasiquote("(quasiquote x)", "( quote x ) ");
+  test_quasiquote("`,x", "x ");
+  test_quasiquote("(quasiquote (unquote x))", "x ");
+  test_quasiquote("`( (,(+ 1 2) 3) 5 )", "( cons ( cons ( + 1 2 ) ( quote (3) ) ) ( quote (5) ) ) ");
+  test_quasiquote("(quasiquote ( ((unquote (+ 1 2)) 3) 5 ) )", "( cons ( cons ( + 1 2 ) ( quote (3) ) ) ( quote (5) ) ) ");
+  test_quasiquote("`( (5 4 ,(+ 1 2) 3) 5 )", "( cons ( cons ( quote 5 ) ( cons ( quote 4 ) ( cons ( + 1 2 ) ( quote (3) ) ) ) ) ( quote (5) ) ) ");
+  test_quasiquote("(quasiquote ( (5 4 (unquote (+ 1 2)) 3) 5 ))", "( cons ( cons ( quote 5 ) ( cons ( quote 4 ) ( cons ( + 1 2 ) ( quote (3) ) ) ) ) ( quote (5) ) ) ");
+  //test_quasiquote("`(,@(cdr '(c)) )", "( cdr ( quote (c) ) ) ");
   }
 
 void run_all_conv_tests()

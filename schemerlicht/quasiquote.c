@@ -198,8 +198,6 @@ static schemerlicht_expression cell_to_expression(schemerlicht_context* ctxt, sc
   schemerlicht_expression result = schemerlicht_make_expression(ctxt, &token_it, &token_it_end);
   destroy_tokens_vector(ctxt, &tokens);
 
-  //schemerlicht_destroy_cell(ctxt, c);
-
   if (!as_list)
     return result;
   return make_list(ctxt, &result);
