@@ -7,6 +7,7 @@
 #include "schemerlicht/simplifyconv.h"
 #include "schemerlicht/tailcall.h"
 #include "schemerlicht/cps.h"
+#include "schemerlicht/quasiquote.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -507,6 +508,27 @@ static void test_cps()
   cps("(if (f) 2 3)", "( let ( [ #%k2 f ] ) ( begin ( #%k2 ( lambda ( #%k1 ) ( begin ( if #%k1 ( let ( [ #%k0 2 ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k0 3 ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ) ) ) ");
   }
 
+static void test_quasiquote(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_quasiquote_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_quasiquote_conversion()
+  {
+  test_quasiquote("`(1 2)", "( quote (1 2) ) ");
+  test_quasiquote("`let", "( quote let ) ");
+  test_quasiquote("`( 1 ,(+ 2 3))", "( cons ( quote 1 ) ( cons ( + 2 3 ) ( quote () ) ) ) ");
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -536,4 +558,5 @@ void run_all_conv_tests()
   tail_call_analysis_2();
   test_cps();
   test_cps_2();
+  test_quasiquote_conversion();
   }

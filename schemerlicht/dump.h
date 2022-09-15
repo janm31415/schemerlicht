@@ -15,5 +15,6 @@ schemerlicht_dump_visitor* schemerlicht_dump_visitor_new(schemerlicht_context* c
 void schemerlicht_dump_visitor_free(schemerlicht_context* ctxt, schemerlicht_dump_visitor* v);
 
 schemerlicht_string schemerlicht_dump(schemerlicht_context* ctxt, schemerlicht_program* prog);
+schemerlicht_string schemerlicht_dump_expression(schemerlicht_context* ctxt, schemerlicht_expression* e);
 
 #endif //SCHEMERLICHT_DUMP_H

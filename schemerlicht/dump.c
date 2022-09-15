@@ -313,3 +313,13 @@ schemerlicht_string schemerlicht_dump(schemerlicht_context* ctxt, schemerlicht_p
   schemerlicht_dump_visitor_free(ctxt, dumper);
   return s;
   }
+
+schemerlicht_string schemerlicht_dump_expression(schemerlicht_context* ctxt, schemerlicht_expression* e)
+  {
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_expression(ctxt, dumper->visitor, e);
+  schemerlicht_string s;
+  schemerlicht_string_copy(ctxt, &s, &dumper->s);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+  return s;
+  }

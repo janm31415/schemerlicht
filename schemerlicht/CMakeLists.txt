@@ -12,6 +12,7 @@ map.h
 memory.h
 object.h
 parser.h
+quasiquote.h
 reader.h
 simplifyconv.h
 stream.h
@@ -34,6 +35,7 @@ map.c
 memory.c
 object.c
 parser.c
+quasiquote.c
 reader.c
 simplifyconv.c
 stream.c

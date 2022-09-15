@@ -290,7 +290,7 @@ typedef struct schemerlicht_program
   schemerlicht_vector expressions;
   } schemerlicht_program;
 
-
+schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt, token** token_it, token** token_it_end);
 SCHEMERLICHT_API schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vector* tokens);
 SCHEMERLICHT_API void schemerlicht_program_destroy(schemerlicht_context* ctxt, schemerlicht_program* p);
 SCHEMERLICHT_API void schemerlicht_expression_destroy(schemerlicht_context* ctxt, schemerlicht_expression* e);

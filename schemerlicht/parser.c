@@ -825,7 +825,12 @@ schemerlicht_expression schemerlicht_init_quote(schemerlicht_context* ctxt)
   q.filename = make_null_string();
   q.line_nr = -1;
   q.column_nr = -1;
-  q.qt = schemerlicht_qt_quote;  
+  q.qt = schemerlicht_qt_quote;
+  q.arg.type = schemerlicht_ct_pair;
+  q.arg.value.vector.vector_size = 0;
+  q.arg.value.vector.vector_capacity = 0;
+  q.arg.value.vector.vector_ptr = NULL;
+  q.arg.value.vector.element_size = 0;
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_quote;
   expr.expr.quote = q;
