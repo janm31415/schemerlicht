@@ -216,40 +216,40 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   UNUSED(v);
   UNUSED(e);
   }
-int previsit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+static int previsit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(ctxt);
   UNUSED(v);
   UNUSED(e);
   return 1;
   }
-void postvisit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+static void postvisit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(ctxt);
   UNUSED(v);
   UNUSED(e);
   }
-int previsit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
-  {
-  UNUSED(ctxt);
-  UNUSED(v);
-  UNUSED(e);
-  return 1;
-  }
-void postvisit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
-  {
-  UNUSED(ctxt);
-  UNUSED(v);
-  UNUSED(e);
-  }
-int previsit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+static int previsit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(ctxt);
   UNUSED(v);
   UNUSED(e);
   return 1;
   }
-void postvisit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+static void postvisit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  }
+static int previsit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  UNUSED(ctxt);
+  UNUSED(v);
+  UNUSED(e);
+  return 1;
+  }
+static void postvisit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   UNUSED(ctxt);
   UNUSED(v);

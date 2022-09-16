@@ -329,6 +329,22 @@ static void dump_quasiquote_3()
   schemerlicht_close(ctxt);
   }
 
+
+static void test_dump(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_dump_tests()
   {
   dump_fixnum();
@@ -348,4 +364,10 @@ void run_all_dump_tests()
   dump_quasiquote();
   dump_quasiquote_2();
   dump_quasiquote_3();
+  test_dump("(cond(#f)(#f 12)(12 13))", "( cond [ #f ] [ #f 12 ] [ 12 13 ] ) ");
+  test_dump("(cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))])", "( cond [ ( < n 2 ) 1 ] [ #t ( + ( fib ( - n 2 ) ) ( fib ( - n 1 ) ) ) ] ) ");
+  test_dump("(cond[(cons 1 2) => (lambda(x) (cdr x))]) ", "( cond [ ( cons 1 2 )  => ( lambda ( x ) ( begin ( cdr x ) ) ) ] ) ");
+  test_dump("(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])", "( case ( + 7 5 ) [ (1 2 3) ( quote small ) ] [ (10 11 12) ( quote big ) ] [ else #undefined ] ) ");
+  test_dump("(case (car '(c d)) [(a e i o u) 'vowel][(w y) 'semivowel][else 'consonant])", "( case ( car ( quote (c d) ) ) [ (a e i o u) ( quote vowel ) ] [ (w y) ( quote semivowel ) ] [ else ( quote consonant ) ] ) ");
+  test_dump("(do ([vec (make-vector 5)] [i 0 (+ i 1)]) ((= i 5) vec) (vector-set! vec i i))", "( do [ vec ( make-vector 5 ) vec ] [ i 0 ( + i 1 ) ] ) ( ( = i 5 ) vec ) ( vector-set! vec i i ) ) ");
   }
