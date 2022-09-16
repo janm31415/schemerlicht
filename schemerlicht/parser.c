@@ -299,6 +299,8 @@ static schemerlicht_expression make_quasiquote(schemerlicht_context* ctxt, token
   if ((strcmp((*token_it)->value.string_ptr, "quasiquote") != 0) && (strcmp((*token_it)->value.string_ptr, "`") != 0))
     schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
   token_next(ctxt, token_it, token_it_end);
+  if (*token_it == *token_it_end)
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
   q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_quote;

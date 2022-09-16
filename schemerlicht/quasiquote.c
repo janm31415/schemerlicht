@@ -210,11 +210,11 @@ static schemerlicht_expression make_quote(schemerlicht_context* ctxt, const char
   schemerlicht_expression q = schemerlicht_init_quote(ctxt);
   q.expr.quote.arg.type = schemerlicht_ct_symbol;
   schemerlicht_string_init(ctxt, &q.expr.quote.arg.value.str, quote_type);
-  schemerlicht_cell* td = tag_data(ctxt, c);
+  schemerlicht_cell td = schemerlicht_cell_copy(ctxt, tag_data(ctxt, c));
   int target_depth = depth - 1;
   if (strcmp(quote_type, "quasiquote") == 0)
     target_depth = depth + 1;
-  schemerlicht_expression e = qq_expand(ctxt, td, target_depth);
+  schemerlicht_expression e = qq_expand(ctxt, &td, target_depth);
   schemerlicht_expression p = schemerlicht_init_primcall(ctxt);
   schemerlicht_string_init(ctxt, &p.expr.prim.name, "cons");
   schemerlicht_vector_push_back(ctxt, &p.expr.prim.arguments, q, schemerlicht_expression);
@@ -228,6 +228,134 @@ static schemerlicht_expression make_quote(schemerlicht_context* ctxt, const char
   if (!list)
     return p;
   return make_list(ctxt, &p);
+  }
+
+static schemerlicht_expression qq_expand_list(schemerlicht_context* ctxt, schemerlicht_cell* c, int depth)
+  {
+  if (is_simple(ctxt, c))
+    {
+    schemerlicht_expression q = schemerlicht_init_quote(ctxt);
+    q.expr.quote.arg.type = schemerlicht_ct_pair;
+    schemerlicht_vector_init(ctxt, &q.expr.quote.arg.value.vector, schemerlicht_cell);
+    schemerlicht_vector_push_back(ctxt, &q.expr.quote.arg.value.vector, *c, schemerlicht_cell);
+    schemerlicht_vector_push_back(ctxt, &q.expr.quote.arg.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);    
+    return q;
+    }
+  else if (tag_is_comma(c))
+    {
+    if (depth == 0)
+      {
+      schemerlicht_cell* td = tag_data(ctxt, c);
+      schemerlicht_expression expr = cell_to_expression(ctxt, td, 1);
+      schemerlicht_destroy_cell(ctxt, c);
+      return expr;
+      }
+    else
+      {
+      schemerlicht_expression expr = make_quote(ctxt, "unquote", c, 1, depth);
+      schemerlicht_destroy_cell(ctxt, c);
+      return expr;
+      }
+    }
+  else if (tag_is_comma_atsign(c))
+    {
+    if (depth == 0)
+      {
+      schemerlicht_cell* td = tag_data(ctxt, c);
+      schemerlicht_expression expr = cell_to_expression(ctxt, td, 0);
+      schemerlicht_destroy_cell(ctxt, c);
+      return expr;
+      }
+    else
+      {
+      schemerlicht_expression expr = make_quote(ctxt, "unquote-splicing", c, 1, depth);
+      schemerlicht_destroy_cell(ctxt, c);
+      return expr;
+      }
+    }
+  else if (tag_is_backquote(c))
+    {
+    schemerlicht_expression expr = make_quote(ctxt, "quasiquote", c, 1, depth);
+    schemerlicht_destroy_cell(ctxt, c);
+    return expr;
+    }
+  else if (is_pair(c))
+    {
+    schemerlicht_cell* p0 = schemerlicht_vector_at(&c->value.vector, 0, schemerlicht_cell);
+    schemerlicht_cell* p1 = schemerlicht_vector_at(&c->value.vector, 1, schemerlicht_cell);
+    if (!has_splicing(ctxt, p0))
+      {
+      schemerlicht_expression expr1 = qq_expand(ctxt, p0, depth);
+      schemerlicht_expression expr2 = qq_expand(ctxt, p1, depth);
+      schemerlicht_expression p = schemerlicht_init_primcall(ctxt);
+      schemerlicht_string_init(ctxt, &p.expr.prim.name, "cons");
+      schemerlicht_vector_push_back(ctxt, &p.expr.prim.arguments, expr1, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &p.expr.prim.arguments, expr2, schemerlicht_expression);
+      schemerlicht_vector_destroy(ctxt, &c->value.vector);
+      return make_list(ctxt, &p);
+      }
+    else if (is_nil(p1))
+      {
+      schemerlicht_expression expr1 = qq_expand_list(ctxt, p0, depth);
+      schemerlicht_vector_destroy(ctxt, &c->value.vector);
+      return make_list(ctxt, &expr1);
+      }
+    else
+      {
+      schemerlicht_expression expr1 = qq_expand_list(ctxt, p0, depth);
+      schemerlicht_expression expr2 = qq_expand(ctxt, p1, depth);
+      schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+      schemerlicht_expression v = schemerlicht_init_variable(ctxt);
+      schemerlicht_string_init(ctxt, &v.expr.var.name, "append");
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, v, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr1, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr2, schemerlicht_expression);
+      schemerlicht_vector_destroy(ctxt, &c->value.vector);
+      return make_list(ctxt, &f);
+      }
+    }
+  else if (c->type == schemerlicht_ct_vector)
+    {
+    schemerlicht_cell empty_pair_cell;
+    empty_pair_cell.type = schemerlicht_ct_pair;
+    empty_pair_cell.value.vector.vector_size = 0;
+    empty_pair_cell.value.vector.vector_capacity = 0;
+    empty_pair_cell.value.vector.element_size = 0;
+    empty_pair_cell.value.vector.vector_ptr = NULL;
+    schemerlicht_cell list_cell = empty_pair_cell;
+    schemerlicht_cell* parent = &list_cell;
+    for (schemerlicht_memsize j = 0; j < c->value.vector.vector_size; ++j)
+      {
+      schemerlicht_assert(parent->value.vector.vector_size == 0);
+      schemerlicht_vector_init(ctxt, &parent->value.vector, schemerlicht_cell);
+      schemerlicht_cell* val = schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell);
+      schemerlicht_vector_push_back(ctxt, &parent->value.vector, *val, schemerlicht_cell);
+      schemerlicht_cell empty_pair_cell;
+      empty_pair_cell.type = schemerlicht_ct_pair;
+      empty_pair_cell.value.vector.vector_size = 0;
+      empty_pair_cell.value.vector.vector_capacity = 0;
+      empty_pair_cell.value.vector.element_size = 0;
+      empty_pair_cell.value.vector.vector_ptr = NULL;
+      schemerlicht_vector_push_back(ctxt, &parent->value.vector, empty_pair_cell, schemerlicht_cell);
+      schemerlicht_cell* p1 = schemerlicht_vector_at(&parent->value.vector, 1, schemerlicht_cell);
+      parent = p1;
+      }
+    schemerlicht_expression expr = qq_expand(ctxt, &list_cell, depth);
+    schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+    schemerlicht_expression v = schemerlicht_init_variable(ctxt);
+    schemerlicht_string_init(ctxt, &v.expr.var.name, "list->vector");
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, v, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr, schemerlicht_expression);
+    schemerlicht_vector_destroy(ctxt, &c->value.vector);
+    return make_list(ctxt, &f);
+    }
+  else
+    {
+    schemerlicht_expression q = schemerlicht_init_quote(ctxt);
+    q.expr.quote.arg = *c;
+    return q;
+    }
+  return schemerlicht_init_nop(ctxt);
   }
 
 static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlicht_cell* c, int depth)
@@ -248,7 +376,11 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
       return expr;
       }
     else
-      return make_quote(ctxt, "unquote", c, 0, depth);
+      {
+      schemerlicht_expression expr = make_quote(ctxt, "unquote", c, 0, depth);
+      schemerlicht_destroy_cell(ctxt, c);
+      return expr;
+      }
     }
   else if (tag_is_comma_atsign(c))
     {
@@ -257,11 +389,17 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX);
       }
     else
-      return make_quote(ctxt, "unquote-splicing", c, 0, depth);
+      {
+      schemerlicht_expression expr = make_quote(ctxt, "unquote-splicing", c, 0, depth);
+      schemerlicht_destroy_cell(ctxt, c);
+      return expr;
+      }
     }
   else if (tag_is_backquote(c))
     {
-    return make_quote(ctxt, "quasiquote", c, 0, depth);
+    schemerlicht_expression expr = make_quote(ctxt, "quasiquote", c, 0, depth);
+    schemerlicht_destroy_cell(ctxt, c);
+    return expr;
     }
   else if (is_pair(c))
     {
@@ -280,14 +418,59 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
       }
     else if (is_nil(p1))
       {
+      schemerlicht_expression expr1 = qq_expand_list(ctxt, p0, depth);
+      schemerlicht_vector_destroy(ctxt, &p1->value.vector);
+      schemerlicht_vector_destroy(ctxt, &c->value.vector);
+      return expr1;
       }
     else
       {
+      schemerlicht_expression expr1 = qq_expand_list(ctxt, p0, depth);
+      schemerlicht_expression expr2 = qq_expand(ctxt, p1, depth);
+      schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+      schemerlicht_expression v = schemerlicht_init_variable(ctxt);
+      schemerlicht_string_init(ctxt, &v.expr.var.name, "append");      
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, v, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr1, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr2, schemerlicht_expression);
+      schemerlicht_vector_destroy(ctxt, &c->value.vector);
+      return f;
       }
     }
   else if (c->type == schemerlicht_ct_vector)
     {
-    assert(0);
+    schemerlicht_cell empty_pair_cell;
+    empty_pair_cell.type = schemerlicht_ct_pair;
+    empty_pair_cell.value.vector.vector_size = 0;
+    empty_pair_cell.value.vector.vector_capacity = 0;
+    empty_pair_cell.value.vector.element_size = 0;
+    empty_pair_cell.value.vector.vector_ptr = NULL;
+    schemerlicht_cell list_cell = empty_pair_cell;
+    schemerlicht_cell* parent = &list_cell;
+    for (schemerlicht_memsize j = 0; j < c->value.vector.vector_size; ++j)
+      {
+      schemerlicht_assert(parent->value.vector.vector_size == 0);
+      schemerlicht_vector_init(ctxt, &parent->value.vector, schemerlicht_cell);
+      schemerlicht_cell* val = schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell);
+      schemerlicht_vector_push_back(ctxt, &parent->value.vector, *val, schemerlicht_cell);
+      schemerlicht_cell empty_pair_cell;
+      empty_pair_cell.type = schemerlicht_ct_pair;
+      empty_pair_cell.value.vector.vector_size = 0;
+      empty_pair_cell.value.vector.vector_capacity = 0;
+      empty_pair_cell.value.vector.element_size = 0;
+      empty_pair_cell.value.vector.vector_ptr = NULL;
+      schemerlicht_vector_push_back(ctxt, &parent->value.vector, empty_pair_cell, schemerlicht_cell);
+      schemerlicht_cell* p1 = schemerlicht_vector_at(&parent->value.vector, 1, schemerlicht_cell);
+      parent = p1;
+      }
+    schemerlicht_expression expr = qq_expand(ctxt, &list_cell, depth);
+    schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
+    schemerlicht_expression v = schemerlicht_init_variable(ctxt);
+    schemerlicht_string_init(ctxt, &v.expr.var.name, "list->vector");
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, v, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr, schemerlicht_expression);    
+    schemerlicht_vector_destroy(ctxt, &c->value.vector);
+    return f;
     }
   else
     {

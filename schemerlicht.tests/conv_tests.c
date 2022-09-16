@@ -540,7 +540,21 @@ static void test_quasiquote_conversion()
   test_quasiquote("(quasiquote ( ((unquote (+ 1 2)) 3) 5 ) )", "( cons ( cons ( + 1 2 ) ( quote (3) ) ) ( quote (5) ) ) ");
   test_quasiquote("`( (5 4 ,(+ 1 2) 3) 5 )", "( cons ( cons ( quote 5 ) ( cons ( quote 4 ) ( cons ( + 1 2 ) ( quote (3) ) ) ) ) ( quote (5) ) ) ");
   test_quasiquote("(quasiquote ( (5 4 (unquote (+ 1 2)) 3) 5 ))", "( cons ( cons ( quote 5 ) ( cons ( quote 4 ) ( cons ( + 1 2 ) ( quote (3) ) ) ) ) ( quote (5) ) ) ");
-  //test_quasiquote("`(,@(cdr '(c)) )", "( cdr ( quote (c) ) ) ");
+  test_quasiquote("`(,@(cdr '(c)) )", "( cdr ( quote (c) ) ) ");
+  test_quasiquote("(quasiquote ( (unquote-splicing (cdr '(c))) ))", "( cdr ( quote (c) ) ) ");
+  test_quasiquote("`((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))", "( cons ( cons ( quote foo ) ( cons ( - 10 3 ) ( quote () ) ) ) ( append ( cdr ( quote (c) ) ) ( car ( quote (cons) ) ) ) ) ");
+  test_quasiquote("(quasiquote ((foo (unquote (- 10 3))) (unquote-splicing (cdr '(c))) . (unquote (car '(cons)))))", "( cons ( cons ( quote foo ) ( cons ( - 10 3 ) ( quote () ) ) ) ( append ( cdr ( quote (c) ) ) ( car ( quote (cons) ) ) ) ) ");
+  test_quasiquote("(let ((name 'a)) `(list ,name ',name))", "( let ( [ name ( quote a ) ] ) ( begin ( cons ( quote list ) ( cons name ( cons ( cons ( quote quote ) ( cons name ( quote () ) ) ) ( quote () ) ) ) ) ) ) ");
+  test_quasiquote("(let ((name (quote a))) (quasiquote (list (unquote name) (quote (unquote name)))))", "( let ( [ name ( quote a ) ] ) ( begin ( cons ( quote list ) ( cons name ( cons ( cons ( quote quote ) ( cons name ( quote () ) ) ) ( quote () ) ) ) ) ) ) ");
+  test_quasiquote("`(a ,(+ 1 2) ,@(map abs '(4 -5 6)) b)", "( cons ( quote a ) ( cons ( + 1 2 ) ( append ( map abs ( quote (4 -5 6) ) ) ( quote (b) ) ) ) ) ");
+  test_quasiquote("( cons ( quote a ) ( cons ( + 1 2 ) ( append ( map abs ( quote (4 -5 6) ) ) ( quote (b) ) ) ) ) ", "( cons ( quote a ) ( cons ( + 1 2 ) ( append ( map abs ( quote (4 -5 6) ) ) ( quote (b) ) ) ) ) ");
+  test_quasiquote("`#(10 5 ,(sqrt 4) ,@(map sqrt '(16 9)) 8)", "( list->vector ( cons ( quote 10 ) ( cons ( quote 5 ) ( cons ( sqrt 4 ) ( append ( map sqrt ( quote (16 9) ) ) ( quote (8) ) ) ) ) ) ) ");
+  test_quasiquote("(quasiquote #(10 5 (unquote (sqrt 4)) (unquote-splicing (map sqrt (quote (16 9)))) 8))", "( list->vector ( cons ( quote 10 ) ( cons ( quote 5 ) ( cons ( sqrt 4 ) ( append ( map sqrt ( quote (16 9) ) ) ( quote (8) ) ) ) ) ) ) ");
+  test_quasiquote("`(1 2 #(10 ,(+ 2 6)) 5)", "( cons ( quote 1 ) ( cons ( quote 2 ) ( cons ( list->vector ( cons ( quote 10 ) ( cons ( + 2 6 ) ( quote () ) ) ) ) ( quote (5) ) ) ) ) ");
+  test_quasiquote("(quasiquote (1 2 #(10 (unquote (+ 2 6))) 5))", "( cons ( quote 1 ) ( cons ( quote 2 ) ( cons ( list->vector ( cons ( quote 10 ) ( cons ( + 2 6 ) ( quote () ) ) ) ) ( quote (5) ) ) ) ) ");
+  test_quasiquote("`( `(,(+ 1 2 ,(+ 3 4) ) ) )", "( cons ( cons ( quote quasiquote ) ( cons ( cons ( cons ( quote unquote ) ( cons ( cons ( quote + ) ( cons ( quote 1 ) ( cons ( quote 2 ) ( cons ( + 3 4 ) ( quote () ) ) ) ) ) ( quote () ) ) ) ( quote () ) ) ( quote () ) ) ) ( quote () ) ) ");
+  test_quasiquote("`(,(+ 1 2 7) )", "( cons ( + 1 2 7 ) ( quote () ) ) ");
+  test_quasiquote("`(a `(b ,(+ 1 2) ,(foo ,(+ 1 3) d) e) f)", "( cons ( quote a ) ( cons ( cons ( quote quasiquote ) ( cons ( cons ( quote b ) ( cons ( cons ( quote unquote ) ( cons ( quote (+ 1 2) ) ( quote () ) ) ) ( cons ( cons ( quote unquote ) ( cons ( cons ( quote foo ) ( cons ( + 1 3 ) ( quote (d) ) ) ) ( quote () ) ) ) ( quote (e) ) ) ) ) ( quote () ) ) ) ( quote (f) ) ) ) ");  
   }
 
 void run_all_conv_tests()
