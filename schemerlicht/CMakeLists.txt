@@ -13,6 +13,7 @@ memory.h
 object.h
 parser.h
 quasiquote.h
+quotecollect.h
 reader.h
 simplifyconv.h
 stream.h
@@ -36,6 +37,7 @@ memory.c
 object.c
 parser.c
 quasiquote.c
+quotecollect.c
 reader.c
 simplifyconv.c
 stream.c
