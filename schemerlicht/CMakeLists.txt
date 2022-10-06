@@ -7,6 +7,7 @@ copy.h
 defconv.h
 dump.h
 error.h
+lambdatolet.h
 limits.h
 map.h
 memory.h
@@ -32,6 +33,7 @@ copy.c
 defconv.c
 dump.c
 error.c
+lambdatolet.c
 map.c
 memory.c
 object.c

@@ -8,6 +8,7 @@
 #include "schemerlicht/tailcall.h"
 #include "schemerlicht/cps.h"
 #include "schemerlicht/quasiquote.h"
+#include "schemerlicht/lambdatolet.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -557,6 +558,26 @@ static void test_quasiquote_conversion()
   test_quasiquote("`(a `(b ,(+ 1 2) ,(foo ,(+ 1 3) d) e) f)", "( cons ( quote a ) ( cons ( cons ( quote quasiquote ) ( cons ( cons ( quote b ) ( cons ( cons ( quote unquote ) ( cons ( quote (+ 1 2) ) ( quote () ) ) ) ( cons ( cons ( quote unquote ) ( cons ( cons ( quote foo ) ( cons ( + 1 3 ) ( quote (d) ) ) ) ( quote () ) ) ) ( quote (e) ) ) ) ) ( quote () ) ) ) ( quote (f) ) ) ) ");  
   }
 
+static void test_lambda_to_let_conversion()
+  {
+  /*
+((lambda (p1 p2 ...) body) v1 v2 ...)
+
+(let ([p1 v1] [p2 v2] ...) body)
+*/
+
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "((lambda (x y) (+ x y)) 1 2)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( let ( [ x 1 ] [ y 2 ] ) ( begin ( + x y ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+
+  }
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -587,4 +608,5 @@ void run_all_conv_tests()
   test_cps();
   test_cps_2();
   test_quasiquote_conversion();
+  test_lambda_to_let_conversion();
   }
