@@ -233,8 +233,8 @@ static int previsit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht_v
       schemerlicht_let_binding new_binding;
       new_binding.binding_expr = prim;
       schemerlicht_string_copy(ctxt, &new_binding.binding_name, it);
-      schemerlicht_vector_push_back(ctxt, &new_bindings, new_binding, schemerlicht_let_binding);
-      *it = adapted;      
+      schemerlicht_vector_push_back(ctxt, &new_bindings, new_binding, schemerlicht_let_binding); 
+      schemerlicht_string_copy(ctxt, it, &adapted);
       }
     }
   if (new_bindings.vector_size == 0)
