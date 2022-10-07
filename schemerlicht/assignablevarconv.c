@@ -2,7 +2,6 @@
 #include "visitor.h"
 #include "context.h"
 #include "vector.h"
-#include "map.h"
 #include "stringvec.h"
 
 typedef struct schemerlicht_find_assignable_variables_visitor

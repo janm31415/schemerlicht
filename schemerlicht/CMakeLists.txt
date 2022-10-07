@@ -1,13 +1,13 @@
 set(HDRS
 assignablevarconv.h
 begconv.h
-schemerlicht.h
 context.h
 cps.h
 copy.h
 defconv.h
 dump.h
 error.h
+freevaranalysis.h
 lambdatolet.h
 limits.h
 map.h
@@ -17,6 +17,7 @@ parser.h
 quasiquote.h
 quotecollect.h
 reader.h
+schemerlicht.h
 simplifyconv.h
 stream.h
 string.h
@@ -36,6 +37,7 @@ copy.c
 defconv.c
 dump.c
 error.c
+freevaranalysis.c
 lambdatolet.c
 map.c
 memory.c
