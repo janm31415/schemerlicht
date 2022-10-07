@@ -573,6 +573,23 @@ static void test_lambda_to_let_conversion()
   schemerlicht_close(ctxt);
   }
 
+static void test_find_assignable_variables()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_find_assignable_variables(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_vector vars = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression)->expr.let.assignable_variables;
+  TEST_EQ_INT(1, vars.vector_size);
+  schemerlicht_string s = *schemerlicht_vector_at(&vars, 0, schemerlicht_string);
+  TEST_EQ_STRING("x", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_assignable_variable_conversion()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
@@ -618,5 +635,6 @@ void run_all_conv_tests()
   test_cps_2();
   test_quasiquote_conversion();
   test_lambda_to_let_conversion();
+  test_find_assignable_variables();
   //test_assignable_variable_conversion();
   }
