@@ -618,6 +618,20 @@ static void test_assignable_variable_conversion_2()
   schemerlicht_close(ctxt);
   }
 
+static void test_assignable_variable_conversion_3()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 3]) (set! x 5))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( let ( [ #%x 3 ] ) ( begin ( let ( [ x ( vector #%x ) ] ) ( begin ( vector-set! x 0 5 ) ) ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -652,4 +666,5 @@ void run_all_conv_tests()
   test_find_assignable_variables();
   test_assignable_variable_conversion();
   test_assignable_variable_conversion_2();
+  test_assignable_variable_conversion_3();
   }
