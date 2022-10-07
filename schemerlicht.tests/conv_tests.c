@@ -593,11 +593,11 @@ static void test_find_assignable_variables()
 static void test_assignable_variable_conversion()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x))");
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 12]) (let([y(let([z #f]) (set! z 14))])  z))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
-  TEST_EQ_STRING("( let ( [ x_0 12 ] ) ( begin ( let ( [ y_2 ( let ( [ #%x_1 #f ] ) ( begin ( let ( [ x_1 ( vector #%x_1 ) ] ) ( begin ( vector-set! x_1 0 14 ) ) ) ) ) ] ) ( begin x_0 ) ) ) ) ", res.string_ptr);
+  TEST_EQ_STRING("( let ( [ x 12 ] ) ( begin ( let ( [ y ( let ( [ #%z #f ] ) ( begin ( let ( [ z ( vector #%z ) ] ) ( begin ( vector-set! z 0 14 ) ) ) ) ) ] ) ( begin z ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -636,5 +636,5 @@ void run_all_conv_tests()
   test_quasiquote_conversion();
   test_lambda_to_let_conversion();
   test_find_assignable_variables();
-  //test_assignable_variable_conversion();
+  test_assignable_variable_conversion();
   }

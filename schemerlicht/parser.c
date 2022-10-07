@@ -764,6 +764,22 @@ schemerlicht_expression schemerlicht_init_lambda(schemerlicht_context* ctxt)
   return expr;
   }
 
+schemerlicht_expression schemerlicht_init_fixnum(schemerlicht_context* ctxt)
+  {
+  schemerlicht_parsed_fixnum fx;
+  fx.column_nr = -1;
+  fx.line_nr = -1;
+  fx.filename = make_null_string();
+  fx.value = 0;
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_fixnum;
+  l.lit.fx = fx;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
 schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_funcall f;
@@ -846,6 +862,8 @@ schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
   s.name = make_null_string();
   s.line_nr = -1;
   s.column_nr = -1;
+  s.originates_from_define = 0;
+  s.originates_from_quote = 0;
   schemerlicht_vector_init(ctxt, &s.value, schemerlicht_expression);
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_set;
@@ -1007,6 +1025,8 @@ static schemerlicht_expression make_set(schemerlicht_context* ctxt, token** toke
   s.filename = make_set_filename(ctxt);
   s.line_nr = (*token_it)->line_nr;
   s.column_nr = (*token_it)->column_nr;
+  s.originates_from_define = 0;
+  s.originates_from_quote = 0;
   if (strcmp((*token_it)->value.string_ptr, "set!") != 0)
     schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, s.line_nr, s.column_nr, "set!");
   token_next(ctxt, token_it, token_it_end);

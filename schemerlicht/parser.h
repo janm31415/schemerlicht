@@ -316,6 +316,7 @@ schemerlicht_expression schemerlicht_init_lambda(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt);
+schemerlicht_expression schemerlicht_init_fixnum(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_primcall(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_variable(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_foreign(schemerlicht_context* ctxt);
