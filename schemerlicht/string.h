@@ -45,4 +45,6 @@ SCHEMERLICHT_API void schemerlicht_string_clear(schemerlicht_string* str);
 
 SCHEMERLICHT_API schemerlicht_string make_null_string();
 
+SCHEMERLICHT_API int schemerlicht_string_compare_less(schemerlicht_string* left, schemerlicht_string* right);
+
 #endif // SCHEMERLICHT_STRING_H

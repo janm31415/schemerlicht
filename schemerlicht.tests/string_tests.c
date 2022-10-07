@@ -83,6 +83,30 @@ static void test_string_append_2()
   schemerlicht_string_destroy(ctxt, &s1);
   schemerlicht_close(ctxt);
   }
+
+static void test_string_compare_less_aux(const char* left, const char* right, int expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_string s1, s2;
+  schemerlicht_string_init(ctxt, &s1, left);
+  schemerlicht_string_init(ctxt, &s2, right);
+  int compare_result = schemerlicht_string_compare_less(&s1, &s2);
+  TEST_EQ_INT(expected, compare_result);
+  schemerlicht_string_destroy(ctxt, &s1);
+  schemerlicht_string_destroy(ctxt, &s2);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_string_compare()
+  {
+  test_string_compare_less_aux("a", "b", 1);
+  test_string_compare_less_aux("b", "a", 0);
+  test_string_compare_less_aux("a", "a", 0);
+  test_string_compare_less_aux("brabbelauto", "brabbelbox", 1);
+  test_string_compare_less_aux("brabbelbox", "brabbelauto", 0);
+  test_string_compare_less_aux("brabbelauto", "brabbelauto", 0);
+  }
+
 void run_all_string_tests()
   {
   test_string_init();
@@ -90,4 +114,5 @@ void run_all_string_tests()
   test_string_push_back();
   test_string_append();
   test_string_append_2();
+  test_string_compare();
   }

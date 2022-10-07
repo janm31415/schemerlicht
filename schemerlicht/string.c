@@ -123,3 +123,14 @@ schemerlicht_string make_null_string()
   s.string_ptr = NULL;
   return s;
   }
+
+int schemerlicht_string_compare_less(schemerlicht_string* left, schemerlicht_string* right)
+  {
+  const schemerlicht_memsize size = left->string_length < right->string_length ? left->string_length : right->string_length;
+  for (schemerlicht_memsize i = 0; i < size; ++i)
+    {
+    if (left->string_ptr[i] != right->string_ptr[i])
+      return left->string_ptr[i] < right->string_ptr[i] ? 1 : 0;
+    }
+  return left->string_length < right->string_length ? 1 : 0;
+  }

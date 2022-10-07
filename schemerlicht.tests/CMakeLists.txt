@@ -7,6 +7,7 @@ parser_tests.h
 reader_tests.h
 stream_tests.h
 string_tests.h
+stringvec_tests.h
 test_assert.h
 token_tests.h
 vector_tests.h
@@ -21,6 +22,7 @@ parser_tests.c
 reader_tests.c
 stream_tests.c
 string_tests.c
+stringvec_tests.c
 test.c
 test_assert.c
 token_tests.c

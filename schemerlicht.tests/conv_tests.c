@@ -9,6 +9,7 @@
 #include "schemerlicht/cps.h"
 #include "schemerlicht/quasiquote.h"
 #include "schemerlicht/lambdatolet.h"
+#include "schemerlicht/assignablevarconv.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -560,12 +561,6 @@ static void test_quasiquote_conversion()
 
 static void test_lambda_to_let_conversion()
   {
-  /*
-((lambda (p1 p2 ...) body) v1 v2 ...)
-
-(let ([p1 v1] [p2 v2] ...) body)
-*/
-
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, "((lambda (x y) (+ x y)) 1 2)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
@@ -576,8 +571,22 @@ static void test_lambda_to_let_conversion()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
-
   }
+
+static void test_assignable_variable_conversion()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( let ( [ x_0 12 ] ) ( begin ( let ( [ y_2 ( let ( [ #%x_1 #f ] ) ( begin ( let ( [ x_1 ( vector #%x_1 ) ] ) ( begin ( vector-set! x_1 0 14 ) ) ) ) ) ] ) ( begin x_0 ) ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -609,4 +618,5 @@ void run_all_conv_tests()
   test_cps_2();
   test_quasiquote_conversion();
   test_lambda_to_let_conversion();
+  //test_assignable_variable_conversion();
   }

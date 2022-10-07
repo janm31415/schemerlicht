@@ -1,4 +1,5 @@
 set(HDRS
+assignablevarconv.h
 begconv.h
 schemerlicht.h
 context.h
@@ -19,6 +20,7 @@ reader.h
 simplifyconv.h
 stream.h
 string.h
+stringvec.h
 tailcall.h
 token.h
 vector.h
@@ -26,6 +28,7 @@ visitor.h
 )
 	
 set(SRCS
+assignablevarconv.c
 begconv.c
 context.c
 cps.c
@@ -44,6 +47,7 @@ reader.c
 simplifyconv.c
 stream.c
 string.c
+stringvec.c
 tailcall.c
 token.c
 visitor.c
