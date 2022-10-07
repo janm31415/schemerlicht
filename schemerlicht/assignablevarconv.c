@@ -202,16 +202,59 @@ static void postvisit_let_assvarconv(schemerlicht_context* ctxt, schemerlicht_vi
     schemerlicht_string_destroy(ctxt, it);
   schemerlicht_vector_destroy(ctxt, vec);
   schemerlicht_vector_pop_back(&vis->assignable_variables);
-  
+  UNUSED(e);
   }
 
 static int previsit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_vector assignable_vars;
   schemerlicht_vector_init(ctxt, &assignable_vars, schemerlicht_string);
+
+  schemerlicht_vector new_bindings;
+  schemerlicht_vector_init(ctxt, &new_bindings, schemerlicht_let_binding);
+
+
+  schemerlicht_string* it = schemerlicht_vector_begin(&e->expr.lambda.variables, schemerlicht_string);
+  schemerlicht_string* it_end = schemerlicht_vector_end(&e->expr.lambda.variables, schemerlicht_string);
+
+  for (; it != it_end; ++it)
+    {
+    if (schemerlicht_string_vector_binary_search(&e->expr.lambda.assignable_variables, it))
+      {
+      schemerlicht_vector_push_back(ctxt, &assignable_vars, *it, schemerlicht_string);
+      schemerlicht_string adapted;
+      schemerlicht_string_init(ctxt, &adapted, "#%");
+      schemerlicht_string_append(ctxt, &adapted, it);
+      schemerlicht_expression var = schemerlicht_init_variable(ctxt);
+      var.expr.var.name = adapted;
+      schemerlicht_expression prim = schemerlicht_init_primcall(ctxt);
+      schemerlicht_string_init(ctxt, &prim.expr.prim.name, "vector");
+      schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, var, schemerlicht_expression);
+      schemerlicht_let_binding new_binding;
+      new_binding.binding_expr = prim;
+      schemerlicht_string_copy(ctxt, &new_binding.binding_name, it);
+      schemerlicht_vector_push_back(ctxt, &new_bindings, new_binding, schemerlicht_let_binding);
+      *it = adapted;      
+      }
+    }
+  if (new_bindings.vector_size == 0)
+    {
+    schemerlicht_vector_destroy(ctxt, &new_bindings);
+    }
+  else
+    {
+    schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
+    swap(new_let.expr.let.bindings, new_bindings, schemerlicht_vector);
+    swap(new_let.expr.let.body, e->expr.lambda.body, schemerlicht_vector);
+    schemerlicht_vector_destroy(ctxt, &new_bindings);
+    schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
+    schemerlicht_vector_push_back(ctxt, &new_begin.expr.beg.arguments, new_let, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &e->expr.lambda.body, new_begin, schemerlicht_expression);
+    }
+
   schemerlicht_convert_assignable_variables_visitor* vis = (schemerlicht_convert_assignable_variables_visitor*)(v->impl);
   schemerlicht_vector_push_back(ctxt, &vis->assignable_variables, assignable_vars, schemerlicht_vector);
-  UNUSED(e);
+
   return 1;
   }
 
@@ -225,15 +268,13 @@ static void postvisit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht
     schemerlicht_string_destroy(ctxt, it);
   schemerlicht_vector_destroy(ctxt, vec);
   schemerlicht_vector_pop_back(&vis->assignable_variables);
+  UNUSED(e);
   }
 
 static void postvisit_set_assvarconv(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   if (e->expr.set.originates_from_define || e->expr.set.originates_from_quote)
     return;
-  //schemerlicht_convert_assignable_variables_visitor* vis = (schemerlicht_convert_assignable_variables_visitor*)(v->impl);
-  //schemerlicht_vector* vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
-  //if (schemerlicht_string_vector_binary_search(vec, &e->expr.set.name))
   if (is_assignable_variable(v, &e->expr.set.name))
     {
     schemerlicht_expression prim = schemerlicht_init_primcall(ctxt);
@@ -254,9 +295,6 @@ static void postvisit_set_assvarconv(schemerlicht_context* ctxt, schemerlicht_vi
 
 static void visit_variable_assvarconv(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
-  //schemerlicht_convert_assignable_variables_visitor* vis = (schemerlicht_convert_assignable_variables_visitor*)(v->impl);
-  //schemerlicht_vector* vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
-  //if (schemerlicht_string_vector_binary_search(vec, &e->expr.var.name))
   if (is_assignable_variable(v, &e->expr.var.name))
     {
     schemerlicht_expression prim = schemerlicht_init_primcall(ctxt);
