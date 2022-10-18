@@ -83,9 +83,9 @@ typedef struct schemerlicht_vector
       schemerlicht_reallocvector(ctxt, (vec)->vector_ptr, (vec)->vector_capacity, mem_needed, element_type); \
       *(iterator) = (cast(element_type*, (vec)->vector_ptr) + iterator_index); \
       (vec)->vector_capacity = mem_needed; } \
-    element_type* it_end = (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size); \
+    element_type* it_end_vinsert = (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size); \
     (vec)->vector_size += range_size; \
-    memmove(cast(element_type*, *(iterator))+range_size, cast(element_type*, *(iterator)), (it_end - cast(element_type*, *(iterator)))*sizeof(element_type)); \
+    memmove(cast(element_type*, *(iterator))+range_size, cast(element_type*, *(iterator)), (it_end_vinsert - cast(element_type*, *(iterator)))*sizeof(element_type)); \
     memcpy(*(iterator), *(range_it_begin), range_size*sizeof(element_type)); }
   
 

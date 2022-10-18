@@ -51,6 +51,6 @@ int schemerlicht_log2(uint32_t x);
 schemerlicht_object make_schemerlicht_object_fixnum(schemerlicht_fixnum fx);
 schemerlicht_object make_schemerlicht_object_flonum(schemerlicht_flonum fl);
 schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, const char* s);
-void destroy_schemerlicht_object(schemerlicht_context* ctxt, schemerlicht_object* obj);
+void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj);
 
 #endif //SCHEMERLICHT_OBJECT_H

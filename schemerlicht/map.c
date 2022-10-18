@@ -250,7 +250,7 @@ static schemerlicht_map_node* schemerlicht_hash_pointer(const schemerlicht_map* 
 
 static schemerlicht_memsize hash_string(const char* str)
   {
-  int l = strlen(str);
+  int l = cast(int, strlen(str));
   schemerlicht_memsize h = cast(schemerlicht_memsize, l);
   int step = (l >> 5) + 1; // if string is too long, don't hash all its chars
   for (int i = l; i >= step; i -= step)

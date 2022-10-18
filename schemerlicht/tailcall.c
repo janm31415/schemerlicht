@@ -148,6 +148,8 @@ static void schemerlicht_init_tail_call_visitor_free(schemerlicht_context* ctxt,
 
 static int previsit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
   {
+  UNUSED(v);
+  UNUSED(ctxt);
   if (p->expressions.vector_size == 0)
     return 0;
   if (p->expressions.vector_size == 1)
@@ -173,17 +175,23 @@ static int previsit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v,
   }
 static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
+  UNUSED(ctxt);
   if (e->expr.let.tail_position)
     set_tail_call(schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression));
   return 1;
   }
 static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
+  UNUSED(ctxt);
   set_tail_call(schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression));
   return 1;
   }
 static int previsit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
+  UNUSED(ctxt);
   if (e->expr.i.tail_position)
     {
     if (e->expr.i.arguments.vector_size >= 2)     
@@ -195,6 +203,8 @@ static int previsit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
   }
 static int previsit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
+  UNUSED(ctxt);
   if (e->expr.beg.tail_position && e->expr.beg.arguments.vector_size>0)
     {
     set_tail_call(schemerlicht_vector_back(&e->expr.beg.arguments, schemerlicht_expression));

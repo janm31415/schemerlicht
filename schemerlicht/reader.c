@@ -116,6 +116,7 @@ static schemerlicht_cell get_pair(schemerlicht_context* ctxt, schemerlicht_vecto
   int recurse = 1;
   int iter = 0;
   schemerlicht_cell global_out;
+  global_out.type = schemerlicht_ct_invalid_cell;
   schemerlicht_cell* last_cell = NULL;
   schemerlicht_cell* it = schemerlicht_vector_begin(v, schemerlicht_cell);
   schemerlicht_cell* it_end = schemerlicht_vector_end(v, schemerlicht_cell);

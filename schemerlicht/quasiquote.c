@@ -59,6 +59,7 @@ static int tag_is_comma_atsign(schemerlicht_cell* c)
 
 static schemerlicht_cell* tag_data(schemerlicht_context* ctxt, schemerlicht_cell* c)
   {
+  UNUSED(ctxt);
   schemerlicht_assert(tag_is_backquote(c) || tag_is_comma(c) || tag_is_comma_atsign(c));
   schemerlicht_cell* p0 = schemerlicht_vector_at(&c->value.vector, 0, schemerlicht_cell);
   if (p0->value.str.string_length > 3) // quasiquote, unquote, or unquote-splicing
@@ -330,12 +331,6 @@ static schemerlicht_expression qq_expand_list(schemerlicht_context* ctxt, scheme
       schemerlicht_vector_init(ctxt, &parent->value.vector, schemerlicht_cell);
       schemerlicht_cell* val = schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell);
       schemerlicht_vector_push_back(ctxt, &parent->value.vector, *val, schemerlicht_cell);
-      schemerlicht_cell empty_pair_cell;
-      empty_pair_cell.type = schemerlicht_ct_pair;
-      empty_pair_cell.value.vector.vector_size = 0;
-      empty_pair_cell.value.vector.vector_capacity = 0;
-      empty_pair_cell.value.vector.element_size = 0;
-      empty_pair_cell.value.vector.vector_ptr = NULL;
       schemerlicht_vector_push_back(ctxt, &parent->value.vector, empty_pair_cell, schemerlicht_cell);
       schemerlicht_cell* p1 = schemerlicht_vector_at(&parent->value.vector, 1, schemerlicht_cell);
       parent = p1;
@@ -453,12 +448,6 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
       schemerlicht_vector_init(ctxt, &parent->value.vector, schemerlicht_cell);
       schemerlicht_cell* val = schemerlicht_vector_at(&c->value.vector, j, schemerlicht_cell);
       schemerlicht_vector_push_back(ctxt, &parent->value.vector, *val, schemerlicht_cell);
-      schemerlicht_cell empty_pair_cell;
-      empty_pair_cell.type = schemerlicht_ct_pair;
-      empty_pair_cell.value.vector.vector_size = 0;
-      empty_pair_cell.value.vector.vector_capacity = 0;
-      empty_pair_cell.value.vector.element_size = 0;
-      empty_pair_cell.value.vector.vector_ptr = NULL;
       schemerlicht_vector_push_back(ctxt, &parent->value.vector, empty_pair_cell, schemerlicht_cell);
       schemerlicht_cell* p1 = schemerlicht_vector_at(&parent->value.vector, 1, schemerlicht_cell);
       parent = p1;

@@ -186,6 +186,7 @@ static void convert_or(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
 
 static void convert_when(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   assert(e->type == schemerlicht_type_primitive_call);
   assert(strcmp(e->expr.prim.name.string_ptr, "when") == 0);
   schemerlicht_expression i = schemerlicht_init_if(ctxt);
@@ -209,6 +210,7 @@ static void convert_when(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
 
 static void convert_unless(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   assert(e->type == schemerlicht_type_primitive_call);
   assert(strcmp(e->expr.prim.name.string_ptr, "unless") == 0);
   schemerlicht_expression i = schemerlicht_init_if(ctxt);
@@ -235,6 +237,7 @@ static void convert_unless(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
 
 static void convert_delay(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   assert(e->type == schemerlicht_type_primitive_call);
   assert(strcmp(e->expr.prim.name.string_ptr, "delay") == 0);
   if (e->expr.prim.arguments.vector_size != 1)
@@ -362,6 +365,7 @@ static void convert_named_let(schemerlicht_context* ctxt, schemerlicht_visitor* 
 
 static void convert_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   schemerlicht_assert(e->type == schemerlicht_type_case);
   schemerlicht_expression* var = schemerlicht_vector_at(&e->expr.cas.val_expr, 0, schemerlicht_expression);
   if (var->type != schemerlicht_type_variable)
@@ -427,6 +431,7 @@ static void convert_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
 
 static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   schemerlicht_assert(e->type == schemerlicht_type_cond);
   if (e->expr.cond.arguments.vector_size > 0)
     {
@@ -436,10 +441,10 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
     schemerlicht_string_init(ctxt, &bind.binding_name, "cond-var");
     bind.binding_expr = *schemerlicht_vector_at(front_arg, 0, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &new_let.expr.let.bindings, bind, schemerlicht_let_binding);
-    schemerlicht_expression v = schemerlicht_init_variable(ctxt);
-    schemerlicht_string_init(ctxt, &v.expr.var.name, "cond-var");
+    schemerlicht_expression var = schemerlicht_init_variable(ctxt);
+    schemerlicht_string_init(ctxt, &var.expr.var.name, "cond-var");
     schemerlicht_expression i = schemerlicht_init_if(ctxt);
-    schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, v, schemerlicht_expression);
+    schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, var, schemerlicht_expression);
     if (front_arg->vector_size > 1)
       {
       int is_proc = *schemerlicht_vector_at(&e->expr.cond.is_proc, 0, int);      
@@ -448,7 +453,7 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
         schemerlicht_expression new_fun = schemerlicht_init_funcall(ctxt);
         
         schemerlicht_vector_push_back(ctxt, &new_fun.expr.funcall.fun, *schemerlicht_vector_at(front_arg, 0, schemerlicht_expression), schemerlicht_expression);
-        schemerlicht_vector_push_back(ctxt, &new_fun.expr.funcall.arguments, schemerlicht_expression_copy(ctxt, &v), schemerlicht_expression);
+        schemerlicht_vector_push_back(ctxt, &new_fun.expr.funcall.arguments, schemerlicht_expression_copy(ctxt, &var), schemerlicht_expression);
         schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, new_fun, schemerlicht_expression);
         }
       else
@@ -463,7 +468,7 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
       }
     else
       {
-      schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, schemerlicht_expression_copy(ctxt, &v), schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, schemerlicht_expression_copy(ctxt, &var), schemerlicht_expression);
       }
     schemerlicht_vector_destroy(ctxt, front_arg);
     schemerlicht_vector_pop_front(&e->expr.cond.arguments);
@@ -495,6 +500,7 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
 
 static void convert_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {  
+  UNUSED(v);
   schemerlicht_assert(e->type == schemerlicht_type_do);
   schemerlicht_expression letr = schemerlicht_init_let(ctxt);
   letr.expr.let.bt = schemerlicht_bt_letrec;
@@ -514,10 +520,10 @@ static void convert_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
   vit = schemerlicht_vector_begin(&e->expr.d.bindings, schemerlicht_vector);
   for (; vit != vit_end; ++vit)
     {
-    schemerlicht_expression* v = schemerlicht_vector_at(vit, 0, schemerlicht_expression);
-    schemerlicht_assert(v->type == schemerlicht_type_variable); 
-    schemerlicht_vector_push_back(ctxt, &lam.expr.lambda.variables, v->expr.var.name, schemerlicht_string);
-    schemerlicht_string_destroy(ctxt, &v->expr.var.filename);
+    schemerlicht_expression* vec = schemerlicht_vector_at(vit, 0, schemerlicht_expression);
+    schemerlicht_assert(vec->type == schemerlicht_type_variable); 
+    schemerlicht_vector_push_back(ctxt, &lam.expr.lambda.variables, vec->expr.var.name, schemerlicht_string);
+    schemerlicht_string_destroy(ctxt, &vec->expr.var.filename);
     }
   schemerlicht_expression lam_begin = schemerlicht_init_begin(ctxt);
   schemerlicht_expression i = schemerlicht_init_if(ctxt);

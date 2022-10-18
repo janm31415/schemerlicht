@@ -5,6 +5,7 @@
 #include "schemerlicht/context.h"
 #include "schemerlicht/stream.h"
 #include "schemerlicht/parser.h"
+#include "schemerlicht/error.h"
 
 #include "token_tests.h"
 
@@ -67,7 +68,7 @@ static void parse_nil()
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
-  TEST_EQ_INT(schemerlicht_type_nil, expr->expr.lit.type);  
+  TEST_EQ_INT(schemerlicht_type_nil, expr->expr.lit.type);
   TEST_EQ_INT(1, expr->expr.lit.lit.nil.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.nil.column_nr);
   destroy_tokens_vector(ctxt, &tokens);
@@ -164,7 +165,7 @@ static void parse_begin()
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
-  TEST_EQ_INT(schemerlicht_type_begin, expr->type);  
+  TEST_EQ_INT(schemerlicht_type_begin, expr->type);
   TEST_EQ_INT(5, expr->expr.beg.arguments.vector_size);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -192,7 +193,7 @@ static void parse_case()
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
-  TEST_EQ_INT(schemerlicht_type_case, expr->type);  
+  TEST_EQ_INT(schemerlicht_type_case, expr->type);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -237,13 +238,36 @@ static void parse_do()
   schemerlicht_close(ctxt);
   }
 
+static void parse_error()
+  {
+  int branch_side_1 = 0;
+  int branch_side_2 = 0;
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_longjmp my_long_jump;
+  int val = setjmp(my_long_jump.jmp);
+  if (val != 0)
+    {
+    branch_side_1 = 1;
+    }
+  else
+    {
+    branch_side_2 = 1;
+    ctxt->error_jmp = &my_long_jump;    
+    schemerlicht_throw(ctxt, 2);
+    }
+  TEST_EQ_INT(1, branch_side_1);
+  TEST_EQ_INT(1, branch_side_2);
+  TEST_EQ_INT(2, my_long_jump.status);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_parser_tests()
   {
   parse_fixnum_1();
   parse_fixnum_2();
-  parse_flonum(); 
+  parse_flonum();
   parse_nil();
-  parse_true(); 
+  parse_true();
   parse_false();
   parse_string();
   parse_character();
@@ -254,4 +278,5 @@ void run_all_parser_tests()
   parse_cond();
   parse_cond_2();
   parse_do();
+  parse_error();
   }

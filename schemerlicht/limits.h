@@ -44,4 +44,6 @@ typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
   (a) = (b); \
   (b) = tmp; }
 
+typedef uint32_t schemerlicht_instruction;
+
 #endif //SCHEMERLICHT_LIMITS_H

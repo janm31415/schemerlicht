@@ -5,6 +5,8 @@
 #include "parser.h"
 #include "error.h"
 
+#include <string.h>
+
 static schemerlicht_parsed_variable make_var(schemerlicht_context* ctxt, const char* name)
   {
   schemerlicht_parsed_variable v;
@@ -154,14 +156,14 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
   if (define_args.vector_size != 0)
     {
     schemerlicht_vector* begin_args = &body->expr.beg.arguments;
-    schemerlicht_memsize* it = schemerlicht_vector_begin(&define_args, schemerlicht_memsize);
-    schemerlicht_memsize* it_end = schemerlicht_vector_end(&define_args, schemerlicht_memsize);
-    schemerlicht_memsize* rit = it_end - 1;
-    schemerlicht_memsize* rit_end = it - 1;
+    schemerlicht_memsize* it2 = schemerlicht_vector_begin(&define_args, schemerlicht_memsize);
+    schemerlicht_memsize* it2_end = schemerlicht_vector_end(&define_args, schemerlicht_memsize);
+    schemerlicht_memsize* rit = it2_end - 1;
+    schemerlicht_memsize* rit_end = it2 - 1;
     for (; rit != rit_end; --rit)
       {
-      schemerlicht_memsize index = *rit;
-      schemerlicht_expression* begin_args_it_at_index = schemerlicht_vector_begin(begin_args, schemerlicht_expression) + index;
+      schemerlicht_memsize idx = *rit;
+      schemerlicht_expression* begin_args_it_at_index = schemerlicht_vector_begin(begin_args, schemerlicht_expression) + idx;
       schemerlicht_vector_erase(begin_args, &begin_args_it_at_index, schemerlicht_expression);
       }
     schemerlicht_parsed_let let;
@@ -206,12 +208,14 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
 
 static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   schemerlicht_expression* body = schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression);
   convert_internal_define(ctxt, body);
   }
 
 static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   schemerlicht_expression* body = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);
   convert_internal_define(ctxt, body);
   }
@@ -260,6 +264,7 @@ static void modify_expressions(schemerlicht_context* ctxt, schemerlicht_vector* 
 
 static void postvisit_program(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_program* p)
   {
+  UNUSED(v);
   if (p->expressions.vector_size == 1)
     {
     schemerlicht_expression* expr = schemerlicht_vector_at(&p->expressions, 0, schemerlicht_expression);

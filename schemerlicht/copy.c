@@ -41,9 +41,9 @@ typedef struct schemerlicht_copy_visitor
 
 #define COPY_STRING_VECTOR(typ, vector_name) \
   { \
-  schemerlicht_memsize sz = e->expr.typ.vector_name.vector_size; \
-  schemerlicht_vector_init_reserve(ctxt, &cp.expr.typ.vector_name, sz, schemerlicht_string); \
-  for (schemerlicht_memsize j = 0; j < sz; ++j) \
+  schemerlicht_memsize sz_str_v = e->expr.typ.vector_name.vector_size; \
+  schemerlicht_vector_init_reserve(ctxt, &cp.expr.typ.vector_name, sz_str_v, schemerlicht_string); \
+  for (schemerlicht_memsize j = 0; j < sz_str_v; ++j) \
     { \
     schemerlicht_string* s = schemerlicht_vector_at(&e->expr.typ.vector_name, j, schemerlicht_string); \
     schemerlicht_string s_copy; \

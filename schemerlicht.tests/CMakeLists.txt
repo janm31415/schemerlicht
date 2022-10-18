@@ -1,4 +1,5 @@
 set(HDRS
+compiler_tests.h
 conv_tests.h
 copy_tests.h
 dump_tests.h
@@ -14,6 +15,7 @@ vector_tests.h
 )
 	
 set(SRCS
+compiler_tests.c
 conv_tests.c
 copy_tests.c
 dump_tests.c

@@ -405,8 +405,8 @@ static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** tok
         else_statement = 1;
         while (!closing_brackets(token_it, token_it_end))
           {
-          schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
-          schemerlicht_vector_push_back(ctxt, &c.else_body, e, schemerlicht_expression);
+          schemerlicht_expression e2 = schemerlicht_make_expression(ctxt, token_it, token_it_end);
+          schemerlicht_vector_push_back(ctxt, &c.else_body, e2, schemerlicht_expression);
           }
         }
       else
@@ -419,8 +419,8 @@ static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** tok
         schemerlicht_vector_init(ctxt, &then_bodies, schemerlicht_expression);
         while (!closing_brackets(token_it, token_it_end))
           {
-          schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
-          schemerlicht_vector_push_back(ctxt, &then_bodies, e, schemerlicht_expression);
+          schemerlicht_expression e2 = schemerlicht_make_expression(ctxt, token_it, token_it_end);
+          schemerlicht_vector_push_back(ctxt, &then_bodies, e2, schemerlicht_expression);
           }
         schemerlicht_vector_push_back(ctxt, &c.then_bodies, then_bodies, schemerlicht_vector);
         }
@@ -766,6 +766,7 @@ schemerlicht_expression schemerlicht_init_lambda(schemerlicht_context* ctxt)
 
 schemerlicht_expression schemerlicht_init_fixnum(schemerlicht_context* ctxt)
   {
+  UNUSED(ctxt);
   schemerlicht_parsed_fixnum fx;
   fx.column_nr = -1;
   fx.line_nr = -1;
@@ -839,6 +840,7 @@ schemerlicht_expression schemerlicht_init_if(schemerlicht_context* ctxt)
 
 schemerlicht_expression schemerlicht_init_quote(schemerlicht_context* ctxt)
   {
+  UNUSED(ctxt);
   schemerlicht_parsed_quote q;
   q.filename = make_null_string();
   q.line_nr = -1;
@@ -873,6 +875,7 @@ schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
 
 schemerlicht_expression schemerlicht_init_variable(schemerlicht_context* ctxt)
   {
+  UNUSED(ctxt);
   schemerlicht_parsed_variable v;
   v.filename = make_null_string();
   v.line_nr = -1;

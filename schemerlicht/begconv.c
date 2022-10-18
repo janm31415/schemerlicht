@@ -2,6 +2,8 @@
 #include "visitor.h"
 #include "context.h"
 
+#include <string.h>
+
 typedef struct schemerlicht_remove_nested_begin_visitor
   {
   schemerlicht_visitor* visitor;

@@ -636,6 +636,7 @@ static void cps_convert_if(schemerlicht_context* ctxt, schemerlicht_expression* 
 
 static void cps_convert_if_step2(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
+  UNUSED(ctxt);
   schemerlicht_assert(e->type == schemerlicht_type_if);
   schemerlicht_vector_pop_back(&cps->continuation); // pop our local copy of the continuation
   }
@@ -643,7 +644,7 @@ static void cps_convert_if_step2(schemerlicht_context* ctxt, schemerlicht_expres
 static void cps_convert_if_step1(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   schemerlicht_assert(e->type == schemerlicht_type_if);
-  schemerlicht_expression* first = schemerlicht_vector_at(&e->expr.i.arguments, 0, schemerlicht_expression);
+  //schemerlicht_expression* first = schemerlicht_vector_at(&e->expr.i.arguments, 0, schemerlicht_expression);
 
   schemerlicht_memsize idx_val = *schemerlicht_vector_back(&cps->index, schemerlicht_memsize) + 1;
   schemerlicht_vector_push_back(ctxt, &cps->index, idx_val, schemerlicht_memsize);

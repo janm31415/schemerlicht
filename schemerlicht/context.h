@@ -8,13 +8,13 @@
 
 #include <setjmp.h>
 
-struct schemerlicht_longjmp
+typedef struct schemerlicht_longjmp
   {
   schemerlicht_alignment dummy;
   struct schemerlicht_longjmp* previous;
   jmp_buf jmp;
-  volatile int status; // error code
-  };
+  volatile int status; // error code  
+  } schemerlicht_longjmp;
 
 // global state
 typedef struct schemerlicht_global_context
@@ -31,7 +31,7 @@ typedef struct schemerlicht_global_context
 struct schemerlicht_context 
   {
   schemerlicht_global_context* global;
-  schemerlicht_object* objects;
+  //schemerlicht_object* objects;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   };
 

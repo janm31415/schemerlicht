@@ -75,7 +75,7 @@ schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, 
   return obj;
   }
 
-void destroy_schemerlicht_object(schemerlicht_context* ctxt, schemerlicht_object* obj)
+void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   switch (obj->type)
     {

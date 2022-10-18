@@ -1,6 +1,7 @@
 set(HDRS
 assignablevarconv.h
 begconv.h
+compiler.h
 context.h
 cps.h
 copy.h
@@ -8,6 +9,7 @@ defconv.h
 dump.h
 error.h
 freevaranalysis.h
+func.h
 lambdatolet.h
 limits.h
 map.h
@@ -26,11 +28,13 @@ tailcall.h
 token.h
 vector.h
 visitor.h
+vm.h
 )
 	
 set(SRCS
 assignablevarconv.c
 begconv.c
+compiler.c
 context.c
 cps.c
 copy.c
@@ -38,6 +42,7 @@ defconv.c
 dump.c
 error.c
 freevaranalysis.c
+func.c
 lambdatolet.c
 map.c
 memory.c
@@ -53,6 +58,7 @@ stringvec.c
 tailcall.c
 token.c
 visitor.c
+vm.c
 )
 
 if (WIN32)
