@@ -88,10 +88,26 @@ schemerlicht_object make_schemerlicht_object_nil()
   return obj;
   }
 
+schemerlicht_object make_schemerlicht_object_char(schemerlicht_byte ch)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_char;
+  obj.value.ch = ch;
+  return obj;
+  }
+
 schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, const char* s)
   {
   schemerlicht_object obj;
   obj.type = schemerlicht_object_type_string;
+  schemerlicht_string_init(ctxt, &(obj.value.s), s);
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_symbol(schemerlicht_context* ctxt, const char* s)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_symbol;
   schemerlicht_string_init(ctxt, &(obj.value.s), s);
   return obj;
   }
@@ -101,6 +117,11 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
   switch (obj->type)
     {
     case schemerlicht_object_type_string:
+    {
+    schemerlicht_string_destroy(ctxt, &(obj->value.s));
+    break;
+    }
+    case schemerlicht_object_type_symbol:
     {
     schemerlicht_string_destroy(ctxt, &(obj->value.s));
     break;
@@ -141,6 +162,38 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
     case schemerlicht_object_type_string:
       schemerlicht_string_copy(ctxt, &s, &obj->value.s);
       break;
+    case schemerlicht_object_type_symbol:
+      schemerlicht_string_copy(ctxt, &s, &obj->value.s);
+      break;
+    case schemerlicht_object_type_char:
+    {
+    schemerlicht_string_init(ctxt, &s, "#\\");
+    if (obj->value.ch > 31 && obj->value.ch < 127)
+      {
+      schemerlicht_string_push_back(ctxt, &s, obj->value.ch);
+      }
+    else
+      {
+      int v = (int)obj->value.ch;
+      char str[4];
+      sprintf(str, "%d", v);
+      str[3] = 0;
+      if (str[1] == 0)
+        {        
+        str[2] = str[0];
+        str[1] = '0';
+        str[0] = '0';
+        }
+      else if (str[2] == 0)
+        {
+        str[2] = str[1];
+        str[1] = str[0];
+        str[0] = '0';
+        }
+      schemerlicht_string_append_cstr(ctxt, &s, str);
+      }
+    break;
+    }
     }
   return s;
   }

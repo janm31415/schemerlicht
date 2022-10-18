@@ -28,7 +28,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       case SCHEMERLICHT_OPCODE_LOADK:
       {
         schemerlicht_object* k = schemerlicht_vector_at(&fun->constants, SCHEMERLICHT_GETARG_Bx(i), schemerlicht_object);
-        set_object(target, k);
+        schemerlicht_set_object(target, k);
         break;
       }
       default:

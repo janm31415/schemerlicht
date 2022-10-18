@@ -1197,7 +1197,7 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
             case 'l': if (strcmp(substr.string_ptr, "linefeed") == 0) ch.value = 10; break;
             case 'v': if (strcmp(substr.string_ptr, "vtab") == 0) ch.value = 11; break;
             case 'p': if (strcmp(substr.string_ptr, "page") == 0) ch.value = 12; break;
-            case 'r': if (strcmp(substr.string_ptr, "return") == 0) ch.value = 13; break;
+            case 'r': if (strcmp(substr.string_ptr, "return") == 0) ch.value = 13; if (strcmp(substr.string_ptr, "rubout") == 0) ch.value = 127; break;
             case 's': if (strcmp(substr.string_ptr, "space") == 0) ch.value = 32; break;
             }
           if (ch.value == 0)

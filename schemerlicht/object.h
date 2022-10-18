@@ -12,6 +12,8 @@
 #define schemerlicht_object_type_pointer 4
 #define schemerlicht_object_type_true 5
 #define schemerlicht_object_type_false 6
+#define schemerlicht_object_type_char 7
+#define schemerlicht_object_type_symbol 8
 
 typedef union
   {
@@ -19,6 +21,7 @@ typedef union
   schemerlicht_fixnum fx;
   schemerlicht_flonum fl;  
   schemerlicht_string s;
+  schemerlicht_byte ch;
   } schemerlicht_value;
 
 typedef struct schemerlicht_object
@@ -27,18 +30,7 @@ typedef struct schemerlicht_object
   schemerlicht_value value;
   } schemerlicht_object;
 
-//#define set_object(ctxt, obj1, obj2) \
-//  { \
-//  const schemerlicht_object* o2 = (obj2); \
-//  schemerlicht_object* o1 = (obj1); \
-//  o1->type = o2->type; \
-//  if (o1->type == schemerlicht_object_type_string) \
-//    schemerlicht_string_copy(ctxt, &(o1->value.s), &(o2->value.s)); \
-//  else \
-//    o1->value = o2->value; \
-//  }
-
-#define set_object(obj1, obj2) \
+#define schemerlicht_set_object(obj1, obj2) \
   { \
   const schemerlicht_object* o2 = (obj2); \
   schemerlicht_object* o1 = (obj1); \
@@ -55,7 +47,9 @@ schemerlicht_object make_schemerlicht_object_flonum(schemerlicht_flonum fl);
 schemerlicht_object make_schemerlicht_object_true();
 schemerlicht_object make_schemerlicht_object_false();
 schemerlicht_object make_schemerlicht_object_nil();
+schemerlicht_object make_schemerlicht_object_char(schemerlicht_byte ch);
 schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, const char* s);
+schemerlicht_object make_schemerlicht_object_symbol(schemerlicht_context* ctxt, const char* s);
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj);
 
 schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj);

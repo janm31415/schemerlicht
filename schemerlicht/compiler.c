@@ -76,6 +76,51 @@ static void compile_nil(schemerlicht_context* ctxt, schemerlicht_function* fun, 
   schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
   }
 
+static void compile_char(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_literal);
+  schemerlicht_assert(e->expr.lit.type == schemerlicht_type_character);
+  schemerlicht_memsize k_pos = fun->constants.vector_size;
+  schemerlicht_byte b = e->expr.lit.lit.ch.value;
+  schemerlicht_object obj = make_schemerlicht_object_char(b);
+  schemerlicht_vector_push_back(ctxt, &fun->constants, obj, schemerlicht_object);
+  schemerlicht_instruction i = 0;
+  SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_LOADK);
+  SCHEMERLICHT_SETARG_Bx(i, k_pos);
+  SCHEMERLICHT_SETARG_A(i, fun->freereg++);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
+  }
+
+static void compile_string(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_literal);
+  schemerlicht_assert(e->expr.lit.type == schemerlicht_type_string);
+  schemerlicht_memsize k_pos = fun->constants.vector_size;
+  schemerlicht_string s = e->expr.lit.lit.str.value;
+  schemerlicht_object obj = make_schemerlicht_object_string(ctxt, s.string_ptr);
+  schemerlicht_vector_push_back(ctxt, &fun->constants, obj, schemerlicht_object);
+  schemerlicht_instruction i = 0;
+  SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_LOADK);
+  SCHEMERLICHT_SETARG_Bx(i, k_pos);
+  SCHEMERLICHT_SETARG_A(i, fun->freereg++);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
+  }
+
+static void compile_symbol(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_literal);
+  schemerlicht_assert(e->expr.lit.type == schemerlicht_type_symbol);
+  schemerlicht_memsize k_pos = fun->constants.vector_size;
+  schemerlicht_string s = e->expr.lit.lit.sym.value;
+  schemerlicht_object obj = make_schemerlicht_object_symbol(ctxt, s.string_ptr);
+  schemerlicht_vector_push_back(ctxt, &fun->constants, obj, schemerlicht_object);
+  schemerlicht_instruction i = 0;
+  SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_LOADK);
+  SCHEMERLICHT_SETARG_Bx(i, k_pos);
+  SCHEMERLICHT_SETARG_A(i, fun->freereg++);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
+  }
+
 static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_literal);
@@ -95,6 +140,15 @@ static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* f
       break;
     case schemerlicht_type_nil:
       compile_nil(ctxt, fun, e);
+      break;
+    case schemerlicht_type_character:
+      compile_char(ctxt, fun, e);
+      break;
+    case schemerlicht_type_string:
+      compile_string(ctxt, fun, e);
+      break;
+    case schemerlicht_type_symbol:
+      compile_symbol(ctxt, fun, e);
       break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
