@@ -10,6 +10,8 @@
 #define schemerlicht_object_type_flonum 2
 #define schemerlicht_object_type_string 3
 #define schemerlicht_object_type_pointer 4
+#define schemerlicht_object_type_true 5
+#define schemerlicht_object_type_false 6
 
 typedef union
   {
@@ -50,7 +52,12 @@ int schemerlicht_log2(uint32_t x);
 
 schemerlicht_object make_schemerlicht_object_fixnum(schemerlicht_fixnum fx);
 schemerlicht_object make_schemerlicht_object_flonum(schemerlicht_flonum fl);
+schemerlicht_object make_schemerlicht_object_true();
+schemerlicht_object make_schemerlicht_object_false();
+schemerlicht_object make_schemerlicht_object_nil();
 schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, const char* s);
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj);
+
+schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj);
 
 #endif //SCHEMERLICHT_OBJECT_H

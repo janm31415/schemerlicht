@@ -35,17 +35,17 @@ int schemerlicht_log2(uint32_t x)
     7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
     7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
     };
-  if (x >= 0x00010000) 
+  if (x >= 0x00010000)
     {
-    if (x >= 0x01000000) 
+    if (x >= 0x01000000)
       return log_8[((x >> 24) & 0xff) - 1] + 24;
-    else 
+    else
       return log_8[((x >> 16) & 0xff) - 1] + 16;
     }
   else {
-    if (x >= 0x00000100) 
+    if (x >= 0x00000100)
       return log_8[((x >> 8) & 0xff) - 1] + 8;
-    else if (x) 
+    else if (x)
       return log_8[(x & 0xff) - 1];
     return -1;  /* special `log' for 0 */
     }
@@ -64,6 +64,27 @@ schemerlicht_object make_schemerlicht_object_flonum(schemerlicht_flonum fl)
   schemerlicht_object obj;
   obj.type = schemerlicht_object_type_flonum;
   obj.value.fl = fl;
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_true()
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_true;
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_false()
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_nil()
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_nil;
   return obj;
   }
 
@@ -87,4 +108,39 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     default:
       break;
     }
+  }
+
+schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj)
+  {
+  schemerlicht_string s;
+  switch (obj->type)
+    {
+    case schemerlicht_object_type_false:
+      schemerlicht_string_init(ctxt, &s, "#f");
+      break;
+    case schemerlicht_object_type_true:
+      schemerlicht_string_init(ctxt, &s, "#t");
+      break;
+    case schemerlicht_object_type_nil:
+      schemerlicht_string_init(ctxt, &s, "()");
+      break;
+    case schemerlicht_object_type_fixnum:
+    {
+    char str[256];
+    sprintf(str, "%lld", obj->value.fx);
+    schemerlicht_string_init(ctxt, &s, str);
+    break;
+    }
+    case schemerlicht_object_type_flonum:
+    {
+    char str[256];
+    sprintf(str, "%f", obj->value.fl);
+    schemerlicht_string_init(ctxt, &s, str);
+    break;
+    }
+    case schemerlicht_object_type_string:
+      schemerlicht_string_copy(ctxt, &s, &obj->value.s);
+      break;
+    }
+  return s;
   }
