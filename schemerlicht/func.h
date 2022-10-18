@@ -8,6 +8,7 @@ typedef struct schemerlicht_function
   {
   schemerlicht_vector constants;
   schemerlicht_vector code;
+  int freereg;  /* first free register */
   } schemerlicht_function;
 
 

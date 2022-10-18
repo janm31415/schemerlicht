@@ -31,11 +31,15 @@ typedef struct schemerlicht_global_context
 struct schemerlicht_context 
   {
   schemerlicht_global_context* global;
-  //schemerlicht_object* objects;
+  schemerlicht_vector stack;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open();
 SCHEMERLICHT_API void schemerlicht_close(schemerlicht_context* ctxt);
+
+// for new threads
+SCHEMERLICHT_API schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt);
+SCHEMERLICHT_API void schemerlicht_context_destroy(schemerlicht_context* ctxt);
 
 #endif //SCHEMERLICHT_CONTEXT_H

@@ -46,4 +46,7 @@ typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
 
 typedef uint32_t schemerlicht_instruction;
 
+/* maximum stack for a scheme function */
+#define schemerlicht_maxstack	250
+
 #endif //SCHEMERLICHT_LIMITS_H

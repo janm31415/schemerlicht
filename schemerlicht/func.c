@@ -7,6 +7,7 @@ schemerlicht_function schemerlicht_function_init(schemerlicht_context* ctxt)
   schemerlicht_function fun;
   schemerlicht_vector_init(ctxt, &fun.constants, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &fun.code, schemerlicht_instruction);
+  fun.freereg = 0;
   return fun;
   }
 

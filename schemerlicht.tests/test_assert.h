@@ -15,12 +15,12 @@ void InitTestEngine();
 int CloseTestEngine(int force_report);
 
 #define TestEqInt(expval, val, file, line, func) \
-  if ((int)(expval) != (int)(val)) \
+  if ((int64_t)(expval) != (int64_t)(val)) \
     { \
     char expval_str[256]; \
     char val_str[256]; \
-    sprintf(expval_str, "%d", (int)(expval)); \
-    sprintf(val_str, "%d", (int)(val)); \
+    sprintf(expval_str, "%lld", (int64_t)(expval)); \
+    sprintf(val_str, "%lld", (int64_t)(val)); \
     TestFail(expval_str, val_str, file, line, func); \
     } \
   else \

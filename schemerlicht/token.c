@@ -15,7 +15,11 @@ schemerlicht_flonum to_flonum(const char* value)
 
 schemerlicht_fixnum to_fixnum(const char* value)
   {
+#ifdef _WIN32
   return cast(schemerlicht_fixnum, _atoi64(value));
+#else
+  return cast(schemerlicht_fixnum, strtoull(value));
+#endif
   }
 
 int is_number(int* is_real, int* is_scientific, const char* value)
