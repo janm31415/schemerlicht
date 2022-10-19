@@ -333,4 +333,20 @@ schemerlicht_expression schemerlicht_init_foreign(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_if(schemerlicht_context* ctxt);
 schemerlicht_expression schemerlicht_init_quote(schemerlicht_context* ctxt);
 
+void schemerlicht_destroy_parsed_begin(schemerlicht_context* ctxt, schemerlicht_parsed_begin* b);
+void schemerlicht_destroy_parsed_quote(schemerlicht_context* ctxt, schemerlicht_parsed_quote* q);
+void schemerlicht_destroy_literal(schemerlicht_context* ctxt, schemerlicht_literal* p);
+void schemerlicht_destroy_parsed_variable(schemerlicht_context* ctxt, schemerlicht_parsed_variable* p);
+void schemerlicht_destroy_parsed_nop(schemerlicht_context* ctxt, schemerlicht_parsed_nop* p);
+void schemerlicht_destroy_parsed_primitive_call(schemerlicht_context* ctxt, schemerlicht_parsed_primitive_call* p);
+void schemerlicht_destroy_parsed_foreign_call(schemerlicht_context* ctxt, schemerlicht_parsed_foreign_call* p);
+void schemerlicht_destroy_parsed_if(schemerlicht_context* ctxt, schemerlicht_parsed_if* p);
+void schemerlicht_destroy_parsed_cond(schemerlicht_context* ctxt, schemerlicht_parsed_cond* p);
+void schemerlicht_destroy_parsed_do(schemerlicht_context* ctxt, schemerlicht_parsed_do* p);
+void schemerlicht_destroy_parsed_case(schemerlicht_context* ctxt, schemerlicht_parsed_case* p);
+void schemerlicht_destroy_parsed_let(schemerlicht_context* ctxt, schemerlicht_parsed_let* p);
+void schemerlicht_destroy_parsed_lambda(schemerlicht_context* ctxt, schemerlicht_parsed_lambda* p);
+void schemerlicht_destroy_parsed_funcall(schemerlicht_context* ctxt, schemerlicht_parsed_funcall* p);
+void schemerlicht_destroy_parsed_set(schemerlicht_context* ctxt, schemerlicht_parsed_set* p);
+
 #endif // SCHEMERLICHT_PARSER_H

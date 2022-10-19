@@ -190,12 +190,15 @@ static void convert_when(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   UNUSED(v);
   assert(e->type == schemerlicht_type_primitive_call);
   assert(strcmp(e->expr.prim.name.string_ptr, "when") == 0);
+  if (e->expr.prim.arguments.vector_size == 0)
+    {
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "invalid when statement");
+    return;
+    }
   schemerlicht_expression i = schemerlicht_init_if(ctxt);
   i.expr.i.line_nr = e->expr.prim.line_nr;
   i.expr.i.column_nr = e->expr.prim.column_nr;
-  i.expr.i.filename = e->expr.prim.filename;
-  if (e->expr.prim.arguments.vector_size == 0)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, i.expr.i.line_nr, i.expr.i.column_nr);
+  i.expr.i.filename = e->expr.prim.filename;  
   schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, *schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression), schemerlicht_expression);
   schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
   schemerlicht_expression* insert_pos = schemerlicht_vector_begin(&new_begin.expr.beg.arguments, schemerlicht_expression);
@@ -214,12 +217,15 @@ static void convert_unless(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   UNUSED(v);
   assert(e->type == schemerlicht_type_primitive_call);
   assert(strcmp(e->expr.prim.name.string_ptr, "unless") == 0);
+  if (e->expr.prim.arguments.vector_size == 0)
+    {
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "invalid unless statement");
+    return;
+    }
   schemerlicht_expression i = schemerlicht_init_if(ctxt);
   i.expr.i.line_nr = e->expr.prim.line_nr;
   i.expr.i.column_nr = e->expr.prim.column_nr;
   i.expr.i.filename = e->expr.prim.filename;
-  if (e->expr.prim.arguments.vector_size == 0)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, i.expr.i.line_nr, i.expr.i.column_nr);
   schemerlicht_expression np = schemerlicht_init_primcall(ctxt);
   schemerlicht_string_init(ctxt, &np.expr.prim.name, "not");
   schemerlicht_vector_push_back(ctxt, &np.expr.prim.arguments, *schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression), schemerlicht_expression);
@@ -242,7 +248,10 @@ static void convert_delay(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   assert(e->type == schemerlicht_type_primitive_call);
   assert(strcmp(e->expr.prim.name.string_ptr, "delay") == 0);
   if (e->expr.prim.arguments.vector_size != 1)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr);
+    {
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "invalid number of arguments for delay");
+    return;
+    }
   schemerlicht_expression lam = schemerlicht_init_lambda(ctxt);
   schemerlicht_expression lam_begin = schemerlicht_init_begin(ctxt);
   schemerlicht_expression* p_arg = schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression);
@@ -495,7 +504,7 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
     }
   else
     {
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.cond.line_nr, e->expr.cond.column_nr);
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.cond.line_nr, e->expr.cond.column_nr, "cond expression");
     }
   }
 

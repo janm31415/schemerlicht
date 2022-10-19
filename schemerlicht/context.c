@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "parser.h"
 #include "primitives.h"
+#include "error.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {
@@ -14,7 +15,9 @@ static schemerlicht_context* context_new(schemerlicht_context* ctxt)
 
 static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_to_free)
   {
+  schemerlicht_syntax_errors_clear(ctxt_to_free);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->stack);
+  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);
   schemerlicht_free(ctxt, ctxt_to_free, sizeof(schemerlicht_context));
   }
 
@@ -24,6 +27,7 @@ static void context_init(schemerlicht_context* ctxt)
   ctxt->error_jmp = NULL;
   ctxt->number_of_syntax_errors = 0;
   schemerlicht_vector_init_with_size(ctxt, &ctxt->stack, schemerlicht_maxstack, schemerlicht_object);
+  schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_syntax_error_report);
   }
 
 schemerlicht_context* schemerlicht_open()

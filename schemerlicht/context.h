@@ -34,6 +34,7 @@ struct schemerlicht_context
   schemerlicht_global_context* global;
   schemerlicht_vector stack;
   int number_of_syntax_errors;
+  schemerlicht_vector syntax_error_reports;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   };
 

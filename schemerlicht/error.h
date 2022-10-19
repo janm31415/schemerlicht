@@ -2,6 +2,7 @@
 #define SCHEMERLICHT_ERROR_H
 
 #include "schemerlicht.h"
+#include "string.h"
 
 #define SCHEMERLICHT_ERROR_MEMORY 1
 #define SCHEMERLICHT_ERROR_NO_TOKENS 2
@@ -18,6 +19,17 @@ void schemerlicht_throw_parser_required(schemerlicht_context* ctxt, int errorcod
 
 void schemerlicht_runerror(schemerlicht_context* ctxt, const char* fmt, ...);
 
-void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg);
+void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg);
+void schemerlicht_syntax_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg);
+
+typedef struct schemerlicht_syntax_error_report
+  {
+  int errorcode;
+  int line_number;
+  int column_number;
+  schemerlicht_string message;
+  } schemerlicht_syntax_error_report;
+
+void schemerlicht_syntax_errors_clear(schemerlicht_context* ctxt);
 
 #endif //SCHEMERLICHT_ERROR_H

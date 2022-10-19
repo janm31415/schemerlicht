@@ -261,13 +261,18 @@ static void test_error_jump()
   schemerlicht_close(ctxt);
   }
 
-static void parse_error_aux(const char* script, int expected_error_code)
+static void parse_error_aux(const char* script, const char* first_error_message)
   {
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
-  int contains_error = ctxt->number_of_syntax_errors > 0 ? 1 : 0;
+  int contains_error = ctxt->number_of_syntax_errors > 0 ? 1 : 0;  
   TEST_EQ_INT(1, contains_error);
+  if (contains_error)
+    {
+    schemerlicht_syntax_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_syntax_error_report);
+    TEST_EQ_STRING(first_error_message, it->message.string_ptr);
+    }
   schemerlicht_program_destroy(ctxt, &prog);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
@@ -275,8 +280,8 @@ static void parse_error_aux(const char* script, int expected_error_code)
 
 static void parse_errors()
   {
-  parse_error_aux("(", SCHEMERLICHT_ERROR_NO_TOKENS);
-  parse_error_aux("(begin 5 6 7 8 9 10 11 12", SCHEMERLICHT_ERROR_EXPECTED_KEYWORD);
+  parse_error_aux("(", "syntax error: no tokens");
+  parse_error_aux("(begin 5 6 7 8 9 10 11 12", "syntax error (1,2): expected keyword: ) expected");
   }
 
 void run_all_parser_tests()

@@ -236,7 +236,10 @@ static schemerlicht_cell atom(schemerlicht_context* ctxt, token* t)
 schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** token_it, token** token_it_end, int quasiquote)
   {
   if (*token_it >= *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return schemerlicht_make_nil_sym_cell(ctxt);
+    }
   if ((*token_it)->type == SCHEMERLICHT_T_LEFT_ROUND_BRACKET)
     {
     int is_vector = 0;
@@ -244,7 +247,10 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
       is_vector = 1;
     ++(*token_it);
     if (*token_it == *token_it_end)
-      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+      {
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+      return schemerlicht_make_nil_sym_cell(ctxt);
+      }
     schemerlicht_vector items;
     schemerlicht_vector_init(ctxt, &items, schemerlicht_cell);
     while ((*token_it != *token_it_end) && ((*token_it)->type != SCHEMERLICHT_T_RIGHT_ROUND_BRACKET))
