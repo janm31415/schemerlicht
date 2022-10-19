@@ -296,6 +296,48 @@ static void test_add_mixed()
   test_compile_aux("3.000000", "(+ 1 2.0)");
   test_compile_aux("3.000000", "(+ 1.0 2)");
   test_compile_aux("45.140000", "(+ #\\005 #\\032 5 3.14)");
+  test_compile_aux("#undefined", "(+ #\\005 #\\032 5 3.14 \"jan\")");
+  }
+
+static void test_sub()
+  {
+  test_compile_aux("0", "(-)");
+  test_compile_aux("-1", "(- 1)");
+  test_compile_aux("-1", "(- 1 2)");
+  test_compile_aux("-3", "(- 1 2 3 -1)");
+  test_compile_aux("0.100000", "(- 0.5 0.4)");
+  test_compile_aux("-0.000000", "(- 0.5 0.4 0.1)");
+  test_compile_aux("5.800000", "(- 7 0.5 0.4 0.1 0.2)");
+  test_compile_aux("#\\001", "(- #\\008 #\\003 #\\004)");
+  test_compile_aux("#undefined", "(- #\\008 #\\003 #\\004 \"sdf\")");
+  }
+
+static void test_mul()
+  {
+  test_compile_aux("1", "(*)");
+  test_compile_aux("7", "(* 7)");
+  test_compile_aux("7.000000", "(* 7.0)");
+  test_compile_aux("#\\007", "(* #\\007)");
+  test_compile_aux("2", "(* 1 2)");
+  test_compile_aux("6", "(* 1 2 3)");
+  test_compile_aux("-6", "(* 1 2 3 -1)");
+  test_compile_aux("1.250000", "(* 0.5 2.5)");
+  test_compile_aux("0.125000", "(* 0.5 2.5 0.1)");
+  test_compile_aux("#\\232", "(* #\\200 #\\005)");
+  }
+
+static void test_div()
+  {
+  test_compile_aux("1", "(/)");
+  test_compile_aux("0", "(/ 8)");
+  test_compile_aux("0.125000", "(/ 8.0)");
+  test_compile_aux("2", "(/ 4 2)");
+  test_compile_aux("2", "(/ 8 2 2)");
+  test_compile_aux("-1", "(/ 16 4 -4)");
+  test_compile_aux("-1", "(/ 16 -4 4)");
+  test_compile_aux("1.250000", "(/ 2.5 2)");
+  test_compile_aux("-12.500000", "(/ 2.5 2 -0.1)");
+  test_compile_aux("#\\004", "(/ #\\008 #\\002)");
   }
 
 void run_all_compiler_tests()
@@ -311,4 +353,7 @@ void run_all_compiler_tests()
   test_add_flonums();
   test_add_chars();
   test_add_mixed();
+  test_sub();
+  test_mul();
+  test_div();
   }
