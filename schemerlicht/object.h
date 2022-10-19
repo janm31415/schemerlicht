@@ -6,13 +6,13 @@
 #include "string.h"
 
 #define schemerlicht_object_type_undefined 0
-#define schemerlicht_object_type_fixnum 1
-#define schemerlicht_object_type_flonum 2
-#define schemerlicht_object_type_string 3
-#define schemerlicht_object_type_pointer 4
-#define schemerlicht_object_type_true 5
-#define schemerlicht_object_type_false 6
-#define schemerlicht_object_type_char 7
+#define schemerlicht_object_type_char 1
+#define schemerlicht_object_type_fixnum 2
+#define schemerlicht_object_type_flonum 3
+#define schemerlicht_object_type_string 4
+#define schemerlicht_object_type_pointer 5
+#define schemerlicht_object_type_true 6
+#define schemerlicht_object_type_false 7
 #define schemerlicht_object_type_symbol 8
 #define schemerlicht_object_type_nil 9
 

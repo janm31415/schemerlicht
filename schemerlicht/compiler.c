@@ -104,6 +104,10 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
   else
     {
     schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
+    if (prim == NULL)
+      {
+      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+      }
     if (prim->type == schemerlicht_object_type_fixnum)
       {
       const schemerlicht_memsize nr_prim_args = e->expr.prim.arguments.vector_size;

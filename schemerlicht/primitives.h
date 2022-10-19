@@ -8,10 +8,12 @@ typedef enum
   {
   SCHEMERLICHT_ADD1,
   SCHEMERLICHT_SUB1,
+  SCHEMERLICHT_ADD,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_sub1(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_add(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

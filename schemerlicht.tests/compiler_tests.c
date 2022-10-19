@@ -256,6 +256,48 @@ static void test_single_argument_primitives()
   test_compile_aux("-1.600000", "(sub1 -0.6)");
   }
 
+static void test_add_fixnums()
+  {
+  test_compile_aux("0", "(+)");
+  test_compile_aux("3", "(+ 1 2)");
+  test_compile_aux("6", "(+ 1 2 3)");
+  test_compile_aux("10", "(+ 1 2 3 4)");
+  test_compile_aux("15", "(+ 1 2 3 4 5)");
+  test_compile_aux("21", "(+ 1 2 3 4 5 6)");
+  test_compile_aux("28", "(+ 1 2 3 4 5 6 7)");
+  test_compile_aux("36", "(+ 1 2 3 4 5 6 7 8)");
+  test_compile_aux("45", "(+ 1 2 3 4 5 6 7 8 9)");
+  test_compile_aux("55", "(+ 1 2 3 4 5 6 7 8 9 10)");
+  test_compile_aux("66", "(+ 1 2 3 4 5 6 7 8 9 10 11)");
+  }
+
+static void test_add_flonums()
+  {  
+  test_compile_aux("3.000000", "(+ 1.0 2.0)");
+  test_compile_aux("6.000000", "(+ 1.0 2.0 3.0)");
+  test_compile_aux("10.000000", "(+ 1.0 2.0 3.0 4.0)");
+  test_compile_aux("15.000000", "(+ 1.0 2.0 3.0 4.0 5.0)");
+  test_compile_aux("21.000000", "(+ 1.0 2.0 3.0 4.0 5.0 6.0)");
+  test_compile_aux("28.000000", "(+ 1.0 2.0 3.0 4.0 5.0 6.0 7.0)");
+  test_compile_aux("36.000000", "(+ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0)");
+  test_compile_aux("45.000000", "(+ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0)");
+  test_compile_aux("55.000000", "(+ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)");
+  test_compile_aux("66.000000", "(+ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0)");
+  }
+
+static void test_add_chars()
+  {
+  test_compile_aux("#\\%", "(+ #\\005 #\\032)");
+  }
+
+static void test_add_mixed()
+  {
+  test_compile_aux("42", "(+ #\\005 #\\032 5)");
+  test_compile_aux("3.000000", "(+ 1 2.0)");
+  test_compile_aux("3.000000", "(+ 1.0 2)");
+  test_compile_aux("45.140000", "(+ #\\005 #\\032 5 3.14)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -265,4 +307,8 @@ void run_all_compiler_tests()
   test_compile_char();
   test_compile_string();
   test_single_argument_primitives();
+  test_add_fixnums();
+  test_add_flonums();
+  test_add_chars();
+  test_add_mixed();
   }
