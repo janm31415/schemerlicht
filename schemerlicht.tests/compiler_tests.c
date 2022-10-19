@@ -243,6 +243,17 @@ static void test_single_argument_primitives()
   test_compile_aux("#undefined", "(add1 \"blah\")");
   test_compile_aux("8", "(add1 7 80 900)");
   test_compile_aux("#\\b", "(add1 #\\a)");
+
+  test_compile_aux("0", "(sub1)");
+  test_compile_aux("0", "(sub1 1)");
+  test_compile_aux("-1", "(sub1 0)");
+  test_compile_aux("-2", "(sub1 -1)");
+  test_compile_aux("4", "(sub1 5)");
+  test_compile_aux("-1001", "(sub1 -1000)");
+
+  test_compile_aux("0.500000", "(sub1 1.5)");
+  test_compile_aux("-0.500000", "(sub1 0.5)");
+  test_compile_aux("-1.600000", "(sub1 -0.6)");
   }
 
 void run_all_compiler_tests()
