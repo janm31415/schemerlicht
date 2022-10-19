@@ -280,8 +280,9 @@ static void parse_error_aux(const char* script, const char* first_error_message)
 
 static void parse_errors()
   {
-  parse_error_aux("(", "syntax error: no tokens");
-  parse_error_aux("(begin 5 6 7 8 9 10 11 12", "syntax error (1,2): expected keyword: ) expected");
+  parse_error_aux("(", "syntax error (1,1): no tokens");
+  parse_error_aux("(begin 5 6 7 8 9 10 11 12", "syntax error (1,24): expected keyword: ) expected");
+  parse_error_aux("(begin", "syntax error (1,2): no tokens");
   }
 
 void run_all_parser_tests()

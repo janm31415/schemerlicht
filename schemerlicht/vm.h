@@ -77,7 +77,7 @@ typedef enum
   {
   SCHEMERLICHT_OPCODE_MOVE,       /*  A B      R(A) := R(B)					*/
   SCHEMERLICHT_OPCODE_LOADK,      /*  A Bx	   R(A) := Kst(Bx)					*/
-  SCHEMERLICHT_OPCODE_CALL        /* A B C	   R(A), ... ,R(A+C-2) := R(A)(R(A+1), ... ,R(A+B-1)) */
+  SCHEMERLICHT_OPCODE_CALL        /* A B C	   R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
   } schemerlicht_opcode;
 
 #define SCHEMERLICHT_NUM_OPCODES (cast(int, SCHEMERLICHT_OPCODE_CALL+1))

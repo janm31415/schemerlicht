@@ -7,7 +7,7 @@ int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlic
     return 0;
   switch (obj1->type)
     {
-    case schemerlicht_object_type_nil:
+    case schemerlicht_object_type_undefined:
       return 1;
     case schemerlicht_object_type_fixnum:
       return obj1->value.fx == obj2->value.fx;
@@ -84,7 +84,7 @@ schemerlicht_object make_schemerlicht_object_false()
 schemerlicht_object make_schemerlicht_object_nil()
   {
   schemerlicht_object obj;
-  obj.type = schemerlicht_object_type_scheme_nil;
+  obj.type = schemerlicht_object_type_nil;
   return obj;
   }
 
@@ -136,13 +136,16 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
   schemerlicht_string s;
   switch (obj->type)
     {
+    case schemerlicht_object_type_undefined:
+      schemerlicht_string_init(ctxt, &s, "#undefined");
+      break;
     case schemerlicht_object_type_false:
       schemerlicht_string_init(ctxt, &s, "#f");
       break;
     case schemerlicht_object_type_true:
       schemerlicht_string_init(ctxt, &s, "#t");
       break;
-    case schemerlicht_object_type_scheme_nil:
+    case schemerlicht_object_type_nil:
       schemerlicht_string_init(ctxt, &s, "()");
       break;
     case schemerlicht_object_type_fixnum:

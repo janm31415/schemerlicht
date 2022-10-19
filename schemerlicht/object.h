@@ -5,7 +5,7 @@
 #include "limits.h"
 #include "string.h"
 
-#define schemerlicht_object_type_nil 0
+#define schemerlicht_object_type_undefined 0
 #define schemerlicht_object_type_fixnum 1
 #define schemerlicht_object_type_flonum 2
 #define schemerlicht_object_type_string 3
@@ -14,7 +14,7 @@
 #define schemerlicht_object_type_false 6
 #define schemerlicht_object_type_char 7
 #define schemerlicht_object_type_symbol 8
-#define schemerlicht_object_type_scheme_nil 9
+#define schemerlicht_object_type_nil 9
 
 typedef union
   {

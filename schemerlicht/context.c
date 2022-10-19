@@ -37,8 +37,8 @@ schemerlicht_context* schemerlicht_open()
     {
     schemerlicht_global_context* g = schemerlicht_new(NULL, schemerlicht_global_context);
     ctxt->global = g;
-    get_key(g->dummy_node)->type = schemerlicht_object_type_nil;
-    get_value(g->dummy_node)->type = schemerlicht_object_type_nil;
+    get_key(g->dummy_node)->type = schemerlicht_object_type_undefined;
+    get_value(g->dummy_node)->type = schemerlicht_object_type_undefined;
     g->dummy_node->next = NULL;
     g->main_context = ctxt;
     g->expression_map = generate_expression_map(ctxt);

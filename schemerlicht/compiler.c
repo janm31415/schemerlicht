@@ -26,7 +26,7 @@ static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* f
   {
   schemerlicht_assert(e->type == schemerlicht_type_literal);
   schemerlicht_object obj;
-  obj.type = schemerlicht_object_type_nil;
+  obj.type = schemerlicht_object_type_undefined;
   switch (e->expr.lit.type)
     {
     case schemerlicht_type_fixnum:
@@ -123,8 +123,8 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       schemerlicht_instruction i1 = 0;
       SCHEMERLICHT_SET_OPCODE(i1, SCHEMERLICHT_OPCODE_CALL);
       SCHEMERLICHT_SETARG_A(i1, fun->freereg);
-      SCHEMERLICHT_SETARG_B(i1, 2);
-      SCHEMERLICHT_SETARG_C(i1, 2);
+      SCHEMERLICHT_SETARG_B(i1, nr_prim_args);
+      SCHEMERLICHT_SETARG_C(i1, 1); // 1 return value
       schemerlicht_vector_push_back(ctxt, &fun->code, i1, schemerlicht_instruction);
       }
     }

@@ -17,7 +17,7 @@
 
 static void schemerlicht_set_nil(schemerlicht_object* obj)
   {
-  obj->type = schemerlicht_object_type_nil;
+  obj->type = schemerlicht_object_type_undefined;
   }
 
 static void schemerlicht_create_array_vector(schemerlicht_context* ctxt, schemerlicht_map* map, schemerlicht_memsize array_size)
@@ -36,8 +36,8 @@ static void schemerlicht_create_node_vector(schemerlicht_context* ctxt, schemerl
   if (log_node_size == 0)
     {
     map->node = ctxt->global->dummy_node;
-    schemerlicht_assert(get_key(map->node)->type == schemerlicht_object_type_nil);
-    schemerlicht_assert(get_value(map->node)->type == schemerlicht_object_type_nil);
+    schemerlicht_assert(get_key(map->node)->type == schemerlicht_object_type_undefined);
+    schemerlicht_assert(get_value(map->node)->type == schemerlicht_object_type_undefined);
     schemerlicht_assert(map->node->next == NULL);
     }
   else
@@ -108,7 +108,7 @@ static void numuse(const schemerlicht_map* t, schemerlicht_memsize* narray, sche
     nums[lg] = 0;
     for (; i < ttlg; ++i)
       {
-      if (t->array[i].type != schemerlicht_object_type_nil)
+      if (t->array[i].type != schemerlicht_object_type_undefined)
         {
         ++nums[lg];
         ++totaluse;
@@ -123,7 +123,7 @@ static void numuse(const schemerlicht_map* t, schemerlicht_memsize* narray, sche
   while (i--)
     {
     schemerlicht_map_node* n = &t->node[i];
-    if (get_value(n)->type != schemerlicht_object_type_nil)
+    if (get_value(n)->type != schemerlicht_object_type_undefined)
       {
       schemerlicht_memsize k = arrayindex(get_key(n));
       if (k != schemerlicht_mem_invalid_size)
@@ -151,8 +151,8 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
     schemerlicht_assert(t->node == ctxt->global->dummy_node);
     temp[0] = t->node[0];  /* copy it to `temp' */
     nold = temp;
-    get_key(ctxt->global->dummy_node)->type = schemerlicht_object_type_nil; /* restate invariant */
-    get_value(ctxt->global->dummy_node)->type = schemerlicht_object_type_nil;
+    get_key(ctxt->global->dummy_node)->type = schemerlicht_object_type_undefined; /* restate invariant */
+    get_value(ctxt->global->dummy_node)->type = schemerlicht_object_type_undefined;
     schemerlicht_assert(ctxt->global->dummy_node->next == NULL);
     }
   if (nasize > oldasize)  /* array part must grow? */
@@ -166,7 +166,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
     /* re-insert elements from vanishing slice */
     for (i = nasize; i < oldasize; ++i)
       {
-      if (t->array[i].type != schemerlicht_object_type_nil)
+      if (t->array[i].type != schemerlicht_object_type_undefined)
         {
         schemerlicht_object* obj = schemerlicht_map_insert_indexed(ctxt, t, i + 1);
         schemerlicht_set_object(obj, &t->array[i]);
@@ -179,7 +179,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
   for (i = twoto(oldhsize); i >= 1; --i)
     {
     schemerlicht_map_node* old = nold + i - 1;
-    if (get_value(old)->type != schemerlicht_object_type_nil)
+    if (get_value(old)->type != schemerlicht_object_type_undefined)
       {
       schemerlicht_object* obj = schemerlicht_map_insert(ctxt, t, get_key(old));
       schemerlicht_set_object(obj, get_value(old));
@@ -319,7 +319,7 @@ schemerlicht_object* schemerlicht_map_get_indexed(schemerlicht_map* map, schemer
 
 static schemerlicht_object* schemerlicht_map_get_any(schemerlicht_map* map, const schemerlicht_object* key)
   {
-  if (key->type == schemerlicht_object_type_nil)
+  if (key->type == schemerlicht_object_type_undefined)
     return NULL;
   else
     {
@@ -370,7 +370,7 @@ schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerli
 static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key)
   {
   schemerlicht_map_node* main = schemerlicht_main_position(map, key);
-  if (get_value(main)->type != schemerlicht_object_type_nil) // main position is not free
+  if (get_value(main)->type != schemerlicht_object_type_undefined) // main position is not free
     {
     schemerlicht_map_node* other = schemerlicht_main_position(map, get_key(main)); // main position of colliding node
     schemerlicht_map_node* n = map->first_free; // get a free place
@@ -382,7 +382,7 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
       other->next = n; //redo the chain with n in place of main
       *n = *main; // copy colliding node into ree position
       main->next = NULL;
-      get_value(main)->type = schemerlicht_object_type_nil;
+      get_value(main)->type = schemerlicht_object_type_undefined;
       }
     else // colliding node is in its own main position
       {
@@ -393,10 +393,10 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
       }
     }
   schemerlicht_set_object(get_key(main), key);
-  schemerlicht_assert(get_value(main)->type == schemerlicht_object_type_nil);
+  schemerlicht_assert(get_value(main)->type == schemerlicht_object_type_undefined);
   for (;;) // set first_free correctly
     {
-    if (get_key(map->first_free)->type == schemerlicht_object_type_nil) // map still has a free place
+    if (get_key(map->first_free)->type == schemerlicht_object_type_undefined) // map still has a free place
       return get_value(main);
     else if (map->first_free == map->node) //cannot decrement from here
       break;
@@ -408,7 +408,7 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
   schemerlicht_rehash(ctxt, map); // grow map
   schemerlicht_object* val = cast(schemerlicht_object*, schemerlicht_map_get(map, key));
   schemerlicht_assert(val->type == schemerlicht_object_type_fixnum);
-  val->type = schemerlicht_object_type_nil;
+  val->type = schemerlicht_object_type_undefined;
   return val;
   }
 
@@ -433,7 +433,7 @@ schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemer
     return p;
   else
     {
-    if (key->type == schemerlicht_object_type_nil)
+    if (key->type == schemerlicht_object_type_undefined)
       schemerlicht_runerror(ctxt, "table index is nil");
     return new_key(ctxt, map, key);
     }

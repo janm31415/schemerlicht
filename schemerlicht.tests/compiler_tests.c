@@ -230,6 +230,19 @@ static void test_compile_string()
 static void test_single_argument_primitives()
   {
   test_compile_aux("1", "(add1 0)");
+  test_compile_aux("0", "(add1)");
+  test_compile_aux("0", "(add1 -1)");
+  test_compile_aux("6", "(add1 5)");
+  test_compile_aux("-999", "(add1 -1000)");
+  test_compile_aux("536870911", "(add1 536870910)");
+  test_compile_aux("-536870911", "(add1 -536870912)");
+  test_compile_aux("2", "(add1 (add1 0))");
+  test_compile_aux("18", "(add1 (add1 (add1 (add1 (add1 (add1 12))))))");
+  test_compile_aux("1.500000", "(add1 0.5)");
+  test_compile_aux("0.400000", "(add1 -0.6)");
+  test_compile_aux("#undefined", "(add1 \"blah\")");
+  test_compile_aux("8", "(add1 7 80 900)");
+  test_compile_aux("#\\b", "(add1 #\\a)");
   }
 
 void run_all_compiler_tests()
