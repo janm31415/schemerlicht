@@ -22,6 +22,7 @@ typedef struct schemerlicht_global_context
   schemerlicht_map_node dummy_node[1]; //common node array for all empty tables
   schemerlicht_context* main_context;
   schemerlicht_map* expression_map;
+  schemerlicht_map* primitives_map;
   schemerlicht_cell true_sym;
   schemerlicht_cell false_sym;
   schemerlicht_cell nil_sym;
@@ -32,6 +33,7 @@ struct schemerlicht_context
   {
   schemerlicht_global_context* global;
   schemerlicht_vector stack;
+  int number_of_syntax_errors;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   };
 

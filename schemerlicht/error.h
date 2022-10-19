@@ -18,4 +18,6 @@ void schemerlicht_throw_parser_required(schemerlicht_context* ctxt, int errorcod
 
 void schemerlicht_runerror(schemerlicht_context* ctxt, const char* fmt, ...);
 
+void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg);
+
 #endif //SCHEMERLICHT_ERROR_H

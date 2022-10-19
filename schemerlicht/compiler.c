@@ -24,7 +24,7 @@ static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemer
 
 static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
-  schemerlicht_assert(e->type == schemerlicht_type_literal);  
+  schemerlicht_assert(e->type == schemerlicht_type_literal);
   schemerlicht_object obj;
   obj.type = schemerlicht_object_type_nil;
   switch (e->expr.lit.type)
@@ -85,6 +85,15 @@ static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* f
   schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
   }
 
+static schemerlicht_object* find_primitive(schemerlicht_context* ctxt, schemerlicht_string* s)
+  {
+  schemerlicht_object key;
+  key.type = schemerlicht_object_type_string;
+  key.value.s = *s;
+  schemerlicht_object* res = schemerlicht_map_get(ctxt->global->primitives_map, &key);
+  return res;
+  }
+
 static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
@@ -94,29 +103,30 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
     }
   else
     {
-    const schemerlicht_memsize nr_prim_args = e->expr.prim.arguments.vector_size;
-    for (schemerlicht_memsize i = 0; i < nr_prim_args; ++i)
+    schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
+    if (prim->type == schemerlicht_object_type_fixnum)
       {
-      schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.prim.arguments, i, schemerlicht_expression);
-      ++fun->freereg;
-      compile_expression(ctxt, fun, arg);
+      const schemerlicht_memsize nr_prim_args = e->expr.prim.arguments.vector_size;
+      for (schemerlicht_memsize i = 0; i < nr_prim_args; ++i)
+        {
+        schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.prim.arguments, i, schemerlicht_expression);
+        ++fun->freereg;
+        compile_expression(ctxt, fun, arg);
+        }
+      fun->freereg -= nr_prim_args;      
+      int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
+      schemerlicht_instruction i0 = 0;
+      SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_LOADK);
+      SCHEMERLICHT_SETARG_Bx(i0, k_pos);
+      SCHEMERLICHT_SETARG_A(i0, fun->freereg);
+      schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
+      schemerlicht_instruction i1 = 0;
+      SCHEMERLICHT_SET_OPCODE(i1, SCHEMERLICHT_OPCODE_CALL);
+      SCHEMERLICHT_SETARG_A(i1, fun->freereg);
+      SCHEMERLICHT_SETARG_B(i1, 2);
+      SCHEMERLICHT_SETARG_C(i1, 2);
+      schemerlicht_vector_push_back(ctxt, &fun->code, i1, schemerlicht_instruction);
       }
-    fun->freereg -= nr_prim_args;    
-    schemerlicht_object primitive_function_pointer_object;
-    primitive_function_pointer_object.type = schemerlicht_object_type_fixnum;
-    primitive_function_pointer_object.value.fx = SCHEMERLICHT_ADD1; // id of the primitive
-    int k_pos = get_k(ctxt, fun, &primitive_function_pointer_object); // will be added to the constants list
-    schemerlicht_instruction i0 = 0;
-    SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_LOADK);
-    SCHEMERLICHT_SETARG_Bx(i0, k_pos);
-    SCHEMERLICHT_SETARG_A(i0, fun->freereg);
-    schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
-    schemerlicht_instruction i1 = 0;
-    SCHEMERLICHT_SET_OPCODE(i1, SCHEMERLICHT_OPCODE_CALL);
-    SCHEMERLICHT_SETARG_A(i1, fun->freereg);
-    SCHEMERLICHT_SETARG_B(i1, 2);
-    SCHEMERLICHT_SETARG_C(i1, 2);
-    schemerlicht_vector_push_back(ctxt, &fun->code, i1, schemerlicht_instruction);
     }
   }
 

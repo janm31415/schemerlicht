@@ -37,11 +37,17 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       }
       case SCHEMERLICHT_OPCODE_CALL:
       {
-      schemerlicht_assert(target->type == schemerlicht_object_type_fixnum);
-      schemerlicht_fixnum function_id = target->value.fx;
-      const int b = SCHEMERLICHT_GETARG_B(i);
-      const int c = SCHEMERLICHT_GETARG_C(i);
-      schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+      if (target->type == schemerlicht_object_type_fixnum)
+        {
+        schemerlicht_fixnum function_id = target->value.fx;
+        const int b = SCHEMERLICHT_GETARG_B(i);
+        const int c = SCHEMERLICHT_GETARG_C(i);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+        }
+      else
+        {
+        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+        }
       break;
       }
       default:

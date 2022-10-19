@@ -45,3 +45,17 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
       break;
     }
   }
+
+static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, int value)
+  {
+  schemerlicht_object* obj = schemerlicht_map_insert_string(ctxt, m, str);
+  obj->type = schemerlicht_object_type_fixnum;
+  obj->value.fx = (schemerlicht_fixnum)value;
+  }
+
+schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
+  {
+  schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 8);
+  map_insert(ctxt, m, "add1", SCHEMERLICHT_ADD1);
+  return m;
+  }

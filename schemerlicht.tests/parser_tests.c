@@ -238,7 +238,7 @@ static void parse_do()
   schemerlicht_close(ctxt);
   }
 
-static void parse_error()
+static void test_error_jump()
   {
   int branch_side_1 = 0;
   int branch_side_2 = 0;
@@ -261,6 +261,24 @@ static void parse_error()
   schemerlicht_close(ctxt);
   }
 
+static void parse_error_aux(const char* script, int expected_error_code)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  int contains_error = ctxt->number_of_syntax_errors > 0 ? 1 : 0;
+  TEST_EQ_INT(1, contains_error);
+  schemerlicht_program_destroy(ctxt, &prog);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_close(ctxt);
+  }
+
+static void parse_errors()
+  {
+  parse_error_aux("(", SCHEMERLICHT_ERROR_NO_TOKENS);
+  parse_error_aux("(begin 5 6 7 8 9 10 11 12", SCHEMERLICHT_ERROR_EXPECTED_KEYWORD);
+  }
+
 void run_all_parser_tests()
   {
   parse_fixnum_1();
@@ -278,5 +296,6 @@ void run_all_parser_tests()
   parse_cond();
   parse_cond_2();
   parse_do();
-  parse_error();
+  test_error_jump();
+  parse_errors();
   }

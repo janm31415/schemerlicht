@@ -6,6 +6,7 @@
 #include "copy.h"
 #include "error.h"
 
+#include <stdio.h>
 #include <string.h>
 
 typedef struct schemerlicht_simplify_to_core_forms_visitor

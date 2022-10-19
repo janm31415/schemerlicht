@@ -1,6 +1,7 @@
 #include "context.h"
 #include "memory.h"
 #include "parser.h"
+#include "primitives.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {
@@ -21,6 +22,7 @@ static void context_init(schemerlicht_context* ctxt)
   {
   schemerlicht_assert(ctxt->global != NULL);
   ctxt->error_jmp = NULL;
+  ctxt->number_of_syntax_errors = 0;
   schemerlicht_vector_init_with_size(ctxt, &ctxt->stack, schemerlicht_maxstack, schemerlicht_object);
   }
 
@@ -36,6 +38,7 @@ schemerlicht_context* schemerlicht_open()
     g->dummy_node->next = NULL;
     g->main_context = ctxt;
     g->expression_map = generate_expression_map(ctxt);
+    g->primitives_map = generate_primitives_map(ctxt);
     g->true_sym = schemerlicht_make_true_sym_cell(ctxt);
     g->false_sym = schemerlicht_make_false_sym_cell(ctxt);
     g->nil_sym = schemerlicht_make_nil_sym_cell(ctxt);
@@ -49,6 +52,8 @@ void schemerlicht_close(schemerlicht_context* ctxt)
   ctxt = ctxt->global->main_context;
   schemerlicht_map_keys_free(ctxt, ctxt->global->expression_map);
   schemerlicht_map_free(ctxt, ctxt->global->expression_map);
+  schemerlicht_map_keys_free(ctxt, ctxt->global->primitives_map);
+  schemerlicht_map_free(ctxt, ctxt->global->primitives_map);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->true_sym);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->false_sym);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->nil_sym);

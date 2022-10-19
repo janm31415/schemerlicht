@@ -9,6 +9,128 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define SCHEMERLICHT_MAX_SYNTAX_ERRORS 5
+
+static void destroy_parsed_begin(schemerlicht_context* ctxt, schemerlicht_parsed_begin* b)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_begin;
+  expr.expr.beg = *b;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_quote(schemerlicht_context* ctxt, schemerlicht_parsed_quote* q)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = *q;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_literal(schemerlicht_context* ctxt, schemerlicht_literal* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_variable(schemerlicht_context* ctxt, schemerlicht_parsed_variable* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_variable;
+  expr.expr.var = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_nop(schemerlicht_context* ctxt, schemerlicht_parsed_nop* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_nop;
+  expr.expr.nop = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_primitive_call(schemerlicht_context* ctxt, schemerlicht_parsed_primitive_call* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_primitive_call;
+  expr.expr.prim = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_foreign_call(schemerlicht_context* ctxt, schemerlicht_parsed_foreign_call* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_foreign_call;
+  expr.expr.foreign = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_if(schemerlicht_context* ctxt, schemerlicht_parsed_if* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_if;
+  expr.expr.i = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_cond(schemerlicht_context* ctxt, schemerlicht_parsed_cond* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_cond;
+  expr.expr.cond = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_do(schemerlicht_context* ctxt, schemerlicht_parsed_do* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_do;
+  expr.expr.d = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_case(schemerlicht_context* ctxt, schemerlicht_parsed_case* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_case;
+  expr.expr.cas = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_let(schemerlicht_context* ctxt, schemerlicht_parsed_let* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_let;
+  expr.expr.let = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_lambda(schemerlicht_context* ctxt, schemerlicht_parsed_lambda* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_lambda;
+  expr.expr.lambda = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_funcall(schemerlicht_context* ctxt, schemerlicht_parsed_funcall* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_funcall;
+  expr.expr.funcall = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
+static void destroy_parsed_set(schemerlicht_context* ctxt, schemerlicht_parsed_set* p)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_set;
+  expr.expr.set = *p;
+  schemerlicht_expression_destroy(ctxt, &expr);
+  }
+
 schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt, token** token_it, token** token_it_end);
 
 static schemerlicht_string make_dummy_filename(schemerlicht_context* ctxt)
@@ -150,33 +272,35 @@ static schemerlicht_expression make_nop()
   return expr;
   }
 
-static void token_next(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
+static int token_next(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "no tokens");
+    return 0;
     }
-  else
-    {
-    popped_token = (**token_it);
-    ++(*token_it);
-    }
+  popped_token = (**token_it);
+  ++(*token_it);
+  return 1;
   }
 
-static void token_require(schemerlicht_context* ctxt, token** token_it, token** token_it_end, const char* required)
+static int token_require(schemerlicht_context* ctxt, token** token_it, token** token_it_end, const char* required)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "no tokens");
+    return 0;
     }
   else
     {
     if (strcmp((*token_it)->value.string_ptr, required) != 0)
       {
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, required);
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, required);
+      return 0;
       }
     popped_token = (**token_it);
     ++(*token_it);
+    return 1;
     }
   }
 
@@ -191,40 +315,45 @@ static int next_token_equals(token** token_it, token** token_it_end, const char*
   return strcmp(it->value.string_ptr, expected) == 0;
   }
 
-static int current_token_equals(token** token_it, const char* expected)
+static int current_token_equals(token** token_it, token** token_it_end, const char* expected)
   {
+  if (*token_it == *token_it_end)      
+    return 0;    
   if ((*token_it)->type == SCHEMERLICHT_T_FIXNUM || (*token_it)->type == SCHEMERLICHT_T_FLONUM)
     return 0;
   return strcmp((*token_it)->value.string_ptr, expected) == 0;
   }
 
-static int require_left_square_bracket(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
+static int require_left_square_bracket(schemerlicht_context* ctxt, token** token_it)
   {
-  if (*token_it == *token_it_end)
-    {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
-    }
   int res = ((*token_it)->type == SCHEMERLICHT_T_LEFT_SQUARE_BRACKET);
   if (!(res || ((*token_it)->type == SCHEMERLICHT_T_LEFT_ROUND_BRACKET)))
     {
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "[");
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "[");
     }
   ++(*token_it);
   invalidate_popped();
   return res;
   }
 
-static void require_right_square_bracket(schemerlicht_context* ctxt, token** token_it, token** token_it_end, int result_of_require_left_square_bracket)
+static int require_right_square_bracket(schemerlicht_context* ctxt, token** token_it, token** token_it_end, int result_of_require_left_square_bracket)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "no tokens");
+    return 0;
     }
   if (result_of_require_left_square_bracket && ((*token_it)->type != SCHEMERLICHT_T_RIGHT_SQUARE_BRACKET))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "]");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "]");    
+    return 0;
+    }
   if (!result_of_require_left_square_bracket && ((*token_it)->type != SCHEMERLICHT_T_RIGHT_ROUND_BRACKET))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, ")");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, ")");    
+    return 0;
+    }
+  return token_next(ctxt, token_it, token_it_end);
   }
 
 int closing_brackets(token** token_it, token** token_it_end)
@@ -237,7 +366,8 @@ static schemerlicht_expression make_begin(schemerlicht_context* ctxt, token** to
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();    
     }
   schemerlicht_parsed_begin b;
   b.filename = make_begin_filename(ctxt);
@@ -247,137 +377,177 @@ static schemerlicht_expression make_begin(schemerlicht_context* ctxt, token** to
   if (!implicit)
     {
     if (strcmp((*token_it)->value.string_ptr, "begin") != 0)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, b.line_nr, b.column_nr, "begin");
-    token_next(ctxt, token_it, token_it_end);
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, b.line_nr, b.column_nr, "begin");
+      return schemerlicht_make_begin_expression(&b);
+      }
+    if (!token_next(ctxt, token_it, token_it_end))
+      return schemerlicht_make_begin_expression(&b);
     }
   invalidate_popped();
-  while (!current_token_equals(token_it, ")"))
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &b.arguments, e, schemerlicht_expression);
     if (*token_it == *token_it_end)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, b.line_nr, b.column_nr, ")");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, b.line_nr, b.column_nr, ")");
+      return schemerlicht_make_begin_expression(&b);
+      }
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_begin;
-  expr.expr.beg = b;
-  return expr;
+  return schemerlicht_make_begin_expression(&b);
   }
 
 static schemerlicht_expression make_quote(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_QUOTE)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "'");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "'");
+    return make_nop();
+    }
   schemerlicht_parsed_quote q;
   q.line_nr = (*token_it)->line_nr;
   q.column_nr = (*token_it)->column_nr;
   q.filename = make_quote_filename(ctxt);
   q.qt = schemerlicht_qt_quote;
   if ((strcmp((*token_it)->value.string_ptr, "quote") != 0) && (strcmp((*token_it)->value.string_ptr, "'") != 0))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+    return schemerlicht_make_quote_expression(&q);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_quote_expression(&q);
   q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 0);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_quote;
-  expr.expr.quote = q;
-  return expr;
+  return schemerlicht_make_quote_expression(&q);
   }
 
 static schemerlicht_expression make_quasiquote(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_BACKQUOTE)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "`");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "`");
+    return make_nop();
+    }
   schemerlicht_parsed_quote q;
   q.line_nr = (*token_it)->line_nr;
   q.column_nr = (*token_it)->column_nr;
   q.filename = make_quote_filename(ctxt);
   q.qt = schemerlicht_qt_backquote;
   if ((strcmp((*token_it)->value.string_ptr, "quasiquote") != 0) && (strcmp((*token_it)->value.string_ptr, "`") != 0))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
-  token_next(ctxt, token_it, token_it_end);
-  if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+    return schemerlicht_make_quote_expression(&q);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_quote_expression(&q);
   q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_quote;
-  expr.expr.quote = q;
-  return expr;
+  return schemerlicht_make_quote_expression(&q);
   }
 
 static schemerlicht_expression make_unquote(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_UNQUOTE)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ",");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ",");
+    return make_nop();
+    }
   schemerlicht_parsed_quote q;
   q.line_nr = (*token_it)->line_nr;
   q.column_nr = (*token_it)->column_nr;
   q.filename = make_quote_filename(ctxt);
   q.qt = schemerlicht_qt_unquote;
   if ((strcmp((*token_it)->value.string_ptr, "unquote") != 0) && (strcmp((*token_it)->value.string_ptr, ",") != 0))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+    return schemerlicht_make_quote_expression(&q);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_quote_expression(&q);
   q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_quote;
-  expr.expr.quote = q;
-  return expr;
+  return schemerlicht_make_quote_expression(&q);
   }
 
 static schemerlicht_expression make_unquote_splicing(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID && current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_UNQUOTE_SPLICING)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ",@");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ",@");
+    return make_nop();
+    }
   schemerlicht_parsed_quote q;
   q.line_nr = (*token_it)->line_nr;
   q.column_nr = (*token_it)->column_nr;
   q.filename = make_quote_filename(ctxt);
   q.qt = schemerlicht_qt_unquote_splicing;
   if ((strcmp((*token_it)->value.string_ptr, "unquote-splicing") != 0) && (strcmp((*token_it)->value.string_ptr, ",@") != 0))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "quote");
+    return schemerlicht_make_quote_expression(&q);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_quote_expression(&q);
   q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 1);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_quote;
-  expr.expr.quote = q;
-  return expr;
+  return schemerlicht_make_quote_expression(&q);
   }
 
 static schemerlicht_expression make_variable(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
     }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "variable name expected");
+    return make_nop();
+    }
   schemerlicht_parsed_variable v;
   v.filename = make_var_filename(ctxt);
   v.line_nr = (*token_it)->line_nr;
   v.column_nr = (*token_it)->column_nr;
   schemerlicht_string_copy(ctxt, &v.name, &((*token_it)->value));
   token_next(ctxt, token_it, token_it_end);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_variable;
-  expr.expr.var = v;
-  return expr;
+  return schemerlicht_make_variable_expression(&v);
   }
 
 static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "case expected");
+    return make_nop();
+    }
   if (strcmp((*token_it)->value.string_ptr, "case") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "case");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "case expected");
+    return make_nop();
+    }
   schemerlicht_parsed_case c;
   c.line_nr = (*token_it)->line_nr;
   c.column_nr = (*token_it)->column_nr;
@@ -386,22 +556,35 @@ static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** tok
   schemerlicht_vector_init(ctxt, &c.datum_args, schemerlicht_cell);
   schemerlicht_vector_init(ctxt, &c.then_bodies, schemerlicht_vector);
   schemerlicht_vector_init(ctxt, &c.else_body, schemerlicht_expression);
-  token_next(ctxt, token_it, token_it_end);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_case_expression(&c);
   schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
   schemerlicht_vector_push_back(ctxt, &c.val_expr, e, schemerlicht_expression);
-  if (current_token_equals(token_it, ")"))
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, c.line_nr, c.column_nr, "[");
+  if (current_token_equals(token_it, token_it_end, ")"))
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, c.line_nr, c.column_nr, "[");
+    return schemerlicht_make_case_expression(&c);
+    }
   int else_statement = 0;
-  while (!current_token_equals(token_it, ")"))
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     if (else_statement)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, c.line_nr, c.column_nr, ")");
-    int rlsb = require_left_square_bracket(ctxt, token_it, token_it_end);
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, c.line_nr, c.column_nr, ")");
+      return schemerlicht_make_case_expression(&c);
+      }
+    if (*token_it == *token_it_end)
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+      return schemerlicht_make_case_expression(&c);
+      }
+    int rlsb = require_left_square_bracket(ctxt, token_it);
     while (!closing_brackets(token_it, token_it_end))
       {
-      if (current_token_equals(token_it, "else"))
+      if (current_token_equals(token_it, token_it_end, "else"))
         {
-        token_next(ctxt, token_it, token_it_end);
+        if (!token_next(ctxt, token_it, token_it_end))
+          return schemerlicht_make_case_expression(&c);
         else_statement = 1;
         while (!closing_brackets(token_it, token_it_end))
           {
@@ -413,7 +596,10 @@ static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** tok
         {
         schemerlicht_cell cell = schemerlicht_read_quote(ctxt, token_it, token_it_end, 0);
         if (cell.type != schemerlicht_ct_pair)
-          schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, c.line_nr, c.column_nr);
+          {
+          schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, c.line_nr, c.column_nr, "");
+          return schemerlicht_make_case_expression(&c);
+          }
         schemerlicht_vector_push_back(ctxt, &c.datum_args, cell, schemerlicht_cell);
         schemerlicht_vector then_bodies;
         schemerlicht_vector_init(ctxt, &then_bodies, schemerlicht_expression);
@@ -425,47 +611,64 @@ static schemerlicht_expression make_case(schemerlicht_context* ctxt, token** tok
         schemerlicht_vector_push_back(ctxt, &c.then_bodies, then_bodies, schemerlicht_vector);
         }
       }
-    require_right_square_bracket(ctxt, token_it, token_it_end, rlsb);
+    if (!require_right_square_bracket(ctxt, token_it, token_it_end, rlsb))
+      return schemerlicht_make_case_expression(&c);
     }
   if (else_statement == 0)
     {
     schemerlicht_vector_push_back(ctxt, &c.else_body, make_nop(), schemerlicht_expression);
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_case;
-  expr.expr.cas = c;
-  return expr;
+  return schemerlicht_make_case_expression(&c);
   }
 
 static schemerlicht_expression make_cond(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "cond expected");
+    return make_nop();
+    }
   if (strcmp((*token_it)->value.string_ptr, "cond") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "cond");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "cond expected");
+    return make_nop();
+    }
   schemerlicht_parsed_cond c;
   c.line_nr = (*token_it)->line_nr;
   c.column_nr = (*token_it)->column_nr;
   c.filename = make_dummy_filename(ctxt);
   schemerlicht_vector_init(ctxt, &c.arguments, schemerlicht_vector);
-  schemerlicht_vector_init(ctxt, &c.is_proc, int);  
-  token_next(ctxt, token_it, token_it_end);
+  schemerlicht_vector_init(ctxt, &c.is_proc, int);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_cond_expression(&c);
   int else_statement = 0;
-  while (!current_token_equals(token_it, ")"))
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_vector_push_back(ctxt, &c.is_proc, 0, int);
     if (else_statement)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, c.line_nr, c.column_nr, ")");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, c.line_nr, c.column_nr, ")");
+      return schemerlicht_make_cond_expression(&c);
+      }
     schemerlicht_vector expr;
     schemerlicht_vector_init(ctxt, &expr, schemerlicht_expression);
-    int rlsb = require_left_square_bracket(ctxt, token_it, token_it_end);
+    if (*token_it == *token_it_end)
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+      return schemerlicht_make_cond_expression(&c);
+      }
+    int rlsb = require_left_square_bracket(ctxt, token_it);
     while (!closing_brackets(token_it, token_it_end))
       {
-      if (current_token_equals(token_it, "else"))
+      if (current_token_equals(token_it, token_it_end, "else"))
         {
-        token_next(ctxt, token_it, token_it_end);
+        if (!token_next(ctxt, token_it, token_it_end))
+          return schemerlicht_make_cond_expression(&c);
         else_statement = 1;
         schemerlicht_parsed_true t;
         t.column_nr = -1;
@@ -481,43 +684,60 @@ static schemerlicht_expression make_cond(schemerlicht_context* ctxt, token** tok
         }
       else
         {
-        if (current_token_equals(token_it, "=>"))
+        if (current_token_equals(token_it, token_it_end, "=>"))
           {
           *schemerlicht_vector_back(&c.is_proc, int) = 1;
-          token_next(ctxt, token_it, token_it_end);
+          if (!token_next(ctxt, token_it, token_it_end))
+            return schemerlicht_make_cond_expression(&c);
           if (*token_it == *token_it_end)
-            schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+            {
+            schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, c.line_nr, c.column_nr, "no tokens");
+            return schemerlicht_make_cond_expression(&c);
+            }
           schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
           schemerlicht_vector_push_back(ctxt, &expr, e, schemerlicht_expression);
           if (!closing_brackets(token_it, token_it_end))
-            schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, ")");
+            {
+            schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, ")");
+            return schemerlicht_make_cond_expression(&c);
+            }
           }
         else
           {
           schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
           schemerlicht_vector_push_back(ctxt, &expr, e, schemerlicht_expression);
           if (*token_it == *token_it_end)
-            schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+            {
+            schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, c.line_nr, c.column_nr, "no tokens");
+            return schemerlicht_make_cond_expression(&c);
+            }
           }
         }
       }
-    require_right_square_bracket(ctxt, token_it, token_it_end, rlsb);
+    if (!require_right_square_bracket(ctxt, token_it, token_it_end, rlsb))
+      return schemerlicht_make_cond_expression(&c);
     schemerlicht_vector_push_back(ctxt, &c.arguments, expr, schemerlicht_vector);
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_cond;
-  expr.expr.cond = c;
-  return expr;
+  return schemerlicht_make_cond_expression(&c);
   }
 
 static schemerlicht_expression make_do(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "do expected");
+    return make_nop();
+    }
   if (strcmp((*token_it)->value.string_ptr, "do") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "do");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "do expected");
+    return make_nop();
+    }
   schemerlicht_parsed_do d;
   d.line_nr = (*token_it)->line_nr;
   d.column_nr = (*token_it)->column_nr;
@@ -525,12 +745,19 @@ static schemerlicht_expression make_do(schemerlicht_context* ctxt, token** token
   schemerlicht_vector_init(ctxt, &d.bindings, schemerlicht_vector);
   schemerlicht_vector_init(ctxt, &d.test, schemerlicht_expression);
   schemerlicht_vector_init(ctxt, &d.commands, schemerlicht_expression);
-  token_next(ctxt, token_it, token_it_end);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_do_expression(&d);
 
-  token_require(ctxt, token_it, token_it_end, "(");
-  while (!current_token_equals(token_it, ")"))
+  if (!token_require(ctxt, token_it, token_it_end, "("))
+    return schemerlicht_make_do_expression(&d);
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
-    int rlsb = require_left_square_bracket(ctxt, token_it, token_it_end);
+    if (*token_it == *token_it_end)
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+      return schemerlicht_make_do_expression(&d);
+      }
+    int rlsb = require_left_square_bracket(ctxt, token_it);
     schemerlicht_expression var = make_variable(ctxt, token_it, token_it_end);
     schemerlicht_expression init = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector exprs;
@@ -549,12 +776,15 @@ static schemerlicht_expression make_do(schemerlicht_context* ctxt, token** token
       schemerlicht_vector_push_back(ctxt, &exprs, step, schemerlicht_expression);
       }
     schemerlicht_vector_push_back(ctxt, &d.bindings, exprs, schemerlicht_vector);
-    require_right_square_bracket(ctxt, token_it, token_it_end, rlsb);
+    if (!require_right_square_bracket(ctxt, token_it, token_it_end, rlsb))
+      return schemerlicht_make_do_expression(&d);
     }
-  token_next(ctxt, token_it, token_it_end);
-  token_require(ctxt, token_it, token_it_end, "(");
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_do_expression(&d);
+  if (!token_require(ctxt, token_it, token_it_end, "("))
+    return schemerlicht_make_do_expression(&d);
   invalidate_popped();
-  while (!current_token_equals(token_it, ")"))
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression test = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &d.test, test, schemerlicht_expression);
@@ -563,95 +793,125 @@ static schemerlicht_expression make_do(schemerlicht_context* ctxt, token** token
     {
     schemerlicht_vector_push_back(ctxt, &d.test, make_nop(), schemerlicht_expression);
     }
-  token_next(ctxt, token_it, token_it_end);
-  while (!current_token_equals(token_it, ")"))
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_do_expression(&d);
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression command = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &d.commands, command, schemerlicht_expression);
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_do;
-  expr.expr.d = d;
-  return expr;
+  return schemerlicht_make_do_expression(&d);
   }
 
 static schemerlicht_expression make_foreign_call(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "foreign-call expected");
+    return make_nop();
+    }
   if (strcmp((*token_it)->value.string_ptr, "foreign-call") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "foreign-call");
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, (*token_it)->line_nr, (*token_it)->column_nr, "foreign-call expected");
+    return make_nop();
+    }
   schemerlicht_parsed_foreign_call f;
   f.line_nr = (*token_it)->line_nr;
   f.column_nr = (*token_it)->column_nr;
   f.filename = make_foreign_filename(ctxt);
   schemerlicht_vector_init(ctxt, &f.arguments, schemerlicht_expression);
-  token_next(ctxt, token_it, token_it_end);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_foreign_call_expression(&f);
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, f.line_nr, f.column_nr, "no tokens");
+    return schemerlicht_make_foreign_call_expression(&f);
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "");
+    return schemerlicht_make_foreign_call_expression(&f);
+    }
   schemerlicht_string_copy(ctxt, &f.name, &((*token_it)->value));
-  token_next(ctxt, token_it, token_it_end);
-  while (!current_token_equals(token_it, ")"))
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_foreign_call_expression(&f);
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &f.arguments, e, schemerlicht_expression);
     if (*token_it == *token_it_end)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+      return schemerlicht_make_foreign_call_expression(&f);
+      }
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_foreign_call;
-  expr.expr.foreign = f;
-  return expr;
+  return schemerlicht_make_foreign_call_expression(&f);
   }
 
 static schemerlicht_expression make_if(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
     }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "if expected");
+    return make_nop();
+    }
   schemerlicht_parsed_if i;
   schemerlicht_vector_init(ctxt, &i.arguments, schemerlicht_expression);
   i.filename = make_if_filename(ctxt);
   i.line_nr = (*token_it)->line_nr;
   i.column_nr = (*token_it)->column_nr;
   if (strcmp((*token_it)->value.string_ptr, "if") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, i.line_nr, i.column_nr, "if");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, i.line_nr, i.column_nr, "if expected");
+    return schemerlicht_make_if_expression(&i);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_if_expression(&i);
 
-  while (!current_token_equals(token_it, ")"))
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &i.arguments, e, schemerlicht_expression);
     if (*token_it == *token_it_end)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, i.line_nr, i.column_nr, ")");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, i.line_nr, i.column_nr, ")");
+      return schemerlicht_make_if_expression(&i);
+      }
     }
   if (i.arguments.vector_size < 2 || i.arguments.vector_size > 3)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, i.line_nr, i.column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, i.line_nr, i.column_nr, "invalid number of arguments");
+    return schemerlicht_make_if_expression(&i);
+    }
   if (i.arguments.vector_size == 2)
     {
     schemerlicht_vector_push_back(ctxt, &i.arguments, make_nop(), schemerlicht_expression);
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_if;
-  expr.expr.i = i;
-  return expr;
+  return schemerlicht_make_if_expression(&i);
   }
 
 static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
     }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "lambda");
+    return make_nop();
+    }
 
   schemerlicht_parsed_lambda l;
   schemerlicht_vector_init(ctxt, &l.body, schemerlicht_expression);
@@ -662,31 +922,43 @@ static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** t
   l.line_nr = (*token_it)->line_nr;
   l.column_nr = (*token_it)->column_nr;
   if (strcmp((*token_it)->value.string_ptr, "lambda") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "lambda");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "lambda");
+    return schemerlicht_make_lambda_expression(&l);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_lambda_expression(&l);
   l.variable_arity = 0;
-  if (!current_token_equals(token_it, "(")) // rest argument
+  if (!current_token_equals(token_it, token_it_end, "(")) // rest argument
     {
     l.variable_arity = 1;
     schemerlicht_string s;
     schemerlicht_string_copy(ctxt, &s, &(*token_it)->value);
     schemerlicht_vector_push_back(ctxt, &l.variables, s, schemerlicht_string);
-    token_next(ctxt, token_it, token_it_end);
+    if (!token_next(ctxt, token_it, token_it_end))
+      return schemerlicht_make_lambda_expression(&l);
     }
   else
     {
-    token_require(ctxt, token_it, token_it_end, "(");
+    if (!token_require(ctxt, token_it, token_it_end, "("))
+      return schemerlicht_make_lambda_expression(&l);
     int count_after_var = 0;
-    while (!current_token_equals(token_it, ")"))
+    while (!current_token_equals(token_it, token_it_end, ")"))
       {
       if (l.variable_arity)
         ++count_after_var;
       if ((*token_it)->type != SCHEMERLICHT_T_ID && strcmp((*token_it)->value.string_ptr, ".") != 0)
-        schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, (*token_it)->line_nr, (*token_it)->column_nr);
+        {
+        schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, (*token_it)->line_nr, (*token_it)->column_nr, ".");
+        return schemerlicht_make_lambda_expression(&l);
+        }
       if (strcmp((*token_it)->value.string_ptr, ".") == 0)
         {
         if (l.variable_arity)
-          schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, (*token_it)->line_nr, (*token_it)->column_nr);
+          {
+          schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, (*token_it)->line_nr, (*token_it)->column_nr, ".");
+          return schemerlicht_make_lambda_expression(&l);
+          }
         l.variable_arity = 1;
         }
       else
@@ -695,11 +967,16 @@ static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** t
         schemerlicht_string_copy(ctxt, &s, &(*token_it)->value);
         schemerlicht_vector_push_back(ctxt, &l.variables, s, schemerlicht_string);
         }
-      token_next(ctxt, token_it, token_it_end);
+      if (!token_next(ctxt, token_it, token_it_end))
+        return schemerlicht_make_lambda_expression(&l);
       }
     if (l.variable_arity && (count_after_var != 1))
-      schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, l.line_nr, l.column_nr);
-    token_next(ctxt, token_it, token_it_end);
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, l.line_nr, l.column_nr, "");
+      return schemerlicht_make_lambda_expression(&l);
+      }
+    if (!token_next(ctxt, token_it, token_it_end))
+      return schemerlicht_make_lambda_expression(&l);
     }
   schemerlicht_expression begin = make_begin(ctxt, token_it, token_it_end, 1);
   while (begin.expr.beg.arguments.vector_size == 1 && schemerlicht_vector_at(&begin.expr.beg.arguments, 0, schemerlicht_expression)->type == schemerlicht_type_begin)
@@ -710,10 +987,7 @@ static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** t
     schemerlicht_string_destroy(ctxt, &tmp.expr.beg.filename);
     }
   schemerlicht_vector_push_back(ctxt, &l.body, begin, schemerlicht_expression);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_lambda;
-  expr.expr.lambda = l;
-  return expr;
+  return schemerlicht_make_lambda_expression(&l);
   }
 
 schemerlicht_expression schemerlicht_init_let(schemerlicht_context* ctxt)
@@ -903,9 +1177,15 @@ schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt)
 static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** token_it, token** token_it_end, enum schemerlicht_binding_type bt)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "let expected");
+    return make_nop();
+    }
   schemerlicht_parsed_let l;
   l.filename = make_let_filename(ctxt);
   l.line_nr = (*token_it)->line_nr;
@@ -921,50 +1201,82 @@ static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** toke
     case schemerlicht_bt_let:
     {
     if (strcmp((*token_it)->value.string_ptr, "let") != 0)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "let");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "let");
+      return schemerlicht_make_let_expression(&l);
+      }
     break;
     }
     case schemerlicht_bt_let_star:
     {
     if (strcmp((*token_it)->value.string_ptr, "let*") != 0)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "let*");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "let*");
+      return schemerlicht_make_let_expression(&l);
+      }
     break;
     }
     case schemerlicht_bt_letrec:
     {
     if (strcmp((*token_it)->value.string_ptr, "letrec") != 0)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "letrec");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "letrec");
+      return schemerlicht_make_let_expression(&l);
+      }
     break;
     }
     }
-  token_next(ctxt, token_it, token_it_end);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_let_expression(&l);
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, l.line_nr, l.column_nr, "no tokens");
+    return schemerlicht_make_let_expression(&l);
+    }
   if ((*token_it)->type == SCHEMERLICHT_T_ID) // named let?
     {
     if (bt != schemerlicht_bt_let)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "(");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, l.line_nr, l.column_nr, "(");
+      return schemerlicht_make_let_expression(&l);
+      }
     l.named_let = 1;
     schemerlicht_string_clear(&l.let_name);
     schemerlicht_string_append(ctxt, &l.let_name, &(*token_it)->value);
-    token_next(ctxt, token_it, token_it_end);
+    if (!token_next(ctxt, token_it, token_it_end))
+      return schemerlicht_make_let_expression(&l);
     }
-  token_require(ctxt, token_it, token_it_end, "(");
-  while (!current_token_equals(token_it, ")"))
+  if (!token_require(ctxt, token_it, token_it_end, "("))
+    return schemerlicht_make_let_expression(&l);
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
-    int rlsb = require_left_square_bracket(ctxt, token_it, token_it_end);
     if (*token_it == *token_it_end)
-      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+      return schemerlicht_make_let_expression(&l);
+      }
+    int rlsb = require_left_square_bracket(ctxt, token_it);
+    if (*token_it == *token_it_end)
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, l.line_nr, l.column_nr, "no tokens");
+      return schemerlicht_make_let_expression(&l);
+      }
     if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-      schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, (*token_it)->line_nr, (*token_it)->column_nr);
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, (*token_it)->line_nr, (*token_it)->column_nr, "");
+      return schemerlicht_make_let_expression(&l);
+      }
     schemerlicht_let_binding b;
     schemerlicht_string_copy(ctxt, &b.binding_name, &((*token_it)->value));
-    token_next(ctxt, token_it, token_it_end);
+    if (!token_next(ctxt, token_it, token_it_end))
+      return schemerlicht_make_let_expression(&l);
     b.binding_expr = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &l.bindings, b, schemerlicht_let_binding);
-    require_right_square_bracket(ctxt, token_it, token_it_end, rlsb);
+    if (!require_right_square_bracket(ctxt, token_it, token_it_end, rlsb))
+      return schemerlicht_make_let_expression(&l);
     }
-  token_next(ctxt, token_it, token_it_end);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_let_expression(&l);
   schemerlicht_expression begin = make_begin(ctxt, token_it, token_it_end, 1);
   while (begin.expr.beg.arguments.vector_size == 1 && schemerlicht_vector_at(&begin.expr.beg.arguments, 0, schemerlicht_expression)->type == schemerlicht_type_begin)
     {
@@ -974,20 +1286,21 @@ static schemerlicht_expression make_let(schemerlicht_context* ctxt, token** toke
     schemerlicht_string_destroy(ctxt, &tmp.expr.beg.filename);
     }
   schemerlicht_vector_push_back(ctxt, &l.body, begin, schemerlicht_expression);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_let;
-  expr.expr.let = l;
-  return expr;
+  return schemerlicht_make_let_expression(&l);
   }
 
 static schemerlicht_expression make_primitive_call(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
     }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "");
+    return make_nop();
+    }
   schemerlicht_parsed_primitive_call p;
   p.as_object = 0;
   schemerlicht_vector_init(ctxt, &p.arguments, schemerlicht_expression);
@@ -997,33 +1310,41 @@ static schemerlicht_expression make_primitive_call(schemerlicht_context* ctxt, t
   schemerlicht_string_copy(ctxt, &p.name, &((*token_it)->value));
   if (popped_token.type != SCHEMERLICHT_T_LEFT_ROUND_BRACKET)
     {
-    token_next(ctxt, token_it, token_it_end);
+    if (!token_next(ctxt, token_it, token_it_end))
+      return schemerlicht_make_primitive_call_expression(&p);
     p.as_object = 1;
     schemerlicht_expression expr;
     expr.type = schemerlicht_type_primitive_call;
     expr.expr.prim = p;
     return expr;
     }
-  token_next(ctxt, token_it, token_it_end);
-  while (!current_token_equals(token_it, ")"))
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_primitive_call_expression(&p);
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &p.arguments, e, schemerlicht_expression);
     if (*token_it == *token_it_end)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, p.line_nr, p.column_nr, ")");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, p.line_nr, p.column_nr, ")");
+      return schemerlicht_make_primitive_call_expression(&p);
+      }
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_primitive_call;
-  expr.expr.prim = p;
-  return expr;
+  return schemerlicht_make_primitive_call_expression(&p);
   }
 
 static schemerlicht_expression make_set(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "set! expected");
+    return make_nop();
+    }
   schemerlicht_parsed_set s;
   s.filename = make_set_filename(ctxt);
   s.line_nr = (*token_it)->line_nr;
@@ -1031,27 +1352,38 @@ static schemerlicht_expression make_set(schemerlicht_context* ctxt, token** toke
   s.originates_from_define = 0;
   s.originates_from_quote = 0;
   if (strcmp((*token_it)->value.string_ptr, "set!") != 0)
-    schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, s.line_nr, s.column_nr, "set!");
-  token_next(ctxt, token_it, token_it_end);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, s.line_nr, s.column_nr, "set! expected");
+    return schemerlicht_make_set_expression(&s);
+    }
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_set_expression(&s);
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, s.line_nr, s.column_nr, "no tokens");
+    return schemerlicht_make_set_expression(&s);
+    }
   if (current_token_type(token_it, token_it_end) != SCHEMERLICHT_T_ID)
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "");
+    return schemerlicht_make_set_expression(&s);
+    }
   schemerlicht_string_copy(ctxt, &s.name, &((*token_it)->value));
-  token_next(ctxt, token_it, token_it_end);
+  if (!token_next(ctxt, token_it, token_it_end))
+    return schemerlicht_make_set_expression(&s);
   schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
   schemerlicht_vector_init(ctxt, &s.value, schemerlicht_expression);
   schemerlicht_vector_push_back(ctxt, &s.value, e, schemerlicht_expression);
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_set;
-  expr.expr.set = s;
-  return expr;
+  return schemerlicht_make_set_expression(&s);
   }
 
 static schemerlicht_expression make_fun(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    {
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
+    }
   schemerlicht_parsed_funcall f;
   f.line_nr = (*token_it)->line_nr;
   f.column_nr = (*token_it)->column_nr;
@@ -1060,24 +1392,25 @@ static schemerlicht_expression make_fun(schemerlicht_context* ctxt, token** toke
   schemerlicht_vector_init(ctxt, &f.fun, schemerlicht_expression);
   schemerlicht_expression e_fun = schemerlicht_make_expression(ctxt, token_it, token_it_end);
   schemerlicht_vector_push_back(ctxt, &f.fun, e_fun, schemerlicht_expression);
-  while (!current_token_equals(token_it, ")"))
+  while (!current_token_equals(token_it, token_it_end, ")"))
     {
     schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
     schemerlicht_vector_push_back(ctxt, &f.arguments, e, schemerlicht_expression);
     if (*token_it == *token_it_end)
-      schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+      {
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+      return schemerlicht_make_funcall_expression(&f);
+      }
     }
-  schemerlicht_expression expr;
-  expr.type = schemerlicht_type_funcall;
-  expr.expr.funcall = f;
-  return expr;
+  return schemerlicht_make_funcall_expression(&f);
   }
 
 static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
     }
   switch (current_token_type(token_it, token_it_end))
     {
@@ -1091,7 +1424,8 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
     expr.type = schemerlicht_type_literal;
     expr.expr.lit.type = schemerlicht_type_nil;
     expr.expr.lit.lit.nil = n;
-    token_next(ctxt, token_it, token_it_end);
+    if (!token_next(ctxt, token_it, token_it_end))
+      return expr;
     token_require(ctxt, token_it, token_it_end, ")");
     return expr;
     }
@@ -1141,7 +1475,7 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
     {
     int ln = (*token_it)->line_nr;
     int cn = (*token_it)->column_nr;
-    if (current_token_equals(token_it, "#t"))
+    if (current_token_equals(token_it, token_it_end, "#t"))
       {
       schemerlicht_parsed_true t;
       t.line_nr = ln;
@@ -1154,7 +1488,7 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
       token_next(ctxt, token_it, token_it_end);
       return expr;
       }
-    else if (current_token_equals(token_it, "#f"))
+    else if (current_token_equals(token_it, token_it_end, "#f"))
       {
       schemerlicht_parsed_false f;
       f.line_nr = ln;
@@ -1247,9 +1581,12 @@ static enum schemerlicht_expression_type find_current_expression_type(schemerlic
 
 schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
+  if (ctxt->number_of_syntax_errors > SCHEMERLICHT_MAX_SYNTAX_ERRORS)
+    return make_nop();
   if (*token_it == *token_it_end)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    return make_nop();
     }
 
   switch (current_token_type(token_it, token_it_end))
@@ -1263,7 +1600,8 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
     int function_call = (popped_token.type == SCHEMERLICHT_T_LEFT_ROUND_BRACKET);
     int ln = (*token_it)->line_nr;
     int cn = (*token_it)->column_nr;
-    token_next(ctxt, token_it, token_it_end);
+    if (!token_next(ctxt, token_it, token_it_end))
+      return make_nop();
     if (function_call)
       {
       schemerlicht_parsed_funcall f;
@@ -1273,15 +1611,19 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
       f.line_nr = ln;
       f.column_nr = cn;
       schemerlicht_vector_push_back(ctxt, &f.fun, schemerlicht_make_expression(ctxt, token_it, token_it_end), schemerlicht_expression);
-      token_require(ctxt, token_it, token_it_end, ")");
-      if (!current_token_equals(token_it, ")"))
+      if (!token_require(ctxt, token_it, token_it_end, ")"))
+        return schemerlicht_make_funcall_expression(&f);
+      if (!current_token_equals(token_it, token_it_end, ")"))
         {
-        while (!current_token_equals(token_it, ")"))
+        while (!current_token_equals(token_it, token_it_end, ")"))
           {
           schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
           schemerlicht_vector_push_back(ctxt, &f.arguments, e, schemerlicht_expression);
           if (*token_it == *token_it_end)
-            schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+            {
+            schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+            return schemerlicht_make_funcall_expression(&f);
+            }
           }
         }
       schemerlicht_expression output_expr;
@@ -1302,9 +1644,8 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
     else
       {
       schemerlicht_expression expr = schemerlicht_make_expression(ctxt, token_it, token_it_end);
-      if (current_token_equals(token_it, ")"))
+      if (current_token_equals(token_it, token_it_end, ")"))
         {
-        //token_require(ctxt, token_it, token_it_end, ")");
         token_next(ctxt, token_it, token_it_end);
         return expr;
         }
@@ -1317,28 +1658,30 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
         f.line_nr = ln;
         f.column_nr = cn;
         schemerlicht_vector_push_back(ctxt, &f.fun, expr, schemerlicht_expression);
-        while (!current_token_equals(token_it, ")"))
+        while (!current_token_equals(token_it, token_it_end, ")"))
           {
           schemerlicht_expression e = schemerlicht_make_expression(ctxt, token_it, token_it_end);
           schemerlicht_vector_push_back(ctxt, &f.arguments, e, schemerlicht_expression);
           if (*token_it == *token_it_end)
-            schemerlicht_throw_parser_required(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+            {
+            schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_EXPECTED_KEYWORD, f.line_nr, f.column_nr, ")");
+            return schemerlicht_make_funcall_expression(&f);
+            }
           }
         token_require(ctxt, token_it, token_it_end, ")");
-        schemerlicht_expression output_expr;
-        output_expr.type = schemerlicht_type_funcall;
-        output_expr.expr.funcall = f;
-        return output_expr;
+        return schemerlicht_make_funcall_expression(&f);
         }
       }
     }
     case SCHEMERLICHT_T_RIGHT_ROUND_BRACKET:
     {
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, ")");
+    return make_nop();
     }
     case SCHEMERLICHT_T_BAD:
     {
-    schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr);
+    schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, (*token_it)->line_nr, (*token_it)->column_nr, "");
+    return make_nop();
     }
     case SCHEMERLICHT_T_FIXNUM:
       return make_literal(ctxt, token_it, token_it_end);
@@ -1347,7 +1690,7 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
     case SCHEMERLICHT_T_STRING:
       return make_literal(ctxt, token_it, token_it_end);
     case SCHEMERLICHT_T_SYMBOL:
-      if (current_token_equals(token_it, "#undefined"))
+      if (current_token_equals(token_it, token_it_end, "#undefined"))
         return make_nop();
       return make_literal(ctxt, token_it, token_it_end);
     case SCHEMERLICHT_T_QUOTE:
@@ -1408,6 +1751,7 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
 
 schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vector* tokens)
   {
+  ctxt->number_of_syntax_errors = 0;
   invalidate_popped();
   schemerlicht_program prog;
   schemerlicht_vector_init(ctxt, &prog.expressions, schemerlicht_expression);
@@ -1417,6 +1761,8 @@ schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vecto
 
   for (; token_it != token_it_end;)
     {
+    if (ctxt->number_of_syntax_errors > SCHEMERLICHT_MAX_SYNTAX_ERRORS)
+      return prog;
     schemerlicht_expression expr = schemerlicht_make_expression(ctxt, &token_it, &token_it_end);
     schemerlicht_vector_push_back(ctxt, &prog.expressions, expr, schemerlicht_expression);
     }
@@ -1891,5 +2237,85 @@ schemerlicht_expression schemerlicht_make_literal_expression(schemerlicht_litera
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_literal;
   expr.expr.lit = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_nop_expression(schemerlicht_parsed_nop* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_nop;
+  expr.expr.nop = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_primitive_call_expression(schemerlicht_parsed_primitive_call* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_primitive_call;
+  expr.expr.prim = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_foreign_call_expression(schemerlicht_parsed_foreign_call* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_foreign_call;
+  expr.expr.foreign = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_if_expression(schemerlicht_parsed_if* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_if;
+  expr.expr.i = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_cond_expression(schemerlicht_parsed_cond* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_cond;
+  expr.expr.cond = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_case_expression(schemerlicht_parsed_case* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_case;
+  expr.expr.cas = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_do_expression(schemerlicht_parsed_do* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_do;
+  expr.expr.d = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_quote_expression(schemerlicht_parsed_quote* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_quote;
+  expr.expr.quote = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_funcall_expression(schemerlicht_parsed_funcall* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_funcall;
+  expr.expr.funcall = *l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_make_set_expression(schemerlicht_parsed_set* l)
+  {
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_set;
+  expr.expr.set = *l;
   return expr;
   }
