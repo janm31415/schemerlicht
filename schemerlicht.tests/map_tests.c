@@ -170,6 +170,7 @@ static void test_map_with_string_keys()
   TEST_EQ_INT(schemerlicht_object_type_fixnum, obj_find_delta->type);
   TEST_EQ_INT(2003, obj_find_delta->value.fx);
 
+  schemerlicht_map_keys_free(ctxt, m);
   schemerlicht_map_free(ctxt, m);
   schemerlicht_close(ctxt);
   }

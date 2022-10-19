@@ -16,6 +16,7 @@ map.h
 memory.h
 object.h
 parser.h
+primitives.h
 quasiquote.h
 quotecollect.h
 reader.h
@@ -48,6 +49,7 @@ map.c
 memory.c
 object.c
 parser.c
+primitives.c
 quasiquote.c
 quotecollect.c
 reader.c

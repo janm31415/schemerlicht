@@ -221,6 +221,17 @@ static void test_compile_char()
   test_compile_aux("#\\127", "#\\rubout");
   }
 
+static void test_compile_string()
+  {
+  test_compile_aux("\"jan\"", "\"jan\"");
+  test_compile_aux("\"janneman\"", "\"janneman\"");
+  }
+
+static void test_single_argument_primitives()
+  {
+  test_compile_aux("1", "(add1 0)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -228,4 +239,6 @@ void run_all_compiler_tests()
   test_compile_bool();
   test_compile_nil();
   test_compile_char();
+  test_compile_string();
+  test_single_argument_primitives();
   }

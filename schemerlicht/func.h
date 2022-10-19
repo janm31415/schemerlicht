@@ -3,11 +3,14 @@
 
 #include "schemerlicht.h"
 #include "vector.h"
+#include "map.h"
 
 typedef struct schemerlicht_function
   {
+  schemerlicht_map* constants_map;
   schemerlicht_vector constants;
   schemerlicht_vector code;
+  int number_of_constants;
   int freereg;  /* first free register */
   } schemerlicht_function;
 

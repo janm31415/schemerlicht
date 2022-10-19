@@ -84,7 +84,7 @@ schemerlicht_object make_schemerlicht_object_false()
 schemerlicht_object make_schemerlicht_object_nil()
   {
   schemerlicht_object obj;
-  obj.type = schemerlicht_object_type_nil;
+  obj.type = schemerlicht_object_type_scheme_nil;
   return obj;
   }
 
@@ -142,7 +142,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
     case schemerlicht_object_type_true:
       schemerlicht_string_init(ctxt, &s, "#t");
       break;
-    case schemerlicht_object_type_nil:
+    case schemerlicht_object_type_scheme_nil:
       schemerlicht_string_init(ctxt, &s, "()");
       break;
     case schemerlicht_object_type_fixnum:
@@ -160,7 +160,9 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
     break;
     }
     case schemerlicht_object_type_string:
-      schemerlicht_string_copy(ctxt, &s, &obj->value.s);
+      schemerlicht_string_init(ctxt, &s, "\"");
+      schemerlicht_string_append(ctxt, &s, &obj->value.s);
+      schemerlicht_string_push_back(ctxt, &s, '"');
       break;
     case schemerlicht_object_type_symbol:
       schemerlicht_string_copy(ctxt, &s, &obj->value.s);

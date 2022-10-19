@@ -210,14 +210,28 @@ schemerlicht_map* schemerlicht_map_new(schemerlicht_context* ctxt, schemerlicht_
   return m;
   }
 
-void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map)
+void schemerlicht_map_keys_free(schemerlicht_context* ctxt, schemerlicht_map* map)
   {
   schemerlicht_memsize size = node_size(map);
   for (schemerlicht_memsize i = 0; i < size; ++i)
     {
     if (map->node[i].key.type == schemerlicht_object_type_string)
       schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
+    if (map->node[i].key.type == schemerlicht_object_type_symbol)
+      schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
     }
+  }
+
+void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map)
+  {
+  //schemerlicht_memsize size = node_size(map);
+  //for (schemerlicht_memsize i = 0; i < size; ++i)
+  //  {
+  //  if (map->node[i].key.type == schemerlicht_object_type_string)
+  //    schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
+  //  if (map->node[i].key.type == schemerlicht_object_type_symbol)
+  //    schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
+  //  }
   schemerlicht_freevector(ctxt, map->node, node_size(map), schemerlicht_map_node);
   schemerlicht_freevector(ctxt, map->array, map->array_size, schemerlicht_object);
   schemerlicht_delete(ctxt, map);

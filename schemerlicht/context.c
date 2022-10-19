@@ -47,6 +47,7 @@ schemerlicht_context* schemerlicht_open()
 void schemerlicht_close(schemerlicht_context* ctxt)
   {
   ctxt = ctxt->global->main_context;
+  schemerlicht_map_keys_free(ctxt, ctxt->global->expression_map);
   schemerlicht_map_free(ctxt, ctxt->global->expression_map);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->true_sym);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->false_sym);

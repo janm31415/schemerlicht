@@ -14,6 +14,7 @@
 #define schemerlicht_object_type_false 6
 #define schemerlicht_object_type_char 7
 #define schemerlicht_object_type_symbol 8
+#define schemerlicht_object_type_scheme_nil 9
 
 typedef union
   {

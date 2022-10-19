@@ -75,11 +75,12 @@ enum schemerlicht_opcode_mode { schemerlicht_iABC, schemerlicht_iABx, schemerlic
 
 typedef enum 
   {
-  SCHEMERLICHT_OPCODE_MOVE,       /*	A B	     R(A) := R(B)					*/
-  SCHEMERLICHT_OPCODE_LOADK       /*	A Bx	   R(A) := Kst(Bx)					*/
+  SCHEMERLICHT_OPCODE_MOVE,       /*  A B      R(A) := R(B)					*/
+  SCHEMERLICHT_OPCODE_LOADK,      /*  A Bx	   R(A) := Kst(Bx)					*/
+  SCHEMERLICHT_OPCODE_CALL        /* A B C	   R(A), ... ,R(A+C-2) := R(A)(R(A+1), ... ,R(A+B-1)) */
   } schemerlicht_opcode;
 
-#define SCHEMERLICHT_NUM_OPCODES (cast(int, SCHEMERLICHT_OPCODE_LOADK+1))
+#define SCHEMERLICHT_NUM_OPCODES (cast(int, SCHEMERLICHT_OPCODE_CALL+1))
 
 #define SCHEMERLICHT_GET_OPCODE(i)	(cast(schemerlicht_opcode, (i)&SCHEMERLICHT_MASK1(SCHEMERLICHT_SIZE_OPCODE,0)))
 #define SCHEMERLICHT_SET_OPCODE(i,o)	((i) = (((i)&SCHEMERLICHT_MASK0(SCHEMERLICHT_SIZE_OPCODE,0)) | cast(schemerlicht_instruction, o)))
