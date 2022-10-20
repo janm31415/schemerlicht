@@ -7,7 +7,7 @@
 #include <setjmp.h>
 
 void schemerlicht_throw(schemerlicht_context* ctxt, int errorcode)
-  {  
+  {
   UNUSED(ctxt);
   UNUSED(errorcode);
   if (ctxt->error_jmp)
@@ -25,6 +25,14 @@ void schemerlicht_throw_parser(schemerlicht_context* ctxt, int errorcode, int li
   schemerlicht_throw(ctxt, errorcode);
   }
 
+void schemerlicht_throw_compiler(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename)
+  {
+  UNUSED(line_nr);
+  UNUSED(column_nr);
+  UNUSED(filename);
+  schemerlicht_throw(ctxt, errorcode);
+  }
+
 void schemerlicht_throw_parser_required(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* required)
   {
   UNUSED(required);
@@ -35,7 +43,7 @@ void schemerlicht_runerror(schemerlicht_context* ctxt, const char* fmt, ...)
   {
   va_list argp;
   va_start(argp, fmt);
-  
+
   va_end(argp);
   schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_RUNERROR);
   }
@@ -84,7 +92,7 @@ void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int li
   }
 
 void schemerlicht_syntax_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg)
-  {  
+  {
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, msg);
   schemerlicht_syntax_error(ctxt, errorcode, line_nr, column_nr, &s);

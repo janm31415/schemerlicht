@@ -688,6 +688,41 @@ static void test_fx_arithmetic()
   test_compile_aux("-2", "(fx/ -12 5)");
   }
 
+static void test_if()
+  {
+  test_compile_aux("2", "(if (< 2 3) (2) (3))");
+  test_compile_aux("3", "(if (< 3 2) (2) (3))");
+  test_compile_aux("12", "(if #t 12 13)");
+  test_compile_aux("13", "(if #f 12 13)");
+  test_compile_aux("12", "(if 0 12 13)");
+  test_compile_aux("43", "(if () 43 ())");
+  test_compile_aux("13", "(if #t (if 12 13 4) 17)");
+  test_compile_aux("4", "(if #f 12 (if #f 13 4))");  
+  test_compile_aux("2", "(if #\\X (if 1 2 3) (if 4 5 6))");
+  test_compile_aux("#t", "(if (not (boolean? #t)) 15 (boolean? #f))");
+  test_compile_aux("-23", "(if (if (char? #\\a) (boolean? #\\b) (fixnum? #\\c)) 119 -23)");
+  test_compile_aux("6", "(if (if (if (not 1) (not 2) (not 3)) 4 5) 6 7)");
+  test_compile_aux("7", "(if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7)");
+  test_compile_aux("#f", "(not (if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7))");
+  test_compile_aux("14", "(if (char? 12) 13 14) )");
+  test_compile_aux("13", "(if (char? #\\a) 13 14) )");
+  test_compile_aux("13", "(add1 (if (sub1 1) (sub1 13) 14)))");  
+  test_compile_aux("13", "(if (= 12 13) 12 13) ");
+  test_compile_aux("13", "(if (= 12 12) 13 14) ");
+  test_compile_aux("12", "(if (< 12 13) 12 13) ");
+  test_compile_aux("14", "(if (< 12 12) 13 14) ");
+  test_compile_aux("14", "(if (< 13 12) 13 14) ");
+  test_compile_aux("12", "(if (<= 12 13) 12 13) ");
+  test_compile_aux("12", "(if (<= 12 12) 12 13) ");
+  test_compile_aux("14", "(if (<= 13 12) 13 14) ");
+  test_compile_aux("13", "(if (> 12 13) 12 13) ");
+  test_compile_aux("13", "(if (> 12 12) 12 13) ");
+  test_compile_aux("13", "(if (> 13 12) 13 14) ");
+  test_compile_aux("13", "(if (>= 12 13) 12 13) ");
+  test_compile_aux("12", "(if (>= 12 12) 12 13) ");
+  test_compile_aux("13", "(if (>= 13 12) 13 14) ");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -721,4 +756,5 @@ void run_all_compiler_tests()
   test_is_boolean();
   test_is_char();
   test_fx_arithmetic();
+  test_if();
   }

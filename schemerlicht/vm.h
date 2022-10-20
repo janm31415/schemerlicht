@@ -50,7 +50,7 @@ enum schemerlicht_opcode_mode { schemerlicht_iABC, schemerlicht_iABx, schemerlic
 */
 #if SCHEMERLICHT_SIZE_Bx < schemerlicht_mem_bits-1
 #define SCHEMERLICHT_MAXARG_Bx   ((1<<SCHEMERLICHT_SIZE_Bx)-1)
-#define SCHEMERLICHT_MAXARG_sBx  (MAXARG_Bx>>1)         /* 'sBx' is signed */
+#define SCHEMERLICHT_MAXARG_sBx  (SCHEMERLICHT_MAXARG_Bx>>1)         /* 'sBx' is signed */
 #else
 #define SCHEMERLICHT_MAXARG_Bx        MAX_INT
 #define SCHEMERLICHT_MAXARG_sBx        MAX_INT
@@ -77,7 +77,11 @@ typedef enum
   {
   SCHEMERLICHT_OPCODE_MOVE,       /*  A B      R(A) := R(B)					*/
   SCHEMERLICHT_OPCODE_LOADK,      /*  A Bx	   R(A) := Kst(Bx)					*/
-  SCHEMERLICHT_OPCODE_CALL        /* A B C	   R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  SCHEMERLICHT_OPCODE_CALL,       /*  A B C	   R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  SCHEMERLICHT_OPCODE_EQTYPE,     /*  A B      if (type of R(A) == B) then pc++, else perform the following JMP instruction on the next line*/
+  //SCHEMERLICHT_OPCODE_EQ,         /*  A B C    if ((RK(B) == RK(C)) ~= A) then pc++, a test instruction is always followed by a JMP instruction */
+  SCHEMERLICHT_OPCODE_JMP,        /*  sBx      PC += sBx					*/
+  SCHEMERLICHT_OPCODE_RETURN,     /*  A B	     return R(A), ... ,R(A+B-1) */
   } schemerlicht_opcode;
 
 #define SCHEMERLICHT_NUM_OPCODES (cast(int, SCHEMERLICHT_OPCODE_CALL+1))
@@ -103,23 +107,6 @@ typedef enum
 
 #define SCHEMERLICHT_GETARG_sBx(i)	(SCHEMERLICHT_GETARG_Bx(i)-SCHEMERLICHT_MAXARG_sBx)
 #define SCHEMERLICHT_SETARG_sBx(i,b)	SCHEMERLICHT_SETARG_Bx((i),cast(unsigned int, (b)+SCHEMERLICHT_MAXARG_sBx))
-
-/*
-** masks for instruction properties
-*/
-enum schemerlicht_opcode_mode_mask {
-  schemerlicht_opcode_mode_B_is_register = 2,           /* B is a register */
-  schemerlicht_opcode_mode_B_is_register_or_constant,		/* B is a register/constant */
-  schemerlicht_opcode_mode_C_is_register_or_constant,   /* C is a register/constant */
-  schemerlicht_opcode_mode_sets_register_A,  /* instruction sets register A */
-  schemerlicht_opcode_mode_Bx_is_a_constant, /* Bx is a constant */
-  schemerlicht_opcode_mode_operator_is_test	 /* operator is a test */
-  };
-
-extern const schemerlicht_byte schemerlicht_opcode_modes[SCHEMERLICHT_NUM_OPCODES];
-
-#define schemerlicht_get_opcode_mode(m)     (cast(enum schemerlicht_opcode_mode, schemerlicht_opcode_modes[m] & 3))
-#define schemerlicht_test_opcode_mode(m, b) (schemerlicht_opcode_modes[m] & (1 << (b)))
 
 schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_function* fun);
 

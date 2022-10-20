@@ -134,6 +134,40 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
     }
   }
 
+static void compile_if(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_if);
+  if (e->expr.i.arguments.vector_size != 3)
+    schemerlicht_throw_compiler(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED, e->expr.i.line_nr, e->expr.i.column_nr, &e->expr.i.filename);
+  schemerlicht_expression* expr_test = schemerlicht_vector_at(&e->expr.i.arguments, 0, schemerlicht_expression);
+  schemerlicht_expression* expr_then_branch = schemerlicht_vector_at(&e->expr.i.arguments, 1, schemerlicht_expression);
+  schemerlicht_expression* expr_else_branch = schemerlicht_vector_at(&e->expr.i.arguments, 2, schemerlicht_expression);
+  compile_expression(ctxt, fun, expr_test);
+  schemerlicht_instruction i0 = 0;
+  SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_EQTYPE);  
+  SCHEMERLICHT_SETARG_A(i0, fun->freereg);
+  SCHEMERLICHT_SETARG_B(i0, schemerlicht_object_type_false);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
+  schemerlicht_instruction i1 = 0;
+  SCHEMERLICHT_SET_OPCODE(i1, SCHEMERLICHT_OPCODE_JMP);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i1, schemerlicht_instruction);
+  schemerlicht_memsize first_jump_statement_pos = fun->code.vector_size-1;
+  compile_expression(ctxt, fun, expr_else_branch);
+  schemerlicht_instruction i2 = 0;
+  SCHEMERLICHT_SET_OPCODE(i2, SCHEMERLICHT_OPCODE_JMP);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i2, schemerlicht_instruction);
+  schemerlicht_memsize second_jump_statement_pos = fun->code.vector_size-1;
+  schemerlicht_memsize target_first_jump_statement = fun->code.vector_size;
+  compile_expression(ctxt, fun, expr_then_branch);
+  schemerlicht_memsize target_second_jump_statement = fun->code.vector_size;
+  int first_jump_statement_offset = (int)target_first_jump_statement - (int)first_jump_statement_pos - 1;
+  int second_jump_statement_offset = (int)target_second_jump_statement - (int)second_jump_statement_pos - 1;
+  schemerlicht_instruction* first_jump = schemerlicht_vector_at(&fun->code, first_jump_statement_pos, schemerlicht_instruction);
+  schemerlicht_instruction* second_jump = schemerlicht_vector_at(&fun->code, second_jump_statement_pos, schemerlicht_instruction);
+  SCHEMERLICHT_SETARG_sBx(*first_jump, first_jump_statement_offset);
+  SCHEMERLICHT_SETARG_sBx(*second_jump, second_jump_statement_offset);
+  }
+
 static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   int first_free_reg = fun->freereg;
@@ -144,6 +178,9 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
       break;
     case schemerlicht_type_primitive_call:
       compile_prim(ctxt, fun, e);
+      break;
+    case schemerlicht_type_if:
+      compile_if(ctxt, fun, e);
       break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
