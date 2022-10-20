@@ -651,6 +651,43 @@ static void test_is_char()
   test_compile_aux("#f", "(char? 0.3)");
   }
 
+static void test_fx_arithmetic()
+  {
+  test_compile_aux("#f", "(fx=? 12 13)");
+  test_compile_aux("#f", "(fx=? 13 12)");
+  test_compile_aux("#t", "(fx=? 12 12)");
+  test_compile_aux("#t", "(fx<? 12 13)");
+  test_compile_aux("#f", "(fx<? 13 12)");
+  test_compile_aux("#f", "(fx<? 12 12)");
+  test_compile_aux("#f", "(fx>? 12 13)");
+  test_compile_aux("#t", "(fx>? 13 12)");
+  test_compile_aux("#f", "(fx>? 12 12)");
+  test_compile_aux("#t", "(fx<=? 12 13)");
+  test_compile_aux("#f", "(fx<=? 13 12)");
+  test_compile_aux("#t", "(fx<=? 12 12)");
+  test_compile_aux("#f", "(fx>=? 12 13)");
+  test_compile_aux("#t", "(fx>=? 13 12)");
+  test_compile_aux("#t", "(fx>=? 12 12)");
+  test_compile_aux("25", "(fx+ 12 13)");
+  test_compile_aux("25", "(fx+ 13 12)");
+  test_compile_aux("24", "(fx+ 12 12)");
+  test_compile_aux("-1", "(fx- 12 13)");
+  test_compile_aux("1", "(fx- 13 12)");
+  test_compile_aux("0", "(fx- 12 12)");
+  test_compile_aux("156", "(fx* 12 13)");
+  test_compile_aux("156", "(fx* 13 12)");
+  test_compile_aux("144", "(fx* 12 12)");
+  test_compile_aux("-156", "(fx* 12 -13)");
+  test_compile_aux("-156", "(fx* -13 12)");
+  test_compile_aux("-144", "(fx* 12 -12)");
+  test_compile_aux("6", "(fx/ 12 2)");
+  test_compile_aux("1", "(fx/ 13 12)");
+  test_compile_aux("2", "(fx/ 12 5)");
+  test_compile_aux("-6", "(fx/ -12 2)");
+  test_compile_aux("-1", "(fx/ 13 -12)");
+  test_compile_aux("-2", "(fx/ -12 5)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -683,4 +720,5 @@ void run_all_compiler_tests()
   test_is_zero();
   test_is_boolean();
   test_is_char();
+  test_fx_arithmetic();
   }
