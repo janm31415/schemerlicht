@@ -340,6 +340,95 @@ static void test_div()
   test_compile_aux("#\\004", "(/ #\\008 #\\002)");
   }
 
+static void test_combination_of_math_ops()
+  {
+  test_compile_aux("27.000000", "(/ (* 3 (- (+ 23 9) 20.0) 1.5) 2)");
+  }
+
+static void test_equality()
+  {
+  test_compile_aux("#f", "(= 12 13)");
+  test_compile_aux("#t", "(= 12 12)");
+  test_compile_aux("#f", "(= 12.1 13.1)");
+  test_compile_aux("#t", "(= 12.1 12.1)");
+  test_compile_aux("#f", "(= 12 13.1)");
+  test_compile_aux("#t", "(= 12 12.0)");
+  test_compile_aux("#f", "(= 12.0 13)");
+  test_compile_aux("#t", "(= 12.0 12)");
+  test_compile_aux("#t", "(= 12 12)");
+  test_compile_aux("#f", "(= 13 12)");
+  test_compile_aux("#f", "(= 16 (+ 13 1)) ");
+  test_compile_aux("#t", "(= 16 (+ 13 3))");
+  test_compile_aux("#f", "(= 16 (+ 13 13))");
+  test_compile_aux("#f", "(= (+ 13 1) 16) ");
+  test_compile_aux("#t", "(= (+ 13 3) 16) ");
+  test_compile_aux("#f", "(= (+ 13 13) 16)");
+  test_compile_aux("#f", "(= 12.0 13)");
+  test_compile_aux("#t", "(= 12.0 12)");
+  test_compile_aux("#f", "(= 13.0 12)");
+  test_compile_aux("#f", "(= 16.0 (+ 13 1)) ");
+  test_compile_aux("#t", "(= 16.0 (+ 13 3))");
+  test_compile_aux("#f", "(= 16.0 (+ 13 13))");
+  test_compile_aux("#f", "(= (+ 13.0 1) 16) ");
+  test_compile_aux("#t", "(= (+ 13.0 3) 16.0) ");
+  test_compile_aux("#f", "(= (+ 13.0 13.0) 16.0)");
+  test_compile_aux("#t", "(= 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12 12 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12 12 12 12 12 12)");
+  test_compile_aux("#t", "(= 12 12 12 12 12 12 12 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12 12 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12 12 12 12 12 12)");
+  test_compile_aux("#f", "(= 13 12 12 12 12 12 12 12 12 12)");
+  test_compile_aux("#f", "(= 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 12 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 12 12 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 12 12 12 12 12 13)");
+  test_compile_aux("#f", "(= 12 12 12 12 12 12 12 12 12 13)");
+  }
+
+static void test_inequality()
+  {
+  test_compile_aux("#t", "(!= 12 13)");
+  test_compile_aux("#f", "(!= 12 12)");
+  test_compile_aux("#t", "(!= 12.1 13.1)");
+  test_compile_aux("#f", "(!= 12.1 12.1)");
+  test_compile_aux("#t", "(!= 12 13.1)");
+  test_compile_aux("#f", "(!= 12 12.0)");
+  test_compile_aux("#t", "(!= 12.0 13)");
+  test_compile_aux("#f", "(!= 12.0 12)");
+  test_compile_aux("#f", "(!= 12 12)");
+  test_compile_aux("#t", "(!= 13 12)");
+  test_compile_aux("#t", "(!= 16 (+ 13 1)) ");
+  test_compile_aux("#f", "(!= 16 (+ 13 3))");
+  test_compile_aux("#t", "(!= 16 (+ 13 13))");
+  test_compile_aux("#t", "(!= (+ 13 1) 16) ");
+  test_compile_aux("#f", "(!= (+ 13 3) 16) ");
+  test_compile_aux("#t", "(!= (+ 13 13) 16)");
+  test_compile_aux("#t", "(!= 12.0 13)");
+  test_compile_aux("#f", "(!= 12.0 12)");
+  test_compile_aux("#t", "(!= 13.0 12)");
+  test_compile_aux("#t", "(!= 16.0 (+ 13 1)) ");
+  test_compile_aux("#f", "(!= 16.0 (+ 13 3))");
+  test_compile_aux("#t", "(!= 16.0 (+ 13 13))");
+  test_compile_aux("#t", "(!= (+ 13.0 1) 16) ");
+  test_compile_aux("#f", "(!= (+ 13.0 3) 16.0) ");
+  test_compile_aux("#t", "(!= (+ 13.0 13.0) 16.0)");
+  test_compile_aux("#t", "(!= 12 13 14 15 16 17 18 19 20 21 22 23)");
+  test_compile_aux("#t", "(!= 12 13 14 15 16 17 18 19 20 21 22 12)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -356,4 +445,6 @@ void run_all_compiler_tests()
   test_sub();
   test_mul();
   test_div();
+  test_combination_of_math_ops();
+  test_equality();
   }
