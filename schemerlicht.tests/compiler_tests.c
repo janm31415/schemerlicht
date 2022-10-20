@@ -527,6 +527,130 @@ static void test_geq()
   test_compile_aux("#t", "(>= (+ 13.0 13) 16)");
   }
 
+static void test_compare_incorrect_argument()
+  {
+  test_compile_aux("#undefined", "(= 3 #t)");
+  test_compile_aux("#undefined", "(!= 3 ())");
+  test_compile_aux("#undefined", "(< 3 #t)");
+  test_compile_aux("#undefined", "(<= 3 ())");
+  test_compile_aux("#undefined", "(> 3 #t)");
+  test_compile_aux("#undefined", "(>= 3 ())");
+  }
+
+static void test_arithmetic()
+  {
+  test_compile_aux("45", "(+ (+ (+ (+ (+ (+ (+ (+ 1 2) 3) 4) 5) 6) 7) 8) 9)");
+  test_compile_aux("45", "(+ 1 (+ 2 (+ 3 (+ 4 (+ 5 (+ 6 (+ 7 (+ 8 9))))))))");
+  test_compile_aux("-43", "(- (- (- (- (- (- (- (- 1 2) 3) 4) 5) 6) 7) 8) 9)");
+  test_compile_aux("5", "(- 1 (- 2 (- 3 (- 4 (- 5 (- 6 (- 7 (- 8 9))))))))");
+  test_compile_aux("5040", "(* (* (* (* (* 2 3) 4) 5) 6) 7)");
+  test_compile_aux("5040", "(* 2 (* 3 (* 4 (* 5 (* 6 7)))))");
+  }
+
+static void test_is_fixnum()
+  {
+  test_compile_aux("#f", "(fixnum? #\\019)");
+  test_compile_aux("#f", "(fixnum? #\\a)");
+  test_compile_aux("#f", "(fixnum? #t)");
+  test_compile_aux("#f", "(fixnum? #f)");
+  test_compile_aux("#f", "(fixnum? 0.3)");
+  test_compile_aux("#f", "(fixnum? 0.0)");
+  test_compile_aux("#f", "(fixnum? ())");
+  test_compile_aux("#t", "(fixnum? 0)");
+  test_compile_aux("#t", "(fixnum? -1)");
+  test_compile_aux("#t", "(fixnum? 1)");
+  test_compile_aux("#t", "(fixnum? -1000)");
+  test_compile_aux("#t", "(fixnum? 1000)");
+  test_compile_aux("#t", "(fixnum? ((1000)))");
+  }
+
+static void test_not()
+  {
+  test_compile_aux("#f", "(not #t)");
+  test_compile_aux("#t", "(not #f)");
+  test_compile_aux("#t", "(not (not #t))");
+  test_compile_aux("#f", "(not #\\a)");
+  test_compile_aux("#f", "(not 0)");
+  test_compile_aux("#f", "(not 15)");
+  test_compile_aux("#f", "(not ())");
+  test_compile_aux("#t", "(not (not 15))");
+  test_compile_aux("#f", "(not (fixnum? 15))");
+  test_compile_aux("#t", "(not (fixnum? #f))");
+  }
+
+static void test_is_null()
+  {
+  test_compile_aux("#t", "(null? ())");
+  test_compile_aux("#f", "(null? #f)");
+  test_compile_aux("#f", "(null? #t)");
+  test_compile_aux("#f", "(null? (null? ()))");
+  test_compile_aux("#f", "(null? #\\a)");
+  test_compile_aux("#f", "(null? 0)");
+  test_compile_aux("#f", "(null? -10)");
+  test_compile_aux("#f", "(null? 10)");
+  }
+
+static void test_is_flonum()
+  {
+  test_compile_aux("#f","(flonum? #\\019)");
+  test_compile_aux("#f","(flonum? #\\a)");
+  test_compile_aux("#f","(flonum? #t)");
+  test_compile_aux("#f","(flonum? #f)");
+  test_compile_aux("#t","(flonum? 0.3)");
+  test_compile_aux("#t","(flonum? 0.0)");
+  test_compile_aux("#f","(flonum? ())");
+  test_compile_aux("#t","(flonum? 0.0)");
+  test_compile_aux("#t","(flonum? -1.50)");
+  test_compile_aux("#t","(flonum? 1.02)");
+  test_compile_aux("#f","(flonum? -1000)");
+  test_compile_aux("#f","(flonum? 1000)");
+  test_compile_aux("#t","(flonum? ((1000.0)))");
+  }
+
+static void test_is_zero()
+  {
+  test_compile_aux("#t", "(zero? 0)");
+  test_compile_aux("#f", "(zero? 1)");
+  test_compile_aux("#f", "(zero? -1)");
+  test_compile_aux("#f", "(zero? 64)");
+  test_compile_aux("#f", "(zero? 960)");
+  test_compile_aux("#f", "(zero? 53687091158)");
+  test_compile_aux("#t", "(zero? 0.0)");
+  test_compile_aux("#f", "(zero? 0.0001)");
+  test_compile_aux("#f", "(zero? 1.1)");
+  test_compile_aux("#f", "(zero? -1.1)");
+  test_compile_aux("#f", "(zero? 64.1)");
+  test_compile_aux("#f", "(zero? 960.1)");
+  test_compile_aux("#f", "(zero? 53687091158.1)");
+  test_compile_aux("#f", "(zero? #t)");
+  }
+
+static void test_is_boolean()
+  {
+  test_compile_aux("#t", "(boolean? #t)");
+  test_compile_aux("#t", "(boolean? #f)");
+  test_compile_aux("#f", "(boolean? 0)");
+  test_compile_aux("#f", "(boolean? 1)");
+  test_compile_aux("#f", "(boolean? -1)");
+  test_compile_aux("#f", "(boolean? ())");
+  test_compile_aux("#f", "(boolean? #\\a)");
+  test_compile_aux("#t", "(boolean? (boolean? 0))");
+  test_compile_aux("#t", "(boolean? (fixnum? (boolean? 0)))");
+  }
+
+static void test_is_char()
+  {
+  test_compile_aux("#t", "(char? #\\a)");
+  test_compile_aux("#t", "(char? #\\Z)");
+  test_compile_aux("#t", "(char? #\\000)");
+  test_compile_aux("#f", "(char? #t)");
+  test_compile_aux("#f", "(char? #f)");
+  test_compile_aux("#f", "(char? (char? #t))");
+  test_compile_aux("#f", "(char? 0)");
+  test_compile_aux("#f", "(char? 10)");
+  test_compile_aux("#f", "(char? 0.3)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -550,4 +674,13 @@ void run_all_compiler_tests()
   test_leq();
   test_greater();
   test_geq();
+  test_compare_incorrect_argument();
+  test_arithmetic();
+  test_is_fixnum();
+  test_not();
+  test_is_null();
+  test_is_flonum();
+  test_is_zero();
+  test_is_boolean();
+  test_is_char();
   }
