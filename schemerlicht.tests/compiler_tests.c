@@ -429,6 +429,104 @@ static void test_inequality()
   test_compile_aux("#t", "(!= 12 13 14 15 16 17 18 19 20 21 22 12)");
   }
 
+static void test_less()
+  {
+  test_compile_aux("#f", "(< 4 2)");
+  test_compile_aux("#t", "(< 2 4)");
+  test_compile_aux("#f", "(< 4 2 3)");
+  test_compile_aux("#t", "(< 2 4 5)");
+  test_compile_aux("#f", "(< 2 4 3)");
+  test_compile_aux("#f", "(< 4.1 2)");
+  test_compile_aux("#t", "(< 2.1 4)");
+  test_compile_aux("#f", "(< 4.1 2 3)");
+  test_compile_aux("#t", "(< 2.1 4 5)");
+  test_compile_aux("#f", "(< 2.1 4 3)");
+  test_compile_aux("#t", "(< 12 13)");
+  test_compile_aux("#f", "(< 12 12)");
+  test_compile_aux("#f", "(< 13 12)");
+  test_compile_aux("#f", "(< 16 (+ 13 1)) ");
+  test_compile_aux("#f", "(< 16 (+ 13 3))");
+  test_compile_aux("#t", "(< 16 (+ 13 13))");
+  test_compile_aux("#t", "(< (+ 13 1) 16) ");
+  test_compile_aux("#f", "(< (+ 13 3) 16) ");
+  test_compile_aux("#f", "(< (+ 13 13) 16)");
+  test_compile_aux("#t", "(< 12.0 13)");
+  test_compile_aux("#f", "(< 12.0 12)");
+  test_compile_aux("#f", "(< 13.0 12)");
+  test_compile_aux("#f", "(< 16.0 (+ 13 1.0)) ");
+  test_compile_aux("#f", "(< 16.0 (+ 13.0 3.0))");
+  test_compile_aux("#t", "(< 16.0 (+ 13.0 13.0))");
+  test_compile_aux("#t", "(< (+ 13.0 1) 16.0) ");
+  test_compile_aux("#f", "(< (+ 13.0 3.000000001) 16.0)");
+  test_compile_aux("#f", "(< (+ 13 13.0) 16)");
+  }
+
+static void test_leq()
+  {
+  test_compile_aux("#t", "(<= 12 13)");
+  test_compile_aux("#t", "(<= 12 12)");
+  test_compile_aux("#f", "(<= 13 12)");
+  test_compile_aux("#f", "(<= 16 (+ 13 1)) ");
+  test_compile_aux("#t", "(<= 16 (+ 13 3))");
+  test_compile_aux("#t", "(<= 16 (+ 13 13))");
+  test_compile_aux("#t", "(<= (+ 13 1) 16) ");
+  test_compile_aux("#t", "(<= (+ 13 3) 16) ");
+  test_compile_aux("#f", "(<= (+ 13 13) 16)");
+  test_compile_aux("#t", "(<= 12.0 13.0)");
+  test_compile_aux("#t", "(<= 12.0 12.0)");
+  test_compile_aux("#f", "(<= 13.0 12)");
+  test_compile_aux("#f", "(<= 16 (+ 13.0 1)) ");
+  test_compile_aux("#t", "(<= 16 (+ 13 3.0))");
+  test_compile_aux("#t", "(<= 16.0 (+ 13.0 13.0))");
+  test_compile_aux("#t", "(<= (+ 13.0 1) 16) ");
+  test_compile_aux("#t", "(<= (+ 13 3.0) 16.0) ");
+  test_compile_aux("#f", "(<= (+ 13.0 13) 16.0)");
+  }
+
+static void test_greater()
+  {
+  test_compile_aux("#f", "(> 12 13)");
+  test_compile_aux("#f", "(> 12 12)");
+  test_compile_aux("#t", "(> 13 12)");
+  test_compile_aux("#t", "(> 16 (+ 13 1)) ");
+  test_compile_aux("#f", "(> 16 (+ 13 3))");
+  test_compile_aux("#f", "(> 16 (+ 13 13))");
+  test_compile_aux("#f", "(> (+ 13 1) 16) ");
+  test_compile_aux("#f", "(> (+ 13 3) 16) ");
+  test_compile_aux("#t", "(> (+ 13 13) 16)");
+  test_compile_aux("#f", "(> 12.0 13)");
+  test_compile_aux("#f", "(> 12.0 12)");
+  test_compile_aux("#t", "(> 13.0 12)");
+  test_compile_aux("#t", "(> 16.0 (+ 13 1)) ");
+  test_compile_aux("#f", "(> 16.0 (+ 13 3))");
+  test_compile_aux("#f", "(> 16.0 (+ 13 13))");
+  test_compile_aux("#f", "(> (+ 13.0 1) 16) ");
+  test_compile_aux("#f", "(> (+ 13.0 3) 16) ");
+  test_compile_aux("#t", "(> (+ 13.0 13) 16)");
+  }
+
+static void test_geq()
+  {
+  test_compile_aux("#f", "(>= 12 13)");
+  test_compile_aux("#t", "(>= 12 12)");
+  test_compile_aux("#t", "(>= 13 12)");
+  test_compile_aux("#t", "(>= 16 (+ 13 1)) ");
+  test_compile_aux("#t", "(>= 16 (+ 13 3))");
+  test_compile_aux("#f", "(>= 16 (+ 13 13))");
+  test_compile_aux("#f", "(>= (+ 13 1) 16) ");
+  test_compile_aux("#t", "(>= (+ 13 3) 16) ");
+  test_compile_aux("#t", "(>= (+ 13 13) 16)");
+  test_compile_aux("#f", "(>= 12.0 13)");
+  test_compile_aux("#t", "(>= 12.0 12)");
+  test_compile_aux("#t", "(>= 13.0 12)");
+  test_compile_aux("#t", "(>= 16.0 (+ 13 1)) ");
+  test_compile_aux("#t", "(>= 16.0 (+ 13 3))");
+  test_compile_aux("#f", "(>= 16.0 (+ 13 13))");
+  test_compile_aux("#f", "(>= (+ 13.0 1) 16) ");
+  test_compile_aux("#t", "(>= (+ 13.0 3) 16) ");
+  test_compile_aux("#t", "(>= (+ 13.0 13) 16)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -447,4 +545,9 @@ void run_all_compiler_tests()
   test_div();
   test_combination_of_math_ops();
   test_equality();
+  test_inequality();
+  test_less();
+  test_leq();
+  test_greater();
+  test_geq();
   }

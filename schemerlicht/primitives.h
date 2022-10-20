@@ -13,7 +13,11 @@ typedef enum
   SCHEMERLICHT_MUL,
   SCHEMERLICHT_DIV,
   SCHEMERLICHT_EQUAL,
-  SCHEMERLICHT_NOT_EQUAL
+  SCHEMERLICHT_NOT_EQUAL,
+  SCHEMERLICHT_LESS,
+  SCHEMERLICHT_LEQ,
+  SCHEMERLICHT_GREATER,
+  SCHEMERLICHT_GEQ
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -24,6 +28,10 @@ void schemerlicht_primitive_mul(schemerlicht_context* ctxt, int a, int b, int c)
 void schemerlicht_primitive_div(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_equal(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_not_equal(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
