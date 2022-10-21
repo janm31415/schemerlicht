@@ -118,7 +118,7 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
         ++fun->freereg;
         compile_expression(ctxt, fun, arg);
         }
-      fun->freereg -= nr_prim_args;      
+      fun->freereg -= nr_prim_args;
       int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
       schemerlicht_instruction i0 = 0;
       SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_LOADK);
@@ -145,19 +145,19 @@ static void compile_if(schemerlicht_context* ctxt, schemerlicht_function* fun, s
   schemerlicht_expression* expr_else_branch = schemerlicht_vector_at(&e->expr.i.arguments, 2, schemerlicht_expression);
   compile_expression(ctxt, fun, expr_test);
   schemerlicht_instruction i0 = 0;
-  SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_EQTYPE);  
+  SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_EQTYPE);
   SCHEMERLICHT_SETARG_A(i0, fun->freereg);
   SCHEMERLICHT_SETARG_B(i0, schemerlicht_object_type_false);
   schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
   schemerlicht_instruction i1 = 0;
   SCHEMERLICHT_SET_OPCODE(i1, SCHEMERLICHT_OPCODE_JMP);
   schemerlicht_vector_push_back(ctxt, &fun->code, i1, schemerlicht_instruction);
-  schemerlicht_memsize first_jump_statement_pos = fun->code.vector_size-1;
+  schemerlicht_memsize first_jump_statement_pos = fun->code.vector_size - 1;
   compile_expression(ctxt, fun, expr_else_branch);
   schemerlicht_instruction i2 = 0;
   SCHEMERLICHT_SET_OPCODE(i2, SCHEMERLICHT_OPCODE_JMP);
   schemerlicht_vector_push_back(ctxt, &fun->code, i2, schemerlicht_instruction);
-  schemerlicht_memsize second_jump_statement_pos = fun->code.vector_size-1;
+  schemerlicht_memsize second_jump_statement_pos = fun->code.vector_size - 1;
   schemerlicht_memsize target_first_jump_statement = fun->code.vector_size;
   compile_expression(ctxt, fun, expr_then_branch);
   schemerlicht_memsize target_second_jump_statement = fun->code.vector_size;
@@ -190,7 +190,11 @@ static void compile_variable(schemerlicht_context* ctxt, schemerlicht_function* 
       }
     else
       {
-      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+      schemerlicht_instruction i0 = 0;
+      SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_LOADGLOBAL);
+      SCHEMERLICHT_SETARG_A(i0, fun->freereg);
+      SCHEMERLICHT_SETARG_Bx(i0, lookup_entry.position);
+      schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
       }
     }
   }
@@ -213,7 +217,7 @@ static void compile_let(schemerlicht_context* ctxt, schemerlicht_function* fun, 
   const schemerlicht_memsize nr_let_bindings = e->expr.let.bindings.vector_size;
   for (schemerlicht_memsize i = 0; i < nr_let_bindings; ++i)
     {
-    schemerlicht_let_binding* binding = schemerlicht_vector_at(&e->expr.let.bindings, i, schemerlicht_let_binding);    
+    schemerlicht_let_binding* binding = schemerlicht_vector_at(&e->expr.let.bindings, i, schemerlicht_let_binding);
     compile_expression(ctxt, fun, &binding->binding_expr);
     ++fun->freereg;
     }
@@ -225,7 +229,7 @@ static void compile_let(schemerlicht_context* ctxt, schemerlicht_function* fun, 
     schemerlicht_string_copy(ctxt, &name, &binding->binding_name);
     schemerlicht_environment_entry entry;
     entry.type = SCHEMERLICHT_ENV_TYPE_STACK;
-    entry.position = fun->freereg + cast(int, i) - cast(int, nr_let_bindings);
+    entry.position = cast(schemerlicht_fixnum, fun->freereg + cast(int, i) - cast(int, nr_let_bindings));
     schemerlicht_environment_add(ctxt, &name, entry);
     }
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression);
@@ -241,7 +245,7 @@ static void compile_let(schemerlicht_context* ctxt, schemerlicht_function* fun, 
 
 static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
-  if (ctxt->number_of_compile_errors>0)
+  if (ctxt->number_of_compile_errors > 0)
     return;
   int first_free_reg = fun->freereg;
   switch (e->type)

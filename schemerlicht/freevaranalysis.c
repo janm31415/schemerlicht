@@ -5,6 +5,8 @@
 #include "stringvec.h"
 #include "environment.h"
 
+#include <string.h>
+
 typedef struct schemerlicht_free_variable_analysis_visitor
   {
   schemerlicht_visitor* visitor;
@@ -72,8 +74,13 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   schemerlicht_vector* free_vars = schemerlicht_vector_back(&vis->free_variables, schemerlicht_vector);
   schemerlicht_vector* parent_loc_vars = schemerlicht_vector_at(&vis->local_variables, vis->local_variables.vector_size - 2, schemerlicht_vector);
   schemerlicht_vector* parent_free_vars = schemerlicht_vector_at(&vis->free_variables, vis->free_variables.vector_size - 2, schemerlicht_vector);
-  schemerlicht_string* it = schemerlicht_vector_begin(free_vars, schemerlicht_string);
+
+  schemerlicht_string* it = schemerlicht_string_vector_unique(free_vars); // remove doubles
   schemerlicht_string* it_end = schemerlicht_vector_end(free_vars, schemerlicht_string);
+  schemerlicht_vector_erase_range(free_vars, &it, &it_end, schemerlicht_string);
+
+  it = schemerlicht_vector_begin(free_vars, schemerlicht_string);
+  it_end = schemerlicht_vector_end(free_vars, schemerlicht_string);
   for (; it != it_end; ++it)
     {    
     int is_local = schemerlicht_string_vector_binary_search(parent_loc_vars, it);
@@ -115,8 +122,13 @@ static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v
   schemerlicht_vector* free_vars = schemerlicht_vector_back(&vis->free_variables, schemerlicht_vector);
   schemerlicht_vector* parent_loc_vars = schemerlicht_vector_at(&vis->local_variables, vis->local_variables.vector_size-2, schemerlicht_vector);
   schemerlicht_vector* parent_free_vars = schemerlicht_vector_at(&vis->free_variables, vis->free_variables.vector_size-2, schemerlicht_vector);
-  schemerlicht_string* it = schemerlicht_vector_begin(free_vars, schemerlicht_string);
+
+  schemerlicht_string* it = schemerlicht_string_vector_unique(free_vars); // remove doubles
   schemerlicht_string* it_end = schemerlicht_vector_end(free_vars, schemerlicht_string);
+  schemerlicht_vector_erase_range(free_vars, &it, &it_end, schemerlicht_string);
+
+  it = schemerlicht_vector_begin(free_vars, schemerlicht_string);
+  it_end = schemerlicht_vector_end(free_vars, schemerlicht_string);
   for (; it != it_end; ++it)
     {
     schemerlicht_string free_var;

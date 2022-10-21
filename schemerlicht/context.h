@@ -33,6 +33,7 @@ struct schemerlicht_context
   {
   schemerlicht_global_context* global;
   schemerlicht_vector stack;
+  schemerlicht_vector globals;
   int number_of_syntax_errors;
   int number_of_compile_errors;
   schemerlicht_vector syntax_error_reports;

@@ -20,6 +20,20 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       schemerlicht_set_object(target, source);
       break;
       }
+      case SCHEMERLICHT_OPCODE_LOADGLOBAL:
+      {
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i), schemerlicht_object);
+      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, SCHEMERLICHT_GETARG_Bx(i), schemerlicht_object);
+      schemerlicht_set_object(target, global);
+      break;
+      }
+      case SCHEMERLICHT_OPCODE_STOREGLOBAL:
+      {
+      schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i), schemerlicht_object);
+      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, SCHEMERLICHT_GETARG_Bx(i), schemerlicht_object);
+      schemerlicht_set_object(global, source);
+      break;
+      }
       case SCHEMERLICHT_OPCODE_LOADK:
       {
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i), schemerlicht_object);
