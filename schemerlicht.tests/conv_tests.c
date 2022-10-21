@@ -10,6 +10,7 @@
 #include "schemerlicht/quasiquote.h"
 #include "schemerlicht/lambdatolet.h"
 #include "schemerlicht/assignablevarconv.h"
+#include "schemerlicht/freevaranalysis.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -632,6 +633,17 @@ static void test_assignable_variable_conversion_3()
   schemerlicht_close(ctxt);
   }
 
+static void test_free_var_analysis()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "lambda(y) ((lambda (x) (+ x y))(z))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -667,4 +679,5 @@ void run_all_conv_tests()
   test_assignable_variable_conversion();
   test_assignable_variable_conversion_2();
   test_assignable_variable_conversion_3();
+  test_free_var_analysis();
   }

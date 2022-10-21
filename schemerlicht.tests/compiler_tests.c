@@ -7,6 +7,7 @@
 #include "schemerlicht/compiler.h"
 #include "schemerlicht/vm.h"
 #include "schemerlicht/error.h"
+#include "schemerlicht/simplifyconv.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -72,6 +73,7 @@ static void test_compile_aux(const char* expected_value, const char* script)
   schemerlicht_context* ctxt = schemerlicht_open();
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, &func);
@@ -724,6 +726,36 @@ static void test_if()
   test_compile_aux("13", "(if (>= 13 12) 13 14) ");
   }
 
+static void test_and()
+  {
+  test_compile_aux("#t", "(and #t)");
+  test_compile_aux("#f", "(and #f)");
+  test_compile_aux("#t", "(and #t #t)");
+  test_compile_aux("#f", "(and #f #f)");
+  test_compile_aux("#f", "(and #f #t)");
+  test_compile_aux("#f", "(and #t #f)");
+  test_compile_aux("#t", "(and #t #t #t)");
+  test_compile_aux("#f", "(and #f #t #t)");
+  test_compile_aux("#f", "(and #t #t #f)");
+  test_compile_aux("#f", "(and #t #f #t)");
+  test_compile_aux("#f", "(and #f #f #f)");
+  }
+
+static void test_or()
+  {
+  test_compile_aux("#t", "(or #t)");
+  test_compile_aux("#f", "(or #f)");
+  test_compile_aux("#t", "(or #t #t)");
+  test_compile_aux("#f", "(or #f #f)");
+  test_compile_aux("#t", "(or #f #t)");
+  test_compile_aux("#t", "(or #t #f)");
+  test_compile_aux("#t", "(or #t #t #t)");
+  test_compile_aux("#t", "(or #f #t #t)");
+  test_compile_aux("#t", "(or #t #t #f)");
+  test_compile_aux("#t", "(or #t #f #t)");
+  test_compile_aux("#f", "(or #f #f #f)");
+  }
+
 static void test_let()
   {
   test_compile_aux("5", "(let ([x 5]) x)");
@@ -739,6 +771,19 @@ static void test_let()
   test_compile_aux("3", "(let ([t (let ([t (let ([t (let ([t (+ 1 2)]) t)]) t)]) t)]) t)");
   test_compile_aux("192", "(let ([x 12])  (let([x(+ x x)]) (let([x(+ x x)]) (let([x(+ x x)]) (+ x x)))))");
   test_compile_aux("45", "(let ([a 0] [b 1] [c 2] [d 3] [e 4] [f 5] [g 6] [h 7] [i 8] [j 9]) (+ a b c d e f g h i j) )");
+  }
+
+static void test_let_star()
+  {
+  test_compile_aux("5", "(let* ([x 5]) x)");
+  test_compile_aux("3", "(let* ([x (+ 1 2)]) x)");
+  test_compile_aux("10","(let* ([x (+ 1 2)] [y(+ 3 4)])(+ x y))");
+  test_compile_aux("4", "(let* ([x (+ 1 2)] [y(+ 3 4)]) (- y x))");
+  test_compile_aux("18","(let* ([x (let* ([y (+ 1 2)]) (* y y))])(+ x x))");
+  test_compile_aux("7", "(let* ([x (+ 1 2)] [x(+ 3 4)]) x)");
+  test_compile_aux("7", "(let* ([x (+ 1 2)] [x(+ x 4)]) x)");
+  test_compile_aux("3", "(let* ([t (let* ([t (let* ([t (let* ([t (+ 1 2)]) t)]) t)]) t)]) t)");
+  test_compile_aux("192", "(let* ([x 12] [x(+ x x)] [x(+ x x)] [x(+ x x)])  (+ x x))");
   }
 
 static void test_compile_error_aux(const char* script, const char* first_error_message)
@@ -801,6 +846,9 @@ void run_all_compiler_tests()
   test_is_char();
   test_fx_arithmetic();
   test_if();
+  test_and();
+  test_or();
   test_let();
+  test_let_star();
   test_compile_errors();
   }
