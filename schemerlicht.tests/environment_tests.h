@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_ENVIRONMENT_TESTS_H
+#define SCHEMERLICHT_ENVIRONMENT_TESTS_H
+
+void run_all_environment_tests();
+
+#endif //SCHEMERLICHT_ENVIRONMENT_TESTS_H

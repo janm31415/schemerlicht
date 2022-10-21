@@ -3,6 +3,7 @@ compiler_tests.h
 conv_tests.h
 copy_tests.h
 dump_tests.h
+environment_tests.h
 map_tests.h
 parser_tests.h
 reader_tests.h
@@ -19,6 +20,7 @@ compiler_tests.c
 conv_tests.c
 copy_tests.c
 dump_tests.c
+environment_tests.c
 map_tests.c
 parser_tests.c
 reader_tests.c

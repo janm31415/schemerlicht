@@ -36,6 +36,7 @@ struct schemerlicht_context
   int number_of_syntax_errors;
   schemerlicht_vector syntax_error_reports;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
+  schemerlicht_vector environment; // linked chain of environment maps
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open();

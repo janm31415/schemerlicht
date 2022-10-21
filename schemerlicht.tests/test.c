@@ -3,6 +3,7 @@
 #include "conv_tests.h"
 #include "copy_tests.h"
 #include "dump_tests.h"
+#include "environment_tests.h"
 #include "map_tests.h"
 #include "parser_tests.h"
 #include "reader_tests.h"
@@ -25,6 +26,7 @@ int main(int argc, const char* argv[])
   run_all_conv_tests();
   run_all_copy_tests();
   run_all_dump_tests();
+  run_all_environment_tests();
   run_all_map_tests();
   run_all_parser_tests();
   run_all_reader_tests();

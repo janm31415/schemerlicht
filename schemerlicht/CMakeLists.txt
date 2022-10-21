@@ -7,6 +7,7 @@ cps.h
 copy.h
 defconv.h
 dump.h
+environment.h
 error.h
 freevaranalysis.h
 func.h
@@ -41,6 +42,7 @@ cps.c
 copy.c
 defconv.c
 dump.c
+environment.c
 error.c
 freevaranalysis.c
 func.c
