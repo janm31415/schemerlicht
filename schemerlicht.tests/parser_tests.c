@@ -270,7 +270,7 @@ static void parse_error_aux(const char* script, const char* first_error_message)
   TEST_EQ_INT(1, contains_error);
   if (contains_error)
     {
-    schemerlicht_syntax_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_syntax_error_report);
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
     TEST_EQ_STRING(first_error_message, it->message.string_ptr);
     }
   schemerlicht_program_destroy(ctxt, &prog);

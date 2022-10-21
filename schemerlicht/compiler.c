@@ -4,6 +4,7 @@
 #include "context.h"
 #include "vm.h"
 #include "primitives.h"
+#include "environment.h"
 
 static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e);
 
@@ -168,8 +169,80 @@ static void compile_if(schemerlicht_context* ctxt, schemerlicht_function* fun, s
   SCHEMERLICHT_SETARG_sBx(*second_jump, second_jump_statement_offset);
   }
 
+static void compile_variable(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_variable);
+  schemerlicht_environment_entry lookup_entry;
+  int find_var = schemerlicht_environment_find(&lookup_entry, ctxt, &e->expr.var.name);
+  if (find_var == 0)
+    {
+    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN, e->expr.var.line_nr, e->expr.var.column_nr, e->expr.var.name.string_ptr);
+    }
+  else
+    {
+    if (lookup_entry.type == SCHEMERLICHT_ENV_TYPE_STACK)
+      {
+      schemerlicht_instruction i0 = 0;
+      SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_MOVE);
+      SCHEMERLICHT_SETARG_A(i0, fun->freereg);
+      SCHEMERLICHT_SETARG_B(i0, lookup_entry.position);
+      schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
+      }
+    else
+      {
+      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+      }
+    }
+  }
+
+static void compile_begin(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_begin);
+  const schemerlicht_memsize nr_exprs = e->expr.beg.arguments.vector_size;
+  for (schemerlicht_memsize i = 0; i < nr_exprs; ++i)
+    {
+    schemerlicht_expression* expr = schemerlicht_vector_at(&e->expr.beg.arguments, i, schemerlicht_expression);
+    compile_expression(ctxt, fun, expr);
+    }
+  }
+
+static void compile_let(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_let);
+  schemerlicht_assert(e->expr.let.bt == schemerlicht_bt_let);
+  const schemerlicht_memsize nr_let_bindings = e->expr.let.bindings.vector_size;
+  for (schemerlicht_memsize i = 0; i < nr_let_bindings; ++i)
+    {
+    schemerlicht_let_binding* binding = schemerlicht_vector_at(&e->expr.let.bindings, i, schemerlicht_let_binding);    
+    compile_expression(ctxt, fun, &binding->binding_expr);
+    ++fun->freereg;
+    }
+  schemerlicht_environment_push_child(ctxt);
+  for (schemerlicht_memsize i = 0; i < nr_let_bindings; ++i)
+    {
+    schemerlicht_let_binding* binding = schemerlicht_vector_at(&e->expr.let.bindings, i, schemerlicht_let_binding);
+    schemerlicht_string name;
+    schemerlicht_string_copy(ctxt, &name, &binding->binding_name);
+    schemerlicht_environment_entry entry;
+    entry.type = SCHEMERLICHT_ENV_TYPE_STACK;
+    entry.position = fun->freereg + cast(int, i) - cast(int, nr_let_bindings);
+    schemerlicht_environment_add(ctxt, &name, entry);
+    }
+  schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression);
+  compile_expression(ctxt, fun, body_expr);
+  schemerlicht_environment_pop_child(ctxt);
+  schemerlicht_instruction i0 = 0;
+  SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_MOVE);
+  SCHEMERLICHT_SETARG_A(i0, fun->freereg - nr_let_bindings);
+  SCHEMERLICHT_SETARG_B(i0, fun->freereg);
+  schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
+  fun->freereg -= nr_let_bindings;
+  }
+
 static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
+  if (ctxt->number_of_compile_errors>0)
+    return;
   int first_free_reg = fun->freereg;
   switch (e->type)
     {
@@ -182,6 +255,15 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
     case schemerlicht_type_if:
       compile_if(ctxt, fun, e);
       break;
+    case schemerlicht_type_let:
+      compile_let(ctxt, fun, e);
+      break;
+    case schemerlicht_type_begin:
+      compile_begin(ctxt, fun, e);
+      break;
+    case schemerlicht_type_variable:
+      compile_variable(ctxt, fun, e);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
     }
@@ -191,6 +273,7 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
 
 schemerlicht_function schemerlicht_compile_expression(schemerlicht_context* ctxt, schemerlicht_expression* e)
   {
+  schemerlicht_compile_errors_clear(ctxt);
   schemerlicht_function fun = schemerlicht_function_init(ctxt);
   compile_expression(ctxt, &fun, e);
   return fun;

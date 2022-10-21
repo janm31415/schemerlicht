@@ -22,7 +22,7 @@ void schemerlicht_environment_destroy(schemerlicht_context* ctxt)
   schemerlicht_vector_destroy(ctxt, &ctxt->environment);
   }
 
-void schemerlicht_environment_push(schemerlicht_context* ctxt, schemerlicht_string* name, schemerlicht_environment_entry entry)
+void schemerlicht_environment_add(schemerlicht_context* ctxt, schemerlicht_string* name, schemerlicht_environment_entry entry)
   {
   schemerlicht_assert(ctxt->environment.vector_size > 0);
   schemerlicht_map** active_map = schemerlicht_vector_back(&ctxt->environment, schemerlicht_map*);
@@ -55,4 +55,19 @@ int schemerlicht_environment_find(schemerlicht_environment_entry* entry, schemer
       }
     }
   return 0;
+  }
+
+void schemerlicht_environment_push_child(schemerlicht_context* ctxt)
+  {
+  schemerlicht_map* child_env = schemerlicht_map_new(ctxt, 0, 10);
+  schemerlicht_vector_push_back(ctxt, &ctxt->environment, child_env, schemerlicht_map*);
+  }
+
+void schemerlicht_environment_pop_child(schemerlicht_context* ctxt)
+  {
+  schemerlicht_assert(ctxt->environment.vector_size > 1); // don't pop the root
+  schemerlicht_map** child_map = schemerlicht_vector_back(&ctxt->environment, schemerlicht_map*);
+  schemerlicht_map_keys_free(ctxt, *child_map);
+  schemerlicht_map_free(ctxt, *child_map);
+  schemerlicht_vector_pop_back(&ctxt->environment);
   }

@@ -34,7 +34,9 @@ struct schemerlicht_context
   schemerlicht_global_context* global;
   schemerlicht_vector stack;
   int number_of_syntax_errors;
+  int number_of_compile_errors;
   schemerlicht_vector syntax_error_reports;
+  schemerlicht_vector compile_error_reports;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   schemerlicht_vector environment; // linked chain of environment maps
   };

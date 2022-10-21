@@ -35,7 +35,7 @@ static void test_compile_fixnum()
   test_compile_fixnum_aux(-4611686018427387904, "-4611686018427387904");
   test_compile_fixnum_aux(9223372036854775807, "9223372036854775807");
   test_compile_fixnum_aux(-9223372036854775807, "-9223372036854775807");
-  test_compile_fixnum_aux(-9223372036854775808, "-9223372036854775808");  
+  test_compile_fixnum_aux(-9223372036854775808, "-9223372036854775808");
   test_compile_fixnum_aux(-1, "-1");
   test_compile_fixnum_aux(-123, "-123");
   }
@@ -60,7 +60,7 @@ static void test_compile_flonum_aux(schemerlicht_flonum expected_value, const ch
 
 static void test_compile_flonum()
   {
-  test_compile_flonum_aux(5.2, "5.2");  
+  test_compile_flonum_aux(5.2, "5.2");
   test_compile_flonum_aux(3.14, "3.14");
   test_compile_flonum_aux(3.14, "(3.14)");
   test_compile_flonum_aux(3.14159265359, "(3.14159265359)");
@@ -75,7 +75,7 @@ static void test_compile_aux(const char* expected_value, const char* script)
   schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, &func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
-  
+
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
   schemerlicht_string_destroy(ctxt, &s);
@@ -272,7 +272,7 @@ static void test_add_fixnums()
   }
 
 static void test_add_flonums()
-  {  
+  {
   test_compile_aux("3.000000", "(+ 1.0 2.0)");
   test_compile_aux("6.000000", "(+ 1.0 2.0 3.0)");
   test_compile_aux("10.000000", "(+ 1.0 2.0 3.0 4.0)");
@@ -592,19 +592,19 @@ static void test_is_null()
 
 static void test_is_flonum()
   {
-  test_compile_aux("#f","(flonum? #\\019)");
-  test_compile_aux("#f","(flonum? #\\a)");
-  test_compile_aux("#f","(flonum? #t)");
-  test_compile_aux("#f","(flonum? #f)");
-  test_compile_aux("#t","(flonum? 0.3)");
-  test_compile_aux("#t","(flonum? 0.0)");
-  test_compile_aux("#f","(flonum? ())");
-  test_compile_aux("#t","(flonum? 0.0)");
-  test_compile_aux("#t","(flonum? -1.50)");
-  test_compile_aux("#t","(flonum? 1.02)");
-  test_compile_aux("#f","(flonum? -1000)");
-  test_compile_aux("#f","(flonum? 1000)");
-  test_compile_aux("#t","(flonum? ((1000.0)))");
+  test_compile_aux("#f", "(flonum? #\\019)");
+  test_compile_aux("#f", "(flonum? #\\a)");
+  test_compile_aux("#f", "(flonum? #t)");
+  test_compile_aux("#f", "(flonum? #f)");
+  test_compile_aux("#t", "(flonum? 0.3)");
+  test_compile_aux("#t", "(flonum? 0.0)");
+  test_compile_aux("#f", "(flonum? ())");
+  test_compile_aux("#t", "(flonum? 0.0)");
+  test_compile_aux("#t", "(flonum? -1.50)");
+  test_compile_aux("#t", "(flonum? 1.02)");
+  test_compile_aux("#f", "(flonum? -1000)");
+  test_compile_aux("#f", "(flonum? 1000)");
+  test_compile_aux("#t", "(flonum? ((1000.0)))");
   }
 
 static void test_is_zero()
@@ -697,7 +697,7 @@ static void test_if()
   test_compile_aux("12", "(if 0 12 13)");
   test_compile_aux("43", "(if () 43 ())");
   test_compile_aux("13", "(if #t (if 12 13 4) 17)");
-  test_compile_aux("4", "(if #f 12 (if #f 13 4))");  
+  test_compile_aux("4", "(if #f 12 (if #f 13 4))");
   test_compile_aux("2", "(if #\\X (if 1 2 3) (if 4 5 6))");
   test_compile_aux("#t", "(if (not (boolean? #t)) 15 (boolean? #f))");
   test_compile_aux("-23", "(if (if (char? #\\a) (boolean? #\\b) (fixnum? #\\c)) 119 -23)");
@@ -706,7 +706,7 @@ static void test_if()
   test_compile_aux("#f", "(not (if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7))");
   test_compile_aux("14", "(if (char? 12) 13 14) )");
   test_compile_aux("13", "(if (char? #\\a) 13 14) )");
-  test_compile_aux("13", "(add1 (if (sub1 1) (sub1 13) 14)))");  
+  test_compile_aux("13", "(add1 (if (sub1 1) (sub1 13) 14)))");
   test_compile_aux("13", "(if (= 12 13) 12 13) ");
   test_compile_aux("13", "(if (= 12 12) 13 14) ");
   test_compile_aux("12", "(if (< 12 13) 12 13) ");
@@ -721,6 +721,23 @@ static void test_if()
   test_compile_aux("13", "(if (>= 12 13) 12 13) ");
   test_compile_aux("12", "(if (>= 12 12) 12 13) ");
   test_compile_aux("13", "(if (>= 13 12) 13 14) ");
+  }
+
+static void test_let()
+  {
+  test_compile_aux("5", "(let ([x 5]) x)");
+  test_compile_aux("5", "(let ([x 5][y 6]) x)");
+  test_compile_aux("6", "(let ([x 5][y 6]) y)");
+  test_compile_aux("3", "(let ([x (+ 1 2)]) x)");
+  test_compile_aux("10", "(let ([x (+ 1 2)]) (let([y(+ 3 4)])(+ x y))) ");
+  test_compile_aux("4", "(let ([x (+ 1 2)])  (let([y(+ 3 4)])(- y x)))");
+  test_compile_aux("4", "(let ([x (+ 1 2)] [y(+ 3 4)])  (- y x))");
+  test_compile_aux("18", "(let ([x (let ([y (+ 1 2)]) (* y y))]) (+ x x))");
+  test_compile_aux("7", "(let ([x (+ 1 2)]) (let([x(+ 3 4)]) x))");
+  test_compile_aux("7", "(let ([x (+ 1 2)]) (let([x(+ x 4)]) x)) ");
+  test_compile_aux("3", "(let ([t (let ([t (let ([t (let ([t (+ 1 2)]) t)]) t)]) t)]) t)");
+  test_compile_aux("192", "(let ([x 12])  (let([x(+ x x)]) (let([x(+ x x)]) (let([x(+ x x)]) (+ x x)))))");
+  test_compile_aux("45", "(let ([a 0] [b 1] [c 2] [d 3] [e 4] [f 5] [g 6] [h 7] [i 8] [j 9]) (+ a b c d e f g h i j) )");
   }
 
 void run_all_compiler_tests()
@@ -757,4 +774,5 @@ void run_all_compiler_tests()
   test_is_char();
   test_fx_arithmetic();
   test_if();
+  test_let();
   }
