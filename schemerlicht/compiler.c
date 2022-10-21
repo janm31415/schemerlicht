@@ -169,6 +169,38 @@ static void compile_if(schemerlicht_context* ctxt, schemerlicht_function* fun, s
   SCHEMERLICHT_SETARG_sBx(*second_jump, second_jump_statement_offset);
   }
 
+static void compile_set(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_set);
+  schemerlicht_environment_entry lookup_entry;
+  int find_var = schemerlicht_environment_find(&lookup_entry, ctxt, &e->expr.set.name);
+  if (find_var == 0)
+    {
+    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN, e->expr.set.line_nr, e->expr.set.column_nr, e->expr.set.name.string_ptr);
+    }
+  else
+    {
+    schemerlicht_expression* value_expr = schemerlicht_vector_at(&e->expr.set.value, 0, schemerlicht_expression);
+    compile_expression(ctxt, fun, value_expr);
+    if (lookup_entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL)
+      {
+      schemerlicht_instruction i0 = 0;
+      SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_STOREGLOBAL);
+      SCHEMERLICHT_SETARG_A(i0, fun->freereg);
+      SCHEMERLICHT_SETARG_Bx(i0, lookup_entry.position);
+      schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
+      }
+    else
+      {
+      schemerlicht_instruction i0 = 0;
+      SCHEMERLICHT_SET_OPCODE(i0, SCHEMERLICHT_OPCODE_MOVE);
+      SCHEMERLICHT_SETARG_A(i0, fun->freereg);
+      SCHEMERLICHT_SETARG_B(i0, lookup_entry.position);
+      schemerlicht_vector_push_back(ctxt, &fun->code, i0, schemerlicht_instruction);
+      }
+    }
+  }
+
 static void compile_variable(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_variable);
@@ -267,6 +299,9 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
       break;
     case schemerlicht_type_variable:
       compile_variable(ctxt, fun, e);
+      break;
+    case schemerlicht_type_set:
+      compile_set(ctxt, fun, e);
       break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);

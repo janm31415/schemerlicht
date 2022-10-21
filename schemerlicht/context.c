@@ -19,6 +19,12 @@ static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_
   schemerlicht_syntax_errors_clear(ctxt_to_free);
   schemerlicht_compile_errors_clear(ctxt_to_free);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->stack);
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt_to_free->globals, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt_to_free->globals, schemerlicht_object);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_object_destroy(ctxt, it);
+    }
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->globals);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);
@@ -32,6 +38,12 @@ static void context_init(schemerlicht_context* ctxt)
   ctxt->error_jmp = NULL;
   ctxt->number_of_syntax_errors = 0;
   schemerlicht_vector_init_with_size(ctxt, &ctxt->stack, schemerlicht_maxstack, schemerlicht_object);
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack, schemerlicht_object);
+  for (; it != it_end; ++it)
+    {
+    it->type = schemerlicht_object_type_undefined;
+    }
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->compile_error_reports, schemerlicht_error_report);

@@ -8,6 +8,10 @@
 #include "schemerlicht/vm.h"
 #include "schemerlicht/error.h"
 #include "schemerlicht/simplifyconv.h"
+#include "schemerlicht/begconv.h"
+#include "schemerlicht/dump.h"
+#include "schemerlicht/globdef.h"
+#include "schemerlicht/defconv.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -812,6 +816,27 @@ static void test_compile_errors()
   test_compile_error_aux("(let ([x 5]) y)", "compile error (1,14): variable unknown: y");
   }
 
+static void test_define()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define x 5) x");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  int contains_error = ctxt->number_of_compile_errors > 0 ? 1 : 0;
+  TEST_EQ_INT(0, contains_error);
+  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("5", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_destroy(ctxt, &func);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -851,4 +876,5 @@ void run_all_compiler_tests()
   test_let();
   test_let_star();
   test_compile_errors();
+  test_define();
   }

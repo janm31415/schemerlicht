@@ -11,6 +11,7 @@ environment.h
 error.h
 freevaranalysis.h
 func.h
+globdef.h
 lambdatolet.h
 limits.h
 map.h
@@ -46,6 +47,7 @@ environment.c
 error.c
 freevaranalysis.c
 func.c
+globdef.c
 lambdatolet.c
 map.c
 memory.c
