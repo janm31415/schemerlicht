@@ -88,5 +88,16 @@ typedef struct schemerlicht_vector
     memmove(cast(element_type*, *(iterator))+range_size, cast(element_type*, *(iterator)), (it_end_vinsert - cast(element_type*, *(iterator)))*sizeof(element_type)); \
     memcpy(*(iterator), *(range_it_begin), range_size*sizeof(element_type)); }
   
+#define schemerlicht_vector_insert_element(ctxt, vec, iterator, element_value, element_type) \
+  { schemerlicht_memsize mem_needed = (vec)->vector_size + 1; \
+    if ((vec)->vector_capacity < mem_needed) { \
+      schemerlicht_memsize iterator_index = cast(schemerlicht_memsize, cast(element_type*, *(iterator)) - cast(element_type*, (vec)->vector_ptr)); \
+      schemerlicht_reallocvector(ctxt, (vec)->vector_ptr, (vec)->vector_capacity, mem_needed, element_type); \
+      *(iterator) = (cast(element_type*, (vec)->vector_ptr) + iterator_index); \
+      (vec)->vector_capacity = mem_needed; } \
+    element_type* it_end_vinsert = (cast(element_type*, (vec)->vector_ptr) + (vec)->vector_size); \
+    (vec)->vector_size += 1; \
+    memmove(cast(element_type*, *(iterator))+1, cast(element_type*, *(iterator)), (it_end_vinsert - cast(element_type*, *(iterator)))*sizeof(element_type)); \
+    **(iterator) = element_value;  }
 
 #endif //SCHEMERLICHT_VECTOR_H

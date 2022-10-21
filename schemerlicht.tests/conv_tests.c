@@ -11,6 +11,7 @@
 #include "schemerlicht/lambdatolet.h"
 #include "schemerlicht/assignablevarconv.h"
 #include "schemerlicht/freevaranalysis.h"
+#include "schemerlicht/closure.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -644,6 +645,22 @@ static void test_free_var_analysis()
   schemerlicht_close(ctxt);
   }
 
+static void test_closure_conversion_1()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);  
+  schemerlicht_single_begin_conversion(ctxt, &prog);  
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( let ( [ x_0 5 ] ) ( begin ( closure ( lambda ( #%self1 y_1 ) ( begin ( closure ( lambda ( #%self0 ) ( begin ( + ( closure-ref #%self0 1 ) ( closure-ref #%self0 2 ) ) ) ) ( closure-ref #%self1 1 ) y_1 ) ) ) x_0 ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);  
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -680,4 +697,5 @@ void run_all_conv_tests()
   test_assignable_variable_conversion_2();
   test_assignable_variable_conversion_3();
   test_free_var_analysis();
+  test_closure_conversion_1();
   }

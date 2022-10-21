@@ -37,7 +37,7 @@ void schemerlicht_string_vector_sort(schemerlicht_vector* v)
   quicksort(it, it_end);
   }
 
-static schemerlicht_string* lower_bound(schemerlicht_string* first, schemerlicht_string* last, schemerlicht_string* value)
+schemerlicht_string* schemerlicht_lower_bound(schemerlicht_string* first, schemerlicht_string* last, schemerlicht_string* value)
   {
   schemerlicht_string* it;
   schemerlicht_memsize count = cast(schemerlicht_memsize, last - first);
@@ -64,7 +64,7 @@ int schemerlicht_string_vector_binary_search(schemerlicht_vector* v, schemerlich
   {
   schemerlicht_string* it = schemerlicht_vector_begin(v, schemerlicht_string);
   schemerlicht_string* it_end = schemerlicht_vector_end(v, schemerlicht_string);
-  it = lower_bound(it, it_end, s);
+  it = schemerlicht_lower_bound(it, it_end, s);
   return (!(it == it_end) && !(schemerlicht_string_compare_less(s, it))) ? 1 : 0;
   }
 
@@ -72,7 +72,7 @@ void schemerlicht_string_vector_insert_sorted(schemerlicht_context* ctxt, scheme
   {
   schemerlicht_string* sit = schemerlicht_vector_begin(v, schemerlicht_string);
   schemerlicht_string* sit_end = schemerlicht_vector_end(v, schemerlicht_string);
-  sit = lower_bound(sit, sit_end, s);
+  sit = schemerlicht_lower_bound(sit, sit_end, s);
   schemerlicht_string* s_end = s + 1;
   schemerlicht_vector_insert(ctxt, v, &sit, &s, &s_end, schemerlicht_string);
   }
