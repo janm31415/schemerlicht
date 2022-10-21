@@ -637,9 +637,47 @@ static void test_assignable_variable_conversion_3()
 static void test_free_var_analysis()
   {
   schemerlicht_context* ctxt = schemerlicht_open();
-  schemerlicht_vector tokens = script2tokens(ctxt, "lambda(y) ((lambda (x) (+ x y))(z))");
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
+  TEST_EQ_INT(schemerlicht_type_let, expr->type);
+  schemerlicht_parsed_let* l = &expr->expr.let;
+  schemerlicht_expression* beg = schemerlicht_vector_at(&l->body, 0, schemerlicht_expression);
+  TEST_EQ_INT(schemerlicht_type_begin, beg->type);
+  schemerlicht_expression* lam1 = schemerlicht_vector_at(&beg->expr.beg.arguments, 0, schemerlicht_expression);
+  TEST_EQ_INT(schemerlicht_type_lambda, lam1->type);
+  schemerlicht_expression* beg2 = schemerlicht_vector_at(&lam1->expr.lambda.body, 0, schemerlicht_expression);
+  TEST_EQ_INT(schemerlicht_type_begin, beg2->type);
+  schemerlicht_expression* lam2 = schemerlicht_vector_at(&beg2->expr.beg.arguments, 0, schemerlicht_expression);
+  TEST_EQ_INT(schemerlicht_type_lambda, lam2->type);
+  schemerlicht_parsed_lambda* lambda1 = &lam1->expr.lambda;
+  schemerlicht_parsed_lambda* lambda2 = &lam2->expr.lambda;
+  TEST_EQ_INT(1, lambda1->free_variables.vector_size);
+  TEST_EQ_INT(2, lambda2->free_variables.vector_size);  
+  schemerlicht_string* sit = schemerlicht_vector_begin(&lambda1->free_variables, schemerlicht_string);
+  schemerlicht_string* sit_end = schemerlicht_vector_end(&lambda1->free_variables, schemerlicht_string);
+  TEST_EQ_STRING("x", sit->string_ptr);
+#if 0
+  printf("lam1 free vars: ");
+  for (; sit != sit_end; ++sit)
+    {
+    printf("%s  ", sit->string_ptr);
+    }
+  printf("\n");
+#endif
+  sit = schemerlicht_vector_begin(&lambda2->free_variables, schemerlicht_string);
+  sit_end = schemerlicht_vector_end(&lambda2->free_variables, schemerlicht_string);
+  TEST_EQ_STRING("x", sit->string_ptr);
+  TEST_EQ_STRING("y", (sit+1)->string_ptr);
+#if 0
+  printf("lam2 free vars: ");
+  for (; sit != sit_end; ++sit)
+    {
+    printf("%s  ", sit->string_ptr);
+    }
+  printf("\n");  
+#endif
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -654,7 +692,7 @@ static void test_closure_conversion_1()
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
-  TEST_EQ_STRING("( let ( [ x_0 5 ] ) ( begin ( closure ( lambda ( #%self1 y_1 ) ( begin ( closure ( lambda ( #%self0 ) ( begin ( + ( closure-ref #%self0 1 ) ( closure-ref #%self0 2 ) ) ) ) ( closure-ref #%self1 1 ) y_1 ) ) ) x_0 ) ) ) ", res.string_ptr);
+  TEST_EQ_STRING("( let ( [ x 5 ] ) ( begin ( closure ( lambda ( #%self1 y ) ( begin ( closure ( lambda ( #%self0 ) ( begin ( + ( closure-ref #%self0 1 ) ( closure-ref #%self0 2 ) ) ) ) ( closure-ref #%self1 1 ) y ) ) ) x ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);  
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);

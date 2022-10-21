@@ -38,7 +38,7 @@ static void visit_variable_resolve_free_variables(schemerlicht_context* ctxt, sc
   schemerlicht_string* sit_end = schemerlicht_vector_end(&last_lambda->expr.lambda.free_variables, schemerlicht_string);
   schemerlicht_string* find_free_var_it = schemerlicht_lower_bound(sit, sit_end, &e->expr.var.name);
   int contains_var = (!(find_free_var_it == sit_end) && !(schemerlicht_string_compare_less(&e->expr.var.name, find_free_var_it))) ? 1 : 0;
-  if (contains_var == 0)
+  if (contains_var == 1)
     {
     schemerlicht_expression prim = schemerlicht_init_primcall(ctxt);
     schemerlicht_string_init(ctxt, &prim.expr.prim.name, "closure-ref");
