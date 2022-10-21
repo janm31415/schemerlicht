@@ -25,14 +25,21 @@ static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_
     {
     schemerlicht_object_destroy(ctxt, it);
     }
+  it = schemerlicht_vector_begin(&ctxt_to_free->heap, schemerlicht_object);
+  it_end = schemerlicht_vector_end(&ctxt_to_free->heap, schemerlicht_object);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_object_destroy(ctxt, it);
+    }
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->globals);
+  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->heap);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);
   schemerlicht_environment_destroy(ctxt_to_free);
   schemerlicht_free(ctxt, ctxt_to_free, sizeof(schemerlicht_context));
   }
 
-static void context_init(schemerlicht_context* ctxt)
+static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size)
   {
   schemerlicht_assert(ctxt->global != NULL);
   ctxt->error_jmp = NULL;
@@ -44,13 +51,21 @@ static void context_init(schemerlicht_context* ctxt)
     {
     it->type = schemerlicht_object_type_undefined;
     }
+  ctxt->heap_pos = 0;
+  schemerlicht_vector_init_with_size(ctxt, &ctxt->heap, heap_size, schemerlicht_object);
+  it = schemerlicht_vector_begin(&ctxt->heap, schemerlicht_object);
+  it_end = schemerlicht_vector_end(&ctxt->heap, schemerlicht_object);
+  for (; it != it_end; ++it)
+    {
+    it->type = schemerlicht_object_type_undefined;
+    }
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->compile_error_reports, schemerlicht_error_report);
   schemerlicht_environment_init(ctxt);  
   }
 
-schemerlicht_context* schemerlicht_open()
+schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)
   {
   schemerlicht_context* ctxt = context_new(NULL);
   if (ctxt)
@@ -66,7 +81,7 @@ schemerlicht_context* schemerlicht_open()
     g->true_sym = schemerlicht_make_true_sym_cell(ctxt);
     g->false_sym = schemerlicht_make_false_sym_cell(ctxt);
     g->nil_sym = schemerlicht_make_nil_sym_cell(ctxt);
-    context_init(ctxt);
+    context_init(ctxt, heap_size);
     }
   return ctxt;
   }
@@ -85,14 +100,14 @@ void schemerlicht_close(schemerlicht_context* ctxt)
   context_free(NULL, ctxt);
   }
 
-schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt)
+schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size)
   {
   schemerlicht_assert(ctxt->global != NULL);
   schemerlicht_context* ctxt_new = context_new(ctxt);
   if (ctxt_new)
     {
     ctxt_new->global = ctxt->global;
-    context_init(ctxt_new);
+    context_init(ctxt_new, heap_size);
     }
   return ctxt_new;
   }

@@ -46,7 +46,7 @@ schemerlicht_vector script2tokens(schemerlicht_context* ctxt, const char* script
 
 static void tokenize_symbol()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "#f");
   TEST_EQ_INT(1, tokens.vector_size);
   token* first_token = schemerlicht_vector_at(&tokens, 0, token);
@@ -57,7 +57,7 @@ static void tokenize_symbol()
 
 static void tokenize_list()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "(list a b)");
   TEST_EQ_INT(5, tokens.vector_size);  
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
@@ -71,7 +71,7 @@ static void tokenize_list()
 
 static void tokenize_string()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "(print\"spaghetti () \")");
   TEST_EQ_INT(4, tokens.vector_size);
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
@@ -86,7 +86,7 @@ static void tokenize_string()
 
 static void tokenize_fixnum_real()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "(+ 1 2.0)");
   TEST_EQ_INT(5, tokens.vector_size);
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
@@ -100,7 +100,7 @@ static void tokenize_fixnum_real()
 
 static void tokenize_string_w_escape_chars()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "(print\"line1\\nline2\")");
   TEST_EQ_INT(4, tokens.vector_size);
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);
@@ -115,7 +115,7 @@ static void tokenize_string_w_escape_chars()
 
 static void tokenize_string_w_escape_chars_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "(print\"oh\\a\\b\\n\\t\\r\")");
   TEST_EQ_INT(4, tokens.vector_size);
   TEST_EQ_INT(SCHEMERLICHT_T_LEFT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 0, token)->type);

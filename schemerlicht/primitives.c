@@ -2760,6 +2760,30 @@ void schemerlicht_primitive_arithmetic_shift(schemerlicht_context* ctxt, int a, 
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_vector(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_VECTOR);
+  schemerlicht_object v;
+  v.type = schemerlicht_object_type_vector;
+  schemerlicht_vector_init_with_size(ctxt, &v.value.v, b, schemerlicht_object);
+  for (int j = 0; j < b; ++j)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j, schemerlicht_object);
+    schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&v.value.v, j, schemerlicht_object);
+    schemerlicht_set_object(obj_at_pos, arg);
+    }
+  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_set_object(heap_obj, &v);
+  ++ctxt->heap_pos;
+  schemerlicht_set_object(ra, &v);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
   switch (prim_id)
@@ -2935,6 +2959,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_ARITHMETIC_SHIFT:
       schemerlicht_primitive_arithmetic_shift(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_VECTOR:
+      schemerlicht_primitive_vector(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -3008,5 +3035,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "bitwise-not", SCHEMERLICHT_BITWISE_NOT);
   map_insert(ctxt, m, "bitwise-xor", SCHEMERLICHT_BITWISE_XOR);
   map_insert(ctxt, m, "arithmetic-shift", SCHEMERLICHT_ARITHMETIC_SHIFT);
+  map_insert(ctxt, m, "vector", SCHEMERLICHT_VECTOR);
   return m;
   }

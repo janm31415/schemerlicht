@@ -7,7 +7,7 @@
 static void test_stream_construction()
   {
   schemerlicht_stream str;
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_stream_init(ctxt, &str, 10);
   TEST_EQ_INT(10, str.capacity);
   TEST_EQ_INT(0, str.position);
@@ -19,7 +19,7 @@ static void test_stream_construction()
 static void test_stream_write_read()
   {
   schemerlicht_stream str;
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_stream_init(ctxt, &str, 0);
   TEST_EQ_INT(0, str.capacity);
   TEST_EQ_INT(0, str.position);

@@ -8,7 +8,7 @@
 
 static void test_stringvec_sort()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, schemerlicht_string);
 
@@ -45,7 +45,7 @@ static void test_stringvec_sort()
 
 static void test_stringvec_binary_search()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, schemerlicht_string);
 
@@ -90,7 +90,7 @@ static void test_stringvec_binary_search()
 
 static void test_stringvec_insert_sorted()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, schemerlicht_string);
 
@@ -131,7 +131,7 @@ static void test_stringvec_insert_sorted()
 
 static void test_stringvec_unique()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, schemerlicht_string);
 

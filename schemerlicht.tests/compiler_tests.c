@@ -15,7 +15,7 @@
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
@@ -48,7 +48,7 @@ static void test_compile_fixnum()
 
 static void test_compile_flonum_aux(schemerlicht_flonum expected_value, const char* script)
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
@@ -74,7 +74,7 @@ static void test_compile_flonum()
 
 static void test_compile_aux(const char* expected_value, const char* script)
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -792,7 +792,7 @@ static void test_let_star()
 
 static void test_compile_error_aux(const char* script, const char* first_error_message)
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
@@ -818,7 +818,7 @@ static void test_compile_errors()
 
 static void test_define()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, "(define x 5) x");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -831,6 +831,16 @@ static void test_define()
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_destroy(ctxt, &func);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  tokens = script2tokens(ctxt, "x");
+  prog = make_program(ctxt, &tokens);
+  func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  res = schemerlicht_run(ctxt, &func);
+  s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("5", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s); 
   schemerlicht_function_destroy(ctxt, &func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -879,6 +889,11 @@ static void test_bitwise_ops()
   test_compile_aux("2376", "(bitwise-and 2376 2376)");
   }
 
+static void test_vector()
+  {
+  test_compile_aux("#(1 2)", "(vector 1 2)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -921,4 +936,5 @@ void run_all_compiler_tests()
   test_define();
   test_fixnum_char_flonum_conversions();
   test_bitwise_ops();
+  test_vector();
   }

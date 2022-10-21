@@ -7,7 +7,7 @@
 
 static void test_construction_destruction_1()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
   TEST_EQ_INT(5, v.vector_size);
@@ -19,7 +19,7 @@ static void test_construction_destruction_1()
 
 static void test_construction_destruction_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -31,7 +31,7 @@ static void test_construction_destruction_2()
 
 static void test_access()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
   *schemerlicht_vector_at(&v, 0, double) = 1.0;
@@ -50,7 +50,7 @@ static void test_access()
 
 static void test_pop_back()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
   TEST_EQ_INT(5, v.vector_size);
@@ -79,7 +79,7 @@ static void test_pop_back()
 
 static void test_push_back()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -98,7 +98,7 @@ static void test_push_back()
 
 static void test_push_front()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -117,7 +117,7 @@ static void test_push_front()
 
 static void test_push_back_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 0, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -157,7 +157,7 @@ static void test_push_back_2()
 
 static void test_iterator()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -185,7 +185,7 @@ static void test_iterator()
 
 static void test_iterator_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -212,7 +212,7 @@ static void test_iterator_2()
 
 static void test_back()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init(ctxt, &v, double);
   TEST_EQ_INT(0, v.vector_size);
@@ -230,7 +230,7 @@ static void test_back()
 
 static void test_erase()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
   *schemerlicht_vector_at(&v, 0, double) = 1.0;
@@ -267,7 +267,7 @@ static void test_erase()
 
 static void test_erase_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, uint16_t);
   *schemerlicht_vector_at(&v, 0, uint16_t) = 1;
@@ -304,7 +304,7 @@ static void test_erase_2()
 
 static void test_insert()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
   *schemerlicht_vector_at(&v, 0, double) = 1.0;
@@ -349,7 +349,7 @@ static void test_insert()
 
 static void test_insert_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, uint16_t);
   *schemerlicht_vector_at(&v, 0, uint16_t) = 1;
@@ -394,7 +394,7 @@ static void test_insert_2()
 
 static void test_insert_element()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, uint16_t);
   *schemerlicht_vector_at(&v, 0, uint16_t) = 1;
@@ -424,7 +424,7 @@ static void test_insert_element()
 
 static void test_pop_front()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 5, double);
   *schemerlicht_vector_at(&v, 0, double) = 1.0;
@@ -460,7 +460,7 @@ static void test_pop_front()
 
 static void test_erase_range()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector v;
   schemerlicht_vector_init_with_size(ctxt, &v, 7, double);
   *schemerlicht_vector_at(&v, 0, double) = 1.0;

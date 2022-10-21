@@ -62,7 +62,8 @@ typedef enum
   SCHEMERLICHT_BITWISE_OR,
   SCHEMERLICHT_BITWISE_NOT,
   SCHEMERLICHT_BITWISE_XOR,
-  SCHEMERLICHT_ARITHMETIC_SHIFT
+  SCHEMERLICHT_ARITHMETIC_SHIFT,
+  SCHEMERLICHT_VECTOR
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -122,6 +123,7 @@ void schemerlicht_primitive_bitwise_or(schemerlicht_context* ctxt, int a, int b,
 void schemerlicht_primitive_bitwise_not(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_bitwise_xor(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_arithmetic_shift(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_vector(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

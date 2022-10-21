@@ -6,7 +6,7 @@
 
 static void test_map_construction()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
 
   TEST_EQ_INT(10, m->array_size);
@@ -18,7 +18,7 @@ static void test_map_construction()
 
 static void test_map()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
 
   schemerlicht_object* obj = schemerlicht_map_get_indexed(m, 0);
@@ -41,7 +41,7 @@ static void test_map()
 
 static void test_map_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
 
   schemerlicht_object* obj = schemerlicht_map_get_indexed(m, 12);
@@ -64,7 +64,7 @@ static void test_map_2()
 
 static void test_map_3()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
 
   schemerlicht_object* obj = schemerlicht_map_get_indexed(m, 200000);
@@ -87,7 +87,7 @@ static void test_map_3()
 
 static void test_map_4()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 1);
 
   schemerlicht_object* obj20 = schemerlicht_map_insert_indexed(ctxt, m, 20);
@@ -135,7 +135,7 @@ static void test_map_4()
 
 static void test_map_with_string_keys()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 1);
 
   schemerlicht_object* obj_alpha = schemerlicht_map_insert_string(ctxt, m, "alpha");

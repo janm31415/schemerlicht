@@ -7,7 +7,7 @@
 
 static void test_environment_root()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string name;
   schemerlicht_string_init(ctxt, &name, "myVariable");
 
@@ -34,7 +34,7 @@ static void test_environment_root()
 
 static void test_environment_child()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string name;
   schemerlicht_string_init(ctxt, &name, "myVariable");
 
@@ -79,7 +79,7 @@ static void test_environment_child()
 
 static void test_environment_change_entry()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string name;
   schemerlicht_string_init(ctxt, &name, "myVariable");
 

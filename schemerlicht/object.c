@@ -1,5 +1,6 @@
 #include "object.h"
-
+#include <string.h>
+#include <stdio.h>
 
 int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
@@ -8,11 +9,19 @@ int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlic
   switch (obj1->type)
     {
     case schemerlicht_object_type_undefined:
+    case schemerlicht_object_type_true:
+    case schemerlicht_object_type_false:
+    case schemerlicht_object_type_nil:
       return 1;
     case schemerlicht_object_type_fixnum:
       return obj1->value.fx == obj2->value.fx;
     case schemerlicht_object_type_flonum:
       return obj1->value.fl == obj2->value.fl;
+    case schemerlicht_object_type_char:
+      return obj1->value.ch == obj2->value.ch;
+    case schemerlicht_object_type_symbol:
+    case schemerlicht_object_type_string:
+      return strcmp(obj1->value.s.string_ptr, obj2->value.s.string_ptr) == 0 ? 1 : 0;
     case schemerlicht_object_type_pointer:
     default:
       return obj1->value.ptr == obj2->value.ptr;
@@ -126,6 +135,11 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     schemerlicht_string_destroy(ctxt, &(obj->value.s));
     break;
     }
+    case schemerlicht_object_type_vector:
+    {
+    schemerlicht_vector_destroy(ctxt, &(obj->value.v));
+    break;
+    }
     default:
       break;
     }
@@ -134,6 +148,8 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
 schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   schemerlicht_string s;
+  s.string_ptr = 0;
+  s.string_length = 0;
   switch (obj->type)
     {
     case schemerlicht_object_type_undefined:
@@ -197,6 +213,21 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         }
       schemerlicht_string_append_cstr(ctxt, &s, str);
       }
+    break;
+    }
+    case schemerlicht_object_type_vector:
+    {
+    schemerlicht_string_init(ctxt, &s, "#(");
+    for (schemerlicht_memsize j = 0; j < obj->value.v.vector_size; ++j)
+      {
+      schemerlicht_object* new_obj = schemerlicht_vector_at(&obj->value.v, j, schemerlicht_object);
+      schemerlicht_string stmp = schemerlicht_object_to_string(ctxt, new_obj);
+      schemerlicht_string_append(ctxt, &s, &stmp);
+      if (j < obj->value.v.vector_size-1)
+        schemerlicht_string_push_back(ctxt, &s, ' ');
+      schemerlicht_string_destroy(ctxt, &stmp);
+      }
+    schemerlicht_string_push_back(ctxt, &s, ')');
     break;
     }
     }

@@ -4,6 +4,7 @@
 #include "schemerlicht.h"
 #include "limits.h"
 #include "string.h"
+#include "vector.h"
 
 #define schemerlicht_object_type_undefined 0
 #define schemerlicht_object_type_char 1
@@ -15,20 +16,23 @@
 #define schemerlicht_object_type_false 7
 #define schemerlicht_object_type_symbol 8
 #define schemerlicht_object_type_nil 9
+#define schemerlicht_object_type_vector 10
+#define schemerlicht_object_type_list 11
 
 typedef union
   {
+  schemerlicht_vector v;
+  schemerlicht_string s;
   void* ptr;
   schemerlicht_fixnum fx;
-  schemerlicht_flonum fl;  
-  schemerlicht_string s;
+  schemerlicht_flonum fl;    
   schemerlicht_byte ch;
   } schemerlicht_value;
 
 typedef struct schemerlicht_object
-  {
-  int type;
+  {  
   schemerlicht_value value;
+  int type;
   } schemerlicht_object;
 
 #define schemerlicht_set_object(obj1, obj2) \

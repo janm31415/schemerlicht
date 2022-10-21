@@ -7,7 +7,7 @@
 
 static void test_string_init()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, "Hello world!");
   TEST_EQ_INT(12, s.string_length);
@@ -18,7 +18,7 @@ static void test_string_init()
 
 static void test_string_functions()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, "Hello world!");
   
@@ -35,7 +35,7 @@ static void test_string_functions()
 
 static void test_string_push_back()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, "Hello world!");
   schemerlicht_string_push_back(ctxt, &s, '!');
@@ -51,7 +51,7 @@ static void test_string_push_back()
 
 static void test_string_append()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string s1;
   schemerlicht_string_init(ctxt, &s1, "Hello ");
   TEST_EQ_INT(6, s1.string_length);
@@ -70,7 +70,7 @@ static void test_string_append()
 
 static void test_string_append_2()
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string s1;
   schemerlicht_string_init(ctxt, &s1, "Hello ");
   TEST_EQ_INT(6, s1.string_length);
@@ -86,7 +86,7 @@ static void test_string_append_2()
 
 static void test_string_compare_less_aux(const char* left, const char* right, int expected)
   {
-  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_string s1, s2;
   schemerlicht_string_init(ctxt, &s1, left);
   schemerlicht_string_init(ctxt, &s2, right);

@@ -34,6 +34,8 @@ struct schemerlicht_context
   schemerlicht_global_context* global;
   schemerlicht_vector stack;
   schemerlicht_vector globals;
+  schemerlicht_vector heap;
+  schemerlicht_memsize heap_pos;
   int number_of_syntax_errors;
   int number_of_compile_errors;
   schemerlicht_vector syntax_error_reports;
@@ -42,11 +44,11 @@ struct schemerlicht_context
   schemerlicht_vector environment; // linked chain of environment maps
   };
 
-SCHEMERLICHT_API schemerlicht_context* schemerlicht_open();
+SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
 SCHEMERLICHT_API void schemerlicht_close(schemerlicht_context* ctxt);
 
 // for new threads
-SCHEMERLICHT_API schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt);
+SCHEMERLICHT_API schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size);
 SCHEMERLICHT_API void schemerlicht_context_destroy(schemerlicht_context* ctxt);
 
 #endif //SCHEMERLICHT_CONTEXT_H
