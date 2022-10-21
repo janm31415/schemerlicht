@@ -17,6 +17,7 @@ static schemerlicht_context* context_new(schemerlicht_context* ctxt)
 static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_to_free)
   {
   schemerlicht_syntax_errors_clear(ctxt_to_free);
+  schemerlicht_compile_errors_clear(ctxt_to_free);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->stack);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);

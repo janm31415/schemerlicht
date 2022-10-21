@@ -6,6 +6,7 @@
 #include "schemerlicht/token.h"
 #include "schemerlicht/compiler.h"
 #include "schemerlicht/vm.h"
+#include "schemerlicht/error.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -740,6 +741,32 @@ static void test_let()
   test_compile_aux("45", "(let ([a 0] [b 1] [c 2] [d 3] [e 4] [f 5] [g 6] [h 7] [i 8] [j 9]) (+ a b c d e f g h i j) )");
   }
 
+static void test_compile_error_aux(const char* script, const char* first_error_message)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  int contains_error = ctxt->number_of_compile_errors > 0 ? 1 : 0;
+  TEST_EQ_INT(1, contains_error);
+  if (contains_error)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+    TEST_EQ_STRING(first_error_message, it->message.string_ptr);
+    }
+
+  schemerlicht_function_destroy(ctxt, &func);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_compile_errors()
+  {
+  test_compile_error_aux("(let ([x 5]) y)", "compile error (1,14): variable unknown: y");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -775,4 +802,5 @@ void run_all_compiler_tests()
   test_fx_arithmetic();
   test_if();
   test_let();
+  test_compile_errors();
   }
