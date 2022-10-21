@@ -837,6 +837,48 @@ static void test_define()
   schemerlicht_close(ctxt);
   }
 
+static void test_fixnum_char_flonum_conversions()
+  {
+  test_compile_aux("#\\019", "(fixnum->char 19)");
+  test_compile_aux("#\\a", "(fixnum->char 97)");
+  test_compile_aux("#\\A", "(fixnum->char 65)");
+  test_compile_aux("#\\z", "(fixnum->char 122)");
+  test_compile_aux("#\\Z", "(fixnum->char 90)");
+  test_compile_aux("#\\0", "(fixnum->char 48)");
+  test_compile_aux("#\\9", "(fixnum->char 57)");
+  test_compile_aux("19", "(char->fixnum #\\019)");
+  test_compile_aux("97", "(char->fixnum #\\a)");
+  test_compile_aux("65", "(char->fixnum #\\A)");
+  test_compile_aux("122", "(char->fixnum #\\z)");
+  test_compile_aux("90", "(char->fixnum #\\Z)");
+  test_compile_aux("48", "(char->fixnum #\\0)");
+  test_compile_aux("57", "(char->fixnum #\\9)");
+  test_compile_aux("12", "(char->fixnum (fixnum->char 12))");
+  test_compile_aux("#\\x", "(fixnum->char (char->fixnum #\\x))");
+  test_compile_aux("3", "(flonum->fixnum 3.143)");
+  test_compile_aux("-3", "(flonum->fixnum -3.143)");
+  test_compile_aux("3.000000", "(fixnum->flonum 3)");
+  test_compile_aux("#t", "(flonum? (fixnum->flonum 3))");
+  }
+
+static void test_bitwise_ops()
+  {
+  test_compile_aux("6", "(bitwise-not -7)");
+  test_compile_aux("6", "(bitwise-not (bitwise-or (bitwise-not 7) 1))");
+  test_compile_aux("2", "(bitwise-not (bitwise-or (bitwise-not 7) (bitwise-not 2)))");
+  test_compile_aux("12", "(bitwise-and (bitwise-not (bitwise-not 12)) (bitwise-not (bitwise-not 12)))");
+  test_compile_aux("19", "(bitwise-or 3 16)");
+  test_compile_aux("7", "(bitwise-or 3 5)");
+  test_compile_aux("7", "(bitwise-or 3 7)");
+  test_compile_aux("6", "(bitwise-not (bitwise-or (bitwise-not 7) 1))");
+  test_compile_aux("6", "(bitwise-not (bitwise-or 1 (bitwise-not 7)))");
+  test_compile_aux("3", "(bitwise-and 3 7)");
+  test_compile_aux("1", "(bitwise-and 3 5)");
+  test_compile_aux("0", "(bitwise-and 2346 (bitwise-not 2346))");
+  test_compile_aux("0", "(bitwise-and (bitwise-not 2346) 2346)");
+  test_compile_aux("2376", "(bitwise-and 2376 2376)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -877,4 +919,6 @@ void run_all_compiler_tests()
   test_let_star();
   test_compile_errors();
   test_define();
+  test_fixnum_char_flonum_conversions();
+  test_bitwise_ops();
   }

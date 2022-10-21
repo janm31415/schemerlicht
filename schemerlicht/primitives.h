@@ -53,7 +53,16 @@ typedef enum
   SCHEMERLICHT_IS_ZERO,
   SCHEMERLICHT_IS_BOOLEAN,
   SCHEMERLICHT_IS_CHAR,
-  SCHEMERLICHT_NOT
+  SCHEMERLICHT_NOT,
+  SCHEMERLICHT_FIXNUM_CHAR,
+  SCHEMERLICHT_CHAR_FIXNUM,
+  SCHEMERLICHT_FIXNUM_FLONUM,
+  SCHEMERLICHT_FLONUM_FIXNUM,
+  SCHEMERLICHT_BITWISE_AND,
+  SCHEMERLICHT_BITWISE_OR,
+  SCHEMERLICHT_BITWISE_NOT,
+  SCHEMERLICHT_BITWISE_XOR,
+  SCHEMERLICHT_ARITHMETIC_SHIFT
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -104,6 +113,15 @@ void schemerlicht_primitive_charless(schemerlicht_context* ctxt, int a, int b, i
 void schemerlicht_primitive_charleq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_chargreater(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_chargeq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_fixnum_char(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_fixnum_flonum(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_fixnum(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_flonum_fixnum(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_bitwise_and(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_bitwise_or(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_bitwise_not(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_bitwise_xor(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_arithmetic_shift(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

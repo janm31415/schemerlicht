@@ -699,6 +699,22 @@ static void test_closure_conversion_1()
   schemerlicht_close(ctxt);
   }
 
+static void test_closure_conversion_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open();
+  schemerlicht_vector tokens = script2tokens(ctxt, "(lambda (x y z) (let ([ f (lambda (a b) (+ (* a x) (8 b y)))]) (- (f 1 2) (f 3 4))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( closure ( lambda ( #%self1 x y z ) ( begin ( let ( [ f ( closure ( lambda ( #%self0 a b ) ( begin ( + ( * a ( closure-ref #%self0 1 ) ) ( 8 b ( closure-ref #%self0 2 ) ) ) ) ) x y ) ] ) ( begin ( - ( f 1 2 ) ( f 3 4 ) ) ) ) ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -736,4 +752,5 @@ void run_all_conv_tests()
   test_assignable_variable_conversion_3();
   test_free_var_analysis();
   test_closure_conversion_1();
+  test_closure_conversion_2();
   }
