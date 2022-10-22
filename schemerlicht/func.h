@@ -10,6 +10,7 @@ typedef struct schemerlicht_function
   schemerlicht_map* constants_map;
   schemerlicht_vector constants;
   schemerlicht_vector code;
+  schemerlicht_vector lambdas; //functions defined inside the function
   int number_of_constants;
   int freereg;  /* first free register */
   } schemerlicht_function;
