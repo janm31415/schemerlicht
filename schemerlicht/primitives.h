@@ -63,7 +63,14 @@ typedef enum
   SCHEMERLICHT_BITWISE_NOT,
   SCHEMERLICHT_BITWISE_XOR,
   SCHEMERLICHT_ARITHMETIC_SHIFT,
-  SCHEMERLICHT_VECTOR
+  SCHEMERLICHT_VECTOR,
+  SCHEMERLICHT_VECTORREF,
+  SCHEMERLICHT_VECTORSET,
+  SCHEMERLICHT_IS_VECTOR,
+  SCHEMERLICHT_IS_PAIR,
+  SCHEMERLICHT_CONS,
+  SCHEMERLICHT_CAR,
+  SCHEMERLICHT_CDR
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -124,6 +131,13 @@ void schemerlicht_primitive_bitwise_not(schemerlicht_context* ctxt, int a, int b
 void schemerlicht_primitive_bitwise_xor(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_arithmetic_shift(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_vector(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_vector_ref(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_vector_set(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_vector(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_pair(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_cdr(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_car(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

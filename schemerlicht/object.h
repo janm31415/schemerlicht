@@ -11,19 +11,19 @@
 #define schemerlicht_object_type_fixnum 2
 #define schemerlicht_object_type_flonum 3
 #define schemerlicht_object_type_string 4
-#define schemerlicht_object_type_pointer 5
+#define schemerlicht_object_type_closure 5
 #define schemerlicht_object_type_true 6
 #define schemerlicht_object_type_false 7
 #define schemerlicht_object_type_symbol 8
 #define schemerlicht_object_type_nil 9
 #define schemerlicht_object_type_vector 10
-#define schemerlicht_object_type_list 11
+#define schemerlicht_object_type_pair 11
+#define schemerlicht_object_type_void 12
 
 typedef union
   {
   schemerlicht_vector v;
   schemerlicht_string s;
-  void* ptr;
   schemerlicht_fixnum fx;
   schemerlicht_flonum fl;    
   schemerlicht_byte ch;

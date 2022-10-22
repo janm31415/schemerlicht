@@ -289,10 +289,8 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
       return schemerlicht_hash_flonum(m, key->value.fl);
     case schemerlicht_object_type_string:
       return schemerlicht_hash_string(m, key->value.s.string_ptr);
-    case schemerlicht_object_type_pointer:
-      return schemerlicht_hash_pointer(m, key->value.ptr);
     default:
-      return schemerlicht_hash_pointer(m, key->value.ptr);
+      return schemerlicht_hash_pointer(m, key->value.v.vector_ptr);
     }
   }
 

@@ -781,9 +781,9 @@ static void test_let_star()
   {
   test_compile_aux("5", "(let* ([x 5]) x)");
   test_compile_aux("3", "(let* ([x (+ 1 2)]) x)");
-  test_compile_aux("10","(let* ([x (+ 1 2)] [y(+ 3 4)])(+ x y))");
+  test_compile_aux("10", "(let* ([x (+ 1 2)] [y(+ 3 4)])(+ x y))");
   test_compile_aux("4", "(let* ([x (+ 1 2)] [y(+ 3 4)]) (- y x))");
-  test_compile_aux("18","(let* ([x (let* ([y (+ 1 2)]) (* y y))])(+ x x))");
+  test_compile_aux("18", "(let* ([x (let* ([y (+ 1 2)]) (* y y))])(+ x x))");
   test_compile_aux("7", "(let* ([x (+ 1 2)] [x(+ 3 4)]) x)");
   test_compile_aux("7", "(let* ([x (+ 1 2)] [x(+ x 4)]) x)");
   test_compile_aux("3", "(let* ([t (let* ([t (let* ([t (let* ([t (+ 1 2)]) t)]) t)]) t)]) t)");
@@ -840,7 +840,7 @@ static void test_define()
   res = schemerlicht_run(ctxt, &func);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("5", s.string_ptr);
-  schemerlicht_string_destroy(ctxt, &s); 
+  schemerlicht_string_destroy(ctxt, &s);
   schemerlicht_function_destroy(ctxt, &func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -892,6 +892,66 @@ static void test_bitwise_ops()
 static void test_vector()
   {
   test_compile_aux("#(1 2)", "(vector 1 2)");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(vector 1 2 3 4 5 6 7 8)");
+  test_compile_aux("#(1 2 3 4 5 6 7 8 9)", "(vector 1 2 3 4 5 6 7 8 9)");
+  test_compile_aux("#(1 2 3 4 5 6 7 8 9 10)", "(vector 1 2 3 4 5 6 7 8 9 10)");
+  test_compile_aux("#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)", "(vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)");
+  test_compile_aux("2", "(let ([x (vector 1 2)]) (vector-ref x 1))");
+  test_compile_aux("2", "(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 1))");
+  test_compile_aux("10", "(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 9))");
+  test_compile_aux("1", "(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 0))");
+  test_compile_aux("15", "(let ([x (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)]) (vector-ref x 14))");
+
+  test_compile_aux("#undefined", "(let ([x (vector 1 2)] [y 3]) (vector-ref y 1))");
+  test_compile_aux("#undefined", "(let ([x (vector 1 2)] [y 3]) (vector-ref x #t))");
+  test_compile_aux("#undefined", "(let ([x (vector 1 2)] [y 3]) (vector-ref x 2))");
+  test_compile_aux("#undefined", "(let ([x (vector 1 2)] [y 3]) (vector-ref x -1))");
+  test_compile_aux("100", "(let ([x (vector 1 2)]) (begin (vector-set! x 1 100) (vector-ref x 1)))");
+  test_compile_aux("#(1 100)", "(let ([x (vector 1 2)]) (begin (vector-set! x 1 100) x))");
+  test_compile_aux("#(3.140000 2)", "(let ([x (vector 1 2)]) (begin (vector-set! x 0 3.14) x))");
+  test_compile_aux("#(1 2)", "(let ([x (vector 1 2)]) (begin (vector-set! x 0.0 3.14) x))");
+  test_compile_aux("#(1 2)", "(let ([x (vector 1 2)] [y 3]) (begin (vector-set! y 0.0 3.14) x))");
+  test_compile_aux("#(1 2)", "(let ([x (vector 1 2)]) (begin (vector-set! x -1 3.14) x))");
+  test_compile_aux("#(1 2)", "(let ([x (vector 1 2)]) (begin (vector-set! x 100 3.14) x))");
+  test_compile_aux("#t", "(vector? (vector 0)) ");
+  test_compile_aux("#f", "(vector? 1287) ");
+  test_compile_aux("#f", "(vector? ()) ");
+  test_compile_aux("#f", "(vector? #t) ");
+  test_compile_aux("#f", "(vector? #f) ");
+  }
+
+static void test_pair()
+  {
+  test_compile_aux("#t", "(pair? (cons 1 2))");  
+  test_compile_aux("#f", "(pair? 12)");
+  test_compile_aux("#f", "(pair? #t)");
+  test_compile_aux("#f", "(pair? #f)");
+  test_compile_aux("#f", "(pair? ())");
+  test_compile_aux("#f", "(fixnum? (cons 12 43))");
+  test_compile_aux("#f", "(boolean? (cons 12 43))");
+  test_compile_aux("#f", "(null? (cons 12 43))");
+  test_compile_aux("#f", "(not (cons 12 43))");
+  test_compile_aux("32", "(if (cons 12 43) 32 43)");  
+  test_compile_aux("1", "(car(cons 1 23))");  
+  test_compile_aux("123", "(cdr(cons 43 123))");
+  test_compile_aux("#t", "(let([x(cons 1 2)] [y(cons 3 4)]) (pair? x))");
+  test_compile_aux("#t", "(pair? (cons(cons 12 3) #f))");
+  test_compile_aux("#t", "(pair? (cons(cons 12 3) (cons #t #f)))");
+  test_compile_aux("12", "(car(car(cons(cons 12 3) (cons #t #f))))");
+  test_compile_aux("3", "(cdr(car(cons(cons 12 3) (cons #t #f))))");
+  test_compile_aux("#t", "(car(cdr(cons(cons 12 3) (cons #t #f))))");
+  test_compile_aux("#f", "(cdr(cdr(cons(cons 12 3) (cons #t #f))))");
+  test_compile_aux("#t", "(pair? (cons(* 1 1) 1))");
+  test_compile_aux("((1 . 4) 3 . 2)", "(let ([t0 (cons 1 2)] [t1 (cons 3 4)]) (let([a0(car t0)][a1(car t1)][d0(cdr t0)][d1(cdr t1)])(let([t0(cons a0 d1)][t1(cons a1 d0)]) (cons t0 t1))))");
+  test_compile_aux("(1 . 2)", "(let ([t (cons 1 2)])(let([t t])(let([t t])(let([t t]) t))))");
+  test_compile_aux("(1 . 2)", "(let ([t (let ([t (let ([t (let ([t (cons 1 2)]) t)]) t)]) t)]) t)");
+  test_compile_aux("((((()) ()) (()) ()) ((()) ()) (()) ())", "(let ([x ()])(let([x(cons x x)])(let([x(cons x x)])(let([x(cons x x)])(cons x x)))))");
+  test_compile_aux("((#t #t . #t) ((#f . #f) . #f))", "(cons (let ([x #t]) (let ([y (cons x x)]) (cons x y))) (cons(let([x #f]) (let([y(cons x x)]) (cons y x))) ())) ");
+  //test_compile_aux("(1 2 3 4 5 6 7 8 9 10)", "(letrec ([f (lambda (i lst) (if (= i 0) lst (f (sub1 i) (cons i lst))))])(f 10 ())) ");
+  test_compile_aux("(2 . #undefined)", "(cons 2)");
+  test_compile_aux("(2 . 3)", "(cons 2 3 4)");
+  test_compile_aux("#undefined", "(car 2)");
+  test_compile_aux("#undefined", "(cdr 2 3 4)");  
   }
 
 void run_all_compiler_tests()
@@ -937,4 +997,5 @@ void run_all_compiler_tests()
   test_fixnum_char_flonum_conversions();
   test_bitwise_ops();
   test_vector();
+  test_pair();
   }

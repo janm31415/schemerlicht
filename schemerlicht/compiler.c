@@ -303,6 +303,8 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
     case schemerlicht_type_set:
       compile_set(ctxt, fun, e);
       break;
+    case schemerlicht_type_nop:
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
     }
