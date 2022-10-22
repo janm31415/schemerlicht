@@ -16,7 +16,7 @@ typedef struct schemerlicht_function
   } schemerlicht_function;
 
 
-schemerlicht_function schemerlicht_function_init(schemerlicht_context* ctxt);
-void schemerlicht_function_destroy(schemerlicht_context* ctxt, schemerlicht_function* f);
+schemerlicht_function* schemerlicht_function_new(schemerlicht_context* ctxt);
+void schemerlicht_function_free(schemerlicht_context* ctxt, schemerlicht_function* f);
 
 #endif //SCHEMERLICHT_FUNC_H

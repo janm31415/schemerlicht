@@ -19,13 +19,13 @@ static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const ch
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
-  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
 
   TEST_EQ_INT(schemerlicht_object_type_fixnum, res->type);
   TEST_EQ_INT(expected_value, res->value.fx);
 
-  schemerlicht_function_destroy(ctxt, &func);
+  schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -52,13 +52,13 @@ static void test_compile_flonum_aux(schemerlicht_flonum expected_value, const ch
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
-  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
 
   TEST_EQ_INT(schemerlicht_object_type_flonum, res->type);
   TEST_EQ_DOUBLE(expected_value, res->value.fl);
 
-  schemerlicht_function_destroy(ctxt, &func);
+  schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -79,14 +79,14 @@ static void test_compile_aux(const char* expected_value, const char* script)
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
   schemerlicht_string_destroy(ctxt, &s);
-  schemerlicht_function_destroy(ctxt, &func);
+  schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -796,7 +796,7 @@ static void test_compile_error_aux(const char* script, const char* first_error_m
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
-  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   int contains_error = ctxt->number_of_compile_errors > 0 ? 1 : 0;
   TEST_EQ_INT(1, contains_error);
   if (contains_error)
@@ -805,7 +805,7 @@ static void test_compile_error_aux(const char* script, const char* first_error_m
     TEST_EQ_STRING(first_error_message, it->message.string_ptr);
     }
 
-  schemerlicht_function_destroy(ctxt, &func);
+  schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -824,24 +824,24 @@ static void test_define()
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
-  schemerlicht_function func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   int contains_error = ctxt->number_of_compile_errors > 0 ? 1 : 0;
   TEST_EQ_INT(0, contains_error);
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
-  schemerlicht_function_destroy(ctxt, &func);
+  schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   tokens = script2tokens(ctxt, "x");
   prog = make_program(ctxt, &tokens);
   func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  res = schemerlicht_run(ctxt, &func);
+  res = schemerlicht_run(ctxt, func);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
-  schemerlicht_function_destroy(ctxt, &func);
+  schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);

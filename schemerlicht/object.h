@@ -19,6 +19,7 @@
 #define schemerlicht_object_type_vector 10
 #define schemerlicht_object_type_pair 11
 #define schemerlicht_object_type_void 12
+#define schemerlicht_object_type_lambda 13
 
 typedef union
   {

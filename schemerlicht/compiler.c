@@ -250,7 +250,7 @@ static void compile_begin(schemerlicht_context* ctxt, schemerlicht_function* fun
 static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_lambda);
-  schemerlicht_function new_fun = schemerlicht_function_init(ctxt);
+  schemerlicht_function* new_fun = schemerlicht_function_new(ctxt);
   schemerlicht_environment_push_child(ctxt);
 
   for (schemerlicht_memsize i = 0; i < e->expr.lambda.variables.vector_size; ++i)
@@ -263,11 +263,11 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
     schemerlicht_string_copy(ctxt, &entry_name, var_name);
     schemerlicht_environment_add(ctxt, &entry_name, entry);    
     }
-  new_fun.freereg = e->expr.lambda.variables.vector_size;
+  new_fun->freereg = e->expr.lambda.variables.vector_size;
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);
-  compile_expression(ctxt, &new_fun, body_expr);
+  compile_expression(ctxt, new_fun, body_expr);
   schemerlicht_environment_pop_child(ctxt);
-  schemerlicht_vector_push_back(ctxt, &fun->lambdas, new_fun, schemerlicht_function);
+  schemerlicht_vector_push_back(ctxt, &fun->lambdas, new_fun, schemerlicht_function*);
   }
 
 static void compile_let(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
@@ -339,10 +339,10 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
   schemerlicht_assert(fun->freereg == first_free_reg);
   }
 
-schemerlicht_function schemerlicht_compile_expression(schemerlicht_context* ctxt, schemerlicht_expression* e)
+schemerlicht_function* schemerlicht_compile_expression(schemerlicht_context* ctxt, schemerlicht_expression* e)
   {
   schemerlicht_compile_errors_clear(ctxt);
-  schemerlicht_function fun = schemerlicht_function_init(ctxt);
-  compile_expression(ctxt, &fun, e);
+  schemerlicht_function* fun = schemerlicht_function_new(ctxt);
+  compile_expression(ctxt, fun, e);
   return fun;
   }
