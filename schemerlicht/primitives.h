@@ -71,7 +71,10 @@ typedef enum
   SCHEMERLICHT_CONS,
   SCHEMERLICHT_CAR,
   SCHEMERLICHT_CDR,
-  SCHEMERLICHT_HALT
+  SCHEMERLICHT_HALT,
+  SCHEMERLICHT_CLOSURE,
+  SCHEMERLICHT_CLOSUREREF,
+  SCHEMERLICHT_IS_CLOSURE,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -140,6 +143,9 @@ void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c
 void schemerlicht_primitive_cdr(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_car(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_halt(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_closure(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

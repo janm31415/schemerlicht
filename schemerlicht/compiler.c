@@ -258,22 +258,25 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
   {
   schemerlicht_assert(e->type == schemerlicht_type_funcall);  
   const schemerlicht_memsize nr_args = e->expr.funcall.arguments.vector_size;
+  schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.funcall.fun, 0, schemerlicht_expression);
+  compile_expression(ctxt, fun, body_expr);
+  ++fun->freereg;
+
   for (schemerlicht_memsize i = 0; i < nr_args; ++i)
     {
     schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.funcall.arguments, i, schemerlicht_expression);
     compile_expression(ctxt, fun, arg);
     ++fun->freereg;
     }
-  schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.funcall.fun, 0, schemerlicht_expression);
-  compile_expression(ctxt, fun, body_expr);
-  ++fun->freereg;
 
   fun->freereg -= nr_args + 1;
+  
+  make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, 0, fun->freereg);
   for (schemerlicht_memsize i = 0; i < nr_args; ++i)
     {
-    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i, fun->freereg + i);
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i+1, fun->freereg + i+1);
     }
-  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg + nr_args, nr_args, 1);
+  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 1);
   }
 
 static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)

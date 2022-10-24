@@ -224,7 +224,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           schemerlicht_string_append_cstr(ctxt, &s, "()");
           break;
         case schemerlicht_object_type_closure:
-          schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");
+          schemerlicht_string_append_cstr(ctxt, &s, "<closure>");
           break;
         case schemerlicht_object_type_lambda:
           schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");

@@ -110,6 +110,10 @@ typedef enum
 #define SCHEMERLICHT_GETARG_sBx(i)	(SCHEMERLICHT_GETARG_Bx(i)-SCHEMERLICHT_MAXARG_sBx)
 #define SCHEMERLICHT_SETARG_sBx(i,b)	SCHEMERLICHT_SETARG_Bx((i),cast(unsigned int, (b)+SCHEMERLICHT_MAXARG_sBx))
 
+
+schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerlicht_string* s, schemerlicht_function** fun);
 schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_function** fun);
+
+schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schemerlicht_function* fun);
 
 #endif //SCHEMERLICHT_VM_H
