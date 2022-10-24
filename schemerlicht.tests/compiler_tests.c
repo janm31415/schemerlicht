@@ -14,6 +14,8 @@
 #include "schemerlicht/defconv.h"
 #include "schemerlicht/cps.h"
 #include "schemerlicht/closure.h"
+#include "schemerlicht/assignablevarconv.h"
+#include "schemerlicht/lambdatolet.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -79,17 +81,19 @@ static void test_compile_aux(const char* expected_value, const char* script)
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
-  
+
   schemerlicht_define_conversion(ctxt, &prog);
-  schemerlicht_single_begin_conversion(ctxt, &prog);  
+  schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
 #if 0
   schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
-  printf("%s\n",dumped.string_ptr);
+  printf("%s\n", dumped.string_ptr);
   schemerlicht_string_destroy(ctxt, &dumped);
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
@@ -115,6 +119,8 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
 #if 1
@@ -975,7 +981,7 @@ static void test_vector()
 
 static void test_pair()
   {
-  test_compile_aux("#t", "(pair? (cons 1 2))");  
+  test_compile_aux("#t", "(pair? (cons 1 2))");
   test_compile_aux("#f", "(pair? 12)");
   test_compile_aux("#f", "(pair? #t)");
   test_compile_aux("#f", "(pair? #f)");
@@ -984,8 +990,8 @@ static void test_pair()
   test_compile_aux("#f", "(boolean? (cons 12 43))");
   test_compile_aux("#f", "(null? (cons 12 43))");
   test_compile_aux("#f", "(not (cons 12 43))");
-  test_compile_aux("32", "(if (cons 12 43) 32 43)");  
-  test_compile_aux("1", "(car(cons 1 23))");  
+  test_compile_aux("32", "(if (cons 12 43) 32 43)");
+  test_compile_aux("1", "(car(cons 1 23))");
   test_compile_aux("123", "(cdr(cons 43 123))");
   test_compile_aux("#t", "(let([x(cons 1 2)] [y(cons 3 4)]) (pair? x))");
   test_compile_aux("#t", "(pair? (cons(cons 12 3) #f))");
@@ -1004,7 +1010,7 @@ static void test_pair()
   test_compile_aux("(2 . #undefined)", "(cons 2)");
   test_compile_aux("(2 . 3)", "(cons 2 3 4)");
   test_compile_aux("#undefined", "(car 2)");
-  test_compile_aux("#undefined", "(cdr 2 3 4)");  
+  test_compile_aux("#undefined", "(cdr 2 3 4)");
   }
 
 static void test_begin()
@@ -1027,29 +1033,29 @@ static void test_letrec()
   {
   test_compile_aux("12", "(letrec () 12)");
   test_compile_aux("10", "(letrec () (let ([x 5]) (+ x x)))");
-  test_compile_aux_w_dump("7", "(letrec ([f (lambda () 5)]) 7)");
-  test_compile_aux_w_dump("12", "(letrec ([f (lambda () 5)]) (let ([x 12]) x))");
-  test_compile_aux_w_dump("5", "(let ([f (lambda () 5)]) (f))");
-  test_compile_aux_w_dump("5", "(letrec ([f (lambda () 5)]) (f))");  
-  test_compile_aux_w_dump("5", "(letrec ([f (lambda () 5)]) (let ([x (f)]) x))");
-  test_compile_aux_w_dump("11", "(letrec ([f (lambda () 5)]) (+ (f) 6))");
-  test_compile_aux_w_dump("11", "(letrec ([f (lambda () 5)]) (+ 6 (f)))");
-  test_compile_aux_w_dump("15", "(letrec ([f (lambda () 5)]) (- 20 (f)))");
-  test_compile_aux_w_dump("10", "(let ([f (lambda () 5)]) (+ (f) (f)))");
-  //test_compile_aux("12", "(letrec ([f (lambda () (+ 5 7))])(f))");
-  //test_compile_aux("25", "(letrec ([f (lambda (x) (+ x 12))]) (f 13))");
-  //test_compile_aux("12", "(letrec ([f (lambda (x) (+ x 12))]) (f 0))");
-  //test_compile_aux("24", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 0)))");
-  //test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");
-  //test_compile_aux("41", "(letrec ([f (lambda (x y) (+ x y))] [g (lambda(x) (+ x 12))])(f 16 (f (g 0) (+ 1 (g 0)))))");
-  //test_compile_aux("24", "(letrec ([f (lambda (x) (g x x))][g(lambda(x y) (+ x y))])(f 12))");
-  //test_compile_aux("34", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 10)))");
-  //test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");
-  //test_compile_aux("25", "(let ([f (lambda () 12)][g(lambda() 13)])(+ (f)(g)))");
-  //test_compile_aux("120", "(letrec ([f (lambda (x) (if (zero? x) 1 (* x(f(sub1 x)))))]) (f 5))");
-  //test_compile_aux("120", "(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))");
-  //test_compile_aux("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))");
-  //test_compile_aux("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))");  
+  test_compile_aux("7", "(letrec ([f (lambda () 5)]) 7)");
+  test_compile_aux("12", "(letrec ([f (lambda () 5)]) (let ([x 12]) x))");
+  test_compile_aux("5", "(let ([f (lambda () 5)]) (f))");
+  test_compile_aux("5", "(letrec ([f (lambda () 5)]) (f))");
+  test_compile_aux("5", "(letrec ([f (lambda () 5)]) (let ([x (f)]) x))");
+  test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ (f) 6))");
+  test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ 6 (f)))");
+  test_compile_aux("15", "(letrec ([f (lambda () 5)]) (- 20 (f)))");
+  test_compile_aux("10", "(let ([f (lambda () 5)]) (+ (f) (f)))");
+  test_compile_aux("12", "(letrec ([f (lambda () (+ 5 7))])(f))");
+  test_compile_aux("25", "(letrec ([f (lambda (x) (+ x 12))]) (f 13))");
+  test_compile_aux("12", "(letrec ([f (lambda (x) (+ x 12))]) (f 0))");
+  test_compile_aux("24", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 0)))");
+  test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");
+  test_compile_aux("41", "(letrec ([f (lambda (x y) (+ x y))] [g (lambda(x) (+ x 12))])(f 16 (f (g 0) (+ 1 (g 0)))))");  
+  test_compile_aux("24", "(letrec ([f (lambda (x) (g x x))][g(lambda(x y) (+ x y))])(f 12))");  
+  test_compile_aux("34", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 10)))");
+  test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");
+  test_compile_aux("25", "(let ([f (lambda () 12)][g(lambda() 13)])(+ (f)(g)))");
+  test_compile_aux("120", "(letrec ([f (lambda (x) (if (zero? x) 1 (* x(f(sub1 x)))))]) (f 5))");
+  test_compile_aux("120", "(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))");
+  test_compile_aux("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))");
+  //test_compile_aux("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))");
   }
 
 void run_all_compiler_tests()

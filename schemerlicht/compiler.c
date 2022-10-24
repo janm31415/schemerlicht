@@ -256,7 +256,7 @@ static void compile_begin(schemerlicht_context* ctxt, schemerlicht_function* fun
 
 static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
-  schemerlicht_assert(e->type == schemerlicht_type_funcall);  
+  schemerlicht_assert(e->type == schemerlicht_type_funcall);
   const schemerlicht_memsize nr_args = e->expr.funcall.arguments.vector_size;
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.funcall.fun, 0, schemerlicht_expression);
   compile_expression(ctxt, fun, body_expr);
@@ -270,11 +270,14 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
     }
 
   fun->freereg -= nr_args + 1;
-  
-  make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, 0, fun->freereg);
-  for (schemerlicht_memsize i = 0; i < nr_args; ++i)
+
+  if (fun->freereg > 0) // all lambda input variables should be in the first couple of registers.
     {
-    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i+1, fun->freereg + i+1);
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, 0, fun->freereg); // closure at R(0)
+    for (schemerlicht_memsize i = 0; i < nr_args; ++i)
+      {
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i + 1, fun->freereg + i + 1);
+      }
     }
   make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 1);
   }

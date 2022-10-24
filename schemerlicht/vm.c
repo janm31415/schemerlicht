@@ -313,14 +313,25 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         const int c = SCHEMERLICHT_GETARG_C(i);
         schemerlicht_call_primitive(ctxt, function_id, a + stack_offset, b, c);
         }
-      else if (target->type == schemerlicht_object_type_lambda)
+      //else if (target->type == schemerlicht_object_type_lambda)
+      //  {
+      //  schemerlicht_function* lambda = cast(schemerlicht_function*, target->value.ptr);
+      //  //schemerlicht_run(ctxt, lambda); // I think, because of continuation passing style, we could replace fun by lambda here.
+      //  pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
+      //  pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
+      //  fun = &lambda;
+      //  stack_offset += a + 1;
+      //  }
+      else if (target->type == schemerlicht_object_type_closure)
         {
-        schemerlicht_function* lambda = cast(schemerlicht_function*, target->value.ptr);
-        //schemerlicht_run(ctxt, lambda); // I think, because of continuation passing style, we could replace fun by lambda here.
+        schemerlicht_object* lambda_obj = schemerlicht_vector_at(&target->value.v, 0, schemerlicht_object);
+        schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
+        schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
+        //at R(0) we expect the closure (i.e. target) but this already so by compile_funcall
+        //schemerlicht_set_object(schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object), target); 
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
-        stack_offset += a + 1;
         }
       else
         {
