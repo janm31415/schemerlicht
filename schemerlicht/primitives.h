@@ -70,7 +70,8 @@ typedef enum
   SCHEMERLICHT_IS_PAIR,
   SCHEMERLICHT_CONS,
   SCHEMERLICHT_CAR,
-  SCHEMERLICHT_CDR
+  SCHEMERLICHT_CDR,
+  SCHEMERLICHT_HALT
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -138,6 +139,7 @@ void schemerlicht_primitive_is_pair(schemerlicht_context* ctxt, int a, int b, in
 void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_cdr(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_car(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_halt(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

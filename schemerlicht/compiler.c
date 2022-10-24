@@ -11,7 +11,7 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
 static void make_code_abx(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_opcode opc, int a, int bx)
   {
   schemerlicht_instruction i = 0;
-  SCHEMERLICHT_SET_OPCODE(i, opc);  
+  SCHEMERLICHT_SET_OPCODE(i, opc);
   SCHEMERLICHT_SETARG_A(i, a);
   SCHEMERLICHT_SETARG_Bx(i, bx);
   schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
@@ -29,7 +29,7 @@ static void make_code_asbx(schemerlicht_context* ctxt, schemerlicht_function* fu
 static void make_code_ab(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_opcode opc, int a, int b)
   {
   schemerlicht_instruction i = 0;
-  SCHEMERLICHT_SET_OPCODE(i, opc);  
+  SCHEMERLICHT_SET_OPCODE(i, opc);
   SCHEMERLICHT_SETARG_A(i, a);
   SCHEMERLICHT_SETARG_B(i, b);
   schemerlicht_vector_push_back(ctxt, &fun->code, i, schemerlicht_instruction);
@@ -152,10 +152,17 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
         compile_expression(ctxt, fun, arg);
         }
       fun->freereg -= nr_prim_args;
-      int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
+      if (strcmp(e->expr.prim.name.string_ptr, "halt") == 0)
+        {
+        make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_RETURN, fun->freereg + 1, 1);
+        }
+      else
+        {
+        int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
 
-      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
-      make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 1);
+        make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+        make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 1);
+        }
       }
     }
   }
@@ -205,7 +212,7 @@ static void compile_set(schemerlicht_context* ctxt, schemerlicht_function* fun, 
     compile_expression(ctxt, fun, value_expr);
     if (lookup_entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL)
       {
-      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_STOREGLOBAL, fun->freereg, lookup_entry.position);      
+      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_STOREGLOBAL, fun->freereg, lookup_entry.position);
       }
     else
       {
@@ -249,19 +256,24 @@ static void compile_begin(schemerlicht_context* ctxt, schemerlicht_function* fun
 
 static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
-  schemerlicht_assert(e->type == schemerlicht_type_funcall);
-  schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.funcall.fun, 0, schemerlicht_expression);
-  compile_expression(ctxt, fun, body_expr);
-  ++fun->freereg;
+  schemerlicht_assert(e->type == schemerlicht_type_funcall);  
   const schemerlicht_memsize nr_args = e->expr.funcall.arguments.vector_size;
   for (schemerlicht_memsize i = 0; i < nr_args; ++i)
     {
-    schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.funcall.arguments, i, schemerlicht_expression);    
+    schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.funcall.arguments, i, schemerlicht_expression);
     compile_expression(ctxt, fun, arg);
     ++fun->freereg;
     }
-  fun->freereg -= nr_args+1;
-  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_args, 1);
+  schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.funcall.fun, 0, schemerlicht_expression);
+  compile_expression(ctxt, fun, body_expr);
+  ++fun->freereg;
+
+  fun->freereg -= nr_args + 1;
+  for (schemerlicht_memsize i = 0; i < nr_args; ++i)
+    {
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i, fun->freereg + i);
+    }
+  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg + nr_args, nr_args, 1);
   }
 
 static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
@@ -275,10 +287,10 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
     schemerlicht_environment_entry entry;
     entry.type = SCHEMERLICHT_ENV_TYPE_STACK;
     entry.position = i;
-    schemerlicht_string* var_name = schemerlicht_vector_at(&e->expr.lambda.variables, i, schemerlicht_string);    
+    schemerlicht_string* var_name = schemerlicht_vector_at(&e->expr.lambda.variables, i, schemerlicht_string);
     schemerlicht_string entry_name;
     schemerlicht_string_copy(ctxt, &entry_name, var_name);
-    schemerlicht_environment_add(ctxt, &entry_name, entry);    
+    schemerlicht_environment_add(ctxt, &entry_name, entry);
     }
   new_fun->freereg = e->expr.lambda.variables.vector_size;
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);

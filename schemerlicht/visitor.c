@@ -333,7 +333,8 @@ schemerlicht_visitor* schemerlicht_visitor_new(schemerlicht_context* ctxt, void*
   }
 
 static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, schemerlicht_visitor_entry* e)
-  {
+  {  
+  schemerlicht_assert(e->expr == 0 || (e->expr->type >= 0 && e->expr->type <= schemerlicht_type_set));
   switch (e->type)
     {
     case SCHEMERLICHT_VISITOR_EXPRESSION_PRE:

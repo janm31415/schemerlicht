@@ -34,9 +34,10 @@ static int is_simple(schemerlicht_context* ctxt, schemerlicht_expression* e)
   schemerlicht_vector_push_back(ctxt, &expressions, *e, schemerlicht_expression);
   while (expressions.vector_size > 0)
     {
-    schemerlicht_expression* current = schemerlicht_vector_back(&expressions, schemerlicht_expression);
+    schemerlicht_expression current = *schemerlicht_vector_back(&expressions, schemerlicht_expression);
+    schemerlicht_assert(current.type >= 0 && current.type <= schemerlicht_type_set);
     schemerlicht_vector_pop_back(&expressions);
-    switch (current->type)
+    switch (current.type)
       {
       case schemerlicht_type_literal:
         continue;
@@ -46,8 +47,8 @@ static int is_simple(schemerlicht_context* ctxt, schemerlicht_expression* e)
         continue;
       case schemerlicht_type_primitive_call:
       {
-      schemerlicht_expression* it = schemerlicht_vector_begin(&current->expr.prim.arguments, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&current->expr.prim.arguments, schemerlicht_expression);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&current.expr.prim.arguments, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&current.expr.prim.arguments, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &expressions, *it, schemerlicht_expression);
@@ -56,8 +57,8 @@ static int is_simple(schemerlicht_context* ctxt, schemerlicht_expression* e)
       }
       case schemerlicht_type_foreign_call:
       {
-      schemerlicht_expression* it = schemerlicht_vector_begin(&current->expr.foreign.arguments, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&current->expr.foreign.arguments, schemerlicht_expression);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&current.expr.foreign.arguments, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&current.expr.foreign.arguments, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &expressions, *it, schemerlicht_expression);
@@ -66,8 +67,8 @@ static int is_simple(schemerlicht_context* ctxt, schemerlicht_expression* e)
       }
       case schemerlicht_type_set:
       {
-      schemerlicht_expression* it = schemerlicht_vector_begin(&current->expr.set.value, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&current->expr.set.value, schemerlicht_expression);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&current.expr.set.value, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&current.expr.set.value, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &expressions, *it, schemerlicht_expression);
@@ -76,8 +77,8 @@ static int is_simple(schemerlicht_context* ctxt, schemerlicht_expression* e)
       }
       case schemerlicht_type_if:
       {
-      schemerlicht_expression* it = schemerlicht_vector_begin(&current->expr.i.arguments, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&current->expr.i.arguments, schemerlicht_expression);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&current.expr.i.arguments, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&current.expr.i.arguments, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &expressions, *it, schemerlicht_expression);
@@ -86,19 +87,20 @@ static int is_simple(schemerlicht_context* ctxt, schemerlicht_expression* e)
       }
       case schemerlicht_type_let:
       {
-      schemerlicht_let_binding* it = schemerlicht_vector_begin(&current->expr.let.bindings, schemerlicht_let_binding);
-      schemerlicht_let_binding* it_end = schemerlicht_vector_end(&current->expr.let.bindings, schemerlicht_let_binding);
+      schemerlicht_let_binding* it = schemerlicht_vector_begin(&current.expr.let.bindings, schemerlicht_let_binding);
+      schemerlicht_let_binding* it_end = schemerlicht_vector_end(&current.expr.let.bindings, schemerlicht_let_binding);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &expressions, it->binding_expr, schemerlicht_expression);
         }
-      schemerlicht_vector_push_back(ctxt, &expressions, *schemerlicht_vector_at(&current->expr.let.body, 0, schemerlicht_expression), schemerlicht_expression);
+      schemerlicht_expression* expr = schemerlicht_vector_at(&current.expr.let.body, 0, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &expressions, *expr, schemerlicht_expression);
       continue;
       }
       case schemerlicht_type_begin:
       {
-      schemerlicht_expression* it = schemerlicht_vector_begin(&current->expr.beg.arguments, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&current->expr.beg.arguments, schemerlicht_expression);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&current.expr.beg.arguments, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&current.expr.beg.arguments, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &expressions, *it, schemerlicht_expression);
@@ -1469,6 +1471,7 @@ static void treat_cps_expressions(schemerlicht_context* ctxt, cps_conversion_hel
   while (cps->expressions_to_treat.vector_size > 0)
     {
     cps_conversion_state cps_state = *schemerlicht_vector_back(&cps->expressions_to_treat, cps_conversion_state);
+    schemerlicht_assert(cps_state.expr == 0 || (cps_state.expr->type >= 0 && cps_state.expr->type <= schemerlicht_type_set));
     schemerlicht_vector_pop_back(&cps->expressions_to_treat);
     treat_cps_state(ctxt, &cps_state, cps);
     }
@@ -1511,6 +1514,7 @@ void schemerlicht_continuation_passing_style(schemerlicht_context* ctxt, schemer
   if (program->expressions.vector_size == 0)
     return;
   schemerlicht_expression* e = schemerlicht_vector_at(&program->expressions, 0, schemerlicht_expression);
+  /*
   if (e->type == schemerlicht_type_begin)
     {
     schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.beg.arguments, schemerlicht_expression);
@@ -1522,4 +1526,6 @@ void schemerlicht_continuation_passing_style(schemerlicht_context* ctxt, schemer
     {
     cps_start(ctxt, e);
     }
+  */
+  cps_start(ctxt, e);
   }

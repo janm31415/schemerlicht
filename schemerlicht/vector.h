@@ -47,13 +47,13 @@ typedef struct schemerlicht_vector
 
 #define schemerlicht_vector_push_back(ctxt, vec, element_value, element_type) \
   schemerlicht_growvector(ctxt, (vec)->vector_ptr, (vec)->vector_size+1, (vec)->vector_capacity, element_type); \
-  *schemerlicht_vector_at(vec, (vec)->vector_size, element_type) = element_value; \
+  *schemerlicht_vector_at(vec, (vec)->vector_size, element_type) = (element_value); \
   ++((vec)->vector_size)
 
 #define schemerlicht_vector_push_front(ctxt, vec, element_value, element_type) \
   schemerlicht_growvector(ctxt, (vec)->vector_ptr, (vec)->vector_size+1, (vec)->vector_capacity, element_type); \
   memmove(cast(element_type*, (vec)->vector_ptr)+1, cast(element_type*, (vec)->vector_ptr), (vec)->vector_size*sizeof(element_type)); \
-  *schemerlicht_vector_at(vec, 0, element_type) = element_value; \
+  *schemerlicht_vector_at(vec, 0, element_type) = (element_value); \
   ++((vec)->vector_size)
 
 #define schemerlicht_vector_begin(vec, element_type) \

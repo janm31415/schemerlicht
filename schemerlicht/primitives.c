@@ -2995,6 +2995,17 @@ void schemerlicht_primitive_car(schemerlicht_context* ctxt, int a, int b, int c)
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_halt(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_HALT);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
   switch (prim_id)
@@ -3194,6 +3205,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_CAR:
       schemerlicht_primitive_car(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_HALT:
+      schemerlicht_primitive_halt(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -3275,5 +3289,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "cons", SCHEMERLICHT_CONS);
   map_insert(ctxt, m, "car", SCHEMERLICHT_CAR);
   map_insert(ctxt, m, "cdr", SCHEMERLICHT_CDR);
+  map_insert(ctxt, m, "halt", SCHEMERLICHT_HALT);
   return m;
   }

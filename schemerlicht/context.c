@@ -44,6 +44,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_assert(ctxt->global != NULL);
   ctxt->error_jmp = NULL;
   ctxt->number_of_syntax_errors = 0;
+  ctxt->number_of_compile_errors = 0;
   schemerlicht_vector_init_with_size(ctxt, &ctxt->stack, schemerlicht_maxstack, schemerlicht_object);
   schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object);
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack, schemerlicht_object);

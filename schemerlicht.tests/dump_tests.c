@@ -369,5 +369,6 @@ void run_all_dump_tests()
   test_dump("(cond[(cons 1 2) => (lambda(x) (cdr x))]) ", "( cond [ ( cons 1 2 )  => ( lambda ( x ) ( begin ( cdr x ) ) ) ] ) ");
   test_dump("(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])", "( case ( + 7 5 ) [ (1 2 3) ( quote small ) ] [ (10 11 12) ( quote big ) ] [ else #undefined ] ) ");
   test_dump("(case (car '(c d)) [(a e i o u) 'vowel][(w y) 'semivowel][else 'consonant])", "( case ( car ( quote (c d) ) ) [ (a e i o u) ( quote vowel ) ] [ (w y) ( quote semivowel ) ] [ else ( quote consonant ) ] ) ");
-  test_dump("(do ([vec (make-vector 5)] [i 0 (+ i 1)]) ((= i 5) vec) (vector-set! vec i i))", "( do [ vec ( make-vector 5 ) vec ] [ i 0 ( + i 1 ) ] ) ( ( = i 5 ) vec ) ( vector-set! vec i i ) ) ");
+  test_dump("(do ([vec (make-vector 5)] [i 0 (+ i 1)]) ((= i 5) vec) (vector-set! vec i i))", "( do [ vec ( make-vector 5 ) vec ] [ i 0 ( + i 1 ) ] ) ( ( = i 5 ) vec ) ( vector-set! vec i i ) ) ");  
+  test_dump("(let ([x (+ 1 2)]) ( let ( [y (+ 3 4)] ) (+ x y))  )", "( let ( [ x ( + 1 2 ) ] ) ( begin ( let ( [ y ( + 3 4 ) ] ) ( begin ( + x y ) ) ) ) ) ");
   }
