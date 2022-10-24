@@ -209,7 +209,7 @@ static void compile_set(schemerlicht_context* ctxt, schemerlicht_function* fun, 
       }
     else
       {
-      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, fun->freereg, lookup_entry.position);
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, lookup_entry.position, fun->freereg);
       }
     }
   }
@@ -247,6 +247,23 @@ static void compile_begin(schemerlicht_context* ctxt, schemerlicht_function* fun
     }
   }
 
+static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_funcall);
+  schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.funcall.fun, 0, schemerlicht_expression);
+  compile_expression(ctxt, fun, body_expr);
+  ++fun->freereg;
+  const schemerlicht_memsize nr_args = e->expr.funcall.arguments.vector_size;
+  for (schemerlicht_memsize i = 0; i < nr_args; ++i)
+    {
+    schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.funcall.arguments, i, schemerlicht_expression);    
+    compile_expression(ctxt, fun, arg);
+    ++fun->freereg;
+    }
+  fun->freereg -= nr_args+1;
+  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_args, 1);
+  }
+
 static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_lambda);
@@ -268,6 +285,11 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
   compile_expression(ctxt, new_fun, body_expr);
   schemerlicht_environment_pop_child(ctxt);
   schemerlicht_vector_push_back(ctxt, &fun->lambdas, new_fun, schemerlicht_function*);
+  schemerlicht_object lambda_obj;
+  lambda_obj.type = schemerlicht_object_type_lambda;
+  lambda_obj.value.ptr = (void*)new_fun;
+  int k_pos = get_k(ctxt, fun, &lambda_obj);
+  make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
   }
 
 static void compile_let(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
@@ -329,6 +351,9 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
       break;
     case schemerlicht_type_lambda:
       compile_lambda(ctxt, fun, e);
+      break;
+    case schemerlicht_type_funcall:
+      compile_funcall(ctxt, fun, e);
       break;
     case schemerlicht_type_nop:
       break;

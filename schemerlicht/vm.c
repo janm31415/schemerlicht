@@ -52,6 +52,11 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         const int c = SCHEMERLICHT_GETARG_C(i);
         schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         }
+      else if (target->type == schemerlicht_object_type_lambda)
+        {
+        schemerlicht_function* lambda = cast(schemerlicht_function*, target->value.ptr);
+        schemerlicht_run(ctxt, lambda); // I think, because of continuation passing style, we could replace fun by lambda here.
+        }
       else
         {
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);

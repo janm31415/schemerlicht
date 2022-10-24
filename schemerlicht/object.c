@@ -23,6 +23,8 @@ int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlic
     case schemerlicht_object_type_symbol:
     case schemerlicht_object_type_string:
       return strcmp(obj1->value.s.string_ptr, obj2->value.s.string_ptr) == 0 ? 1 : 0;
+    case schemerlicht_object_type_lambda:
+      return obj1->value.ptr == obj2->value.ptr;
     default:
       return obj1->value.v.vector_ptr == obj2->value.v.vector_ptr;
     }
@@ -222,6 +224,9 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           schemerlicht_string_append_cstr(ctxt, &s, "()");
           break;
         case schemerlicht_object_type_closure:
+          schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");
+          break;
+        case schemerlicht_object_type_lambda:
           schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");
           break;
         case schemerlicht_object_type_void:

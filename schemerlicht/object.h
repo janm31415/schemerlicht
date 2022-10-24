@@ -25,6 +25,7 @@ typedef union
   {
   schemerlicht_vector v;
   schemerlicht_string s;
+  void* ptr;
   schemerlicht_fixnum fx;
   schemerlicht_flonum fl;    
   schemerlicht_byte ch;
