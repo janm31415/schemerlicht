@@ -203,11 +203,8 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         schemerlicht_object* lambda_obj = schemerlicht_vector_at(&target->value.v, 0, schemerlicht_object);
         schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
         schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
-        schemerlicht_set_object(schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object), target);
-        //for (schemerlicht_memsize i = 1; i < target->value.v.vector_size; ++i)
-        //  {
-        //  schemerlicht_set_object(schemerlicht_vector_at(&ctxt->stack, stack_offset+i, schemerlicht_object), schemerlicht_vector_at(&target->value.v, i, schemerlicht_object));
-        //  }
+        //at R(0) we expect the closure (i.e. target) but this already so by compile_funcall
+        //schemerlicht_set_object(schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object), target);
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
@@ -276,29 +273,37 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       case SCHEMERLICHT_OPCODE_MOVE:
       {
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i) + stack_offset, schemerlicht_object);
-      schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_B(i) + stack_offset, schemerlicht_object);
+      const int a = SCHEMERLICHT_GETARG_A(i);
+      const int b = SCHEMERLICHT_GETARG_B(i);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a + stack_offset, schemerlicht_object);
+      schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, b + stack_offset, schemerlicht_object);
       schemerlicht_set_object(target, source);
       break;
       }
       case SCHEMERLICHT_OPCODE_LOADGLOBAL:
       {
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i) + stack_offset, schemerlicht_object);
-      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, SCHEMERLICHT_GETARG_Bx(i), schemerlicht_object);
+      const int a = SCHEMERLICHT_GETARG_A(i);
+      const int bx = SCHEMERLICHT_GETARG_Bx(i);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a + stack_offset, schemerlicht_object);
+      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, bx, schemerlicht_object);
       schemerlicht_set_object(target, global);
       break;
       }
       case SCHEMERLICHT_OPCODE_STOREGLOBAL:
       {
-      schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i) + stack_offset, schemerlicht_object);
-      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, SCHEMERLICHT_GETARG_Bx(i), schemerlicht_object);
+      const int a = SCHEMERLICHT_GETARG_A(i);
+      const int bx = SCHEMERLICHT_GETARG_Bx(i);
+      schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, a + stack_offset, schemerlicht_object);
+      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, bx, schemerlicht_object);
       schemerlicht_set_object(global, source);
       break;
       }
       case SCHEMERLICHT_OPCODE_LOADK:
       {
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i) + stack_offset, schemerlicht_object);
-      schemerlicht_object* k = schemerlicht_vector_at(&(*fun)->constants, SCHEMERLICHT_GETARG_Bx(i), schemerlicht_object);
+      const int a = SCHEMERLICHT_GETARG_A(i);
+      const int bx = SCHEMERLICHT_GETARG_Bx(i);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a + stack_offset, schemerlicht_object);
+      schemerlicht_object* k = schemerlicht_vector_at(&(*fun)->constants, bx, schemerlicht_object);
       schemerlicht_set_object(target, k);
       break;
       }

@@ -1055,7 +1055,53 @@ static void test_letrec()
   test_compile_aux("120", "(letrec ([f (lambda (x) (if (zero? x) 1 (* x(f(sub1 x)))))]) (f 5))");
   test_compile_aux("120", "(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))");
   test_compile_aux("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))");
-  //test_compile_aux("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))");
+  //test_compile_aux("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))"); // [JanM] add test later again when GC is in place
+  }
+
+static void test_lambdas()
+  {
+  test_compile_aux("<closure>", "(lambda (x) (+ x x))");
+  test_compile_aux("3", "((lambda(x) x) 3)");
+  test_compile_aux("10", "((lambda(x y) (+ x y)) 3 7)");
+  test_compile_aux("8", "(let ([x 5]) ((lambda (y) (+ 3 y)) x ))");
+  test_compile_aux("5", "( (lambda () (+ 3 2)) () )");
+  test_compile_aux("<closure>", "(let ([f (lambda () 5)]) f)");
+  test_compile_aux("8", "(let ([f (lambda (n) (+ n 5))]) (f 3))");
+  test_compile_aux("5", "(let ([f (lambda () 5)]) (f))");
+  test_compile_aux("8", "(let ([x 5]) ((lambda (y) (+ x y)) 3) )");
+  }
+
+static void test_tailcall()
+  {
+  test_compile_aux("#f", "(letrec ([e (lambda (x) (if (zero? x) #t (o (sub1 x))))][o(lambda(x) (if (zero? x) #f(e(sub1 x))))])(e 1))");
+  test_compile_aux("0", "(letrec ([countdown (lambda (n) (if (zero? n) n (countdown(sub1 n))))])(countdown 5050))");
+  test_compile_aux("50005000", "(letrec ([sum (lambda (n ac)(if (zero? n) ac (sum(sub1 n) (+ n ac))))]) (sum 10000 0))");
+  test_compile_aux("#t", "(letrec ([e (lambda (x) (if (zero? x) #t (o (sub1 x))))][o(lambda(x) (if (zero? x) #f(e(sub1 x))))])(e 500))");
+  }
+
+static void test_closures()
+  {
+  test_compile_aux("12", "(let ([n 12])(let([f(lambda() n)])(f)))");
+  test_compile_aux("112", "(let ([n 12])(let([f(lambda(m) (+ n m))])(f 100)))");
+  test_compile_aux("120", "(let ([f (lambda (f n m)(if (zero? n)  m (f(sub1 n) (* n m))))]) (let([g(lambda(g n m) (f(lambda(n m) (g g n m)) n m))])  (g g 5 1)))");
+  test_compile_aux("120", "(let ([f (lambda (f n) (if (zero? n) 1 (* n(f(sub1 n)))))]) (let([g(lambda(g n) (f(lambda(n) (g g n)) n))]) (g g 5)))");
+  }
+
+static void test_set()
+  {
+  test_compile_aux("13", "(let ([x 12])(set! x 13) x)");
+  test_compile_aux("13", "(let([x 12]) (set! x(add1 x)) x) ");
+  test_compile_aux("12", "(let([x 12]) (let([x #f]) (set! x 14)) x) ");
+  test_compile_aux("12", "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x)) ");
+  test_compile_aux("10", "(let([f #f])(let([g(lambda() f)]) (set! f 10) (g))) ");
+  test_compile_aux("13", "(let([f(lambda(x) (set! x (add1 x)) x)]) (f 12)) ");
+  test_compile_aux("(10 . 11)", "(let([x 10]) (let([f(lambda(x) (set! x(add1 x)) x)]) (cons x(f x)))) ");
+  test_compile_aux("17", "(let([t #f]) (let([locative (cons (lambda() t) (lambda(n) (set! t n)))]) ((cdr locative) 17) ((car locative))))");
+  test_compile_aux("17", "(let([locative (let([t #f]) (cons (lambda() t)  (lambda(n) (set! t n))))]) ((cdr locative) 17) ((car locative))) ");
+  test_compile_aux("(1 . 0)", "(let([make-counter (lambda() (let([counter -1]) (lambda()  (set! counter(add1 counter)) counter)))]) (let([c0(make-counter)] [c1(make-counter)])(c0) (cons(c0) (c1)))) ");
+  test_compile_aux("120", "(let([fact #f]) (set! fact(lambda(n) (if (zero? n) 1 (* n(fact(sub1 n)))))) (fact 5)) ");
+  test_compile_aux("120", "(let([fact #f]) ((begin (set! fact(lambda(n) (if (zero? n)  1 (* n(fact(sub1 n)))))) fact) 5)) ");
+
   }
 
 void run_all_compiler_tests()
@@ -1105,4 +1151,8 @@ void run_all_compiler_tests()
   test_begin();
   test_halt();
   test_letrec();
+  test_lambdas();
+  test_tailcall();
+  test_closures();
+  test_set();
   }
