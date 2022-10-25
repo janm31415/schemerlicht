@@ -75,7 +75,18 @@ typedef enum
   SCHEMERLICHT_CLOSURE,
   SCHEMERLICHT_CLOSUREREF,
   SCHEMERLICHT_IS_CLOSURE,
-  SCHEMERLICHT_LIST
+  SCHEMERLICHT_LIST,
+  SCHEMERLICHT_MAKE_VECTOR,
+  SCHEMERLICHT_MAKE_STRING,
+  SCHEMERLICHT_VECTOR_LENGTH,
+  SCHEMERLICHT_STRING_LENGTH,
+  SCHEMERLICHT_STRING_REF,
+  SCHEMERLICHT_STRING_SET,
+  SCHEMERLICHT_STRING_HASH,
+  SCHEMERLICHT_IS_STRING,
+  SCHEMERLICHT_EQ,
+  SCHEMERLICHT_EQV,
+  SCHEMERLICHT_STRING
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -148,6 +159,17 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
 void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_closure(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_make_vector(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_make_string(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_vector_length(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_length(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_ref(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_set(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_hash(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_string(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_eq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_eqv(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

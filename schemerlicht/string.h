@@ -13,6 +13,8 @@ typedef struct schemerlicht_string
 
 SCHEMERLICHT_API void schemerlicht_string_init(schemerlicht_context* ctxt, schemerlicht_string* str, const char* txt);
 
+SCHEMERLICHT_API void schemerlicht_string_init_with_size(schemerlicht_context* ctxt, schemerlicht_string* str, schemerlicht_memsize size, char element);
+
 SCHEMERLICHT_API void schemerlicht_string_copy(schemerlicht_context* ctxt, schemerlicht_string* str, const schemerlicht_string* str_to_copy);
 
 SCHEMERLICHT_API void schemerlicht_string_init_ranged(schemerlicht_context* ctxt, schemerlicht_string* str, const char* from, const char* to);

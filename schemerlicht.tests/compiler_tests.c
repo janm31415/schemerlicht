@@ -1165,28 +1165,173 @@ static void test_scheme()
   test_compile_aux("10", "((lambda (x) (+ x x)) 5)");
   test_compile_aux("<closure>", "(define twice (lambda (x) (* 2 x)))");
   test_compile_aux("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
-  //test_compile_aux("<lambda>", "(define cube (lambda (x) (* x x x)))");
-  //test_compile_aux("125", "(define cube (lambda (x) (* x x x))) (cube 5)");
-  //test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
-  //test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f)))");
-  //test_compile_aux("20", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat twice) 5)");
-  //test_compile_aux("80", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat (repeat twice)) 5)");
-  /*
-  test_compile_aux("120", "(let ([x 5]) (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact x))");
-  test_compile_aux("<lambda>", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))");
-  test_compile_aux("6", "(fact 3)");
-  test_compile_aux("479001600", "(fact 12)");
-  test_compile_aux("<lambda>", "(define make_list (lambda (n) (list n)))");
-  test_compile_aux("(10)", "((compose make_list twice) 5)");
-  test_compile_aux("<lambda>", "(define abs (lambda (n) (if (> n 0) n (- 0 n))))");
-  test_compile_aux("(3 0 3)", "(list (abs -3) (abs 0) (abs 3))");
-  test_compile_aux("<lambda>", "(define make_cons (lambda (m n) (cons m n)))");
-  test_compile_aux("(1 . 2)", "(make_cons 1 2)");
+  test_compile_aux("<closure>", "(define cube (lambda (x) (* x x x)))");
+  test_compile_aux("125", "(define cube (lambda (x) (* x x x))) (cube 5)");
+  test_compile_aux("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
+  test_compile_aux("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f)))");
+  test_compile_aux("20", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat twice) 5)");
+  test_compile_aux("80", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat (repeat twice)) 5)");
   
-  test_compile_aux("<lambda>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
-  test_compile_aux("<lambda>", "(define zip (combine make_cons))");
-  test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(zip (list 1 2 3 4) (list 5 6 7 8))");
-  */
+  test_compile_aux("120", "(let ([x 5]) (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact x))");
+  test_compile_aux("<closure>", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))");
+  test_compile_aux("6", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact 3)");
+  test_compile_aux("479001600", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact 12)");
+  test_compile_aux("<closure>", "(define make_list (lambda (n) (list n)))");
+  test_compile_aux("(10)", "(define twice (lambda (x) (* 2 x))) (define make_list (lambda (n) (list n))) (define compose (lambda (f g) (lambda (x) (f (g x)))))  ((compose make_list twice) 5)");
+  
+  test_compile_aux("<closure>", "(define abs (lambda (n) (if (> n 0) n (- 0 n))))");
+  test_compile_aux("(3 0 3)", "(define abs (lambda (n) (if (> n 0) n (- 0 n)))) (list (abs -3) (abs 0) (abs 3))");
+  test_compile_aux("<closure>", "(define make_cons (lambda (m n) (cons m n)))");
+  test_compile_aux("(1 . 2)", "(define make_cons (lambda (m n) (cons m n))) (make_cons 1 2)");
+  
+  //test_compile_aux("<closure>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
+  //test_compile_aux("<closure>", "(define zip (combine make_cons))");
+  //test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(zip (list 1 2 3 4) (list 5 6 7 8))");  
+  }
+
+static void test_fibonacci()
+  {
+  test_compile_aux("34", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 8)");
+  test_compile_aux("55", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 9)");
+  test_compile_aux("89", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 10)");
+  //test_compile_aux("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)"); // without gc heap overflow
+  }
+
+static void test_vectors()
+  {
+  test_compile_aux("#t", "(vector? (make-vector 0)) ");
+  test_compile_aux("12", "(vector-length(make-vector 12)) ");
+  test_compile_aux("#f", "(vector? (cons 1 2)) ");
+  test_compile_aux("#f", "(vector? 1287) ");
+  test_compile_aux("#f", "(vector? ()) ");
+  test_compile_aux("#f", "(vector? #t) ");
+  test_compile_aux("#f", "(vector? #f) ");
+  test_compile_aux("#f", "(pair? (make-vector 12)) ");
+  test_compile_aux("#f", "(null? (make-vector 12)) ");
+  test_compile_aux("#f", "(boolean? (make-vector 12)) ");
+  test_compile_aux("#()", "(make-vector 0) ");
+  test_compile_aux("#(3.140000 3.140000 3.140000 3.140000 3.140000)", "(make-vector 5 3.14) ");
+  test_compile_aux("12", "(vector-ref (make-vector 5 12) 0)");
+  test_compile_aux("12", "(vector-ref (make-vector 5 12) 1)");
+  test_compile_aux("12", "(vector-ref (make-vector 5 12) 2)");
+  test_compile_aux("12", "(vector-ref (make-vector 5 12) 3)");
+  test_compile_aux("12", "(vector-ref (make-vector 5 12) 4)");
+
+  test_compile_aux("#(5 3.140000 (3 . 2))", "(vector 5 3.14 (cons 3 2)) ");
+
+  test_compile_aux("#(#t #f)", "(let([v(make-vector 2)]) (vector-set! v 0 #t)(vector-set! v 1 #f) v) ");
+
+  test_compile_aux("(#(100 200) . #(300 400))", "(let([v0(make-vector 2)])(let([v1(make-vector 2)]) (vector-set! v0 0 100) (vector-set! v0 1 200)  (vector-set! v1 0 300)  (vector-set! v1 1 400) (cons v0 v1))) ");
+  test_compile_aux("(#(100 200 150) . #(300 400 350))", "(let([v0(make-vector 3)]) (let([v1(make-vector 3)]) (vector-set! v0 0 100)  (vector-set! v0 1 200)  (vector-set! v0 2 150) (vector-set! v1 0 300)  (vector-set! v1 1 400)  (vector-set! v1 2 350)  (cons v0 v1))) ");
+  test_compile_aux("(#(100 200) . #(300 400))", "(let([n 2])  (let([v0(make-vector n)]) (let([v1(make-vector n)])  (vector-set! v0 0 100) (vector-set! v0 1 200)  (vector-set! v1 0 300) (vector-set! v1 1 400)  (cons v0 v1)))) ");
+  test_compile_aux("(#(100 200 150) . #(300 400 350))", "(let([n 3]) (let([v0(make-vector n)]) (let([v1(make-vector(vector-length v0))]) (vector-set! v0(- (vector-length v0) 3) 100) (vector-set! v0(- (vector-length v1) 2) 200) (vector-set! v0(- (vector-length v0) 1) 150) (vector-set! v1(- (vector-length v1) 3) 300)  (vector-set! v1(- (vector-length v0) 2) 400)  (vector-set! v1(- (vector-length v1) 1) 350)  (cons v0 v1)))) ");
+  test_compile_aux("1", "(let([n 1]) (vector-set! (make-vector n) (sub1 n) (* n n)) n) ");
+  test_compile_aux("1", "(let([n 1])(let([v(make-vector 1)]) (vector-set! v(sub1 n) n) (vector-ref  v(sub1 n)))) ");
+  test_compile_aux("(#(2) . #(13))", "(let([v0(make-vector 1)]) (vector-set! v0 0 1) (let([v1(make-vector 1)]) (vector-set! v1 0 13)  (vector-set! (if (vector? v0) v0 v1) (sub1(vector-length(if (vector? v0) v0 v1)))  (add1(vector-ref  (if (vector? v0) v0 v1)  (sub1(vector-length(if (vector? v0) v0 v1))))))  (cons v0 v1))) ");
+  test_compile_aux("100", "(letrec([f (lambda(v i) (if (>= i 0) (begin (vector-set! v i i) (f v (sub1 i))) v))])(let([ v (make-vector 100) ]) (vector-length (f v (sub1 100)))))");
+
+  test_compile_aux("#t", "(let([v(make-vector 2)]) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref  v 0) (vector-ref  v 1))) ");
+  test_compile_aux("((1 . 2) . #t)", "(let([v(make-vector 1)][y(cons 1 2)]) (vector-set! v 0 y) (cons y(eq? y(vector-ref  v 0)))) ");
+  test_compile_aux("(3 . 3)", "(letrec([f (lambda(v i) (if (>= i 0) (f v (sub1 i)) v))])(let([ v (cons 3 3) ]) (f v 3)))");
+
+  test_compile_aux("#(#undefined #undefined #undefined #undefined #undefined #undefined #undefined #undefined #undefined #undefined)", "(let ([a (make-vector 10)] [b (make-vector 10)] [c (make-vector 10)]) a)");
+
+  }
+
+static void test_strings()
+  {
+  test_compile_aux("#t", "(string? (make-string 3)) ");
+  test_compile_aux("#f", "(string? (make-vector 3)) ");
+
+  test_compile_aux("\"aaaaa\"", "(make-string 5 #\\a)");
+  test_compile_aux("\"bbbbbb\"", "(make-string 6 #\\b)");
+  test_compile_aux("\"ccccccc\"", "(make-string 7 #\\c)");
+  test_compile_aux("\"dddddddd\"", "(make-string 8 #\\d)");
+  test_compile_aux("\"eeeeeeeee\"", "(make-string 9 #\\e)");
+  test_compile_aux("\"ffffffffff\"", "(make-string 10 #\\f)");
+  test_compile_aux("\"ggggggggggg\"", "(make-string 11 #\\g)");
+  test_compile_aux("\"hhhhhhhhhhhh\"", "(make-string 12 #\\h)");
+  test_compile_aux("\"iiiiiiiiiiiii\"", "(make-string 13 #\\i)");
+  test_compile_aux("\"jjjjjjjjjjjjjj\"", "(make-string 14 #\\j)");
+  test_compile_aux("\"kkkkkkkkkkkkkkk\"", "(make-string 15 #\\k)");
+  test_compile_aux("\"llllllllllllllll\"", "(make-string 16 #\\l)");
+  test_compile_aux("\"mmmmmmmmmmmmmmmmm\"", "(make-string 17 #\\m)");
+  
+  test_compile_aux("\"jan\"", "(string #\\j #\\a #\\n)");
+  test_compile_aux("\"janneman\"", "(string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n)");
+  test_compile_aux("\"jannemanneke\"", "(string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n #\\n #\\e #\\k #\\e)");
+  test_compile_aux("\"jannemannekejannemanneke\"", "(string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n #\\n #\\e #\\k #\\e #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n #\\n #\\e #\\k #\\e)");
+  
+  test_compile_aux("0", "(string-length (make-string 0 #\\a))");
+  test_compile_aux("1", "(string-length (make-string 1 #\\a))");
+  test_compile_aux("2", "(string-length (make-string 2 #\\a))");
+  test_compile_aux("3", "(string-length (make-string 3 #\\a))");
+  test_compile_aux("4", "(string-length (make-string 4 #\\a))");
+  test_compile_aux("5", "(string-length (make-string 5 #\\a))");
+  test_compile_aux("6", "(string-length (make-string 6 #\\a))");
+  test_compile_aux("7", "(string-length (make-string 7 #\\a))");
+  test_compile_aux("8", "(string-length (make-string 8 #\\a))");
+  test_compile_aux("9", "(string-length (make-string 9 #\\a))");
+  test_compile_aux("10", "(string-length (make-string 10 #\\a))");
+  
+  test_compile_aux("0", "(string-length (make-string 0))");
+  test_compile_aux("1", "(string-length (make-string 1))");
+  test_compile_aux("2", "(string-length (make-string 2))");
+  test_compile_aux("3", "(string-length (make-string 3))");
+  test_compile_aux("4", "(string-length (make-string 4))");
+  test_compile_aux("5", "(string-length (make-string 5))");
+  test_compile_aux("6", "(string-length (make-string 6))");
+  test_compile_aux("7", "(string-length (make-string 7))");
+  test_compile_aux("8", "(string-length (make-string 8))");
+  test_compile_aux("9", "(string-length (make-string 9))");
+  test_compile_aux("10", "(string-length (make-string 10))");
+  
+
+  test_compile_aux("#\\j", "(string-ref (string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n) 0)");
+  test_compile_aux("#\\a", "(string-ref (string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n) 1)");
+  test_compile_aux("#\\n", "(string-ref (string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n) 2)");
+  test_compile_aux("#undefined", "(string-ref (string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n) 9)");
+
+  test_compile_aux("#\\j", "(string-ref (string #\\j #\\a #\\n) 0)");
+  test_compile_aux("#\\a", "(string-ref (string #\\j #\\a #\\n) 1)");
+  test_compile_aux("#\\n", "(string-ref (string #\\j #\\a #\\n) 2)");
+  test_compile_aux("#undefined", "(string-ref (string #\\j #\\a #\\n) 4)");
+  
+  test_compile_aux("\"abcde\"", "(let([s (make-string 5 #\\a)]) (string-set! s 1 #\\b)  (string-set! s 2 #\\c) (string-set! s 3 #\\d) (string-set! s 4 #\\e) s)");
+  test_compile_aux("#\\c", "(let([s (make-string 5 #\\a)]) (string-set! s 1 #\\b)  (string-set! s 2 #\\c) (string-set! s 3 #\\d) (string-set! s 4 #\\e) (string-ref s 2))");
+  test_compile_aux("\"\"", "(make-string 0) )");
+  test_compile_aux("#\\a", "(let([s(make-string 1)])(string-set! s 0 #\\a) (string-ref s 0)) )");
+  test_compile_aux("(#\\a . #\\b)", "(let([s(make-string 2)]) (string-set! s 0 #\\a) (string-set! s 1 #\\b) (cons(string-ref s 0) (string-ref s 1))) )");
+  test_compile_aux("#\\a", "(let([i 0])(let([s(make-string 1)])(string-set! s i #\\a) (string-ref s i))) )");
+  test_compile_aux("(#\\a . #\\b)", "(let([i 0][j 1])(let([s(make-string 2)])(string-set! s i #\\a)  (string-set! s j #\\b)  (cons(string-ref s i) (string-ref s j)))) )");
+  test_compile_aux("#\\a", "(let([i 0][c #\\a])(let([s(make-string 1)])(string-set! s i c) (string-ref s i))) )");
+  
+  test_compile_aux("\"jan\"", "(string #\\j #\\a #\\n)");
+  test_compile_aux("\"janneman\"", "(string #\\j #\\a #\\n #\\n #\\e #\\m #\\a #\\n)");
+
+  test_compile_aux("12", "(string-length(make-string 12)) )");
+  test_compile_aux("#f", "(string? (make-vector 12)) )");
+  test_compile_aux("#f", "(string? (cons 1 2)) )");
+  test_compile_aux("#f", "(string? 1287) )");
+  test_compile_aux("#f", "(string? ()) )");
+  test_compile_aux("#f", "(string? #t) )");
+  test_compile_aux("#f", "(string? #f) )");
+  test_compile_aux("#f", "(pair? (make-string 12)) )");
+  test_compile_aux("#f", "(null? (make-string 12)) )");
+  test_compile_aux("#f", "(boolean? (make-string 12)) )");
+  test_compile_aux("#f", "(vector? (make-string 12)) )");
+  test_compile_aux("\"\"", "(make-string 0) )");
+  
+  test_compile_aux("\"tf\"", "(let([v(make-string 2)])(string-set! v 0 #\\t)(string-set! v 1 #\\f) v) )");
+  test_compile_aux("#t", "(let([v(make-string 2)]) (string-set! v 0 #\\x) (string-set! v 1 #\\x) (char=? (string-ref v 0) (string-ref v 1))) )");
+  test_compile_aux("(\"abc\" . \"def\")", "(let([v0(make-string 3)]) (let([v1(make-string 3)]) (string-set! v0 0 #\\a) (string-set! v0 1 #\\b)(string-set! v0 2 #\\c) (string-set! v1 0 #\\d) (string-set! v1 1 #\\e) (string-set! v1 2 #\\f) (cons v0 v1))) )");
+  test_compile_aux("(\"ab\" . \"cd\")", "(let([n 2])(let([v0(make-string n)])(let([v1(make-string n)])(string-set! v0 0 #\\a)(string-set! v0 1 #\\b)(string-set! v1 0 #\\c)(string-set! v1 1 #\\d)(cons v0 v1)))) )");
+  test_compile_aux("(\"abc\" . \"ZYX\")", "(let([n 3])(let([v0(make-string n)])(let([v1(make-string(string-length v0))])(string-set! v0(- (string-length v0) 3) #\\a)(string-set! v0(- (string-length v1) 2) #\\b)(string-set! v0(- (string-length v0) 1) #\\c)(string-set! v1(- (string-length v1) 3) #\\Z)(string-set! v1(- (string-length v0) 2) #\\Y)(string-set! v1(- (string-length v1) 1) #\\X)(cons v0 v1)))) )");
+  test_compile_aux("1", "(let([n 1])(string-set! (make-string n) (sub1 n) (fixnum->char 34)) n) )");
+  test_compile_aux("1", "(let([n 1]) (let([v(make-string 1)]) (string-set! v(sub1 n) (fixnum->char n)) (char->fixnum(string-ref v(sub1 n))))) )");
+  test_compile_aux("(\"b\" . \"A\")", "(let([v0(make-string 1)]) (string-set! v0 0 #\\a) (let([v1(make-string 1)]) (string-set! v1 0 #\\A) (string-set! (if (string? v0) v0 v1) (sub1(string-length(if (string? v0) v0 v1))) (fixnum->char (add1 (char->fixnum (string-ref (if (string? v0) v0 v1)(sub1(string-length(if (string? v0) v0 v1)))))))) (cons v0 v1))) )");
+  test_compile_aux("\"\"\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\") s) )");
+  test_compile_aux("\"\\\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\\) s) )");  
   }
 
 void run_all_compiler_tests()
@@ -1245,4 +1390,7 @@ void run_all_compiler_tests()
   test_global_define();
   test_list();
   test_scheme();
+  test_fibonacci();
+  test_vectors();
+  test_strings();
   }

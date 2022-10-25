@@ -10,6 +10,15 @@ void schemerlicht_string_init(schemerlicht_context* ctxt, schemerlicht_string* s
   memcpy(str->string_ptr, txt, str->string_capacity * sizeof(char));
   }
 
+void schemerlicht_string_init_with_size(schemerlicht_context* ctxt, schemerlicht_string* str, schemerlicht_memsize size, char element)
+  {
+  str->string_length = size;
+  str->string_ptr = schemerlicht_newvector(ctxt, str->string_length + 1, char);
+  str->string_capacity = str->string_length + 1;
+  memset(str->string_ptr, element, size);
+  str->string_ptr[size] = 0;
+  }
+
 void schemerlicht_string_copy(schemerlicht_context* ctxt, schemerlicht_string* str, const schemerlicht_string* str_to_copy)
   {
   str->string_length = str_to_copy->string_length;
