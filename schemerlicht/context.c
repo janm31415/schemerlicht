@@ -19,19 +19,13 @@ static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_
   schemerlicht_syntax_errors_clear(ctxt_to_free);
   schemerlicht_compile_errors_clear(ctxt_to_free);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->stack);
-  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt_to_free->globals, schemerlicht_object);
-  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt_to_free->globals, schemerlicht_object);
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt_to_free->heap, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt_to_free->heap, schemerlicht_object);
   for (; it != it_end; ++it)
     {
     schemerlicht_object_destroy(ctxt, it);
     }
-  it = schemerlicht_vector_begin(&ctxt_to_free->heap, schemerlicht_object);
-  it_end = schemerlicht_vector_end(&ctxt_to_free->heap, schemerlicht_object);
-  for (; it != it_end; ++it)
-    {
-    schemerlicht_object_destroy(ctxt, it);
-    }
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->globals);
+  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->globals); // we don't destroy the objects in the globals list, as they point to constants or heap objects
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->heap);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);

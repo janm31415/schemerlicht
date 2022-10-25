@@ -16,6 +16,7 @@
 #include "schemerlicht/closure.h"
 #include "schemerlicht/assignablevarconv.h"
 #include "schemerlicht/lambdatolet.h"
+#include "schemerlicht/freevaranalysis.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -1149,7 +1150,43 @@ static void test_list()
   test_compile_aux("(1 2 3 4 5 6 7 8 9 10)", "(list 1 2 3 4 5 6 7 8 9 10)");
   test_compile_aux("(1 2 3 4 5 6 7 8 9 10 11)", "(list 1 2 3 4 5 6 7 8 9 10 11)");
   test_compile_aux("(1 2 3 4 5 6 7 8 9 10 11 12)", "(list 1 2 3 4 5 6 7 8 9 10 11 12)");
+  }
 
+static void test_scheme()
+  {  
+  test_compile_aux("4", "(+ 2 2)");
+  test_compile_aux("210", "(+ (* 2 100) (* 1 10))");
+  test_compile_aux("2", "(if (> 6 5) (+ 1 1) (+ 2 2))");
+  test_compile_aux("4", "(if (< 6 5) (+ 1 1) (+ 2 2))");
+  test_compile_aux("3", "(define x 3)");
+  test_compile_aux("3", "(define x 3) x");
+  test_compile_aux("6", "(define x 3) (+ x x)");
+  test_compile_aux("3", "(begin (define x 1) (set! x (+ x 1)) (+ x 1))");
+  test_compile_aux("10", "((lambda (x) (+ x x)) 5)");
+  test_compile_aux("<closure>", "(define twice (lambda (x) (* 2 x)))");
+  test_compile_aux("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
+  //test_compile_aux("<lambda>", "(define cube (lambda (x) (* x x x)))");
+  //test_compile_aux("125", "(define cube (lambda (x) (* x x x))) (cube 5)");
+  //test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
+  //test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f)))");
+  //test_compile_aux("20", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat twice) 5)");
+  //test_compile_aux("80", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat (repeat twice)) 5)");
+  /*
+  test_compile_aux("120", "(let ([x 5]) (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact x))");
+  test_compile_aux("<lambda>", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))");
+  test_compile_aux("6", "(fact 3)");
+  test_compile_aux("479001600", "(fact 12)");
+  test_compile_aux("<lambda>", "(define make_list (lambda (n) (list n)))");
+  test_compile_aux("(10)", "((compose make_list twice) 5)");
+  test_compile_aux("<lambda>", "(define abs (lambda (n) (if (> n 0) n (- 0 n))))");
+  test_compile_aux("(3 0 3)", "(list (abs -3) (abs 0) (abs 3))");
+  test_compile_aux("<lambda>", "(define make_cons (lambda (m n) (cons m n)))");
+  test_compile_aux("(1 . 2)", "(make_cons 1 2)");
+  
+  test_compile_aux("<lambda>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
+  test_compile_aux("<lambda>", "(define zip (combine make_cons))");
+  test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(zip (list 1 2 3 4) (list 5 6 7 8))");
+  */
   }
 
 void run_all_compiler_tests()
@@ -1207,4 +1244,5 @@ void run_all_compiler_tests()
   test_inner_define();
   test_global_define();
   test_list();
+  test_scheme();
   }
