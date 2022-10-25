@@ -1,9 +1,12 @@
-#ifndef SCHEMERLICHT_QUASIQUOTE_H
-#define SCHEMERLICHT_QUASIQUOTE_H
+#ifndef SCHEMERLICHT_QUOTECOLLECT_H
+#define SCHEMERLICHT_QUOTECOLLECT_H
 
 #include "schemerlicht.h"
 #include "parser.h"
 
-void schemerlicht_quote_collection(schemerlicht_context* ctxt, schemerlicht_program* program);
+/*
+* returns a sorted stringvec containing all quotes as string
+*/
+schemerlicht_vector schemerlicht_quote_collection(schemerlicht_context* ctxt, schemerlicht_program* program);
 
-#endif //SCHEMERLICHT_QUASIQUOTE_H
+#endif //SCHEMERLICHT_QUOTECOLLECT_H

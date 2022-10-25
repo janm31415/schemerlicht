@@ -12,6 +12,8 @@
 #include "schemerlicht/assignablevarconv.h"
 #include "schemerlicht/freevaranalysis.h"
 #include "schemerlicht/closure.h"
+#include "schemerlicht/quotecollect.h"
+#include "schemerlicht/globdef.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -738,6 +740,34 @@ static void test_closure_conversion_2()
   schemerlicht_close(ctxt);
   }
 
+static void test_quote_collect_1()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, "'r 'g 'b 'g");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  TEST_EQ_INT(3, quotes.vector_size);
+  if (quotes.vector_size == 3)
+    {
+    schemerlicht_string* s0 = schemerlicht_vector_at(&quotes, 0, schemerlicht_string);
+    schemerlicht_string* s1 = schemerlicht_vector_at(&quotes, 1, schemerlicht_string);
+    schemerlicht_string* s2 = schemerlicht_vector_at(&quotes, 2, schemerlicht_string);
+    TEST_EQ_STRING("b", s0->string_ptr);
+    TEST_EQ_STRING("g", s1->string_ptr);
+    TEST_EQ_STRING("r", s2->string_ptr);
+    }
+  schemerlicht_string* it = schemerlicht_vector_begin(&quotes, schemerlicht_string);
+  schemerlicht_string* it_end = schemerlicht_vector_end(&quotes, schemerlicht_string);
+  for (; it!=it_end; ++it)
+    {
+    schemerlicht_string_destroy(ctxt, it);
+    }
+  schemerlicht_vector_destroy(ctxt, &quotes);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -777,4 +807,5 @@ void run_all_conv_tests()
   test_free_var_analysis();
   test_closure_conversion_1();
   test_closure_conversion_2();
+  test_quote_collect_1();
   }

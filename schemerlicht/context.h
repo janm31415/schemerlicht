@@ -42,6 +42,7 @@ struct schemerlicht_context
   schemerlicht_vector compile_error_reports;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   schemerlicht_vector environment; // linked chain of environment maps
+  schemerlicht_map* quote_to_index;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
