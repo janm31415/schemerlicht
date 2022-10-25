@@ -792,7 +792,10 @@ static void test_quote_conversion()
   test_quote_conversion_aux("(quote #f)", "( set! #%q0 #f ) #%q0 ");
   test_quote_conversion_aux("(quote #\\a)", "( set! #%q0 #\\97 ) #%q0 ");
   test_quote_conversion_aux("(quote ())", "( set! #%q0 () ) #%q0 ");
-  test_quote_conversion_aux("(quote (1 2 3))", "( set! #%q0 () ) #%q0 ");
+  test_quote_conversion_aux("(quote (1 2 3))", "( set! #%q0 ( cons 1 ( cons 2 ( cons 3 () ) ) ) ) #%q0 ");
+  test_quote_conversion_aux("(quote (1 2 3 4 5 6 7 8))", "( set! #%q0 ( cons 1 ( cons 2 ( cons 3 ( cons 4 ( cons 5 ( cons 6 ( cons 7 ( cons 8 () ) ) ) ) ) ) ) ) ) #%q0 ");
+  test_quote_conversion_aux("(quote #(1 2 3 4 5 6 7 8))", "( set! #%q0 ( vector 1 2 3 4 5 6 7 8 ) ) #%q0 ");
+  test_quote_conversion_aux("(quote (a b c))", "( set! #%q0 ( cons ( string->symbol \"a\" ) ( cons ( string->symbol \"b\" ) ( cons ( string->symbol \"c\" ) () ) ) ) ) #%q0 ");
   }
 
 void run_all_conv_tests()

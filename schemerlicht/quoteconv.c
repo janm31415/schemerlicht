@@ -160,6 +160,21 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
         }
       break;
       }
+      case schemerlicht_ct_vector:
+      {
+      res = schemerlicht_init_primcall(ctxt);
+      schemerlicht_string_init(ctxt, &res.expr.prim.name, "vector");      
+      schemerlicht_cell* it = schemerlicht_vector_begin(&c.value.vector, schemerlicht_cell);
+      schemerlicht_cell* it_end = schemerlicht_vector_end(&c.value.vector, schemerlicht_cell);
+      schemerlicht_cell* rit = it_end-1;
+      schemerlicht_cell* rit_end = it - 1;
+      for (; rit != rit_end; --rit)
+        {
+        schemerlicht_vector_push_back(ctxt, &todo, *rit, schemerlicht_cell);
+        }
+      parents_to_add = c.value.vector.vector_size;
+      break;
+      }
       }
     if (last_result)
       {
@@ -167,7 +182,7 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
       schemerlicht_expression* add_to_parent = schemerlicht_vector_back(&last_result->expr.prim.arguments, schemerlicht_expression);
       for (int i = 0; i < parents_to_add; ++i)
         {
-        schemerlicht_vector_push_back(ctxt, &parent, &add_to_parent, schemerlicht_expression*);
+        schemerlicht_vector_push_back(ctxt, &parent, add_to_parent, schemerlicht_expression*);
         }
       }
     else
