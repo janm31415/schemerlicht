@@ -22,6 +22,7 @@ parser.h
 primitives.h
 quasiquote.h
 quotecollect.h
+quoteconv.h
 reader.h
 schemerlicht.h
 simplifyconv.h
@@ -57,6 +58,7 @@ object.c
 parser.c
 primitives.c
 quasiquote.c
+quoteconv.c
 quotecollect.c
 reader.c
 simplifyconv.c

@@ -14,6 +14,7 @@
 #include "schemerlicht/closure.h"
 #include "schemerlicht/quotecollect.h"
 #include "schemerlicht/globdef.h"
+#include "schemerlicht/quoteconv.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -756,16 +757,33 @@ static void test_quote_collect_1()
     TEST_EQ_STRING("g", s1->string_ptr);
     TEST_EQ_STRING("r", s2->string_ptr);
     }
-  schemerlicht_string* it = schemerlicht_vector_begin(&quotes, schemerlicht_string);
-  schemerlicht_string* it_end = schemerlicht_vector_end(&quotes, schemerlicht_string);
-  for (; it!=it_end; ++it)
-    {
-    schemerlicht_string_destroy(ctxt, it);
-    }
-  schemerlicht_vector_destroy(ctxt, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
+  }
+
+static void test_quote_conversion_aux(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);  
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_quote_conversion()
+  {
+  test_quote_conversion_aux("'0", "( set! #%q0 0 ) #%q0 ");
+  test_quote_conversion_aux("(quote 0)", "( set! #%q0 0 ) #%q0 ");
+  test_quote_conversion_aux("(quote 0) (quote 0)", "( set! #%q0 0 ) #%q0 #%q0 ");
   }
 
 void run_all_conv_tests()
@@ -808,4 +826,5 @@ void run_all_conv_tests()
   test_closure_conversion_1();
   test_closure_conversion_2();
   test_quote_collect_1();
+  test_quote_conversion();
   }

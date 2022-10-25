@@ -62,3 +62,14 @@ schemerlicht_vector schemerlicht_quote_collection(schemerlicht_context* ctxt, sc
   schemerlicht_quote_collection_visitor_free(ctxt, v);
   return collected_quotes;
   }
+
+void schemerlicht_quote_collection_destroy(schemerlicht_context* ctxt, schemerlicht_vector* collected_quotes)
+  {
+  schemerlicht_string* it = schemerlicht_vector_begin(collected_quotes, schemerlicht_string);
+  schemerlicht_string* it_end = schemerlicht_vector_end(collected_quotes, schemerlicht_string);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_string_destroy(ctxt, it);
+    }
+  schemerlicht_vector_destroy(ctxt, collected_quotes);
+  }
