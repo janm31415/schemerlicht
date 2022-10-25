@@ -146,6 +146,14 @@ static int previsit_let_assvarconv(schemerlicht_context* ctxt, schemerlicht_visi
   schemerlicht_vector new_bindings;
   schemerlicht_vector_init(ctxt, &new_bindings, schemerlicht_let_binding);
 
+  schemerlicht_string* s_it = schemerlicht_vector_begin(&e->expr.let.assignable_variables, schemerlicht_string);
+  schemerlicht_string* s_it_end = schemerlicht_vector_end(&e->expr.let.assignable_variables, schemerlicht_string);
+  for (; s_it != s_it_end; ++s_it)
+    {
+    schemerlicht_string ass_var_name;
+    schemerlicht_string_copy(ctxt, &ass_var_name, s_it);
+    schemerlicht_vector_push_back(ctxt, &assignable_vars, ass_var_name, schemerlicht_string);
+    }
 
   schemerlicht_let_binding* it = schemerlicht_vector_begin(&e->expr.let.bindings, schemerlicht_let_binding);
   schemerlicht_let_binding* it_end = schemerlicht_vector_end(&e->expr.let.bindings, schemerlicht_let_binding);
@@ -154,7 +162,7 @@ static int previsit_let_assvarconv(schemerlicht_context* ctxt, schemerlicht_visi
     {
     if (schemerlicht_string_vector_binary_search(&e->expr.let.assignable_variables, &it->binding_name))
       {
-      schemerlicht_vector_push_back(ctxt, &assignable_vars, it->binding_name, schemerlicht_string);
+      //schemerlicht_vector_push_back(ctxt, &assignable_vars, it->binding_name, schemerlicht_string);
       schemerlicht_string adapted;
       schemerlicht_string_init(ctxt, &adapted, "#%");
       schemerlicht_string_append(ctxt, &adapted, &it->binding_name);
@@ -166,6 +174,7 @@ static int previsit_let_assvarconv(schemerlicht_context* ctxt, schemerlicht_visi
       schemerlicht_let_binding new_binding;
       new_binding.binding_expr = prim;
       schemerlicht_string_copy(ctxt, &new_binding.binding_name, &it->binding_name);
+      schemerlicht_string_destroy(ctxt, &it->binding_name);
       schemerlicht_vector_push_back(ctxt, &new_bindings, new_binding, schemerlicht_let_binding);
       schemerlicht_string_copy(ctxt, &it->binding_name, &adapted);
       }
@@ -212,6 +221,14 @@ static int previsit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht_v
   schemerlicht_vector new_bindings;
   schemerlicht_vector_init(ctxt, &new_bindings, schemerlicht_let_binding);
 
+  schemerlicht_string* s_it = schemerlicht_vector_begin(&e->expr.lambda.assignable_variables, schemerlicht_string);
+  schemerlicht_string* s_it_end = schemerlicht_vector_end(&e->expr.lambda.assignable_variables, schemerlicht_string);
+  for (; s_it != s_it_end; ++s_it)
+    {
+    schemerlicht_string ass_var_name;
+    schemerlicht_string_copy(ctxt, &ass_var_name, s_it);
+    schemerlicht_vector_push_back(ctxt, &assignable_vars, ass_var_name, schemerlicht_string);
+    }
 
   schemerlicht_string* it = schemerlicht_vector_begin(&e->expr.lambda.variables, schemerlicht_string);
   schemerlicht_string* it_end = schemerlicht_vector_end(&e->expr.lambda.variables, schemerlicht_string);
@@ -220,7 +237,7 @@ static int previsit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht_v
     {
     if (schemerlicht_string_vector_binary_search(&e->expr.lambda.assignable_variables, it))
       {
-      schemerlicht_vector_push_back(ctxt, &assignable_vars, *it, schemerlicht_string);
+      //schemerlicht_vector_push_back(ctxt, &assignable_vars, *it, schemerlicht_string);
       schemerlicht_string adapted;
       schemerlicht_string_init(ctxt, &adapted, "#%");
       schemerlicht_string_append(ctxt, &adapted, it);
@@ -232,6 +249,7 @@ static int previsit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht_v
       schemerlicht_let_binding new_binding;
       new_binding.binding_expr = prim;
       schemerlicht_string_copy(ctxt, &new_binding.binding_name, it);
+      schemerlicht_string_destroy(ctxt, it);
       schemerlicht_vector_push_back(ctxt, &new_bindings, new_binding, schemerlicht_let_binding); 
       schemerlicht_string_copy(ctxt, it, &adapted);
       }

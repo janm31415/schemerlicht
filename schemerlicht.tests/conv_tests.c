@@ -603,7 +603,7 @@ static void test_assignable_variable_conversion()
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
-  TEST_EQ_STRING("( let ( [ x 12 ] ) ( begin ( let ( [ y ( let ( [ #%z #f ] ) ( begin ( let ( [ z ( vector #%z ) ] ) ( begin ( vector-set! z 0 14 ) ) ) ) ) ] ) ( begin z ) ) ) ) ", res.string_ptr);
+  TEST_EQ_STRING("( let ( [ x 12 ] ) ( begin ( let ( [ y ( let ( [ #%z #f ] ) ( begin ( let ( [ z ( vector #%z ) ] ) ( begin ( vector-set! z 0 14 ) ) ) ) ) ] ) ( begin ( vector-ref z 0 ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -632,6 +632,25 @@ static void test_assignable_variable_conversion_3()
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
   TEST_EQ_STRING("( let ( [ #%x 3 ] ) ( begin ( let ( [ x ( vector #%x ) ] ) ( begin ( vector-set! x 0 5 ) ) ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_assignable_variable_conversion_4()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( let ( [ x 5 ] ) ( begin ( let ( [ #%foo #undefined ] [ #%bar #undefined ] ) ( begin ( let ( [ foo ( vector #%foo ) ] [ bar ( vector #%bar ) ] ) ( begin ( let ( [ #%t0 ( lambda ( y ) ( begin ( ( vector-ref bar 0 ) x y ) ) ) ] [ #%t1 ( lambda ( a b ) ( begin ( + ( * a b ) a ) ) ) ] ) ( begin ( vector-set! foo 0 #%t0 ) ( vector-set! bar 0 #%t1 ) ) ) ( ( vector-ref foo 0 ) ( + x 3 ) ) ) ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -754,6 +773,7 @@ void run_all_conv_tests()
   test_assignable_variable_conversion();
   test_assignable_variable_conversion_2();
   test_assignable_variable_conversion_3();
+  test_assignable_variable_conversion_4();
   test_free_var_analysis();
   test_closure_conversion_1();
   test_closure_conversion_2();

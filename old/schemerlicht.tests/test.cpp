@@ -13,7 +13,7 @@ int main(int /*argc*/, const char* /*argv*/[])
   InitTestEngine();
 
   auto tic = std::clock();
-  run_all_compile_tests();
+  //run_all_compile_tests();
   run_all_conversion_tests();
   run_all_format_tests();
   run_all_parse_tests();

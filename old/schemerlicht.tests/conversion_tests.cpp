@@ -34,7 +34,7 @@ namespace
     dump(str, prog);
     return str.str();
     }
-    
+
   void alpha_conversion()
     {
     auto tokens = tokenize("(let ([x 5][y 6]) x)");
@@ -290,7 +290,7 @@ namespace
     {
     compiler_options ops;
     ops.parallel = false;
-   //environment_map empty = std::make_shared<environment<environment_entry>>(nullptr);
+    //environment_map empty = std::make_shared<environment<environment_entry>>(nullptr);
     auto tokens = tokenize("(15)");
     std::reverse(tokens.begin(), tokens.end());
     auto prog = make_program(tokens);
@@ -803,6 +803,27 @@ namespace
     TEST_EQ("( cons ( quote a ) ( cons ( cons ( quote quasiquote ) ( cons ( cons ( quote b ) ( cons ( cons ( quote unquote ) ( cons ( quote (+ 1 2) ) ( quote () ) ) ) ( cons ( cons ( quote unquote ) ( cons ( cons ( quote foo ) ( cons ( + 1 3 ) ( quote (d) ) ) ) ( quote () ) ) ) ( quote (e) ) ) ) ) ( quote () ) ) ) ( quote (f) ) ) ) ", to_string(prog));
     }
 
+  void test_inner_define_conversion()
+    {
+    context ctxt = create_context(1024, 1024, 1024, 1024);  
+    environment_map env = std::make_shared<environment<environment_entry>>(nullptr);
+    uint64_t alpha_conversion_index = 0;
+    repl_data rd;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
+
+    auto tokens = tokenize("(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))");
+    std::reverse(tokens.begin(), tokens.end());
+    auto prog = make_program(tokens);
+    define_conversion(prog);
+    single_begin_conversion(prog);
+    simplify_to_core_forms(prog);
+    alpha_conversion(prog, alpha_conversion_index, empty);
+    global_define_environment_allocation(prog, env, rd, ctxt);
+    compiler_options ops;    
+    //cps_conversion(prog, ops);
+    assignable_variable_conversion(prog, ops);
+    std::cout << to_string(prog);
+    }
   }
 
 
@@ -827,4 +848,5 @@ void run_all_conversion_tests()
   bug1();
   quasiquote_conversion_tests();
   constant_propagation_tests();
+  test_inner_define_conversion();
   }

@@ -1101,6 +1101,35 @@ static void test_set()
   test_compile_aux("(1 . 0)", "(let([make-counter (lambda() (let([counter -1]) (lambda()  (set! counter(add1 counter)) counter)))]) (let([c0(make-counter)] [c1(make-counter)])(c0) (cons(c0) (c1)))) ");
   test_compile_aux("120", "(let([fact #f]) (set! fact(lambda(n) (if (zero? n) 1 (* n(fact(sub1 n)))))) (fact 5)) ");
   test_compile_aux("120", "(let([fact #f]) ((begin (set! fact(lambda(n) (if (zero? n)  1 (* n(fact(sub1 n)))))) fact) 5)) ");
+  }
+
+static void test_letrec2()
+  {
+  test_compile_aux("12", "(letrec() 12) ");
+  test_compile_aux("12", "(letrec([f 12]) f) ");
+  test_compile_aux("25", "(letrec([f 12][g 13]) (+ f g)) ");
+  test_compile_aux("120", "(letrec([fact (lambda(n) (if (zero? n)  1  (* n(fact(sub1 n)))))]) (fact 5)) ");
+  test_compile_aux("12", "(letrec([f 12][g(lambda() f)]) (g)) ");
+  test_compile_aux("130", "(letrec([f 12][g(lambda(n) (set! f n))])(g 130) f) ");
+  test_compile_aux("12", "(letrec([f (lambda(g) (set! f g) (f))]) (f(lambda() 12))) ");
+  test_compile_aux("100", "(letrec([f (cons (lambda() f) (lambda(x) (set! f x)))]) (let([g(car f)]) ((cdr f) 100) (g))) ");
+  test_compile_aux("1", "(let([v (vector 1 2 3)])(vector-ref v 0))");
+  test_compile_aux("#(5 2 3)", "(let([v (vector 1 2 3)])(vector-set! v 0 5) v)");
+  test_compile_aux("48", "(letrec([f(letrec([g(lambda(x) (* x 2))]) (lambda(n) (g(* n 2))))]) (f 12)) ");
+  //test_compile_aux("120", "(letrec([f (lambda(f n) (if (zero? n)  1 (* n(f f(sub1 n)))))]) (f f 5)) "); << This fails because no alpha conversion yet
+  test_compile_aux("120", "(letrec([f1 (lambda(f n) (if (zero? n)  1 (* n(f f(sub1 n)))))]) (f1 f1 5)) "); // manually alpha converted
+  test_compile_aux("120", "(let([f(lambda(f) (lambda(n) (if (zero? n)  1 (* n(f(sub1 n))))))]) (letrec([fix (lambda(f) (f(lambda(n) ((fix f) n))))])((fix f) 5))) ");
+  }
+
+static void test_inner_define()
+  {
+  test_compile_aux("7", "(let()(define x 3)(define y 4)(+ x y))");
+  //test_compile_aux("6", "(let()(letrec ([x 3][y x]) (+ x y)))"); // this violates r5rs letrec definition
+  //test_compile_aux("6", "(letrec ([x 3][y x]) (+ x y))"); // this violates r5rs letrec definition
+  //test_compile_aux("6", "(let()(define x 3)(define y x)(+ x y))");  // this violates r5rs letrec / define definition : it must be possible to evaluate each (expression) of every internal definition in a body without assigning or referring to the value of any variable being defined
+  //test_compile_aux("8", "(let()(define x 3)(set! x 4)(define y x)(+ x y))");  // this violates r5rs letrec / define definition  
+  
+  test_compile_aux("45", "(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))");
 
   }
 
@@ -1155,4 +1184,6 @@ void run_all_compiler_tests()
   test_tailcall();
   test_closures();
   test_set();
+  test_letrec2();
+  test_inner_define();
   }
