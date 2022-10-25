@@ -22,7 +22,7 @@ int main(int argc, const char* argv[])
   InitTestEngine();
   clock_t start_t, end_t;
   start_t = clock();
-  //run_all_compiler_tests();
+  run_all_compiler_tests();
   run_all_conv_tests();
   run_all_copy_tests();
   run_all_dump_tests();

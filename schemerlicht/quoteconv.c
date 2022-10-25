@@ -6,6 +6,7 @@
 #include "stringvec.h"
 #include "reader.h"
 #include "parser.h"
+#include "environment.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -16,8 +17,8 @@ static int _is_char(schemerlicht_cell* c, char* ch)
     return 0;
   if (c->value.str.string_ptr[0] == '#' && c->value.str.string_ptr[1] == '\\')
     {
-    schemerlicht_memsize len = c->value.str.string_length-2;
-    const char* str = c->value.str.string_ptr+2;
+    schemerlicht_memsize len = c->value.str.string_length - 2;
+    const char* str = c->value.str.string_ptr + 2;
     if (len == 0)
       {
       *ch = 32;
@@ -163,10 +164,10 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
       case schemerlicht_ct_vector:
       {
       res = schemerlicht_init_primcall(ctxt);
-      schemerlicht_string_init(ctxt, &res.expr.prim.name, "vector");      
+      schemerlicht_string_init(ctxt, &res.expr.prim.name, "vector");
       schemerlicht_cell* it = schemerlicht_vector_begin(&c.value.vector, schemerlicht_cell);
       schemerlicht_cell* it_end = schemerlicht_vector_end(&c.value.vector, schemerlicht_cell);
-      schemerlicht_cell* rit = it_end-1;
+      schemerlicht_cell* rit = it_end - 1;
       schemerlicht_cell* rit_end = it - 1;
       for (; rit != rit_end; --rit)
         {
@@ -240,6 +241,16 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
       schemerlicht_expression val = _parse(ctxt, &e->expr.quote.arg);
       schemerlicht_vector_push_back(ctxt, &set.expr.set.value, val, schemerlicht_expression);
       schemerlicht_vector_push_back(ctxt, &vis->quote_expressions, set, schemerlicht_expression);
+
+      schemerlicht_environment_entry entry;
+      entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
+      entry.position = ctxt->globals.vector_size;
+      schemerlicht_string s;
+      schemerlicht_string_copy(ctxt, &s, &set.expr.set.name);
+      schemerlicht_environment_add(ctxt, &s, entry);
+      schemerlicht_object obj;
+      obj.type = schemerlicht_object_type_undefined;
+      schemerlicht_vector_push_back(ctxt, &ctxt->globals, obj, schemerlicht_object);
       }
     }
   quote_object = schemerlicht_map_get(ctxt->quote_to_index, &key);
@@ -264,7 +275,7 @@ static schemerlicht_quote_conversion_visitor* schemerlicht_quote_conversion_visi
   schemerlicht_quote_conversion_visitor* v = schemerlicht_new(ctxt, schemerlicht_quote_conversion_visitor);
   v->visitor = schemerlicht_visitor_new(ctxt, v);
   v->visitor->visit_quote = visit_quote;
-  v->index = 0;
+  v->index = ctxt->quote_to_index_size;
   schemerlicht_vector_init(ctxt, &v->quote_expressions, schemerlicht_expression);
   return v;
   }
@@ -285,9 +296,31 @@ void schemerlicht_quote_conversion(schemerlicht_context* ctxt, schemerlicht_prog
   schemerlicht_quote_conversion_visitor* v = schemerlicht_quote_conversion_visitor_new(ctxt);
   v->collected_quotes = collected_quotes;
   schemerlicht_visit_program(ctxt, v->visitor, program);
+  ctxt->quote_to_index_size = v->index;
+
   schemerlicht_expression* it = schemerlicht_vector_begin(&v->quote_expressions, schemerlicht_expression);
   schemerlicht_expression* it_end = schemerlicht_vector_end(&v->quote_expressions, schemerlicht_expression);
-  schemerlicht_expression* prog_it = schemerlicht_vector_begin(&program->expressions, schemerlicht_expression);
-  schemerlicht_vector_insert(ctxt, &program->expressions, &prog_it, &it, &it_end, schemerlicht_expression);
+  if (program->expressions.vector_size == 1)
+    {
+    schemerlicht_expression* single_program_expr = schemerlicht_vector_at(&program->expressions, 0, schemerlicht_expression);
+    if (single_program_expr->type == schemerlicht_type_begin)
+      {
+      schemerlicht_expression* beg_it = schemerlicht_vector_begin(&single_program_expr->expr.beg.arguments, schemerlicht_expression);
+      schemerlicht_vector_insert(ctxt, &single_program_expr->expr.beg.arguments, &beg_it, &it, &it_end, schemerlicht_expression);
+      }
+    else
+      {
+      schemerlicht_expression begin = schemerlicht_init_begin(ctxt);
+      schemerlicht_expression* beg_it = schemerlicht_vector_begin(&begin.expr.beg.arguments, schemerlicht_expression);
+      schemerlicht_vector_insert(ctxt, &begin.expr.beg.arguments, &beg_it, &it, &it_end, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &begin.expr.beg.arguments, *single_program_expr, schemerlicht_expression);
+      *single_program_expr = begin;
+      }
+    }
+  else
+    {
+    schemerlicht_expression* prog_it = schemerlicht_vector_begin(&program->expressions, schemerlicht_expression);
+    schemerlicht_vector_insert(ctxt, &program->expressions, &prog_it, &it, &it_end, schemerlicht_expression);
+    }
   schemerlicht_quote_conversion_visitor_free(ctxt, v);
   }

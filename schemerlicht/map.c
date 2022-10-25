@@ -222,6 +222,18 @@ void schemerlicht_map_keys_free(schemerlicht_context* ctxt, schemerlicht_map* ma
     }
   }
 
+void schemerlicht_map_values_free(schemerlicht_context* ctxt, schemerlicht_map* map)
+  {
+  schemerlicht_memsize size = node_size(map);
+  for (schemerlicht_memsize i = 0; i < size; ++i)
+    {
+    if (map->node[i].value.type == schemerlicht_object_type_string)
+      schemerlicht_string_destroy(ctxt, &(map->node[i].value.value.s));
+    if (map->node[i].value.type == schemerlicht_object_type_symbol)
+      schemerlicht_string_destroy(ctxt, &(map->node[i].value.value.s));
+    }
+  }
+
 void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map)
   {
   //schemerlicht_memsize size = node_size(map);

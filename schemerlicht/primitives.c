@@ -3543,6 +3543,51 @@ void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_string_to_symbol(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_TO_SYMBOL);
+  if (b == 0)
+    {
+    schemerlicht_object v;
+    v.type = schemerlicht_object_type_undefined;
+    schemerlicht_set_object(ra, &v);
+    }
+  else
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_string)
+      {
+      schemerlicht_object* symbol = schemerlicht_map_get(ctxt->string_to_symbol, arg);
+      if (symbol != NULL)
+        {
+        schemerlicht_set_object(ra, symbol);
+        }
+      else
+        {
+        schemerlicht_object key;
+        key.type = schemerlicht_object_type_string;
+        schemerlicht_string_copy(ctxt, &key.value.s, &arg->value.s);
+        schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
+        new_symbol->type = schemerlicht_object_type_symbol;
+        schemerlicht_string_copy(ctxt, &new_symbol->value.s, &arg->value.s);     
+        schemerlicht_set_object(ra, new_symbol);
+        }
+      }
+    else
+      {
+      schemerlicht_object v;
+      v.type = schemerlicht_object_type_undefined;
+      schemerlicht_set_object(ra, &v);
+      }
+    }  
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
   switch (prim_id)
@@ -3790,6 +3835,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_STRING:
       schemerlicht_primitive_string(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_STRING_TO_SYMBOL:
+      schemerlicht_primitive_string_to_symbol(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -3887,5 +3935,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "eq?", SCHEMERLICHT_EQ);
   map_insert(ctxt, m, "eqv?", SCHEMERLICHT_EQV);
   map_insert(ctxt, m, "string", SCHEMERLICHT_STRING);
+  map_insert(ctxt, m, "string->symbol", SCHEMERLICHT_STRING_TO_SYMBOL);
   return m;
   }

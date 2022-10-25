@@ -17,6 +17,9 @@
 #include "schemerlicht/assignablevarconv.h"
 #include "schemerlicht/lambdatolet.h"
 #include "schemerlicht/freevaranalysis.h"
+#include "schemerlicht/quotecollect.h"
+#include "schemerlicht/quoteconv.h"
+#include "schemerlicht/quasiquote.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -86,6 +89,9 @@ static void test_compile_aux(const char* expected_value, const char* script)
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
@@ -118,6 +124,9 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
@@ -1334,6 +1343,24 @@ static void test_strings()
   test_compile_aux("\"\\\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\\) s) )");  
   }
 
+static void test_quotes()
+  {
+  test_compile_aux("(1 2 3)", "(quote (1 2 3))");
+  test_compile_aux("3", "(if #f (quote ()) 3)");
+  test_compile_aux("()", "(quote ())");
+  test_compile_aux("1", "(quote 1)");
+  test_compile_aux("1", "(quote 1)");
+  test_compile_aux("1.300000", "(quote 1.3)");
+  test_compile_aux("\"Jan\"", "(quote \"Jan\")");
+  test_compile_aux("#t", "(quote #t)");
+  test_compile_aux("#f", "(quote #f)");
+  test_compile_aux("a", "(quote a)");
+  test_compile_aux("a", "(begin (quote a) (quote ()) (quote a))");
+  test_compile_aux("a", "(begin (quote a) (quote ()) (quote a))");
+  test_compile_aux("(1 2)", "(quote (1 2))");
+  test_compile_aux("#(1 2 3.140000 #t)", "(quote #(1 2 3.14 #t))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -1393,4 +1420,5 @@ void run_all_compiler_tests()
   test_fibonacci();
   test_vectors();
   test_strings();
+  test_quotes();
   }

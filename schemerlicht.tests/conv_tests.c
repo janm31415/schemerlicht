@@ -781,21 +781,21 @@ static void test_quote_conversion_aux(const char* script, const char* expected)
 
 static void test_quote_conversion()
   {
-  test_quote_conversion_aux("'0", "( set! #%q0 0 ) #%q0 ");
-  test_quote_conversion_aux("(quote 0)", "( set! #%q0 0 ) #%q0 ");
-  test_quote_conversion_aux("(quote 0) (quote 0)", "( set! #%q0 0 ) #%q0 #%q0 ");
-  test_quote_conversion_aux("'1", "( set! #%q0 1 ) #%q0 ");
-  test_quote_conversion_aux("(quote -1)", "( set! #%q0 -1 ) #%q0 ");
-  test_quote_conversion_aux("(quote 3.14)", "( set! #%q0 3.140000 ) #%q0 ");
-  test_quote_conversion_aux("(quote \"Jan\")", "( set! #%q0 \"Jan\" ) #%q0 ");
-  test_quote_conversion_aux("(quote #t)", "( set! #%q0 #t ) #%q0 ");
-  test_quote_conversion_aux("(quote #f)", "( set! #%q0 #f ) #%q0 ");
-  test_quote_conversion_aux("(quote #\\a)", "( set! #%q0 #\\97 ) #%q0 ");
-  test_quote_conversion_aux("(quote ())", "( set! #%q0 () ) #%q0 ");
-  test_quote_conversion_aux("(quote (1 2 3))", "( set! #%q0 ( cons 1 ( cons 2 ( cons 3 () ) ) ) ) #%q0 ");
-  test_quote_conversion_aux("(quote (1 2 3 4 5 6 7 8))", "( set! #%q0 ( cons 1 ( cons 2 ( cons 3 ( cons 4 ( cons 5 ( cons 6 ( cons 7 ( cons 8 () ) ) ) ) ) ) ) ) ) #%q0 ");
-  test_quote_conversion_aux("(quote #(1 2 3 4 5 6 7 8))", "( set! #%q0 ( vector 1 2 3 4 5 6 7 8 ) ) #%q0 ");
-  test_quote_conversion_aux("(quote (a b c))", "( set! #%q0 ( cons ( string->symbol \"a\" ) ( cons ( string->symbol \"b\" ) ( cons ( string->symbol \"c\" ) () ) ) ) ) #%q0 ");
+  test_quote_conversion_aux("'0", "( begin ( set! #%q0 0 ) #%q0 ) ");
+  test_quote_conversion_aux("(quote 0)", "( begin ( set! #%q0 0 ) #%q0 ) ");
+  test_quote_conversion_aux("(begin (quote 0) (quote 0))", "( begin ( set! #%q0 0 ) #%q0 #%q0 ) ");
+  test_quote_conversion_aux("'1", "( begin ( set! #%q0 1 ) #%q0 ) ");
+  test_quote_conversion_aux("(quote -1)", "( begin ( set! #%q0 -1 ) #%q0 ) ");
+  test_quote_conversion_aux("(quote 3.14)", "( begin ( set! #%q0 3.140000 ) #%q0 ) ");
+  test_quote_conversion_aux("(quote \"Jan\")", "( begin ( set! #%q0 \"Jan\" ) #%q0 ) ");
+  test_quote_conversion_aux("(quote #t)", "( begin ( set! #%q0 #t ) #%q0 ) ");
+  test_quote_conversion_aux("(quote #f)", "( begin ( set! #%q0 #f ) #%q0 ) ");
+  test_quote_conversion_aux("(quote #\\a)", "( begin ( set! #%q0 #\\97 ) #%q0 ) ");
+  test_quote_conversion_aux("(quote ())", "( begin ( set! #%q0 () ) #%q0 ) ");
+  test_quote_conversion_aux("(quote (1 2 3))", "( begin ( set! #%q0 ( cons 1 ( cons 2 ( cons 3 () ) ) ) ) #%q0 ) ");
+  test_quote_conversion_aux("(quote (1 2 3 4 5 6 7 8))", "( begin ( set! #%q0 ( cons 1 ( cons 2 ( cons 3 ( cons 4 ( cons 5 ( cons 6 ( cons 7 ( cons 8 () ) ) ) ) ) ) ) ) ) #%q0 ) ");
+  test_quote_conversion_aux("(quote #(1 2 3 4 5 6 7 8))", "( begin ( set! #%q0 ( vector 1 2 3 4 5 6 7 8 ) ) #%q0 ) ");
+  test_quote_conversion_aux("(quote (a b c))", "( begin ( set! #%q0 ( cons ( string->symbol \"a\" ) ( cons ( string->symbol \"b\" ) ( cons ( string->symbol \"c\" ) () ) ) ) ) #%q0 ) ");
   }
 
 void run_all_conv_tests()

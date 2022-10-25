@@ -86,7 +86,8 @@ typedef enum
   SCHEMERLICHT_IS_STRING,
   SCHEMERLICHT_EQ,
   SCHEMERLICHT_EQV,
-  SCHEMERLICHT_STRING
+  SCHEMERLICHT_STRING,
+  SCHEMERLICHT_STRING_TO_SYMBOL
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -170,6 +171,7 @@ void schemerlicht_primitive_is_string(schemerlicht_context* ctxt, int a, int b, 
 void schemerlicht_primitive_eq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_eqv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_to_symbol(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
