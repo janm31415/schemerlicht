@@ -1123,13 +1123,32 @@ static void test_letrec2()
 
 static void test_inner_define()
   {
-  test_compile_aux("7", "(let()(define x 3)(define y 4)(+ x y))");
-  //test_compile_aux("6", "(let()(letrec ([x 3][y x]) (+ x y)))"); // this violates r5rs letrec definition
-  //test_compile_aux("6", "(letrec ([x 3][y x]) (+ x y))"); // this violates r5rs letrec definition
-  //test_compile_aux("6", "(let()(define x 3)(define y x)(+ x y))");  // this violates r5rs letrec / define definition : it must be possible to evaluate each (expression) of every internal definition in a body without assigning or referring to the value of any variable being defined
-  //test_compile_aux("8", "(let()(define x 3)(set! x 4)(define y x)(+ x y))");  // this violates r5rs letrec / define definition  
-  
+  test_compile_aux("7", "(let()(define x 3)(define y 4)(+ x y))");  
   test_compile_aux("45", "(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))");
+  }
+
+static void test_global_define()
+  {
+  test_compile_aux("3", "(define x 3) x");
+  test_compile_aux("4", "(define x 3) (set! x 4) x");
+  test_compile_aux("4", "(begin (define x 3) (set! x 4) x)");
+  }
+
+static void test_list()
+  {
+  test_compile_aux("()", "(list)");
+  test_compile_aux("(3)", "(list 3)");
+  test_compile_aux("(3 6)", "(list 3 6)");
+  test_compile_aux("(1 2 3)", "(list 1 2 3)");
+  test_compile_aux("(1 2 3 4)", "(list 1 2 3 4)");
+  test_compile_aux("(1 2 3 4 5)", "(list 1 2 3 4 5)");
+  test_compile_aux("(1 2 3 4 5 6)", "(list 1 2 3 4 5 6)");
+  test_compile_aux("(1 2 3 4 5 6 7)", "(list 1 2 3 4 5 6 7)");
+  test_compile_aux("(1 2 3 4 5 6 7 8)", "(list 1 2 3 4 5 6 7 8)");
+  test_compile_aux("(1 2 3 4 5 6 7 8 9)", "(list 1 2 3 4 5 6 7 8 9)");
+  test_compile_aux("(1 2 3 4 5 6 7 8 9 10)", "(list 1 2 3 4 5 6 7 8 9 10)");
+  test_compile_aux("(1 2 3 4 5 6 7 8 9 10 11)", "(list 1 2 3 4 5 6 7 8 9 10 11)");
+  test_compile_aux("(1 2 3 4 5 6 7 8 9 10 11 12)", "(list 1 2 3 4 5 6 7 8 9 10 11 12)");
 
   }
 
@@ -1186,4 +1205,6 @@ void run_all_compiler_tests()
   test_set();
   test_letrec2();
   test_inner_define();
+  test_global_define();
+  test_list();
   }

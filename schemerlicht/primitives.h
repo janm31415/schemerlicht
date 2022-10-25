@@ -75,6 +75,7 @@ typedef enum
   SCHEMERLICHT_CLOSURE,
   SCHEMERLICHT_CLOSUREREF,
   SCHEMERLICHT_IS_CLOSURE,
+  SCHEMERLICHT_LIST
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -146,6 +147,7 @@ void schemerlicht_primitive_halt(schemerlicht_context* ctxt, int a, int b, int c
 void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_closure(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
