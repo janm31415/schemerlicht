@@ -1359,6 +1359,32 @@ static void test_quotes()
   test_compile_aux("a", "(begin (quote a) (quote ()) (quote a))");
   test_compile_aux("(1 2)", "(quote (1 2))");
   test_compile_aux("#(1 2 3.140000 #t)", "(quote #(1 2 3.14 #t))");
+
+  test_compile_aux("42", "quote 42 ");
+  test_compile_aux("(1 . 2)", "quote (1 . 2) ");
+  test_compile_aux("(1 2 3)", "quote (1 2 3) ");
+  test_compile_aux("(1 2 3)", "quote (1 2 3) ");
+  test_compile_aux("(1 2 3)", "(let([x quote (1 2 3)]) x) ");
+  test_compile_aux("(1 2 3)", "(let([f(lambda() quote (1 2 3))]) (f)) ");
+  test_compile_aux("#t", "(let([f(lambda() quote (1 2 3))]) (eq? (f)(f))) ");
+  test_compile_aux("(1 2 3)", "(let([f(lambda() (lambda()  quote (1 2 3)))]) ((f))) ");
+  test_compile_aux("(#(1 2 3) . 1)", "(let([x quote #(1 2 3)]) (cons x(vector-ref x 0))) ");
+  test_compile_aux("\"Hello World\"", "\"Hello World\" ");
+  test_compile_aux("(\"Hello\" \"World\")", "quote (\"Hello\" \"World\") ");
+
+  test_compile_aux("42", "'42 ");
+  test_compile_aux("(1 . 2)", "'(1 . 2) ");
+  test_compile_aux("(1 2 3)", "'(1 2 3) ");
+  test_compile_aux("(1 2 3)", "(let([x '(1 2 3)]) x) ");
+  test_compile_aux("(1 2 3)", "(let([f(lambda() '(1 2 3))]) (f)) ");
+  test_compile_aux("#t", "(let([f(lambda() '(1 2 3))]) (eq? (f)(f))) ");
+  test_compile_aux("(1 2 3)", "(let([f(lambda() (lambda()  '(1 2 3)))]) ((f))) ");
+  test_compile_aux("(#(1 2 3) . 1)", "(let([x '#(1 2 3)]) (cons x(vector-ref x 0))) ");
+  test_compile_aux("\"Hello World\"", "\"Hello World\" ");
+  test_compile_aux("(\"Hello\" \"World\")", "'(\"Hello\" \"World\") ");
+
+  test_compile_aux("#\\a", "(quote #\\a)");
+  test_compile_aux("(a b c)", "(quote (a b c))");
   }
 
 void run_all_compiler_tests()
