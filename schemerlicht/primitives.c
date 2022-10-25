@@ -3573,7 +3573,7 @@ void schemerlicht_primitive_string_to_symbol(schemerlicht_context* ctxt, int a, 
         schemerlicht_string_copy(ctxt, &key.value.s, &arg->value.s);
         schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
         new_symbol->type = schemerlicht_object_type_symbol;
-        schemerlicht_string_copy(ctxt, &new_symbol->value.s, &arg->value.s);     
+        schemerlicht_string_copy(ctxt, &new_symbol->value.s, &arg->value.s);
         schemerlicht_set_object(ra, new_symbol);
         }
       }
@@ -3583,7 +3583,124 @@ void schemerlicht_primitive_string_to_symbol(schemerlicht_context* ctxt, int a, 
       v.type = schemerlicht_object_type_undefined;
       schemerlicht_set_object(ra, &v);
       }
-    }  
+    }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_length(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_LENGTH);
+  schemerlicht_object ret;
+  if (b == 0)
+    {
+    ret.type = schemerlicht_object_type_undefined;
+    }
+  else
+    {
+    ret.type = schemerlicht_object_type_fixnum;
+    schemerlicht_memsize length = 0;
+    schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a+1, schemerlicht_object);
+    if (p->type != schemerlicht_object_type_nil && p->type != schemerlicht_object_type_pair)
+      {
+      ret.type = schemerlicht_object_type_undefined;
+      }
+    else
+      {
+      while (p->type != schemerlicht_object_type_nil)
+        {
+        ++length;
+        p = schemerlicht_vector_at(&p->value.v, 1, schemerlicht_object);
+        if (p->type != schemerlicht_object_type_nil && p->type != schemerlicht_object_type_pair)
+          {
+          ret.type = schemerlicht_object_type_undefined;
+          break;
+          }
+        }
+      if (ret.type == schemerlicht_object_type_fixnum)
+        ret.value.fx = length;
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_set_car(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SET_CAR);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_void;
+  if (b > 1)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);    
+    schemerlicht_object* value = schemerlicht_vector_at(&ctxt->stack, a + 2, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_pair)
+      {     
+      schemerlicht_assert(v->value.v.vector_size == 2);
+      schemerlicht_object* value_to_change = schemerlicht_vector_at(&v->value.v, 0, schemerlicht_object);
+      schemerlicht_set_object(value_to_change, value);        
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_set_cdr(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SET_CDR);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_void;
+  if (b > 1)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+    schemerlicht_object* value = schemerlicht_vector_at(&ctxt->stack, a + 2, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_pair)
+      {
+      schemerlicht_assert(v->value.v.vector_size == 2);
+      schemerlicht_object* value_to_change = schemerlicht_vector_at(&v->value.v, 1, schemerlicht_object);
+      schemerlicht_set_object(value_to_change, value);
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_symbol(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  UNUSED(c);
+  // R(A), ... ,R(A+C-1) := R(A)(R(A+1), ... ,R(A+B)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_SYMBOL);
+  schemerlicht_object ret;
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_symbol)
+      ret.type = schemerlicht_object_type_true;
+    else
+      ret.type = schemerlicht_object_type_false;
+    }
+  else
+    {
+    ret.type = schemerlicht_object_type_false;
+    }
+  schemerlicht_set_object(ra, &ret);
   }
 
 ////////////////////////////////////////////////////
@@ -3838,6 +3955,18 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_STRING_TO_SYMBOL:
       schemerlicht_primitive_string_to_symbol(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_LENGTH:
+      schemerlicht_primitive_length(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_SET_CAR:
+      schemerlicht_primitive_set_car(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_SET_CDR:
+      schemerlicht_primitive_set_cdr(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_SYMBOL:
+      schemerlicht_primitive_is_symbol(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -3936,5 +4065,9 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "eqv?", SCHEMERLICHT_EQV);
   map_insert(ctxt, m, "string", SCHEMERLICHT_STRING);
   map_insert(ctxt, m, "string->symbol", SCHEMERLICHT_STRING_TO_SYMBOL);
+  map_insert(ctxt, m, "length", SCHEMERLICHT_LENGTH);
+  map_insert(ctxt, m, "set-car!", SCHEMERLICHT_SET_CAR);
+  map_insert(ctxt, m, "set-cdr!", SCHEMERLICHT_SET_CDR);
+  map_insert(ctxt, m, "symbol?", SCHEMERLICHT_IS_SYMBOL);
   return m;
   }

@@ -1193,9 +1193,9 @@ static void test_scheme()
   test_compile_aux("<closure>", "(define make_cons (lambda (m n) (cons m n)))");
   test_compile_aux("(1 . 2)", "(define make_cons (lambda (m n) (cons m n))) (make_cons 1 2)");
   
-  //test_compile_aux("<closure>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
-  //test_compile_aux("<closure>", "(define zip (combine make_cons))");
-  //test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(zip (list 1 2 3 4) (list 5 6 7 8))");  
+  test_compile_aux("<closure>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
+  test_compile_aux("<closure>", "(define make_cons (lambda (m n) (cons m n)))(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y))))))) (define zip (combine make_cons))");
+  test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(define make_cons (lambda (m n) (cons m n)))(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y))))))) (define zip (combine make_cons))(zip (list 1 2 3 4) (list 5 6 7 8))");  
   }
 
 static void test_fibonacci()
@@ -1385,6 +1385,32 @@ static void test_quotes()
 
   test_compile_aux("#\\a", "(quote #\\a)");
   test_compile_aux("(a b c)", "(quote (a b c))");
+  test_compile_aux("#f", "(symbol? (quote (a b c)))");
+  test_compile_aux("#t", "(symbol? (quote a ))");
+  }
+
+static void test_length()
+  {
+  test_compile_aux("0", "(length ())");
+  test_compile_aux("1", "(length (list 8))");
+  test_compile_aux("2", "(length (list 8 9))");
+  test_compile_aux("3", "(length (list 8 9 10))");
+  test_compile_aux("8", "(length (list 8 9 10 11 12 13 14 15))");
+  test_compile_aux("#undefined", "(length 5)");
+  }
+
+static void test_set_car_cdr()
+  {
+  test_compile_aux("(1)", "(let ([x (cons 1 2)])(begin(set-cdr! x ()) x))");
+  test_compile_aux("(1)", "(let ([x (cons 1 2)]) (set-cdr! x ()) x)");
+  test_compile_aux("(12 14 . 15)", "(let ([x (cons 12 13)] [y (cons 14 15)])  (set-cdr! x y) x)");
+  test_compile_aux("(14 12 . 13)", "(let ([x (cons 12 13)] [y (cons 14 15)]) (set-cdr! y x) y)");
+  test_compile_aux("(12 . 13)", "(let ([x (cons 12 13)] [y (cons 14 15)])(set-cdr! y x)x)");
+  test_compile_aux("(14 . 15)", "(let ([x (cons 12 13)] [y (cons 14 15)]) (set-cdr! x y) y)");
+  test_compile_aux("(#t . #f)", "(let ([x (let ([x (cons 1 2)]) (set-car! x #t) (set-cdr! x #f) x)]) (cons x x) x)");
+  test_compile_aux("(#t . #t)", "(let ([x (cons 1 2)]) (set-cdr! x x)  (set-car! (cdr x) x) (cons(eq? x(car x)) (eq? x(cdr x))))");
+  test_compile_aux("#f", "(let ([x #f])(if (pair? x) (set-car! x 12) #f)  x)");
+
   }
 
 void run_all_compiler_tests()
@@ -1447,4 +1473,6 @@ void run_all_compiler_tests()
   test_vectors();
   test_strings();
   test_quotes();
+  test_length();
+  test_set_car_cdr();
   }
