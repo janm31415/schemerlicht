@@ -1058,6 +1058,105 @@ schemerlicht_expression schemerlicht_init_fixnum(schemerlicht_context* ctxt)
   return expr;
   }
 
+schemerlicht_expression schemerlicht_init_flonum(schemerlicht_context* ctxt)
+  {
+  UNUSED(ctxt);
+  schemerlicht_parsed_flonum fl;
+  fl.column_nr = -1;
+  fl.line_nr = -1;
+  fl.filename = make_null_string();
+  fl.value = 0;
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_flonum;
+  l.lit.fl = fl;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_string(schemerlicht_context* ctxt)
+  {
+  UNUSED(ctxt);
+  schemerlicht_parsed_string s;
+  s.column_nr = -1;
+  s.line_nr = -1;
+  s.filename = make_null_string();
+  s.value = make_null_string();
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_string;
+  l.lit.str = s;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_true(schemerlicht_context* ctxt)
+  {
+  UNUSED(ctxt);
+  schemerlicht_parsed_true t;
+  t.column_nr = -1;
+  t.line_nr = -1;
+  t.filename = make_null_string();
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_true;
+  l.lit.t = t;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_false(schemerlicht_context* ctxt)
+  {
+  UNUSED(ctxt);
+  schemerlicht_parsed_false f;
+  f.column_nr = -1;
+  f.line_nr = -1;
+  f.filename = make_null_string();
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_false;
+  l.lit.f = f;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_nil(schemerlicht_context* ctxt)
+  {
+  UNUSED(ctxt);
+  schemerlicht_parsed_nil n;
+  n.column_nr = -1;
+  n.line_nr = -1;
+  n.filename = make_null_string();
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_nil;
+  l.lit.nil = n;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
+schemerlicht_expression schemerlicht_init_char(schemerlicht_context* ctxt)
+  {
+  UNUSED(ctxt);
+  schemerlicht_parsed_character ch;
+  ch.column_nr = -1;
+  ch.line_nr = -1;
+  ch.filename = make_null_string();
+  ch.value = 0;
+  schemerlicht_literal l;
+  l.type = schemerlicht_type_character;
+  l.lit.ch = ch;
+  schemerlicht_expression expr;
+  expr.type = schemerlicht_type_literal;
+  expr.expr.lit = l;
+  return expr;
+  }
+
 schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_funcall f;
@@ -1437,7 +1536,7 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
     schemerlicht_parsed_fixnum f;
     f.line_nr = (*token_it)->line_nr;
     f.column_nr = (*token_it)->column_nr;
-    f.value = to_fixnum((*token_it)->value.string_ptr);
+    f.value = schemerlicht_to_fixnum((*token_it)->value.string_ptr);
     f.filename = make_lit_filename(ctxt);
     schemerlicht_expression expr;
     expr.type = schemerlicht_type_literal;
@@ -1451,7 +1550,7 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
     schemerlicht_parsed_flonum f;
     f.line_nr = (*token_it)->line_nr;
     f.column_nr = (*token_it)->column_nr;
-    f.value = to_flonum((*token_it)->value.string_ptr);
+    f.value = schemerlicht_to_flonum((*token_it)->value.string_ptr);
     f.filename = make_lit_filename(ctxt);
     schemerlicht_expression expr;
     expr.type = schemerlicht_type_literal;

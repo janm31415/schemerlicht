@@ -10,13 +10,13 @@
 
 static void test_number_recognition()
   {
-  schemerlicht_flonum fl = to_flonum("1.2");
+  schemerlicht_flonum fl = schemerlicht_to_flonum("1.2");
   TEST_EQ_DOUBLE(1.2, fl);
-  fl = to_flonum("3.14159");
+  fl = schemerlicht_to_flonum("3.14159");
   TEST_EQ_DOUBLE(3.14159, fl);
-  fl = to_flonum("-3.14159");
+  fl = schemerlicht_to_flonum("-3.14159");
   TEST_EQ_DOUBLE(-3.14159, fl);
-  fl = to_flonum("10");
+  fl = schemerlicht_to_flonum("10");
   TEST_EQ_DOUBLE(10.0, fl);
 
   int is_real;

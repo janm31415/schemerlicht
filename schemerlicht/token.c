@@ -8,12 +8,12 @@
 #include <ctype.h>
 #include <string.h>
 
-schemerlicht_flonum to_flonum(const char* value)
+schemerlicht_flonum schemerlicht_to_flonum(const char* value)
   {
   return cast(schemerlicht_flonum, atof(value));
   }
 
-schemerlicht_fixnum to_fixnum(const char* value)
+schemerlicht_fixnum schemerlicht_to_fixnum(const char* value)
   {
 #ifdef _WIN32
   return cast(schemerlicht_fixnum, _atoi64(value));

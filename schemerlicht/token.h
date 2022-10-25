@@ -6,8 +6,8 @@
 #include "stream.h"
 #include "vector.h"
 
-SCHEMERLICHT_API schemerlicht_flonum to_flonum(const char* value);
-SCHEMERLICHT_API schemerlicht_fixnum to_fixnum(const char* value);
+SCHEMERLICHT_API schemerlicht_flonum schemerlicht_to_flonum(const char* value);
+SCHEMERLICHT_API schemerlicht_fixnum schemerlicht_to_fixnum(const char* value);
 SCHEMERLICHT_API int is_number(int* is_real, int* is_scientific, const char* value);
 
 enum token_type

@@ -784,6 +784,15 @@ static void test_quote_conversion()
   test_quote_conversion_aux("'0", "( set! #%q0 0 ) #%q0 ");
   test_quote_conversion_aux("(quote 0)", "( set! #%q0 0 ) #%q0 ");
   test_quote_conversion_aux("(quote 0) (quote 0)", "( set! #%q0 0 ) #%q0 #%q0 ");
+  test_quote_conversion_aux("'1", "( set! #%q0 1 ) #%q0 ");
+  test_quote_conversion_aux("(quote -1)", "( set! #%q0 -1 ) #%q0 ");
+  test_quote_conversion_aux("(quote 3.14)", "( set! #%q0 3.140000 ) #%q0 ");
+  test_quote_conversion_aux("(quote \"Jan\")", "( set! #%q0 \"Jan\" ) #%q0 ");
+  test_quote_conversion_aux("(quote #t)", "( set! #%q0 #t ) #%q0 ");
+  test_quote_conversion_aux("(quote #f)", "( set! #%q0 #f ) #%q0 ");
+  test_quote_conversion_aux("(quote #\\a)", "( set! #%q0 #\\97 ) #%q0 ");
+  test_quote_conversion_aux("(quote ())", "( set! #%q0 () ) #%q0 ");
+  test_quote_conversion_aux("(quote (1 2 3))", "( set! #%q0 () ) #%q0 ");
   }
 
 void run_all_conv_tests()
