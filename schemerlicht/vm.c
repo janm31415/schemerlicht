@@ -357,14 +357,6 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
         }
-      //else if (target->type == schemerlicht_object_type_lambda)
-      //  {
-      //  schemerlicht_function* lambda = cast(schemerlicht_function*, target->value.ptr);
-      //  //schemerlicht_run(ctxt, lambda); // I think, because of continuation passing style, we could replace fun by lambda here.
-      //  pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
-      //  pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
-      //  fun = &lambda;      
-      //  }
       else if (target->type == schemerlicht_object_type_closure)
         {
         schemerlicht_object* lambda_obj = schemerlicht_vector_at(&target->value.v, 0, schemerlicht_object);

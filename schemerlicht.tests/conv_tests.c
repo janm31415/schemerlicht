@@ -349,6 +349,24 @@ static void simplify_to_core_conversion_cond()
   schemerlicht_close(ctxt);
   }
 
+static void simplify_to_core_conversion_cond_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, "(cond[(cons 1 2) => (lambda(x) (cdr x))])");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+
+  TEST_EQ_STRING("( let ( [ cond-var ( cons 1 2 ) ] ) ( begin ( if cond-var ( ( lambda ( x ) ( begin ( cdr x ) ) ) cond-var ) #undefined ) ) ) ", s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void simplify_to_core_conversion_do()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -820,6 +838,7 @@ void run_all_conv_tests()
   simplify_to_core_conversion_named_let();
   simplify_to_core_conversion_case();
   simplify_to_core_conversion_cond();
+  simplify_to_core_conversion_cond_2();
   simplify_to_core_conversion_do();
   simplify_to_core_conversion_when();
   simplify_to_core_conversion_unless();

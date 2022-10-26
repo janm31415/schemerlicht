@@ -1463,6 +1463,45 @@ static void test_primitive_objects()
   test_compile_aux("(3 0 3)", "(define abs (lambda (n) ((if (> n 0) + -) 0 n))) (list (abs -3) (abs 0) (abs 3))");
   }
 
+static void test_applying_thunks()
+  {
+  test_compile_aux("12", "(let([f(lambda() 12)]) (f)) ");
+  test_compile_aux("25", "(let([f(lambda() (+ 12 13))]) (f)) ");
+  test_compile_aux("26", "(let([f(lambda() 13)]) (+ (f)(f))) ");
+  test_compile_aux("50", "(let([f(lambda()(let([g(lambda() (+ 2 3))])(* (g)(g))))])(+ (f)(f))) ");
+  test_compile_aux("50", "(let([f(lambda()(let([f(lambda() (+ 2 3))])(* (f)(f))))]) (+ (f)(f))) ");
+  test_compile_aux("14", "(let([f(if (boolean? (lambda() 12))(lambda() 13)(lambda() 14))])(f)) ");
+  }
+
+static void test_parameter_passing()
+  {
+  test_compile_aux("12", "(let([f(lambda(x) x)]) (f 12)) ");
+  test_compile_aux("25", "(let([f(lambda(x y) (+ x y))]) (f 12 13)) ");
+  test_compile_aux("1100", "(let([f(lambda(x)(let([g(lambda(x y) (+ x y))])(g x 100)))])(f 1000)) ");
+  test_compile_aux("26", "(let([f(lambda(g) (g 2 13))])(f(lambda(n m) (* n m)))) ");
+  test_compile_aux("10100", "(let([f(lambda(g) (+ (g 10) (g 100)))])(f(lambda(x) (* x x)))) ");
+  test_compile_aux("120", "(let([f(lambda(f n m)(if (zero? n) m (f f(sub1 n) (* n m))))]) (f f 5 1)) ");
+  test_compile_aux("120", "(let([f(lambda(f n)(if (zero? n) 1 (* n(f f(sub1 n)))))]) (f f 5)) ");
+  }
+
+static void test_cond()
+  {
+  test_compile_aux("2", "(cond[1 2][else 3]) ");
+  test_compile_aux("1", "(cond[1][else 13]) ");
+  test_compile_aux("#f", "(cond[#f #t][#t #f]) ");
+  test_compile_aux("17", "(cond[else 17]) ");
+  test_compile_aux("13", "(cond[#f][#f 12][12 13]) ");
+  test_compile_aux("1287", "(let([b #t])(cond [else 1287])) ");
+  test_compile_aux("2", "(cond[(cons 1 2) => (lambda(x) (cdr x))]) ");
+  test_compile_aux("yes", "(if (> 3 2) 'yes 'no)");
+  test_compile_aux("no", "(if (> 2 3) 'yes 'no)");
+  test_compile_aux("1", "(if (> 3 2) (- 3 2)(+ 3 2))");
+  test_compile_aux("greater", "(cond [(> 3 2) 'greater] [(< 3 2) 'less])");
+  test_compile_aux("less", "(cond [(> 2 3) 'greater] [(< 2 3) 'less])");
+  test_compile_aux("equal", "(cond [(> 3 3) 'greater] [(< 3 3) 'less] [else 'equal])");
+
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -1528,4 +1567,7 @@ void run_all_compiler_tests()
   test_when_unless();
   test_symbol();
   test_primitive_objects();
+  test_applying_thunks();
+  test_parameter_passing();
+  test_cond();
   }

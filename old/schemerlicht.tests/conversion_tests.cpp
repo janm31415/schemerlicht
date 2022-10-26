@@ -110,6 +110,17 @@ namespace
     TEST_ASSERT(to_string(prog) == "( let ( [ f #undefined ] [ g #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( x y ) ( begin ( + x y ) ) ) ] [ #%t1 ( lambda ( x ) ( begin ( + x 12 ) ) ) ] ) ( begin ( set! f #%t0 ) ( set! g #%t1 ) ) ) ( f 16 ( f ( g 0 ) ( + 1 ( g 0 ) ) ) ) ) ) ");
     }
 
+  void simplify_to_core_conversion_cond()
+    {
+    auto tokens = tokenize("(cond[(cons 1 2) => (lambda(x) (cdr x))])");
+    std::reverse(tokens.begin(), tokens.end());
+    auto prog = make_program(tokens);
+    simplify_to_core_forms(prog);
+    TEST_ASSERT(to_string(prog) == "( let ( [ cond-var ( cons 1 2 ) ] ) ( begin ( if cond-var ( ( lambda ( x ) ( begin ( cdr x ) ) ) cond-var ) #undefined ) ) ) ");
+    //std::cout << to_string(prog) << "\n";
+    }
+
+
   void convert_define()
     {
     auto tokens = tokenize("(let ([x 5]) (define foo (lambda (y) (bar x y))) (define bar (lambda (a b) (+ (* a b) a))) (foo (+ x 3)))");
@@ -221,6 +232,19 @@ namespace
     free_variable_analysis(prog, env);
     closure_conversion(prog, ops);
     TEST_ASSERT(to_string(prog) == "( closure ( lambda ( #%self1 x_0 y_1 z_2 ) ( begin ( let ( [ f_5 ( closure ( lambda ( #%self0 a_3 b_4 ) ( begin ( + ( * a_3 ( closure-ref #%self0 1 ) ) ( 8 b_4 ( closure-ref #%self0 2 ) ) ) ) ) x_0 y_1 ) ] ) ( begin ( - ( f_5 1 2 ) ( f_5 3 4 ) ) ) ) ) ) ) ");
+    
+    tokens = tokenize("(cond[(cons 1 2) => (lambda(x) (cdr x))])");
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    simplify_to_core_forms(prog);
+    alpha_conversion_index = 0;
+    alpha_conversion(prog, alpha_conversion_index, empty);
+    global_define_environment_allocation(prog, env, rd, ctxt);
+    cps_conversion(prog, ops);
+    free_variable_analysis(prog, env);
+    closure_conversion(prog, ops);
+    TEST_ASSERT(to_string(prog) == "( let ( [ cond-var_0 ( cons 1 2 ) ] ) ( begin ( if cond-var_0 ( let ( [ #%k1 ( closure ( lambda ( #%self0 #%k4 x_1 ) ( begin ( #%k4 ( cdr x_1 ) ) ) ) ) ] ) ( begin ( #%k1 ( closure ( lambda ( #%self1 #%k0 ) ( begin ( halt #%k0 ) ) ) ) cond-var_0 ) ) ) ( let ( [ #%k0 #undefined ] ) ( begin ( halt #%k0 ) ) ) ) ) ) ");
+    //std::cout << to_string(prog) << std::endl;;
     destroy_context(ctxt);
     }
 
@@ -485,12 +509,12 @@ namespace
     std::reverse(tokens.begin(), tokens.end());
     prog = make_program(tokens);
     single_begin_conversion(prog);
-    simplify_to_core_forms(prog);
+    simplify_to_core_forms(prog);    
     tail_call_analysis(prog);
     TEST_ASSERT(!only_tail_calls(prog));
     cps_conversion(prog, ops);
     TEST_ASSERT(to_string(prog) == "( begin ( let ( [ #%k2 ( lambda ( #%k4 n ) ( begin ( if ( > n 0 ) ( let ( [ #%k5 + ] ) ( begin ( #%k5 #%k4 0 n ) ) ) ( let ( [ #%k5 - ] ) ( begin ( #%k5 #%k4 0 n ) ) ) ) ) ) ] ) ( begin ( let ( [ #%k0 ( define abs #%k2 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ( let ( [ #%k13 abs ] ) ( begin ( #%k13 ( lambda ( #%k1 ) ( begin ( let ( [ #%k9 abs ] ) ( begin ( #%k9 ( lambda ( #%k2 ) ( begin ( let ( [ #%k5 abs ] ) ( begin ( #%k5 ( lambda ( #%k3 ) ( begin ( let ( [ #%k0 ( list #%k1 #%k2 #%k3 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) 3 ) ) ) ) ) 0 ) ) ) ) ) -3 ) ) ) ) ");
-    std::cout << to_string(prog) << "\n\n";
+    //std::cout << to_string(prog) << "\n\n";
     tail_call_analysis(prog);
     TEST_ASSERT(only_tail_calls(prog));
     }
@@ -849,6 +873,7 @@ void run_all_conversion_tests()
   simplify_to_core_conversion_and();
   simplify_to_core_conversion_or();
   simplify_to_core_conversion_letrec();
+  simplify_to_core_conversion_cond();
   convert_define();
   single_begin_conv();
   dump_conversion();

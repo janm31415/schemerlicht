@@ -462,7 +462,7 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
         {
         schemerlicht_expression new_fun = schemerlicht_init_funcall(ctxt);
         
-        schemerlicht_vector_push_back(ctxt, &new_fun.expr.funcall.fun, *schemerlicht_vector_at(front_arg, 0, schemerlicht_expression), schemerlicht_expression);
+        schemerlicht_vector_push_back(ctxt, &new_fun.expr.funcall.fun, *schemerlicht_vector_at(front_arg, 1, schemerlicht_expression), schemerlicht_expression);
         schemerlicht_vector_push_back(ctxt, &new_fun.expr.funcall.arguments, schemerlicht_expression_copy(ctxt, &var), schemerlicht_expression);
         schemerlicht_vector_push_back(ctxt, &i.expr.i.arguments, new_fun, schemerlicht_expression);
         }
