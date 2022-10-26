@@ -342,7 +342,20 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         schemerlicht_fixnum function_id = target->value.fx;
         const int b = SCHEMERLICHT_GETARG_B(i);
         const int c = SCHEMERLICHT_GETARG_C(i);
-        schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1); // skip the closure argument
+        schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1); // skip the closure argument        
+        schemerlicht_object continuation = *schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+        schemerlicht_assert(continuation.type == schemerlicht_object_type_closure);
+        schemerlicht_object result_of_prim_call = *schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+        schemerlicht_object* r0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+        schemerlicht_object* r1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+        schemerlicht_set_object(r0, &continuation);
+        schemerlicht_set_object(r1, &result_of_prim_call);
+        schemerlicht_object* lambda_obj = schemerlicht_vector_at(&continuation.value.v, 0, schemerlicht_object);
+        schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
+        schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
+        pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
+        pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
+        fun = &lambda;
         }
       //else if (target->type == schemerlicht_object_type_lambda)
       //  {

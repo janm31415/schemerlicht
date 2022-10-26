@@ -1451,16 +1451,16 @@ static void test_symbol()
 
 static void test_primitive_objects()
   {
-  test_compile_aux_w_dump("3", "(define op (lambda (a b c) (a b c)))   (op + 1 2)");
-  test_compile_aux_w_dump("7", "(define op (lambda (a b c) (a b c)))  (define three (lambda () 3)) (define four (lambda () 4)) (op + (three) (four))");
-  test_compile_aux_w_dump("7", "(define op (lambda (a b c) (a (b) (c))))  (define three (lambda () 3)) (define four (lambda () 4)) (op + three four)");
-  test_compile_aux_w_dump("8", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (define op (lambda (a b c) (a b c)))  (op + (fib 3) (fib 4))");
-  test_compile_aux_w_dump("<closure>", "(define twice (lambda (x) (* 2 x)))");
-  test_compile_aux_w_dump("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
-  test_compile_aux_w_dump("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
-  test_compile_aux_w_dump("(10)", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) ((compose list twice) 5)");
-  test_compile_aux_w_dump("<closure>", "(define abs (lambda (n) ((if (> n 0) + -) 0 n)))");
-  test_compile_aux_w_dump("(3 0 3)", "(define abs (lambda (n) ((if (> n 0) + -) 0 n))) (list (abs -3) (abs 0) (abs 3))");
+  test_compile_aux("3", "(define op (lambda (a b c) (a b c)))   (op + 1 2)");
+  test_compile_aux("7", "(define op (lambda (a b c) (a b c)))  (define three (lambda () 3)) (define four (lambda () 4)) (op + (three) (four))");
+  test_compile_aux("7", "(define op (lambda (a b c) (a (b) (c))))  (define three (lambda () 3)) (define four (lambda () 4)) (op + three four)");
+  test_compile_aux("8", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (define op (lambda (a b c) (a b c)))  (op + (fib 3) (fib 4))");
+  test_compile_aux("<closure>", "(define twice (lambda (x) (* 2 x)))");
+  test_compile_aux("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
+  test_compile_aux("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
+  test_compile_aux("(10)", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) ((compose list twice) 5)");
+  test_compile_aux("<closure>", "(define abs (lambda (n) ((if (> n 0) + -) 0 n)))");
+  test_compile_aux("(3 0 3)", "(define abs (lambda (n) ((if (> n 0) + -) 0 n))) (list (abs -3) (abs 0) (abs 3))");
   }
 
 void run_all_compiler_tests()
