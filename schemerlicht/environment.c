@@ -30,8 +30,8 @@ void schemerlicht_environment_add(schemerlicht_context* ctxt, schemerlicht_strin
   key.type = schemerlicht_object_type_string;
   key.value.s = *name;
   schemerlicht_object* entry_object = schemerlicht_map_insert(ctxt, *active_map, &key);
-  //abusing schemerlicht_object type fo fit in schemerlicht_environment_entry
-  entry_object->type = cast(int, entry.type);
+  //abusing schemerlicht_object type fo fit in schemerlicht_environment_entry, but avoiding 0
+  entry_object->type = cast(int, entry.type) + 1;
   entry_object->value.fx = entry.position;
   }
 
@@ -49,7 +49,7 @@ int schemerlicht_environment_find(schemerlicht_environment_entry* entry, schemer
     schemerlicht_object* entry_object = schemerlicht_map_get(*map_rit, &key);
     if (entry_object != NULL)
       {
-      entry->type = entry_object->type;
+      entry->type = entry_object->type - 1;
       entry->position = entry_object->value.fx;
       return 1;
       }
@@ -67,7 +67,7 @@ void schemerlicht_environment_pop_child(schemerlicht_context* ctxt)
   {
   schemerlicht_assert(ctxt->environment.vector_size > 1); // don't pop the root
   schemerlicht_map** child_map = schemerlicht_vector_back(&ctxt->environment, schemerlicht_map*);
-  schemerlicht_map_keys_free(ctxt, *child_map);
+  schemerlicht_map_keys_free(ctxt, *child_map);  
   schemerlicht_map_free(ctxt, *child_map);
   schemerlicht_vector_pop_back(&ctxt->environment);
   }

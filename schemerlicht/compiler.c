@@ -154,27 +154,25 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       {
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
-    if (prim->type == schemerlicht_object_type_primitive)
+    schemerlicht_assert(prim->type == schemerlicht_object_type_primitive);
+    const schemerlicht_memsize nr_prim_args = e->expr.prim.arguments.vector_size;
+    for (schemerlicht_memsize i = 0; i < nr_prim_args; ++i)
       {
-      const schemerlicht_memsize nr_prim_args = e->expr.prim.arguments.vector_size;
-      for (schemerlicht_memsize i = 0; i < nr_prim_args; ++i)
-        {
-        schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.prim.arguments, i, schemerlicht_expression);
-        ++fun->freereg;
-        compile_expression(ctxt, fun, arg);
-        }
-      fun->freereg -= nr_prim_args;
-      if (strcmp(e->expr.prim.name.string_ptr, "halt") == 0)
-        {
-        make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_RETURN, fun->freereg + 1, 1);
-        }
-      else
-        {
-        int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
+      schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.prim.arguments, i, schemerlicht_expression);
+      ++fun->freereg;
+      compile_expression(ctxt, fun, arg);
+      }
+    fun->freereg -= nr_prim_args;
+    if (strcmp(e->expr.prim.name.string_ptr, "halt") == 0)
+      {
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_RETURN, fun->freereg + 1, 1);
+      }
+    else
+      {
+      int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
 
-        make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
-        make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 0);
-        }
+      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+      make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 0);
       }
     }
   }
@@ -315,9 +313,11 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
   compile_expression(ctxt, new_fun, body_expr);
   schemerlicht_environment_pop_child(ctxt);
 
+#ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
   schemerlicht_string tmp = schemerlicht_dump_expression(ctxt, body_expr);
   schemerlicht_string_append(ctxt, &new_fun->function_definition, &tmp);
   schemerlicht_string_destroy(ctxt, &tmp);
+#endif
 
   schemerlicht_vector_push_back(ctxt, &fun->lambdas, new_fun, schemerlicht_function*);
   schemerlicht_object lambda_obj;

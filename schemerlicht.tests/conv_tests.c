@@ -759,6 +759,27 @@ static void test_closure_conversion_2()
   schemerlicht_close(ctxt);
   }
 
+static void test_call_cc()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING("( set! call/cc ( closure ( lambda ( #%self1 k f ) ( begin ( f k ( closure ( lambda ( #%self0 dummy-k result ) ( begin ( ( closure-ref #%self0 1 ) result ) ) ) k ) ) ) ) ) ) ", res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_quote_collect_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -859,4 +880,5 @@ void run_all_conv_tests()
   test_closure_conversion_2();
   test_quote_collect_1();
   test_quote_conversion();
+  test_call_cc();
   }

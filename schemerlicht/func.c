@@ -11,7 +11,9 @@ schemerlicht_function* schemerlicht_function_new(schemerlicht_context* ctxt)
   schemerlicht_vector_init(ctxt, &fun->lambdas, schemerlicht_function*);
   fun->freereg = 0;
   fun->number_of_constants = 0;
+#ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
   schemerlicht_string_init(ctxt, &fun->function_definition, "");
+#endif
   return fun;
   }
 
@@ -33,6 +35,8 @@ void schemerlicht_function_free(schemerlicht_context* ctxt, schemerlicht_functio
   schemerlicht_map_free(ctxt, f->constants_map);
   schemerlicht_vector_destroy(ctxt, &f->constants);
   schemerlicht_vector_destroy(ctxt, &f->code);
+#ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
   schemerlicht_string_destroy(ctxt, &f->function_definition);
+#endif
   schemerlicht_delete(ctxt, f);
   }

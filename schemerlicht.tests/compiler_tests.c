@@ -20,6 +20,7 @@
 #include "schemerlicht/quotecollect.h"
 #include "schemerlicht/quoteconv.h"
 #include "schemerlicht/quasiquote.h"
+#include "schemerlicht/environment.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -1514,6 +1515,181 @@ static void test_newton()
   test_compile_aux("-500", "(define appl (lambda (op n) (op n) ))  (- (appl - -500))");
   }
 
+static void test_compile_cc()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+#if 0
+  schemerlicht_vector tokens = script2tokens(ctxt, "( lambda ( %self1 k f ) ( begin ( f k ( closure ( lambda ( %self0 dummy-k result ) ( begin ( ( closure-ref %self0 1 ) result ) ) ) k ) ) ) )");
+  schemerlicht_program prog = make_program(ctxt, &tokens);  
+  
+  schemerlicht_function* callccfunc = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  //schemerlicht_string s = schemerlicht_fun_to_string(ctxt, func);
+  //printf("%s\n", s.string_ptr);
+  //schemerlicht_string_destroy(ctxt, &s);
+
+  schemerlicht_object* lambdacallcc = schemerlicht_vector_at(&callccfunc->constants, 0, schemerlicht_object);
+  schemerlicht_object callcc;
+  callcc.type = schemerlicht_object_type_closure;
+  schemerlicht_vector_init(ctxt, &callcc.value.v, schemerlicht_object);
+  schemerlicht_vector_push_back(ctxt, &callcc.value.v, *lambdacallcc, schemerlicht_object);
+
+  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_set_object(heap_obj, &callcc);
+  schemerlicht_environment_entry entry;
+  entry.position = ctxt->heap_pos;
+  entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
+  schemerlicht_string callcc_name;
+  schemerlicht_string_init(ctxt, &callcc_name, "call/cc");
+  schemerlicht_environment_add(ctxt, &callcc_name, entry);
+  ++ctxt->heap_pos;
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+#else
+  schemerlicht_vector tokens = script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog); 
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  //schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+  schemerlicht_function* callccfunc = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_run(ctxt, &callccfunc);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+#endif
+  
+  tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
+  prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+
+  schemerlicht_function* func1 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  
+  schemerlicht_object* res = schemerlicht_run(ctxt, &func1);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("1", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+  tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 1))))");
+  prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+
+  schemerlicht_function* func2 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+
+  res = schemerlicht_run(ctxt, &func2);
+  s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("15", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+    
+  tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (escape 3))))))))");
+  prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+  
+  schemerlicht_function* func3 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));  
+  res = schemerlicht_run(ctxt, &func3);
+  s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("35", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);  
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  
+  tokens = script2tokens(ctxt, "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (throw 3))))))))");
+  prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+
+  schemerlicht_function* func4 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  res = schemerlicht_run(ctxt, &func4);
+  s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("3", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+  tokens = script2tokens(ctxt, "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 1)))))))");
+  prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+
+  schemerlicht_function* func5 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  res = schemerlicht_run(ctxt, &func5);
+  s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("1005", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+  schemerlicht_function_free(ctxt, func1);
+  schemerlicht_function_free(ctxt, func2);
+  schemerlicht_function_free(ctxt, func3);
+  schemerlicht_function_free(ctxt, func4);
+  schemerlicht_function_free(ctxt, func5);
+  schemerlicht_function_free(ctxt, callccfunc);  
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -1583,4 +1759,5 @@ void run_all_compiler_tests()
   test_parameter_passing();
   test_cond();
   test_newton();
+  test_compile_cc();
   }

@@ -13,7 +13,9 @@ typedef struct schemerlicht_function
   schemerlicht_vector lambdas; //functions defined inside the function
   int number_of_constants;
   int freereg;  /* first free register */
+#ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
   schemerlicht_string function_definition;
+#endif
   } schemerlicht_function;
 
 
