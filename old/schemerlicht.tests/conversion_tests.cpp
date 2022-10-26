@@ -480,6 +480,19 @@ namespace
     //std::cout << to_string(prog) << "\n\n";
     tail_call_analysis(prog);
     TEST_ASSERT(only_tail_calls(prog));
+
+    tokens = tokenize("(define abs (lambda (n) ((if (> n 0) + -) 0 n))) (list (abs -3) (abs 0) (abs 3))");
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    single_begin_conversion(prog);
+    simplify_to_core_forms(prog);
+    tail_call_analysis(prog);
+    TEST_ASSERT(!only_tail_calls(prog));
+    cps_conversion(prog, ops);
+    TEST_ASSERT(to_string(prog) == "( begin ( let ( [ #%k2 ( lambda ( #%k4 n ) ( begin ( if ( > n 0 ) ( let ( [ #%k5 + ] ) ( begin ( #%k5 #%k4 0 n ) ) ) ( let ( [ #%k5 - ] ) ( begin ( #%k5 #%k4 0 n ) ) ) ) ) ) ] ) ( begin ( let ( [ #%k0 ( define abs #%k2 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ( let ( [ #%k13 abs ] ) ( begin ( #%k13 ( lambda ( #%k1 ) ( begin ( let ( [ #%k9 abs ] ) ( begin ( #%k9 ( lambda ( #%k2 ) ( begin ( let ( [ #%k5 abs ] ) ( begin ( #%k5 ( lambda ( #%k3 ) ( begin ( let ( [ #%k0 ( list #%k1 #%k2 #%k3 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) 3 ) ) ) ) ) 0 ) ) ) ) ) -3 ) ) ) ) ");
+    std::cout << to_string(prog) << "\n\n";
+    tail_call_analysis(prog);
+    TEST_ASSERT(only_tail_calls(prog));
     }
 
   void cps_conversion_2()
@@ -822,7 +835,7 @@ namespace
     compiler_options ops;    
     //cps_conversion(prog, ops);
     assignable_variable_conversion(prog, ops);
-    std::cout << to_string(prog);
+    //std::cout << to_string(prog);
     }
   }
 

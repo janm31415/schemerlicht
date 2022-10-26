@@ -49,7 +49,10 @@ static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemer
   {
   const schemerlicht_object* idx = schemerlicht_map_get(fun->constants_map, k);
   if (idx != NULL && idx->type == schemerlicht_object_type_fixnum)
+    {
+    schemerlicht_object_destroy(ctxt, k); // the key should be destroyed as the object was already added to the constants map
     return cast(int, idx->value.fx);
+    }
   else
     {
     schemerlicht_object* new_id = schemerlicht_map_insert(ctxt, fun->constants_map, k);
@@ -133,7 +136,14 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
   schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
   if (e->expr.prim.as_object)
     {
-    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+    schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
+    if (prim == NULL)
+      {
+      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+      }
+    prim->type = schemerlicht_object_type_primitive_object; // change type to object
+    int k_pos = get_k(ctxt, fun, prim);
+    make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
     }
   else
     {
@@ -142,7 +152,7 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       {
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
-    if (prim->type == schemerlicht_object_type_fixnum)
+    if (prim->type == schemerlicht_object_type_primitive)
       {
       const schemerlicht_memsize nr_prim_args = e->expr.prim.arguments.vector_size;
       for (schemerlicht_memsize i = 0; i < nr_prim_args; ++i)
@@ -161,7 +171,7 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
         int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
 
         make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
-        make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 1);
+        make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 0);
         }
       }
     }
@@ -279,7 +289,7 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
       make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i + 1, fun->freereg + i + 1);
       }
     }
-  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 1);
+  make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 0);
   }
 
 static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)

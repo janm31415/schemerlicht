@@ -14,6 +14,8 @@ int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlic
     case schemerlicht_object_type_nil:
     case schemerlicht_object_type_void:
       return 1;
+    case schemerlicht_object_type_primitive:
+    case schemerlicht_object_type_primitive_object:
     case schemerlicht_object_type_fixnum:
       return obj1->value.fx == obj2->value.fx;
     case schemerlicht_object_type_flonum:
@@ -231,6 +233,10 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           break;
         case schemerlicht_object_type_void:
           schemerlicht_string_append_cstr(ctxt, &s, "#<void>");
+          break;
+        case schemerlicht_object_type_primitive:
+        case schemerlicht_object_type_primitive_object:
+          schemerlicht_string_append_cstr(ctxt, &s, "<procedure>");
           break;
         case schemerlicht_object_type_fixnum:
         {

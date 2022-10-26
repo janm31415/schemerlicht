@@ -91,7 +91,8 @@ typedef enum
   SCHEMERLICHT_LENGTH,
   SCHEMERLICHT_SET_CAR,
   SCHEMERLICHT_SET_CDR,
-  SCHEMERLICHT_IS_SYMBOL
+  SCHEMERLICHT_IS_SYMBOL,
+  SCHEMERLICHT_IS_PROCEDURE
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -180,6 +181,7 @@ void schemerlicht_primitive_length(schemerlicht_context* ctxt, int a, int b, int
 void schemerlicht_primitive_set_car(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_set_cdr(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_symbol(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_procedure(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

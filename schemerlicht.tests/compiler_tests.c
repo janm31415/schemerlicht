@@ -150,6 +150,13 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debuginfo, &func);
   printf("%s\n", debuginfo.string_ptr);
   schemerlicht_string_destroy(ctxt, &debuginfo);
+
+  if (ctxt->number_of_compile_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
@@ -1410,7 +1417,50 @@ static void test_set_car_cdr()
   test_compile_aux("(#t . #f)", "(let ([x (let ([x (cons 1 2)]) (set-car! x #t) (set-cdr! x #f) x)]) (cons x x) x)");
   test_compile_aux("(#t . #t)", "(let ([x (cons 1 2)]) (set-cdr! x x)  (set-car! (cdr x) x) (cons(eq? x(car x)) (eq? x(cdr x))))");
   test_compile_aux("#f", "(let ([x #f])(if (pair? x) (set-car! x 12) #f)  x)");
+  }
 
+static void test_when_unless()
+  {
+  test_compile_aux("(3 . 2)", "(let([x(cons 1 2)]) (when(pair? x) (set-car! x(+ (car x) (cdr x)))) x) ");
+  test_compile_aux("(5 . 2)", "(let([x(cons 1 2)]) (when(pair? x) (set-car! x(+ (car x) (cdr x))) (set-car! x(+ (car x) (cdr x)))) x) ");
+  test_compile_aux("(3 . 2)", "(let([x(cons 1 2)]) (unless(fixnum? x) (set-car! x(+ (car x) (cdr x)))) x) ");
+  test_compile_aux("(5 . 2)", "(let([x(cons 1 2)]) (unless(fixnum? x) (set-car! x(+ (car x) (cdr x))) (set-car! x(+ (car x) (cdr x)))) x) ");
+  }
+
+static void test_symbol()
+  {
+  test_compile_aux("#t", "(symbol? 'foo) ");
+  test_compile_aux("#f", "(symbol? '()) ");
+  test_compile_aux("#f", "(symbol? "") ");
+  test_compile_aux("#f", "(symbol? '(1 2)) ");
+  test_compile_aux("#f", "(symbol? '#()) ");
+  test_compile_aux("#f", "(symbol? (lambda(x) x)) ");
+  test_compile_aux("#t", "(symbol? 'foo) ");
+  test_compile_aux("#f", "(string? 'foo) ");
+  test_compile_aux("#f", "(pair? 'foo) ");
+  test_compile_aux("#f", "(vector? 'foo) ");
+  test_compile_aux("#f", "(null? 'foo) ");
+  test_compile_aux("#f", "(boolean? 'foo) ");
+  test_compile_aux("#f", "(procedure? 'foo) ");
+  test_compile_aux("#f", "(eq? 'foo 'bar) ");
+  test_compile_aux("#t", "(eq? 'foo 'foo) ");
+  test_compile_aux("foo", "'foo ");
+  test_compile_aux("(foo bar baz)", "'(foo bar baz) ");
+  test_compile_aux("(foo foo foo foo foo foo foo foo foo foo foo)", "'(foo foo foo foo foo foo foo foo foo foo foo)  ");
+  }
+
+static void test_primitive_objects()
+  {
+  test_compile_aux_w_dump("3", "(define op (lambda (a b c) (a b c)))   (op + 1 2)");
+  test_compile_aux_w_dump("7", "(define op (lambda (a b c) (a b c)))  (define three (lambda () 3)) (define four (lambda () 4)) (op + (three) (four))");
+  test_compile_aux_w_dump("7", "(define op (lambda (a b c) (a (b) (c))))  (define three (lambda () 3)) (define four (lambda () 4)) (op + three four)");
+  test_compile_aux_w_dump("8", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (define op (lambda (a b c) (a b c)))  (op + (fib 3) (fib 4))");
+  test_compile_aux_w_dump("<closure>", "(define twice (lambda (x) (* 2 x)))");
+  test_compile_aux_w_dump("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
+  test_compile_aux_w_dump("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
+  test_compile_aux_w_dump("(10)", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) ((compose list twice) 5)");
+  test_compile_aux_w_dump("<closure>", "(define abs (lambda (n) ((if (> n 0) + -) 0 n)))");
+  test_compile_aux_w_dump("(3 0 3)", "(define abs (lambda (n) ((if (> n 0) + -) 0 n))) (list (abs -3) (abs 0) (abs 3))");
   }
 
 void run_all_compiler_tests()
@@ -1475,4 +1525,7 @@ void run_all_compiler_tests()
   test_quotes();
   test_length();
   test_set_car_cdr();
+  test_when_unless();
+  test_symbol();
+  test_primitive_objects();
   }

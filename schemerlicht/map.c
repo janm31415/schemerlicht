@@ -295,6 +295,13 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
   {
   switch (key->type)
     {
+    case schemerlicht_object_type_void:
+    case schemerlicht_object_type_true:
+    case schemerlicht_object_type_false:
+    case schemerlicht_object_type_nil:
+      return schemerlicht_hash_fixnum(m, key->type);
+    case schemerlicht_object_type_primitive:
+    case schemerlicht_object_type_primitive_object:
     case schemerlicht_object_type_fixnum:
       return schemerlicht_hash_fixnum(m, key->value.fx);
     case schemerlicht_object_type_char:
