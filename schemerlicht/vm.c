@@ -129,6 +129,14 @@ static schemerlicht_string debug_object_to_string(schemerlicht_context* ctxt, sc
     schemerlicht_string_append_cstr(ctxt, &res, ": ");
     schemerlicht_string_append_cstr(ctxt, &res, buffer);
     }
+  if (obj->type == schemerlicht_object_type_primitive_object)
+    {
+    char buffer[256];
+    uint64_t fx = cast(uint64_t, obj->value.fx);
+    sprintf(buffer, "%lld", fx);
+    schemerlicht_string_append_cstr(ctxt, &res, ": (as object) ");
+    schemerlicht_string_append_cstr(ctxt, &res, buffer);
+    }
   return res;
   }
 
@@ -198,11 +206,18 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         }
       else if (target->type == schemerlicht_object_type_primitive_object)
         {        
+        schemerlicht_string stackstr = schemerlicht_show_stack(ctxt, 0, 9);
+        printf("%s\n", stackstr.string_ptr);
+        schemerlicht_string_destroy(ctxt, &stackstr);
         schemerlicht_fixnum function_id = target->value.fx;
         const int b = SCHEMERLICHT_GETARG_B(i);
         const int c = SCHEMERLICHT_GETARG_C(i);
         schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1); // skip the closure argument
         schemerlicht_string_append_cstr(ctxt, s, "   primitive object call\n");
+        stackstr = schemerlicht_show_stack(ctxt, 0, 9);
+        printf("%s\n", stackstr.string_ptr);
+        schemerlicht_string_destroy(ctxt, &stackstr);
+
         schemerlicht_object continuation = *schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
         schemerlicht_assert(continuation.type == schemerlicht_object_type_closure);
         schemerlicht_object result_of_prim_call = *schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
@@ -210,6 +225,9 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         schemerlicht_object* r1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
         schemerlicht_set_object(r0, &continuation);
         schemerlicht_set_object(r1, &result_of_prim_call);
+        stackstr = schemerlicht_show_stack(ctxt, 0, 9);
+        printf("%s\n", stackstr.string_ptr);
+        schemerlicht_string_destroy(ctxt, &stackstr);
         schemerlicht_object* lambda_obj = schemerlicht_vector_at(&continuation.value.v, 0, schemerlicht_object);
         schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
         schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
@@ -444,6 +462,26 @@ schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schem
     schemerlicht_string subfunstr = schemerlicht_fun_to_string(ctxt, *fit);
     schemerlicht_string_append(ctxt, &s, &subfunstr);
     schemerlicht_string_destroy(ctxt, &subfunstr);
+    }
+  return s;
+  }
+
+schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stack_start, int stack_end)
+  {
+  char buffer[256];
+  schemerlicht_string s;
+  schemerlicht_string_init(ctxt, &s, "SCHEMERLICHT STACK:\n");
+  for (int i = stack_start; i <= stack_end; ++i)
+    {
+    sprintf(buffer, "%d", i);
+    schemerlicht_string_append_cstr(ctxt, &s, "  ");
+    schemerlicht_string_append_cstr(ctxt, &s, buffer);
+    schemerlicht_string_append_cstr(ctxt, &s, ": ");
+    schemerlicht_object* stack_item = schemerlicht_vector_at(&ctxt->stack, i, schemerlicht_object);
+    schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, stack_item);
+    schemerlicht_string_append(ctxt, &s, &tmp);
+    schemerlicht_string_destroy(ctxt, &tmp);
+    schemerlicht_string_push_back(ctxt, &s, '\n');
     }
   return s;
   }

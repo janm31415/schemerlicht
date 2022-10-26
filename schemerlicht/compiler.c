@@ -5,6 +5,7 @@
 #include "vm.h"
 #include "primitives.h"
 #include "environment.h"
+#include "dump.h"
 
 static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e);
 
@@ -141,8 +142,9 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       {
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
-    prim->type = schemerlicht_object_type_primitive_object; // change type to object
-    int k_pos = get_k(ctxt, fun, prim);
+    schemerlicht_object prim_as_object = *prim;
+    prim_as_object.type = schemerlicht_object_type_primitive_object; // change type to object
+    int k_pos = get_k(ctxt, fun, &prim_as_object);
     make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
     }
   else
@@ -312,6 +314,11 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);
   compile_expression(ctxt, new_fun, body_expr);
   schemerlicht_environment_pop_child(ctxt);
+
+  schemerlicht_string tmp = schemerlicht_dump_expression(ctxt, body_expr);
+  schemerlicht_string_append(ctxt, &new_fun->function_definition, &tmp);
+  schemerlicht_string_destroy(ctxt, &tmp);
+
   schemerlicht_vector_push_back(ctxt, &fun->lambdas, new_fun, schemerlicht_function*);
   schemerlicht_object lambda_obj;
   lambda_obj.type = schemerlicht_object_type_lambda;

@@ -2070,6 +2070,13 @@ namespace
       }
     };
 
+  struct newton_bugtest:public compile_fixture {
+    void test()
+      {
+      TEST_EQ("14.1421", run("(define abs (lambda (n) ((if (> n 0) + -) 0 n)))(define newton lambda(guess function derivative epsilon) (define guess2 (- guess (/ (function guess) (derivative guess)))) (if (< (abs(- guess guess2)) epsilon) guess2 (newton guess2 function derivative epsilon)))(define square-root lambda(a) (newton 1 (lambda(x) (-(* x x) a)) (lambda(x) (* 2 x)) 1e-8))(square-root 200.)"));
+      }
+    };
+
   struct callcc : public compile_fixture {
     void test()
       {
@@ -4876,7 +4883,7 @@ void run_all_compile_tests()
       default:
         break;
       }
-#if 1
+#if 0
     fixnums().test();
     bools().test();
     test_for_nil().test();
@@ -5037,5 +5044,6 @@ void run_all_compile_tests()
     macros().test();
 #endif
     //ack_perf_test().test();
+    newton_bugtest().test();
     }
   }

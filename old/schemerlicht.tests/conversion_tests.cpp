@@ -23,6 +23,7 @@
 #include "schemerlicht/constant_folding.h"
 #include "schemerlicht/linear_scan_index.h"
 #include "schemerlicht/quasiquote_conversion.h"
+#include "schemerlicht/lambda_to_let_conversion.h"
 
 COMPILER_BEGIN
 
@@ -861,6 +862,32 @@ namespace
     assignable_variable_conversion(prog, ops);
     //std::cout << to_string(prog);
     }
+
+  void test_prim_object_conversion()
+    {
+    context ctxt = create_context(1024, 1024, 1024, 1024);
+    environment_map env = std::make_shared<environment<environment_entry>>(nullptr);
+    uint64_t alpha_conversion_index = 0;
+    repl_data rd;
+    std::shared_ptr < environment<alpha_conversion_data>> empty;
+
+    //auto tokens = tokenize("(define abs (lambda (n) ((if (> n 0) + -) 0 n)))(define newton lambda(guess function derivative epsilon) (define guess2 (- guess (/ (function guess) (derivative guess)))) (if (< (abs(- guess guess2)) epsilon) guess2 (newton guess2 function derivative epsilon)))(define square-root lambda(a) (newton 1 (lambda(x) (-(* x x) a)) (lambda(x) (* 2 x)) 1e-8))(square-root 200.)");
+    auto tokens = tokenize("(define abs1 (lambda (n) ((if (> n 0) + -) 0 n) ))  (- (abs1 -500))");
+    std::reverse(tokens.begin(), tokens.end());
+    auto prog = make_program(tokens);
+    define_conversion(prog);
+    single_begin_conversion(prog);
+    simplify_to_core_forms(prog);
+    alpha_conversion(prog, alpha_conversion_index, empty);
+    global_define_environment_allocation(prog, env, rd, ctxt);
+    compiler_options ops;
+    cps_conversion(prog, ops);    
+    lambda_to_let_conversion(prog);
+    assignable_variable_conversion(prog, ops);
+    free_variable_analysis(prog, env);
+    closure_conversion(prog, ops);
+    std::cout << to_string(prog);
+    }
   }
 
 
@@ -887,4 +914,5 @@ void run_all_conversion_tests()
   quasiquote_conversion_tests();
   constant_propagation_tests();
   test_inner_define_conversion();
+  test_prim_object_conversion();
   }

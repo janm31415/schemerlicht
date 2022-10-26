@@ -151,6 +151,10 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   printf("%s\n", debuginfo.string_ptr);
   schemerlicht_string_destroy(ctxt, &debuginfo);
 
+  schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 9);
+  printf("%s\n", stackstring.string_ptr);
+  schemerlicht_string_destroy(ctxt, &stackstring);
+
   if (ctxt->number_of_compile_errors > 0)
     {
     schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
@@ -1499,7 +1503,15 @@ static void test_cond()
   test_compile_aux("greater", "(cond [(> 3 2) 'greater] [(< 3 2) 'less])");
   test_compile_aux("less", "(cond [(> 2 3) 'greater] [(< 2 3) 'less])");
   test_compile_aux("equal", "(cond [(> 3 3) 'greater] [(< 3 3) 'less] [else 'equal])");
+  }
 
+static void test_newton()
+  {
+  test_compile_aux("14.142136", "(define abs (lambda (n) ( (if (> n 0) + -) 0 n) ))  (define newton lambda(guess function derivative epsilon) (define guess2 (- guess (/ (function guess) (derivative guess)))) (if (< (abs(- guess guess2)) epsilon) guess2 (newton guess2 function derivative epsilon)))(define square-root lambda(a) (newton 1 (lambda(x1) (-(* x1 x1) a)) (lambda(x2) (* 2 x2)) 1e-8))(square-root 200.)");
+  test_compile_aux("14.142136", "(define abs(lambda(n) (if (> n 0) n(- 0 n))))(define newton lambda(guess function derivative epsilon) (define guess2 (- guess (/ (function guess) (derivative guess)))) (if (< (abs(- guess guess2)) epsilon) guess2 (newton guess2 function derivative epsilon)))(define square-root lambda(a) (newton 1 (lambda(x) (-(* x x) a)) (lambda(x) (* 2 x)) 1e-8))(square-root 200.)");
+  test_compile_aux("5", "(define abs1 (lambda (n) ((if (> n 0) + -) 0 n) )) (define abs2 (lambda (n) (abs1 (- (abs1 n))))) (abs2 -5)");
+  test_compile_aux("-500", "(define abs1 (lambda (n) ((if (> n 0) + -) 0 n) ))  (- (abs1 -500))");
+  test_compile_aux("-500", "(define appl (lambda (op n) (op n) ))  (- (appl - -500))");
   }
 
 void run_all_compiler_tests()
@@ -1570,4 +1582,5 @@ void run_all_compiler_tests()
   test_applying_thunks();
   test_parameter_passing();
   test_cond();
+  test_newton();
   }
