@@ -3,6 +3,7 @@
 #include "error.h"
 #include "map.h"
 #include "primitives.h"
+#include "gc.h"
 
 #include <stdio.h>
 
@@ -318,6 +319,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         {
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
         }
+      schemerlicht_check_garbage_collection(ctxt);
       break;
       }
       case SCHEMERLICHT_OPCODE_EQTYPE:
@@ -360,9 +362,9 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       case SCHEMERLICHT_OPCODE_RETURN:
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
+      const int b = SCHEMERLICHT_GETARG_B(i);
       if (a != 0)
-        {
-        int b = SCHEMERLICHT_GETARG_B(i);
+        {        
         for (int j = 0; j < b; ++j)
           {
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -370,7 +372,10 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
           schemerlicht_set_object(retj, srcj);
           }
         }
+      schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
+      stack_to_block->type = schemerlicht_object_type_blocking;
       pc = pc_end;
+      schemerlicht_check_garbage_collection(ctxt);
       break;
       }
       default:
@@ -478,6 +483,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
         }
+      schemerlicht_check_garbage_collection(ctxt);
       break;
       }
       case SCHEMERLICHT_OPCODE_EQTYPE:
@@ -519,9 +525,9 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       case SCHEMERLICHT_OPCODE_RETURN:
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
+      const int b = SCHEMERLICHT_GETARG_B(i);
       if (a != 0)
-        {
-        int b = SCHEMERLICHT_GETARG_B(i);
+        {        
         for (int j = 0; j < b; ++j)
           {
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -529,7 +535,10 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
           schemerlicht_set_object(retj, srcj);
           }
         }
+      schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
+      stack_to_block->type = schemerlicht_object_type_blocking;
       pc = pc_end;
+      schemerlicht_check_garbage_collection(ctxt);
       break;
       }
       default:

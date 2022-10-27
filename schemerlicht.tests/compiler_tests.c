@@ -82,9 +82,9 @@ static void test_compile_flonum()
   test_compile_flonum_aux(3.14159265359, "(3.14159265359)");
   }
 
-static void test_compile_aux(const char* expected_value, const char* script)
+static void test_compile_aux_heap(const char* expected_value, const char* script, int heap_size)
   {
-  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_context* ctxt = schemerlicht_open(heap_size);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
@@ -116,6 +116,11 @@ static void test_compile_aux(const char* expected_value, const char* script)
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
+  }
+
+static void test_compile_aux(const char* expected_value, const char* script)
+  {
+  test_compile_aux_heap(expected_value, script, 256);
   }
 
 static void test_compile_aux_w_dump(const char* expected_value, const char* script)
@@ -1077,8 +1082,8 @@ static void test_letrec()
   test_compile_aux("25", "(let ([f (lambda () 12)][g(lambda() 13)])(+ (f)(g)))");
   test_compile_aux("120", "(letrec ([f (lambda (x) (if (zero? x) 1 (* x(f(sub1 x)))))]) (f 5))");
   test_compile_aux("120", "(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))");
-  test_compile_aux("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))");
-  //test_compile_aux("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))"); // [JanM] add test later again when GC is in place
+  test_compile_aux_heap("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))", 1000);
+  test_compile_aux_heap("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))", 2000); // [JanM] add test later again when GC is in place
   }
 
 static void test_lambdas()
@@ -1216,7 +1221,7 @@ static void test_fibonacci()
   test_compile_aux("34", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 8)");
   test_compile_aux("55", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 9)");
   test_compile_aux("89", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 10)");
-  //test_compile_aux("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)"); // without gc heap overflow
+  //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256*256*256); // without gc heap overflow
   }
 
 static void test_vectors()
@@ -1694,7 +1699,7 @@ static void test_compile_cc()
 static void test_ack_performance()
   {
   //currently less than 2s with large heap (size 256*256*256) on my laptop
-  test_compile_aux("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)");
+  test_compile_aux_heap("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)", 256*256);
   }
 
 static void test_lambda_variable_arity_not_using_rest_arg()
@@ -1770,7 +1775,7 @@ static void test_lambda_variable_arity_while_using_rest_arg_and_closure()
 static void test_garbage_collection()
   {
   schemerlicht_context* ctxt = schemerlicht_open(200);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 80))");
+  schemerlicht_vector tokens = script2tokens(ctxt, "(vector 1 2 3)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1785,16 +1790,21 @@ static void test_garbage_collection()
   TEST_EQ_INT(0, ctxt->heap_pos);
   TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
 
+  for (int i = 0; i < 80; ++i)
+    {
+    schemerlicht_run(ctxt, &fun);
+    //schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 2);
+    //printf("%s\n", stackstring.string_ptr);
+    //schemerlicht_string_destroy(ctxt, &stackstring);
+    TEST_EQ_INT(i+1, ctxt->heap_pos);
+    TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
+    }
   schemerlicht_run(ctxt, &fun);
-
-  TEST_EQ_INT(83, ctxt->heap_pos);
-  TEST_EQ_INT(1, schemerlicht_need_to_perform_gc(ctxt));
-
-  //schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 9);
-  //printf("%s\n", stackstring.string_ptr);
-  //schemerlicht_string_destroy(ctxt, &stackstring);
-
-  schemerlicht_collect_garbage(ctxt);
+  TEST_EQ_INT(4, ctxt->heap_pos);
+  TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
+  schemerlicht_run(ctxt, &fun);
+  TEST_EQ_INT(5, ctxt->heap_pos);
+  TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
 
   schemerlicht_function_free(ctxt, fun);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1848,7 +1858,7 @@ void run_all_compiler_tests()
   test_pair();
   test_begin();
   test_halt();
-  test_letrec();
+  test_letrec();  
   test_lambdas();
   test_tailcall();
   test_closures();
@@ -1878,4 +1888,5 @@ void run_all_compiler_tests()
   test_lambda_long_list();
   test_lambda_variable_arity_while_using_rest_arg_and_closure();
   test_garbage_collection();
+  
   }

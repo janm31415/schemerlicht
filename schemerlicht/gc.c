@@ -27,7 +27,7 @@ static schemerlicht_memsize get_heap_size(schemerlicht_context* ctxt)
 
 static schemerlicht_object* get_inactive_heap(schemerlicht_context* ctxt)
   {
-  return cast(schemerlicht_object*, ctxt->raw_heap.vector_ptr) + (1-active_heap(ctxt)) * get_heap_size(ctxt);
+  return cast(schemerlicht_object*, ctxt->raw_heap.vector_ptr) + (1 - active_heap(ctxt)) * get_heap_size(ctxt);
   }
 
 int schemerlicht_need_to_perform_gc(schemerlicht_context* ctxt)
@@ -75,7 +75,7 @@ static void* get_object_pointer(schemerlicht_object* obj)
       return obj->value.ptr;
     default:
       return NULL;
-    }  
+    }
   }
 
 // returns position in the new heap of the object
@@ -150,7 +150,7 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
   const schemerlicht_memsize heap_size = get_heap_size(ctxt);
   for (schemerlicht_memsize i = 0; i < heap_size; ++i)
     {
-    schemerlicht_object* obj = target_heap+i;
+    schemerlicht_object* obj = target_heap + i;
     switch (obj->type)
       {
       case schemerlicht_object_type_vector:
@@ -173,8 +173,25 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
 
 void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   {
+#if 0
+  schemerlicht_object* source_heap = get_active_heap(ctxt);
+  schemerlicht_assert(ctxt->heap == source_heap);  
+  schemerlicht_object* target_heap = get_inactive_heap(ctxt);
+  schemerlicht_assert((abs((int)source_heap - (int)target_heap)) == ctxt->raw_heap.vector_size/2*sizeof(schemerlicht_object));
+  const schemerlicht_memsize heap_size = get_heap_size(ctxt);
+  schemerlicht_assert(target_heap->type == schemerlicht_object_type_blocking);
+  for (schemerlicht_memsize i = 0; i < heap_size; ++i)
+    {
+    *(target_heap + i) = *(source_heap + i);
+    source_heap[i].type = schemerlicht_object_type_blocking;
+    }
+  ctxt->heap = target_heap;
+  target_heap = get_inactive_heap(ctxt);
+  schemerlicht_assert(target_heap->type == schemerlicht_object_type_blocking);
+#else
+  schemerlicht_assert(ctxt->heap_pos < ctxt->raw_heap.vector_size/2);
   gc_state state;
-  state.gc_heap_pos = 0;  
+  state.gc_heap_pos = 0;
   state.gc_objects_treated = schemerlicht_map_new(ctxt, 0, 4);
   sweep_environment(ctxt, &state);
   sweep_stack(ctxt, &state);
@@ -184,18 +201,22 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   const schemerlicht_memsize heap_size = get_heap_size(ctxt);
   for (schemerlicht_memsize i = 0; i < heap_size; ++i)
     {
-    void* ptr = get_object_pointer(source_heap+i);
-    schemerlicht_object key;
-    key.type = schemerlicht_object_type_lambda; // hack for working with pointers
-    key.value.ptr = ptr;
-    schemerlicht_object* value = schemerlicht_map_get(state.gc_objects_treated, &key);
-    if (value == NULL)
+    void* ptr = get_object_pointer(source_heap + i);
+    if (ptr)
       {
-      schemerlicht_object_destroy(ctxt, source_heap+i);
+      schemerlicht_object key;
+      key.type = schemerlicht_object_type_lambda; // hack for working with pointers
+      key.value.ptr = ptr;
+      schemerlicht_object* value = schemerlicht_map_get(state.gc_objects_treated, &key);
+      if (value == NULL)
+        {
+        schemerlicht_object_destroy(ctxt, source_heap + i);
+        }
       }
     source_heap[i].type = schemerlicht_object_type_blocking;
     }
   ctxt->heap = target_heap;
   ctxt->heap_pos = state.gc_heap_pos;
   schemerlicht_map_free(ctxt, state.gc_objects_treated);
+#endif
   }
