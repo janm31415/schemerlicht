@@ -1790,9 +1790,9 @@ static void test_garbage_collection()
   TEST_EQ_INT(83, ctxt->heap_pos);
   TEST_EQ_INT(1, schemerlicht_need_to_perform_gc(ctxt));
 
-  schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 90);
-  printf("%s\n", stackstring.string_ptr);
-  schemerlicht_string_destroy(ctxt, &stackstring);
+  //schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 9);
+  //printf("%s\n", stackstring.string_ptr);
+  //schemerlicht_string_destroy(ctxt, &stackstring);
 
   schemerlicht_collect_garbage(ctxt);
 

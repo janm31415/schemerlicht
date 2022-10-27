@@ -6,7 +6,7 @@
 void schemerlicht_environment_init(schemerlicht_context* ctxt)
   {
   schemerlicht_vector_init(ctxt, &ctxt->environment, schemerlicht_map*);
-  schemerlicht_map* default_environment = schemerlicht_map_new(ctxt, 0, 10);
+  schemerlicht_map* default_environment = schemerlicht_map_new(ctxt, 0, 3);
   schemerlicht_vector_push_back(ctxt, &ctxt->environment, default_environment, schemerlicht_map*);
   }
 
@@ -57,9 +57,29 @@ int schemerlicht_environment_find(schemerlicht_environment_entry* entry, schemer
   return 0;
   }
 
+void schemerlicht_environment_update(schemerlicht_context* ctxt, schemerlicht_string* name, schemerlicht_environment_entry entry)
+  {  
+  schemerlicht_object key;
+  key.type = schemerlicht_object_type_string;
+  key.value.s = *name;
+  schemerlicht_map** map_it = schemerlicht_vector_begin(&ctxt->environment, schemerlicht_map*);
+  schemerlicht_map** map_it_end = schemerlicht_vector_end(&ctxt->environment, schemerlicht_map*);
+  schemerlicht_map** map_rit = map_it_end - 1;
+  schemerlicht_map** map_rit_end = map_it - 1;
+  for (; map_rit != map_rit_end; --map_rit)
+    {
+    schemerlicht_object* entry_object = schemerlicht_map_get(*map_rit, &key);
+    if (entry_object != NULL)
+      {
+      entry_object->type = entry.type + 1;
+      entry_object->value.fx = entry.position;
+      }
+    }
+  }
+
 void schemerlicht_environment_push_child(schemerlicht_context* ctxt)
   {
-  schemerlicht_map* child_env = schemerlicht_map_new(ctxt, 0, 10);
+  schemerlicht_map* child_env = schemerlicht_map_new(ctxt, 0, 3);
   schemerlicht_vector_push_back(ctxt, &ctxt->environment, child_env, schemerlicht_map*);
   }
 
@@ -78,7 +98,7 @@ schemerlicht_memsize schemerlicht_environment_base_size(schemerlicht_context* ct
   return node_size((*parent_map));
   }
 
-int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, schemerlicht_context* ctxt, schemerlicht_memsize pos)
+int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, schemerlicht_string* name, schemerlicht_context* ctxt, schemerlicht_memsize pos)
   {
   schemerlicht_map** parent_map = schemerlicht_vector_at(&ctxt->environment, 0, schemerlicht_map*);
   schemerlicht_assert(pos < cast(schemerlicht_memsize, node_size((*parent_map))));
@@ -86,7 +106,8 @@ int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, sche
     {
     entry->type = (*parent_map)->node[pos].value.type - 1;
     entry->position = (*parent_map)->node[pos].value.value.fx;
+    *name = (*parent_map)->node[pos].key.value.s;
     return 1;
-    }
+    }  
   return 0;
   }

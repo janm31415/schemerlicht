@@ -5,6 +5,7 @@
 #include "string.h"
 #include "limits.h"
 #include "vector.h"
+#include "object.h"
 
 typedef enum
   {
@@ -23,6 +24,7 @@ void schemerlicht_environment_destroy(schemerlicht_context* ctxt);
 
 void schemerlicht_environment_add(schemerlicht_context* ctxt, schemerlicht_string* name, schemerlicht_environment_entry entry);
 int schemerlicht_environment_find(schemerlicht_environment_entry* entry, schemerlicht_context* ctxt, schemerlicht_string* name);
+void schemerlicht_environment_update(schemerlicht_context* ctxt, schemerlicht_string* name, schemerlicht_environment_entry entry);
 
 void schemerlicht_environment_push_child(schemerlicht_context* ctxt);
 void schemerlicht_environment_pop_child(schemerlicht_context* ctxt);
@@ -33,5 +35,5 @@ void schemerlicht_environment_pop_child(schemerlicht_context* ctxt);
 schemerlicht_memsize schemerlicht_environment_base_size(schemerlicht_context* ctxt);
 
 // returns 1 if a valid environment entry found at position pos, 0 otherwise. The entry is returned in 'entry'.
-int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, schemerlicht_context* ctxt, schemerlicht_memsize pos);
+int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, schemerlicht_string* name, schemerlicht_context* ctxt, schemerlicht_memsize pos);
 #endif //SCHEMERLICHT_ENVIRONMENT_H
