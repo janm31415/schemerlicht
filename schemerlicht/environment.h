@@ -27,4 +27,11 @@ int schemerlicht_environment_find(schemerlicht_environment_entry* entry, schemer
 void schemerlicht_environment_push_child(schemerlicht_context* ctxt);
 void schemerlicht_environment_pop_child(schemerlicht_context* ctxt);
 
+// The next 2 functions are useful for garbage collection where we need to run over the environment in order to know which heap positions to keep.
+
+// returns the number of elements in the environment at the parent/base level (thus not taking into account children)
+schemerlicht_memsize schemerlicht_environment_base_size(schemerlicht_context* ctxt);
+
+// returns 1 if a valid environment entry found at position pos, 0 otherwise. The entry is returned in 'entry'.
+int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, schemerlicht_context* ctxt, schemerlicht_memsize pos);
 #endif //SCHEMERLICHT_ENVIRONMENT_H

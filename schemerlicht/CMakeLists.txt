@@ -12,6 +12,7 @@ environment.h
 error.h
 freevaranalysis.h
 func.h
+gc.h
 globdef.h
 lambdatolet.h
 limits.h
@@ -50,6 +51,7 @@ environment.c
 error.c
 freevaranalysis.c
 func.c
+gc.c
 globdef.c
 lambdatolet.c
 map.c

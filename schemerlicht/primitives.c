@@ -2776,7 +2776,7 @@ void schemerlicht_primitive_vector(schemerlicht_context* ctxt, int a, int b, int
     schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&v.value.v, j, schemerlicht_object);
     schemerlicht_set_object(obj_at_pos, arg);
     }
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
@@ -2929,7 +2929,7 @@ void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c
     schemerlicht_set_object(v0, arg0);
     schemerlicht_set_object(v1, arg1);
     }
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
@@ -2960,7 +2960,7 @@ void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c
     v1->type = schemerlicht_object_type_nil;
     schemerlicht_object* last_arg = schemerlicht_vector_at(&ctxt->stack, a + b + c, schemerlicht_object);
     schemerlicht_set_object(v0, last_arg);
-    schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+    schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
     schemerlicht_set_object(heap_obj, &obj1);
     ++ctxt->heap_pos;
     for (int j = b - 1; j >= 1; --j)
@@ -2973,7 +2973,7 @@ void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c
       schemerlicht_set_object(v1, heap_obj);
       schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + j + c, schemerlicht_object);
       schemerlicht_set_object(v0, arg);
-      heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+      heap_obj = &ctxt->heap[ctxt->heap_pos];
       schemerlicht_set_object(heap_obj, &obj2);
       ++ctxt->heap_pos;
       }
@@ -3067,7 +3067,7 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
     schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&v.value.v, j, schemerlicht_object);
     schemerlicht_set_object(obj_at_pos, arg);
     }
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
@@ -3201,7 +3201,7 @@ void schemerlicht_primitive_make_vector(schemerlicht_context* ctxt, int a, int b
     schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&v.value.v, j, schemerlicht_object);
     schemerlicht_set_object(obj_at_pos, fill_obj);
     }
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
@@ -3242,7 +3242,7 @@ void schemerlicht_primitive_make_string(schemerlicht_context* ctxt, int a, int b
       ch = character->value.ch;
     }
   schemerlicht_string_init_with_size(ctxt, &v.value.s, string_length, ch);
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
@@ -3557,7 +3557,7 @@ void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int
       *ch = arg->value.ch;
       }
     }
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);

@@ -25,7 +25,7 @@ static void make_variable_arity_list(schemerlicht_context* ctxt, int a, int b)
     v1->type = schemerlicht_object_type_nil;
     schemerlicht_object* last_arg = schemerlicht_vector_at(&ctxt->stack, a + b - 1, schemerlicht_object);
     schemerlicht_set_object(v0, last_arg);
-    schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+    schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
     schemerlicht_set_object(heap_obj, &obj1);
     ++ctxt->heap_pos;
     for (int j = b - 2; j >= 0; --j)
@@ -38,7 +38,7 @@ static void make_variable_arity_list(schemerlicht_context* ctxt, int a, int b)
       schemerlicht_set_object(v1, heap_obj);
       schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + j, schemerlicht_object);
       schemerlicht_set_object(v0, arg);
-      heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
+      heap_obj = &ctxt->heap[ctxt->heap_pos];
       schemerlicht_set_object(heap_obj, &obj2);
       ++ctxt->heap_pos;
       }

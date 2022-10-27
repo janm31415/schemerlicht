@@ -34,7 +34,8 @@ struct schemerlicht_context
   schemerlicht_global_context* global;
   schemerlicht_vector stack;
   schemerlicht_vector globals;
-  schemerlicht_vector heap;
+  schemerlicht_vector raw_heap;
+  schemerlicht_object* heap;
   schemerlicht_memsize heap_pos;
   int number_of_syntax_errors;
   int number_of_compile_errors;

@@ -21,6 +21,7 @@
 #include "schemerlicht/quoteconv.h"
 #include "schemerlicht/quasiquote.h"
 #include "schemerlicht/environment.h"
+#include "schemerlicht/gc.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -1741,6 +1742,64 @@ static void test_lambda_variable_arity_while_using_rest_arg()
   test_compile_aux("#(10 20 30 40 50 60 (70 80 90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 . args)(vector a0 a1 a2 a3 a4 a5 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
   test_compile_aux("#(10 20 30 40 50 60 70 (80 90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 a6 . args)(vector a0 a1 a2 a3 a4 a5 a6 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
   test_compile_aux("#(10 20 30 40 50 60 70 80 (90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 a6 a7 . args)(vector a0 a1 a2 a3 a4 a5 a6 a7 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(\"a\" (\"b\" \"c\" \"d\"))", "(let([f(lambda(a0 . args) (vector a0 args))]) (f \"a\" \"b\" \"c\" \"d\")) ");
+  }
+
+static void test_lambda_long_list()
+  {
+  test_compile_aux("#(10 20 30 40 50 60 70 80 (90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 a6 a7 a8)(vector a0 a1 a2 a3 a4 a5 a6 a7 (list a8)))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 40 50 60 70 80 90)", "((lambda(a0 a1 a2 a3 a4 a5 a6 a7 a8)(vector a0 a1 a2 a3 a4 a5 a6 a7 a8)) 10 20 30 40 50 60 70 80 90) ");
+  test_compile_aux("450", "((lambda(a0 a1 a2 a3 a4 a5 a6 a7 a8) (+ a0 a1 a2 a3 a4 a5 a6 a7 a8)) 10 20 30 40 50 60 70 80 90) ");
+  }
+
+static void test_lambda_variable_arity_while_using_rest_arg_and_closure()
+  {
+  test_compile_aux("112", "(let ([n 12])(let([f(lambda(m . args) (+ n m))])(f 100 5 2 8)))");
+  test_compile_aux("112", "(let ([n 12])(let([f(lambda(m . args) (+ n m))])(f 100 5)))");
+  test_compile_aux("112", "(let ([n 12])(let([f(lambda(m . args) (+ n m))])(f 100 ())))");
+  test_compile_aux("112", "(let ([n 12])(let([f(lambda(m . args) (+ n m))])(f 100)))");
+  test_compile_aux("115", "(let ([n 12][m 100])(let([f (lambda(a b . args) (+ a b n m))])(f 1 2 5)))");
+  test_compile_aux("115", "(let ([n 12][m 100])(let([f (lambda(a b . args) (+ a b n m))])(f 1 2)))");
+  test_compile_aux("3", "(let([f (lambda(a b . args) (+ a b))])(f 1 2 3 4))");
+  test_compile_aux("6", "(let([f (lambda(a b . args) (+ a b (car args)))])(f 1 2 3 4))");
+  test_compile_aux("10", "(let([f (lambda(a b . args) (+ a b (car args) (car (cdr args))))])(f 1 2 3 4))");
+  test_compile_aux("322", "(let ([n 12][m 100][z 200])(let([f (lambda(a b . args) (+ a b z n m (car args) (car (cdr args))))])(f 1 2 3 4)))");
+  test_compile_aux("315", "(let ([n 12][m 100][z 200])(let([f (lambda(a b . args) (+ a b z n m))])(f 1 2 3 4)))");
+  }
+
+static void test_garbage_collection()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(200);
+  schemerlicht_vector tokens = script2tokens(ctxt, "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 80))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+  schemerlicht_function* fun = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  TEST_EQ_INT(0, ctxt->heap_pos);
+  TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
+
+  schemerlicht_run(ctxt, &fun);
+
+  TEST_EQ_INT(83, ctxt->heap_pos);
+  TEST_EQ_INT(1, schemerlicht_need_to_perform_gc(ctxt));
+
+  schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 90);
+  printf("%s\n", stackstring.string_ptr);
+  schemerlicht_string_destroy(ctxt, &stackstring);
+
+  schemerlicht_collect_garbage(ctxt);
+
+  schemerlicht_function_free(ctxt, fun);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
   }
 
 void run_all_compiler_tests()
@@ -1816,4 +1875,7 @@ void run_all_compiler_tests()
   //test_ack_performance();
   test_lambda_variable_arity_not_using_rest_arg();
   test_lambda_variable_arity_while_using_rest_arg();
+  test_lambda_long_list();
+  test_lambda_variable_arity_while_using_rest_arg_and_closure();
+  test_garbage_collection();
   }

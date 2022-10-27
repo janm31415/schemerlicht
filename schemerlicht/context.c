@@ -24,14 +24,14 @@ static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_
   schemerlicht_syntax_errors_clear(ctxt_to_free);
   schemerlicht_compile_errors_clear(ctxt_to_free);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->stack);
-  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt_to_free->heap, schemerlicht_object);
-  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt_to_free->heap, schemerlicht_object);
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt_to_free->raw_heap, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt_to_free->raw_heap, schemerlicht_object);
   for (; it != it_end; ++it)
     {
     schemerlicht_object_destroy(ctxt, it);
     }
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->globals); // we don't destroy the objects in the globals list, as they point to constants or heap objects
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->heap);
+  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->raw_heap);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);
   schemerlicht_environment_destroy(ctxt_to_free);
@@ -49,16 +49,17 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    it->type = schemerlicht_object_type_undefined;
+    it->type = schemerlicht_object_type_blocking;
     }
   ctxt->heap_pos = 0;
-  schemerlicht_vector_init_with_size(ctxt, &ctxt->heap, heap_size, schemerlicht_object);
-  it = schemerlicht_vector_begin(&ctxt->heap, schemerlicht_object);
-  it_end = schemerlicht_vector_end(&ctxt->heap, schemerlicht_object);
+  schemerlicht_vector_init_with_size(ctxt, &ctxt->raw_heap, heap_size, schemerlicht_object);
+  it = schemerlicht_vector_begin(&ctxt->raw_heap, schemerlicht_object);
+  it_end = schemerlicht_vector_end(&ctxt->raw_heap, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    it->type = schemerlicht_object_type_undefined;
+    it->type = schemerlicht_object_type_blocking;
     }
+  ctxt->heap = cast(schemerlicht_object*, ctxt->raw_heap.vector_ptr);
   ctxt->quote_to_index = schemerlicht_map_new(ctxt, 0, 8);
   ctxt->quote_to_index_size = 0;
   ctxt->string_to_symbol = schemerlicht_map_new(ctxt, 0, 8);
