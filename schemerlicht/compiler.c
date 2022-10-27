@@ -289,6 +289,7 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
       make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i + 1, fun->freereg + i + 1);
       }
     }
+  make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, nr_args+1, schemerlicht_object_type_blocking); // for variable arity function calls we need to know where the arguments stop
   make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 0);
   }
 
@@ -307,6 +308,10 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
     schemerlicht_string entry_name;
     schemerlicht_string_copy(ctxt, &entry_name, var_name);
     schemerlicht_environment_add(ctxt, &entry_name, entry);
+    }
+  if (e->expr.lambda.variable_arity)
+    {
+    make_code_ab(ctxt, new_fun, SCHEMERLICHT_OPCODE_LIST_STACK, e->expr.lambda.variables.vector_size-1, 0);
     }
   new_fun->freereg = e->expr.lambda.variables.vector_size;
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);

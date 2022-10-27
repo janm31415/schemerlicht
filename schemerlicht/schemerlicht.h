@@ -25,6 +25,6 @@ typedef unsigned char schemerlicht_byte;
 #define SCHEMERLICHT_API extern
 #endif
 
-//#define SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
+#define SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
 
 #endif //SCHEMERLICHT_H

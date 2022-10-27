@@ -22,6 +22,7 @@
 #define schemerlicht_object_type_lambda 13
 #define schemerlicht_object_type_primitive 14
 #define schemerlicht_object_type_primitive_object 15
+#define schemerlicht_object_type_blocking 16 // used for indicating where gc can stop or where the variable arity lambda list stops
 
 typedef union
   {

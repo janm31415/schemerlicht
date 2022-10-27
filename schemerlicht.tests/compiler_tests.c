@@ -1527,7 +1527,7 @@ static void test_compile_cc()
   //printf("%s\n", s.string_ptr);
   //schemerlicht_string_destroy(ctxt, &s);
 
-  schemerlicht_object* lambdacallcc = schemerlicht_vector_at(&callccfunc->constants, 0, schemerlicht_object);
+  schemerlicht_object* lambdacallcc = schemerlicht_run(ctxt, &callccfunc);//schemerlicht_vector_at(&callccfunc->constants, 0, schemerlicht_object);
   schemerlicht_object callcc;
   callcc.type = schemerlicht_object_type_closure;
   schemerlicht_vector_init(ctxt, &callcc.value.v, schemerlicht_object);
@@ -1690,6 +1690,59 @@ static void test_compile_cc()
   schemerlicht_close(ctxt);
   }
 
+static void test_ack_performance()
+  {
+  //currently less than 2s with large heap (size 256*256*256) on my laptop
+  test_compile_aux("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)");
+  }
+
+static void test_lambda_variable_arity_not_using_rest_arg()
+  {
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f)) ");
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f 10)) ");
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f 10 20)) ");
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f 10 20 30)) ");
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f 10 20 30 40)) ");
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f 10 20 30 40 50)) ");
+  test_compile_aux("12", "(let([f(lambda args 12)]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("12", "(let([f(lambda (a0 . args) 12)]) (f 10)) ");
+  test_compile_aux("10", "(let([f(lambda (a0 . args) a0)]) (f 10)) ");
+  test_compile_aux("12", "(let([f(lambda (a0 . args) 12)]) (f 10 20)) ");
+  test_compile_aux("10", "(let([f(lambda (a0 . args) a0)]) (f 10 20)) ");
+  test_compile_aux("12", "(let([f(lambda (a0 . args) 12)]) (f 10 20 30)) ");
+  test_compile_aux("10", "(let([f(lambda (a0 . args) a0)]) (f 10 20 30)) ");
+  test_compile_aux("12", "(let([f(lambda (a0 . args) 12)]) (f 10 20 30 40)) ");
+  test_compile_aux("10", "(let([f(lambda (a0 . args) a0)]) (f 10 20 30 40)) ");
+  test_compile_aux("#(10 20)", "(let([f(lambda(a0 a1 . args) (vector a0 a1))]) (f 10 20 30 40 50 60 70 80 90 100)) ");
+  test_compile_aux("#(10 20 30)", "(let([f(lambda(a0 a1 a2 . args) (vector a0 a1 a2))]) (f 10 20 30 40 50 60 70 80 90 100)) ");
+  test_compile_aux("#(10 20 30 40)", "(let([f(lambda(a0 a1 a2 a3 . args) (vector a0 a1 a2 a3))]) (f 10 20 30 40 50 60 70 80 90 100)) ");
+  test_compile_aux("#(10 20 30 40 50)", "(let([f(lambda(a0 a1 a2 a3 a4 . args) (vector a0 a1 a2 a3 a4))]) (f 10 20 30 40 50 60 70 80 90 100)) ");
+  test_compile_aux("#(10 20 30 40 50 60)", "(let([f(lambda(a0 a1 a2 a3 a4 a5 . args) (vector a0 a1 a2 a3 a4 a5))]) (f 10 20 30 40 50 60 70 80 90 100)) ");
+  }
+
+static void test_lambda_variable_arity_while_using_rest_arg()
+  {
+  test_compile_aux("()", "(let([f(lambda args args)]) (f)) ");
+  test_compile_aux("(10)", "(let([f(lambda args args)]) (f 10)) ");
+  test_compile_aux("(10 20)", "(let([f(lambda args args)]) (f 10 20)) ");
+  test_compile_aux("(10 20 30)", "(let([f(lambda args args)]) (f 10 20 30)) ");
+  test_compile_aux("(10 20 30 40)", "(let([f(lambda args args)]) (f 10 20 30 40)) ");
+  test_compile_aux("(10 20 30 40 50)", "(let([f(lambda args args)]) (f 10 20 30 40 50)) ");
+  test_compile_aux("(10 20 30 40 50 60)", "(let([f(lambda args args)]) (f 10 20 30 40 50 60)) ");
+  test_compile_aux("(10 20 30 40 50 60 70)", "(let([f(lambda args args)]) (f 10 20 30 40 50 60 70)) ");
+  test_compile_aux("#(10 ())", "(let([f(lambda(a0 . args) (vector a0 args))]) (f 10)) ");
+  test_compile_aux("#(10 (20))", "(let([f(lambda(a0 . args) (vector a0 args))]) (f 10 20)) ");
+  test_compile_aux("#(10 (20 30))", "(let([f(lambda(a0 . args) (vector a0 args))]) (f 10 20 30)) ");
+  test_compile_aux("#(10 (20 30 40))", "(let([f(lambda(a0 . args) (vector a0 args))]) (f 10 20 30 40)) ");
+  test_compile_aux("#(10 20 (30 40 50 60 70 80 90))", "(let([f(lambda(a0 a1 . args) (vector a0 a1 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 (40 50 60 70 80 90))", "(let([f(lambda(a0 a1 a2 . args) (vector a0 a1 a2 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 40 (50 60 70 80 90))", "(let([f(lambda(a0 a1 a2 a3 . args) (vector a0 a1 a2 a3 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 40 50 (60 70 80 90))", "(let([f(lambda(a0 a1 a2 a3 a4 . args) (vector a0 a1 a2 a3 a4 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 40 50 60 (70 80 90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 . args)(vector a0 a1 a2 a3 a4 a5 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 40 50 60 70 (80 90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 a6 . args)(vector a0 a1 a2 a3 a4 a5 a6 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  test_compile_aux("#(10 20 30 40 50 60 70 80 (90))", "(let([f(lambda(a0 a1 a2 a3 a4 a5 a6 a7 . args)(vector a0 a1 a2 a3 a4 a5 a6 a7 args))]) (f 10 20 30 40 50 60 70 80 90)) ");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -1760,4 +1813,7 @@ void run_all_compiler_tests()
   test_cond();
   test_newton();
   test_compile_cc();
+  //test_ack_performance();
+  test_lambda_variable_arity_not_using_rest_arg();
+  test_lambda_variable_arity_while_using_rest_arg();
   }

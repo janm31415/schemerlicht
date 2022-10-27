@@ -75,14 +75,16 @@ enum schemerlicht_opcode_mode { schemerlicht_iABC, schemerlicht_iABx, schemerlic
 
 typedef enum 
   {
-  SCHEMERLICHT_OPCODE_MOVE,       /*  A B      R(A) := R(B)					*/
-  SCHEMERLICHT_OPCODE_LOADK,      /*  A Bx	   R(A) := Kst(Bx)					*/
+  SCHEMERLICHT_OPCODE_MOVE,       /*  A B      R(A) := R(B)         */
+  SCHEMERLICHT_OPCODE_LOADK,      /*  A Bx	   R(A) := Kst(Bx)      */
+  SCHEMERLICHT_OPCODE_SETTYPE,    /*  A B      type of R(A) := B    */
   SCHEMERLICHT_OPCODE_CALL,       /*  A B C	   R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   SCHEMERLICHT_OPCODE_EQTYPE,     /*  A B      if (type of R(A) == B) then pc++, else perform the following JMP instruction on the next line*/  
   SCHEMERLICHT_OPCODE_JMP,        /*  sBx      PC += sBx					*/
   SCHEMERLICHT_OPCODE_RETURN,     /*  A B	     return R(A), ... ,R(A+B-1) */
   SCHEMERLICHT_OPCODE_LOADGLOBAL, /*  A Bx     R(A) := Global(Bx) */
-  SCHEMERLICHT_OPCODE_STOREGLOBAL /*  A Bx     Global(Bx) := R(A) */
+  SCHEMERLICHT_OPCODE_STOREGLOBAL,/*  A Bx     Global(Bx) := R(A) */
+  SCHEMERLICHT_OPCODE_LIST_STACK, /*  A B      R(A) := (list R(A) R(A+1) ... R(A+x)) with x first occurence where R(A+x+1).type == schemerlicht_object_type_blocked */
   } schemerlicht_opcode;
 
 #define SCHEMERLICHT_NUM_OPCODES (cast(int, SCHEMERLICHT_OPCODE_RETURN+1))

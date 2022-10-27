@@ -296,6 +296,7 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
   switch (key->type)
     {
     case schemerlicht_object_type_void:
+    case schemerlicht_object_type_blocking:
     case schemerlicht_object_type_true:
     case schemerlicht_object_type_false:
     case schemerlicht_object_type_nil:
