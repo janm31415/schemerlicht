@@ -3810,6 +3810,105 @@ void schemerlicht_primitive_member(schemerlicht_context* ctxt, int a, int b, int
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_assv(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ASSV);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_false;
+  if (b >= 2)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+    schemerlicht_object* lst = schemerlicht_vector_at(&ctxt->stack, a + 2, schemerlicht_object);
+    while (lst->type == schemerlicht_object_type_pair)
+      {
+      schemerlicht_object* v0 = schemerlicht_vector_at(&lst->value.v, 0, schemerlicht_object);
+      schemerlicht_object* v1 = schemerlicht_vector_at(&lst->value.v, 1, schemerlicht_object);
+      if (v0->type == schemerlicht_object_type_pair)
+        {
+        schemerlicht_object* v00 = schemerlicht_vector_at(&v0->value.v, 0, schemerlicht_object);
+        if (schemerlicht_objects_eqv(v, v00))
+          {
+          ret = *v0;
+          break;
+          }
+        }
+      lst = v1;
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_assq(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ASSQ);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_false;
+  if (b >= 2)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+    schemerlicht_object* lst = schemerlicht_vector_at(&ctxt->stack, a + 2, schemerlicht_object);
+    while (lst->type == schemerlicht_object_type_pair)
+      {
+      schemerlicht_object* v0 = schemerlicht_vector_at(&lst->value.v, 0, schemerlicht_object);
+      schemerlicht_object* v1 = schemerlicht_vector_at(&lst->value.v, 1, schemerlicht_object);
+      if (v0->type == schemerlicht_object_type_pair)
+        {
+        schemerlicht_object* v00 = schemerlicht_vector_at(&v0->value.v, 0, schemerlicht_object);
+        if (schemerlicht_objects_eq(v, v00))
+          {
+          ret = *v0;
+          break;
+          }
+        }
+      lst = v1;
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_assoc(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ASSOC);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_false;
+  if (b >= 2)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
+    schemerlicht_object* lst = schemerlicht_vector_at(&ctxt->stack, a + 2, schemerlicht_object);
+    while (lst->type == schemerlicht_object_type_pair)
+      {
+      schemerlicht_object* v0 = schemerlicht_vector_at(&lst->value.v, 0, schemerlicht_object);
+      schemerlicht_object* v1 = schemerlicht_vector_at(&lst->value.v, 1, schemerlicht_object);
+      if (v0->type == schemerlicht_object_type_pair)
+        {
+        schemerlicht_object* v00 = schemerlicht_vector_at(&v0->value.v, 0, schemerlicht_object);
+        if (schemerlicht_objects_equal(ctxt, v, v00))
+          {
+          ret = *v0;
+          break;
+          }
+        }
+      lst = v1;
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
   switch (prim_id)
@@ -4090,6 +4189,15 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_MEMBER:
       schemerlicht_primitive_member(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_ASSV:
+      schemerlicht_primitive_assv(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_ASSQ:
+      schemerlicht_primitive_assq(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_ASSOC:
+      schemerlicht_primitive_assoc(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -4198,5 +4306,8 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "memv", SCHEMERLICHT_MEMV);
   map_insert(ctxt, m, "memq", SCHEMERLICHT_MEMQ);
   map_insert(ctxt, m, "member", SCHEMERLICHT_MEMBER);
+  map_insert(ctxt, m, "assv", SCHEMERLICHT_ASSV);
+  map_insert(ctxt, m, "assq", SCHEMERLICHT_ASSQ);
+  map_insert(ctxt, m, "assoc", SCHEMERLICHT_ASSOC);
   return m;
   }

@@ -1896,14 +1896,34 @@ static void test_case()
   test_compile_aux("#undefined", "(case (car '(c d)) [(a) 'a] [(b) 'b])");
   test_compile_aux("consonant", "(case (car '(c d)) [(a e i o u) 'vowel][(w y) 'semivowel][else 'consonant])");
   test_compile_aux("vowel", "(case (car '(e d)) [(a e i o u) 'vowel][(w y) 'semivowel][else 'consonant])");
-  //TEST_EQ("backwards", "(case (list 'y 'x) [((a b) (x y)) 'forwards]  [((b a) (y x)) 'backwards])"); // this only works if case is rewritten with member instead of memv
+  //test_compile_aux("backwards", "(case (list 'y 'x) [((a b) (x y)) 'forwards]  [((b a) (y x)) 'backwards])"); // this only works if case is rewritten with member instead of memv
   test_compile_aux("5", "(let ([x 3]) (case x [else 5]))");
   test_compile_aux("5", "(let ([x #\\a]) (case x [(#\\newline) 7] [else 5]))");
   test_compile_aux("5", "(let ([x #\\a]) (case x [(#\\newline) (char->fixnum x)] [else 5]))");
   test_compile_aux("10", "(let ([x #\\newline]) (case x [(#\\newline) (char->fixnum x)] [else 5]))");
   test_compile_aux("#t", "(let ([x #\\newline]) (eqv? x #\\newline))");
   test_compile_aux("(#\\010)", "(let ([x #\\newline]) (memv x '(#\\newline)))");
+  }
 
+static void test_named_let()
+  {
+  test_compile_aux("((6 1 3) (-5 -2))", "(let loop ([numbers '(3 -2 1 6 -5)][nonneg '()][neg '()])(cond[(null? numbers) (list nonneg neg)][(>= (car numbers) 0) (loop(cdr numbers)(cons(car numbers) nonneg)neg)][(< (car numbers) 0)(loop(cdr numbers) nonneg (cons(car numbers) neg))]))");  
+  }
+
+static void test_list_ops()
+  {  
+  test_compile_aux("((a 1) (b 2) (c 3))", "(define e (list (list 'a 1) (list 'b 2) (list 'c 3)))");
+  test_compile_aux("(a 1)", "(define e (list (list 'a 1) (list 'b 2) (list 'c 3))) (assq 'a e)");
+  test_compile_aux("(b 2)", "(define e (list (list 'a 1) (list 'b 2) (list 'c 3))) (assq 'b e)");
+  test_compile_aux("(c 3)", "(define e (list (list 'a 1) (list 'b 2) (list 'c 3))) (assq 'c e)");
+  test_compile_aux("#f", "(define e (list (list 'a 1) (list 'b 2) (list 'c 3))) (assq 'd e)");
+  test_compile_aux("((a))", "(assoc (list 'a) '(((a)) ((b)) ((c))))");
+  test_compile_aux("(5 7)", "(assv 5 '((2 3) (5 7) (11 13)))");
+  test_compile_aux("((a 1) (b 2) (c 3))", "(define e (list (list 'a 1) (list 'b 2) (list 'c 3))) (set! e '((a 1 ) ( b 2) (c 3)) ) e");
+  test_compile_aux("(a 1)", "(define e '((a 1 ) ( b 2) (c 3)) )(assv 'a e)");
+  test_compile_aux("#f", "(define e '((a 1 ) ( b 2) (c 3)) )(assv 'd e)");
+  test_compile_aux("(a 1)", "(define e '((a 1 ) ( b 2) (c 3)) )(assq 'a e)");
+  test_compile_aux("(a b)", "(define e '((a 1 ) ( b 2) (c 3)) )(memq 'a '(a b))");  
   }
 
 void run_all_compiler_tests()
@@ -1986,4 +2006,6 @@ void run_all_compiler_tests()
   test_is_equal();
   test_memv_memq_member();
   test_case();
+  test_named_let();
+  test_list_ops();
   }

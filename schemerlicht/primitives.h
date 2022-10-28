@@ -97,7 +97,10 @@ typedef enum
   SCHEMERLICHT_RECLAIM,
   SCHEMERLICHT_MEMV,
   SCHEMERLICHT_MEMQ,
-  SCHEMERLICHT_MEMBER
+  SCHEMERLICHT_MEMBER,
+  SCHEMERLICHT_ASSV,
+  SCHEMERLICHT_ASSQ,
+  SCHEMERLICHT_ASSOC
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -192,6 +195,9 @@ void schemerlicht_primitive_reclaim(schemerlicht_context* ctxt, int a, int b, in
 void schemerlicht_primitive_memv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_memq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_member(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_assv(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_assq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_assoc(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
