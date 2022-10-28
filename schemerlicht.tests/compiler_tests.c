@@ -1267,7 +1267,7 @@ static void test_vectors()
   test_compile_aux("(3 . 3)", "(letrec([f (lambda(v i) (if (>= i 0) (f v (sub1 i)) v))])(let([ v (cons 3 3) ]) (f v 3)))");
 
   test_compile_aux("#(#undefined #undefined #undefined #undefined #undefined #undefined #undefined #undefined #undefined #undefined)", "(let ([a (make-vector 10)] [b (make-vector 10)] [c (make-vector 10)]) a)");
-
+  test_compile_aux("#(#t #t #t)", "(let ([v (vector 1 2 3)]) (vector-fill! v #t) v)");
   }
 
 static void test_strings()
@@ -1945,6 +1945,74 @@ static void test_symbol_ops()
   test_compile_aux("(a b)", "(define e '((a 1 ) ( b 2) (c 3)) )(memq 'a '(a b))");
   }
 
+static void test_string_ops()
+  {
+  test_compile_aux("\"sym\"", "(string-copy \"sym\")");
+  test_compile_aux("\"thisisaverylongstring\"", "(string-copy \"thisisaverylongstring\")");
+  test_compile_aux("#undefined", "(string-copy '())");
+  test_compile_aux("#f", "(let ([s \"str\"])  (eq? s (string-copy s)))");
+  test_compile_aux("#f", "(let ([s \"str\"])  (eqv? s (string-copy s)))");
+  test_compile_aux("#t", "(let ([s \"str\"])  (equal? s (string-copy s)))");
+
+  test_compile_aux("\"abcdef\"", "(string-append \"abc\" \"def\")");
+  test_compile_aux("\"abcddefg\"", "(string-append \"abcd\" \"defg\")");
+  test_compile_aux("\"abcdefghijklmn\"", "(string-append \"abcdefg\" \"hijklmn\")");
+  test_compile_aux("\"abcdefg1hijklmn2\"", "(string-append \"abcdefg1\" \"hijklmn2\")");
+  test_compile_aux("\"\"", "(string-append)");
+  test_compile_aux("\"Jan\"", "(string-append \"Jan\")");
+  test_compile_aux("\"abcdef\"", "(string-append \"abc\" \"def\")");
+  test_compile_aux("\"abcddefg\"", "(string-append \"abcd\" \"defg\")");
+  test_compile_aux("\"abcdefghijklmn\"", "(string-append \"abcdefg\" \"hijklmn\")");
+  test_compile_aux("\"abcdefg1hijklmn2\"", "(string-append \"abcdefg1\" \"hijklmn2\")");
+  test_compile_aux("\"abcdefghijklm\"", "(string-append \"abc\" \"def\" \"ghijklm\")");
+
+  test_compile_aux("193485963", "(string-hash \"abc\")");
+  test_compile_aux("193450027", "(string-hash \"ABC\")");
+  test_compile_aux("177670", "(string-hash \"a\")");
+  test_compile_aux("5863207", "(string-hash \"aa\")");
+  test_compile_aux("193485928", "(string-hash \"aaa\")");
+  test_compile_aux("177638", "(string-hash \"A\")");
+  test_compile_aux("5862119", "(string-hash \"AA\")");
+  test_compile_aux("193449992", "(string-hash \"AAA\")");
+  test_compile_aux("177674", "(string-hash (symbol->string 'e))");
+  test_compile_aux("177687", "(string-hash (symbol->string 'r))");
+  test_compile_aux("5863207", "(string-hash \"aa\")");
+  test_compile_aux("5862119", "(string-hash \"AA\")");
+  test_compile_aux("177684", "(string-hash (symbol->string 'o))");
+  test_compile_aux("193450027", "(string-hash \"ABC\")");
+  test_compile_aux("177638", "(string-hash \"A\")");
+  test_compile_aux("177691", "(string-hash (symbol->string 'v))");
+  test_compile_aux("193485963", "(string-hash \"abc\")");
+  test_compile_aux("177673", "(string-hash (symbol->string 'd))");
+  test_compile_aux("177675", "(string-hash (symbol->string 'f))");
+  test_compile_aux("177677", "(string-hash (symbol->string 'h))");
+  test_compile_aux("177688", "(string-hash (symbol->string 's))");
+  test_compile_aux("177689", "(string-hash (symbol->string 't))");
+  test_compile_aux("177682", "(string-hash (symbol->string 'm))");
+  test_compile_aux("177678", "(string-hash (symbol->string 'i))");
+  test_compile_aux("177681", "(string-hash (symbol->string 'l))");
+  test_compile_aux("5863210", "(string-hash (symbol->string 'ad))");
+  test_compile_aux("177690", "(string-hash (symbol->string 'u))");
+  test_compile_aux("177695", "(string-hash (symbol->string 'z))");
+  test_compile_aux("5863214", "(string-hash (symbol->string 'ah))");
+  test_compile_aux("177694", "(string-hash (symbol->string 'y))");
+  test_compile_aux("177679", "(string-hash (symbol->string 'j))");
+  test_compile_aux("177680", "(string-hash (symbol->string 'k))");
+  test_compile_aux("177676", "(string-hash (symbol->string 'g))");
+  test_compile_aux("177693", "(string-hash (symbol->string 'x))");
+  test_compile_aux("177692", "(string-hash (symbol->string 'w))");
+  test_compile_aux("177685", "(string-hash (symbol->string 'p))");
+  test_compile_aux("5863212", "(string-hash (symbol->string 'af))");
+  test_compile_aux("177686", "(string-hash (symbol->string 'q))");
+  test_compile_aux("177670", "(string-hash \"a\")");
+  test_compile_aux("193449992", "(string-hash \"AAA\")");
+  test_compile_aux("193485928", "(string-hash \"aaa\")");
+  test_compile_aux("177683", "(string-hash (symbol->string 'n))");
+  test_compile_aux("6952521827504", "(string-hash (symbol->string 'Martin))");
+
+  test_compile_aux("\"zzzzzzzzzzzzzzzzzzzz\"", "(let ([s \"thisismylongerstring\"]) (string-fill! s #\\z) s)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2028,4 +2096,5 @@ void run_all_compiler_tests()
   test_named_let();
   test_list_ops();
   test_symbol_ops();
+  test_string_ops();
   }

@@ -101,7 +101,11 @@ typedef enum
   SCHEMERLICHT_MEMBER,
   SCHEMERLICHT_ASSV,
   SCHEMERLICHT_ASSQ,
-  SCHEMERLICHT_ASSOC
+  SCHEMERLICHT_ASSOC,
+  SCHEMERLICHT_STRING_APPEND,
+  SCHEMERLICHT_STRING_COPY,
+  SCHEMERLICHT_STRING_FILL,
+  SCHEMERLICHT_VECTOR_FILL,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -200,6 +204,10 @@ void schemerlicht_primitive_member(schemerlicht_context* ctxt, int a, int b, int
 void schemerlicht_primitive_assv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_assq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_assoc(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_append(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_copy(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_fill(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_vector_fill(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
