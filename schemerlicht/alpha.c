@@ -78,7 +78,7 @@ static int find_variable(schemerlicht_string* alpha_name, schemerlicht_alpha_con
     schemerlicht_object* obj = schemerlicht_map_get(*map_rit, &key);
     if (obj != NULL)
       {
-      *alpha_name = obj->value.s;      
+      *alpha_name = obj->value.s;
       return 1;
       }
     }
@@ -113,7 +113,7 @@ static int previsit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
 static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
-  push_variables_child(ctxt, vis);    
+  push_variables_child(ctxt, vis);
   schemerlicht_string* it = schemerlicht_vector_begin(&e->expr.lambda.variables, schemerlicht_string);
   schemerlicht_string* it_end = schemerlicht_vector_end(&e->expr.lambda.variables, schemerlicht_string);
   for (; it != it_end; ++it)
@@ -126,20 +126,20 @@ static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   }
 
 static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
-  {  
-  schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
-  pop_variables_child(ctxt, vis);  
-  }
-
-static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
-  push_variables_child(ctxt, vis);  
+  pop_variables_child(ctxt, vis);
+  }
+
+static void postvisit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
+  push_variables_child(ctxt, vis);
   const schemerlicht_memsize nr_let_bindings = e->expr.let.bindings.vector_size;
   for (schemerlicht_memsize i = 0; i < nr_let_bindings; ++i)
     {
     schemerlicht_let_binding* binding = schemerlicht_vector_at(&e->expr.let.bindings, i, schemerlicht_let_binding);
-    schemerlicht_string alpha_name = schemerlicht_make_alpha_name(ctxt, &binding->binding_name, vis->index++);    
+    schemerlicht_string alpha_name = schemerlicht_make_alpha_name(ctxt, &binding->binding_name, vis->index++);
     add_variable(ctxt, vis, &binding->binding_name, &alpha_name);
     binding->binding_name = alpha_name;
     }
@@ -148,7 +148,7 @@ static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
 static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
-  pop_variables_child(ctxt, vis);  
+  pop_variables_child(ctxt, vis);
   UNUSED(e);
   }
 
@@ -160,7 +160,7 @@ static schemerlicht_alpha_conversion_visitor* schemerlicht_alpha_conversion_visi
   v->visitor->previsit_set = previsit_set;
   v->visitor->previsit_lambda = previsit_lambda;
   v->visitor->postvisit_lambda = postvisit_lambda;
-  v->visitor->previsit_let = previsit_let;
+  v->visitor->postvisit_let_bindings = postvisit_let_bindings;
   v->visitor->postvisit_let = postvisit_let;
   return v;
   }
@@ -171,7 +171,7 @@ static void schemerlicht_alpha_conversion_visitor_free(schemerlicht_context* ctx
     {
     schemerlicht_vector_destroy(ctxt, &v->variables);
     v->visitor->destroy(ctxt, v->visitor);
-    schemerlicht_delete(ctxt, v);    
+    schemerlicht_delete(ctxt, v);
     }
   }
 
@@ -180,7 +180,7 @@ void schemerlicht_alpha_conversion(schemerlicht_context* ctxt, schemerlicht_prog
   {
   schemerlicht_alpha_conversion_visitor* v = schemerlicht_alpha_conversion_visitor_new(ctxt);
   v->index = 0;
-  schemerlicht_vector_init(ctxt, &v->variables, schemerlicht_map*);  
+  schemerlicht_vector_init(ctxt, &v->variables, schemerlicht_map*);
   schemerlicht_visit_program(ctxt, v->visitor, program);
   schemerlicht_alpha_conversion_visitor_free(ctxt, v);
   }

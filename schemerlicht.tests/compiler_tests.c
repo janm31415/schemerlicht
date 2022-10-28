@@ -22,6 +22,7 @@
 #include "schemerlicht/quasiquote.h"
 #include "schemerlicht/environment.h"
 #include "schemerlicht/gc.h"
+#include "schemerlicht/alpha.h"
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -91,6 +92,7 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -131,6 +133,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -1144,7 +1147,7 @@ static void test_letrec2()
   test_compile_aux("1", "(let([v (vector 1 2 3)])(vector-ref v 0))");
   test_compile_aux("#(5 2 3)", "(let([v (vector 1 2 3)])(vector-set! v 0 5) v)");
   test_compile_aux("48", "(letrec([f(letrec([g(lambda(x) (* x 2))]) (lambda(n) (g(* n 2))))]) (f 12)) ");
-  //test_compile_aux("120", "(letrec([f (lambda(f n) (if (zero? n)  1 (* n(f f(sub1 n)))))]) (f f 5)) "); << This fails because no alpha conversion yet
+  test_compile_aux("120", "(letrec([f (lambda(f n) (if (zero? n)  1 (* n(f f(sub1 n)))))]) (f f 5)) "); // << This fails if no alpha conversion
   test_compile_aux("120", "(letrec([f1 (lambda(f n) (if (zero? n)  1 (* n(f f(sub1 n)))))]) (f1 f1 5)) "); // manually alpha converted
   test_compile_aux("120", "(let([f(lambda(f) (lambda(n) (if (zero? n)  1 (* n(f(sub1 n))))))]) (letrec([fix (lambda(f) (f(lambda(n) ((fix f) n))))])((fix f) 5))) ");
   }
@@ -1557,6 +1560,7 @@ static void test_compile_cc()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog); 
+  schemerlicht_alpha_conversion(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   //schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
@@ -1575,6 +1579,7 @@ static void test_compile_cc()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -1599,6 +1604,7 @@ static void test_compile_cc()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -1623,6 +1629,7 @@ static void test_compile_cc()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -1646,6 +1653,7 @@ static void test_compile_cc()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -1669,6 +1677,7 @@ static void test_compile_cc()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   quotes = schemerlicht_quote_collection(ctxt, &prog);
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -1780,6 +1789,7 @@ static void test_garbage_collection()
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
