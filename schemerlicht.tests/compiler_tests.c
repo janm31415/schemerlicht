@@ -1926,6 +1926,25 @@ static void test_list_ops()
   test_compile_aux("(a b)", "(define e '((a 1 ) ( b 2) (c 3)) )(memq 'a '(a b))");  
   }
 
+static void test_symbol_ops()
+  {
+  test_compile_aux("#t", "(symbol? 'foo)");
+  test_compile_aux("#t", "(symbol? (car '(a b)))");
+  test_compile_aux("#f", "(symbol? \"bar\")");
+  test_compile_aux("#t", "(symbol? 'nil)");
+  test_compile_aux("#f", "(symbol? '())");
+  test_compile_aux("#f", "(symbol? #f)");
+  test_compile_aux("abcdefghabcdefghabcdefghabcdefgh1", "(quote abcdefghabcdefghabcdefghabcdefgh1)");
+  test_compile_aux("abcdefghabcdefghabcdefghabcdefgh2", "(quote abcdefghabcdefghabcdefghabcdefgh2)");
+  test_compile_aux("\"sym\"", "(symbol->string 'sym)");
+  test_compile_aux("\"thisisaverylongsymbol\"", "(symbol->string 'thisisaverylongsymbol)");
+  test_compile_aux("((a 1) (b 2) (c 3))", "(define e '((a 1 ) ( b 2) (c 3)) )");
+  test_compile_aux("(a 1)", "(define e '((a 1 ) ( b 2) (c 3)) ) (assv 'a e)");
+  test_compile_aux("#f", "(define e '((a 1 ) ( b 2) (c 3)) ) (assv 'd e)");
+  test_compile_aux("(a 1)", "(define e '((a 1 ) ( b 2) (c 3)) )(assq 'a e)");
+  test_compile_aux("(a b)", "(define e '((a 1 ) ( b 2) (c 3)) )(memq 'a '(a b))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2008,4 +2027,5 @@ void run_all_compiler_tests()
   test_case();
   test_named_let();
   test_list_ops();
+  test_symbol_ops();
   }

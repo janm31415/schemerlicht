@@ -89,6 +89,7 @@ typedef enum
   SCHEMERLICHT_IS_EQUAL,
   SCHEMERLICHT_STRING,
   SCHEMERLICHT_STRING_TO_SYMBOL,
+  SCHEMERLICHT_SYMBOL_TO_STRING,
   SCHEMERLICHT_LENGTH,
   SCHEMERLICHT_SET_CAR,
   SCHEMERLICHT_SET_CDR,
@@ -186,6 +187,7 @@ void schemerlicht_primitive_eqv(schemerlicht_context* ctxt, int a, int b, int c)
 void schemerlicht_primitive_is_equal(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string_to_symbol(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_symbol_to_string(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_length(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_set_car(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_set_cdr(schemerlicht_context* ctxt, int a, int b, int c);

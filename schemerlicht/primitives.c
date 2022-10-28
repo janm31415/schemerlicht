@@ -3554,6 +3554,44 @@ void schemerlicht_primitive_string_to_symbol(schemerlicht_context* ctxt, int a, 
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_symbol_to_string(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SYMBOL_TO_STRING);
+  if (b == 0)
+    {
+    schemerlicht_object v;
+    v.type = schemerlicht_object_type_undefined;
+    schemerlicht_set_object(ra, &v);
+    }
+  else
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_symbol)
+      {      
+      schemerlicht_object v;
+      v.type = schemerlicht_object_type_string;
+      schemerlicht_string_copy(ctxt, &v.value.s, &arg->value.s);
+      schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+      schemerlicht_set_object(heap_obj, &v);
+      ++ctxt->heap_pos;
+
+      schemerlicht_set_object(ra, heap_obj);
+      }
+    else
+      {
+      schemerlicht_object v;
+      v.type = schemerlicht_object_type_undefined;
+      schemerlicht_set_object(ra, &v);
+      }
+    }
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_primitive_length(schemerlicht_context* ctxt, int a, int b, int c)
   {
 
@@ -4198,6 +4236,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_ASSOC:
       schemerlicht_primitive_assoc(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_SYMBOL_TO_STRING:
+      schemerlicht_primitive_symbol_to_string(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -4309,5 +4350,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "assv", SCHEMERLICHT_ASSV);
   map_insert(ctxt, m, "assq", SCHEMERLICHT_ASSQ);
   map_insert(ctxt, m, "assoc", SCHEMERLICHT_ASSOC);
+  map_insert(ctxt, m, "symbol->string", SCHEMERLICHT_SYMBOL_TO_STRING);
   return m;
   }
