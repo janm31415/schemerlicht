@@ -64,7 +64,7 @@ static void add_variable(schemerlicht_context* ctxt, schemerlicht_alpha_conversi
   obj->value.s = *alpha_name;
   }
 
-static int find_variable(schemerlicht_string* alpha_name, schemerlicht_alpha_conversion_visitor* v, schemerlicht_string* var_name)
+static int find_variable(schemerlicht_string* alpha_name, schemerlicht_context* ctxt, schemerlicht_alpha_conversion_visitor* v, schemerlicht_string* var_name)
   {
   schemerlicht_object key;
   key.type = schemerlicht_object_type_string;
@@ -75,7 +75,7 @@ static int find_variable(schemerlicht_string* alpha_name, schemerlicht_alpha_con
   schemerlicht_map** map_rit_end = map_it - 1;
   for (; map_rit != map_rit_end; --map_rit)
     {
-    schemerlicht_object* obj = schemerlicht_map_get(*map_rit, &key);
+    schemerlicht_object* obj = schemerlicht_map_get(ctxt, *map_rit, &key);
     if (obj != NULL)
       {
       *alpha_name = obj->value.s;
@@ -89,7 +89,7 @@ static void visit_variable(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   {
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
   schemerlicht_string alpha_name;
-  if (find_variable(&alpha_name, vis, &e->expr.var.name))
+  if (find_variable(&alpha_name, ctxt, vis, &e->expr.var.name))
     {
     schemerlicht_string_clear(&e->expr.var.name);
     schemerlicht_string_append(ctxt, &e->expr.var.name, &alpha_name);
@@ -102,7 +102,7 @@ static int previsit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
     return 1;
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
   schemerlicht_string alpha_name;
-  if (find_variable(&alpha_name, vis, &e->expr.set.name))
+  if (find_variable(&alpha_name, ctxt, vis, &e->expr.set.name))
     {
     schemerlicht_string_clear(&e->expr.set.name);
     schemerlicht_string_append(ctxt, &e->expr.set.name, &alpha_name);

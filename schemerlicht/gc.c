@@ -95,7 +95,7 @@ static schemerlicht_memsize collect_object(schemerlicht_context* ctxt, schemerli
     schemerlicht_object key;
     key.type = schemerlicht_object_type_lambda; // hack for working with pointers
     key.value.ptr = ptr;
-    schemerlicht_object* value = schemerlicht_map_get(state->gc_objects_treated, &key);
+    schemerlicht_object* value = schemerlicht_map_get(ctxt, state->gc_objects_treated, &key);
     if (value != NULL)
       {
       schemerlicht_assert(value->type == schemerlicht_object_type_fixnum);
@@ -207,7 +207,7 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
       schemerlicht_object key;
       key.type = schemerlicht_object_type_lambda; // hack for working with pointers
       key.value.ptr = ptr;
-      schemerlicht_object* value = schemerlicht_map_get(state.gc_objects_treated, &key);
+      schemerlicht_object* value = schemerlicht_map_get(ctxt, state.gc_objects_treated, &key);
       if (value == NULL)
         {
         schemerlicht_object_destroy(ctxt, source_heap + i);

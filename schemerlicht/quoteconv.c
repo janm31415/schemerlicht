@@ -223,7 +223,7 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   schemerlicht_object* quote_object = NULL;
   if (schemerlicht_string_vector_binary_search(vis->collected_quotes, &key.value.s))
     {
-    quote_object = schemerlicht_map_get(ctxt->quote_to_index, &key);
+    quote_object = schemerlicht_map_get(ctxt, ctxt->quote_to_index, &key);
     if (quote_object == NULL)
       {
       schemerlicht_expression set = schemerlicht_init_set(ctxt);
@@ -253,7 +253,7 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
       schemerlicht_vector_push_back(ctxt, &ctxt->globals, obj, schemerlicht_object);
       }
     }
-  quote_object = schemerlicht_map_get(ctxt->quote_to_index, &key);
+  quote_object = schemerlicht_map_get(ctxt, ctxt->quote_to_index, &key);
   schemerlicht_assert(quote_object != NULL);
   schemerlicht_assert(quote_object->type == schemerlicht_object_type_fixnum);
   schemerlicht_expression var = schemerlicht_init_variable(ctxt);

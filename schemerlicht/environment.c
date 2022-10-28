@@ -46,7 +46,7 @@ int schemerlicht_environment_find(schemerlicht_environment_entry* entry, schemer
   schemerlicht_map** map_rit_end = map_it - 1;
   for (; map_rit != map_rit_end; --map_rit)
     {
-    schemerlicht_object* entry_object = schemerlicht_map_get(*map_rit, &key);
+    schemerlicht_object* entry_object = schemerlicht_map_get(ctxt, *map_rit, &key);
     if (entry_object != NULL)
       {
       entry->type = entry_object->type - 1;
@@ -68,7 +68,7 @@ void schemerlicht_environment_update(schemerlicht_context* ctxt, schemerlicht_st
   schemerlicht_map** map_rit_end = map_it - 1;
   for (; map_rit != map_rit_end; --map_rit)
     {
-    schemerlicht_object* entry_object = schemerlicht_map_get(*map_rit, &key);
+    schemerlicht_object* entry_object = schemerlicht_map_get(ctxt, *map_rit, &key);
     if (entry_object != NULL)
       {
       entry_object->type = entry.type + 1;

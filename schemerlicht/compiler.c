@@ -48,7 +48,7 @@ static void make_code_abc(schemerlicht_context* ctxt, schemerlicht_function* fun
 
 static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* k)
   {
-  const schemerlicht_object* idx = schemerlicht_map_get(fun->constants_map, k);
+  const schemerlicht_object* idx = schemerlicht_map_get(ctxt, fun->constants_map, k);
   if (idx != NULL && idx->type == schemerlicht_object_type_fixnum)
     {
     schemerlicht_object_destroy(ctxt, k); // the key should be destroyed as the object was already added to the constants map
@@ -128,7 +128,7 @@ static schemerlicht_object* find_primitive(schemerlicht_context* ctxt, schemerli
   schemerlicht_object key;
   key.type = schemerlicht_object_type_string;
   key.value.s = *s;
-  schemerlicht_object* res = schemerlicht_map_get(ctxt->global->primitives_map, &key);
+  schemerlicht_object* res = schemerlicht_map_get(ctxt, ctxt->global->primitives_map, &key);
   return res;
   }
 
@@ -396,6 +396,7 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
       compile_funcall(ctxt, fun, e);
       break;
     case schemerlicht_type_nop:
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, fun->freereg, schemerlicht_object_type_undefined);
       break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);

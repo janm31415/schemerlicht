@@ -340,7 +340,7 @@ schemerlicht_object* schemerlicht_map_get_indexed(schemerlicht_map* map, schemer
     }
   }
 
-static schemerlicht_object* schemerlicht_map_get_any(schemerlicht_map* map, const schemerlicht_object* key)
+static schemerlicht_object* schemerlicht_map_get_any(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key)
   {
   if (key->type == schemerlicht_object_type_undefined)
     return NULL;
@@ -349,7 +349,7 @@ static schemerlicht_object* schemerlicht_map_get_any(schemerlicht_map* map, cons
     schemerlicht_map_node* n = schemerlicht_main_position(map, key);
     do
       {
-      if (schemerlicht_objects_equal(get_key(n), key))
+      if (schemerlicht_objects_equal(ctxt, get_key(n), key))
         return get_value(n);
       else
         n = n->next;
@@ -371,7 +371,7 @@ schemerlicht_object* schemerlicht_map_get_string(schemerlicht_map* map, const ch
     return NULL;
   }
 
-schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerlicht_object* key)
+schemerlicht_object* schemerlicht_map_get(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key)
   {
   switch (key->type)
     {
@@ -386,7 +386,7 @@ schemerlicht_object* schemerlicht_map_get(schemerlicht_map* map, const schemerli
       }
     }
     default:
-      return schemerlicht_map_get_any(map, key);
+      return schemerlicht_map_get_any(ctxt, map, key);
     }
   }
 
@@ -429,7 +429,7 @@ static schemerlicht_object* new_key(schemerlicht_context* ctxt, schemerlicht_map
   // there are no free places anymore.
   get_value(main)->type = schemerlicht_object_type_fixnum;
   schemerlicht_rehash(ctxt, map); // grow map
-  schemerlicht_object* val = cast(schemerlicht_object*, schemerlicht_map_get(map, key));
+  schemerlicht_object* val = cast(schemerlicht_object*, schemerlicht_map_get(ctxt, map, key));
   schemerlicht_assert(val->type == schemerlicht_object_type_fixnum);
   val->type = schemerlicht_object_type_undefined;
   return val;
@@ -451,7 +451,7 @@ schemerlicht_object* schemerlicht_map_insert_indexed(schemerlicht_context* ctxt,
 
 schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemerlicht_map* map, const schemerlicht_object* key)
   {
-  schemerlicht_object* p = schemerlicht_map_get(map, key);
+  schemerlicht_object* p = schemerlicht_map_get(ctxt, map, key);
   if (p != NULL)
     return p;
   else

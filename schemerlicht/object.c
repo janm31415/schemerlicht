@@ -2,7 +2,148 @@
 #include <string.h>
 #include <stdio.h>
 
-int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlicht_object* obj2)
+int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_object* obj2)
+  {
+  if (obj1->type != obj2->type)
+    return 0;
+  switch (obj1->type)
+    {
+    case schemerlicht_object_type_undefined:
+    case schemerlicht_object_type_true:
+    case schemerlicht_object_type_false:
+    case schemerlicht_object_type_nil:
+    case schemerlicht_object_type_void:
+    case schemerlicht_object_type_blocking:
+      return 1;
+    case schemerlicht_object_type_primitive:
+    case schemerlicht_object_type_primitive_object:
+    case schemerlicht_object_type_fixnum:
+      return obj1->value.fx == obj2->value.fx;
+    case schemerlicht_object_type_flonum:
+      return obj1->value.fl == obj2->value.fl;
+    case schemerlicht_object_type_char:
+      return obj1->value.ch == obj2->value.ch;
+    case schemerlicht_object_type_symbol:
+    case schemerlicht_object_type_string:
+      return obj1->value.s.string_ptr == obj2->value.s.string_ptr ? 1 : 0;
+    case schemerlicht_object_type_lambda:
+      return obj1->value.ptr == obj2->value.ptr;
+    default:
+      return obj1->value.v.vector_ptr == obj2->value.v.vector_ptr;
+    }
+  }
+
+int schemerlicht_objects_eqv(const schemerlicht_object* obj1, const schemerlicht_object* obj2)
+  {
+  return schemerlicht_objects_eq(obj1, obj2);
+  }
+
+
+static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2)
+  {
+  schemerlicht_assert(obj1->type == obj2->type);
+  schemerlicht_assert(obj1->value.v.vector_size == obj2->value.v.vector_size);  
+  schemerlicht_vector left_queue, right_queue;
+  schemerlicht_vector_init(ctxt, &left_queue, schemerlicht_object);
+  schemerlicht_vector_init(ctxt, &right_queue, schemerlicht_object);
+  schemerlicht_object* it = schemerlicht_vector_begin(&obj1->value.v, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&obj1->value.v, schemerlicht_object);
+  schemerlicht_object* insertion_pos = schemerlicht_vector_begin(&left_queue, schemerlicht_object);
+  schemerlicht_vector_insert(ctxt, &left_queue, &insertion_pos, &it, &it_end, schemerlicht_object);
+  it = schemerlicht_vector_begin(&obj2->value.v, schemerlicht_object);
+  it_end = schemerlicht_vector_end(&obj2->value.v, schemerlicht_object);
+  insertion_pos = schemerlicht_vector_begin(&right_queue, schemerlicht_object);
+  schemerlicht_vector_insert(ctxt, &right_queue, &insertion_pos, &it, &it_end, schemerlicht_object);
+  
+  while (left_queue.vector_size > 0)
+    {
+    schemerlicht_object* o1 = schemerlicht_vector_back(&left_queue, schemerlicht_object);
+    schemerlicht_object* o2 = schemerlicht_vector_back(&right_queue, schemerlicht_object);
+    schemerlicht_vector_pop_back(&left_queue);
+    schemerlicht_vector_pop_back(&right_queue);
+    if (o1->type != o2->type)
+      {
+      schemerlicht_vector_destroy(ctxt, &left_queue);
+      schemerlicht_vector_destroy(ctxt, &right_queue);
+      return 0;
+      }
+    switch (o1->type)
+      {
+      case schemerlicht_object_type_undefined:
+      case schemerlicht_object_type_true:
+      case schemerlicht_object_type_false:
+      case schemerlicht_object_type_nil:
+      case schemerlicht_object_type_void:
+      case schemerlicht_object_type_blocking:
+        break;
+      case schemerlicht_object_type_primitive:
+      case schemerlicht_object_type_primitive_object:
+      case schemerlicht_object_type_fixnum:
+        if (o1->value.fx != o2->value.fx)
+          {
+          schemerlicht_vector_destroy(ctxt, &left_queue);
+          schemerlicht_vector_destroy(ctxt, &right_queue);
+          return 0;
+          }
+        break;
+      case schemerlicht_object_type_flonum:
+        if (o1->value.fl != o2->value.fl)
+          {
+          schemerlicht_vector_destroy(ctxt, &left_queue);
+          schemerlicht_vector_destroy(ctxt, &right_queue);
+          return 0;
+          }
+        break;
+      case schemerlicht_object_type_char:
+        if (o1->value.ch != o2->value.ch)
+          {
+          schemerlicht_vector_destroy(ctxt, &left_queue);
+          schemerlicht_vector_destroy(ctxt, &right_queue);
+          return 0;
+          }
+        break;
+      case schemerlicht_object_type_symbol:
+      case schemerlicht_object_type_string:
+        if (strcmp(obj1->value.s.string_ptr, obj2->value.s.string_ptr) != 0)
+          {
+          schemerlicht_vector_destroy(ctxt, &left_queue);
+          schemerlicht_vector_destroy(ctxt, &right_queue);
+          return 0;
+          }
+        break;
+      case schemerlicht_object_type_lambda:
+        if (o1->value.ptr != o2->value.ptr)
+          {
+          schemerlicht_vector_destroy(ctxt, &left_queue);
+          schemerlicht_vector_destroy(ctxt, &right_queue);
+          return 0;
+          }
+        break;
+      default:
+        if (o1->value.v.vector_size != o2->value.v.vector_size)
+          {
+          schemerlicht_vector_destroy(ctxt, &left_queue);
+          schemerlicht_vector_destroy(ctxt, &right_queue);
+          return 0;
+          }
+        it = schemerlicht_vector_begin(&o1->value.v, schemerlicht_object);
+        it_end = schemerlicht_vector_end(&o1->value.v, schemerlicht_object);
+        insertion_pos = schemerlicht_vector_begin(&left_queue, schemerlicht_object);
+        schemerlicht_vector_insert(ctxt, &left_queue, &insertion_pos, &it, &it_end, schemerlicht_object);
+        it = schemerlicht_vector_begin(&o2->value.v, schemerlicht_object);
+        it_end = schemerlicht_vector_end(&o2->value.v, schemerlicht_object);
+        insertion_pos = schemerlicht_vector_begin(&right_queue, schemerlicht_object);
+        schemerlicht_vector_insert(ctxt, &right_queue, &insertion_pos, &it, &it_end, schemerlicht_object);
+        break;
+      }
+    }
+  
+  schemerlicht_vector_destroy(ctxt, &left_queue);
+  schemerlicht_vector_destroy(ctxt, &right_queue);
+  return 1;
+  }
+
+int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
   if (obj1->type != obj2->type)
     return 0;
@@ -29,7 +170,9 @@ int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlic
     case schemerlicht_object_type_lambda:
       return obj1->value.ptr == obj2->value.ptr;
     default:
-      return obj1->value.v.vector_ptr == obj2->value.v.vector_ptr;
+      if (obj1->value.v.vector_size != obj2->value.v.vector_size)
+        return 0;
+      return schemerlicht_objects_equal_recursive(ctxt, obj1, obj2);
     }
   }
 

@@ -48,7 +48,9 @@ typedef struct schemerlicht_object
   o1->value = o2->value; \
   }
 
-int schemerlicht_objects_equal(const schemerlicht_object* obj1, const schemerlicht_object* obj2);
+int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2);
+int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_object* obj2);
+int schemerlicht_objects_eqv(const schemerlicht_object* obj1, const schemerlicht_object* obj2);
 
 int schemerlicht_log2(uint32_t x);
 
