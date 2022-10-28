@@ -106,6 +106,19 @@ typedef enum
   SCHEMERLICHT_STRING_COPY,
   SCHEMERLICHT_STRING_FILL,
   SCHEMERLICHT_VECTOR_FILL,
+  SCHEMERLICHT_CURRENT_SECONDS,
+  SCHEMERLICHT_CURRENT_MILLISECONDS,
+  SCHEMERLICHT_IS_LIST,
+  SCHEMERLICHT_STRING_EQUAL,
+  SCHEMERLICHT_STRING_LESS,
+  SCHEMERLICHT_STRING_GREATER,
+  SCHEMERLICHT_STRING_LEQ,
+  SCHEMERLICHT_STRING_GEQ,
+  SCHEMERLICHT_STRING_CI_EQUAL,
+  SCHEMERLICHT_STRING_CI_LESS,
+  SCHEMERLICHT_STRING_CI_GREATER,
+  SCHEMERLICHT_STRING_CI_LEQ,
+  SCHEMERLICHT_STRING_CI_GEQ,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -208,6 +221,19 @@ void schemerlicht_primitive_string_append(schemerlicht_context* ctxt, int a, int
 void schemerlicht_primitive_string_copy(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string_fill(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_vector_fill(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_current_seconds(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_current_milliseconds(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_list(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_equal(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_less(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_greater(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_leq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_geq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_ci_equal(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_ci_less(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_ci_greater(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_ci_leq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_ci_geq(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

@@ -2183,10 +2183,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "closure?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure-ref", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "cons", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "compare-strings", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "compare-strings-ci", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "current-seconds", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "current-milliseconds", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "current-seconds", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "current-milliseconds", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "define", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "defmacro", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "define-macro", schemerlicht_et_primitive_call);
@@ -2236,6 +2234,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   //map_insert(ctxt, m, "load", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "length", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "list", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "list?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "make-port", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "make-string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "make-vector", schemerlicht_et_primitive_call);
@@ -2272,6 +2271,16 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "string-ref", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string-set!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string->symbol", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string=?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string>?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string<?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string>=?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string<=?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string-ci=?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string-ci>?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string-ci<?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string-ci>=?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string-ci<=?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "substring", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "symbol?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "symbol->string", schemerlicht_et_primitive_call);
