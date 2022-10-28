@@ -119,6 +119,7 @@ typedef enum
   SCHEMERLICHT_STRING_CI_GREATER,
   SCHEMERLICHT_STRING_CI_LEQ,
   SCHEMERLICHT_STRING_CI_GEQ,
+  SCHEMERLICHT_SUBSTRING
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -234,6 +235,7 @@ void schemerlicht_primitive_string_ci_less(schemerlicht_context* ctxt, int a, in
 void schemerlicht_primitive_string_ci_greater(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string_ci_leq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string_ci_geq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_substring(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

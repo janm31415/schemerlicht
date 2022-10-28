@@ -2281,7 +2281,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "string-ci<?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string-ci>=?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string-ci<=?", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "substring", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "substring", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "symbol?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "symbol->string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sub1", schemerlicht_et_primitive_call);

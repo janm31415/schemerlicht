@@ -2104,6 +2104,14 @@ static void test_string_ops()
   test_compile_aux("#f", "(string-ci>=? \"abC\" \"aBcd\")");
   test_compile_aux("#t", "(string-ci>=? \"abCD\" \"aBc\")");
   test_compile_aux("#t", "(string-ci>=? \"aBC\" \"ABc\")");
+
+  test_compile_aux("\"cdefgh\"", "(substring \"abcdefghijklm\" 2 8)");
+  test_compile_aux("\"c\"", "(substring \"abcdefghijklm\" 2 3)");
+  test_compile_aux("\"cdefghijklm\"", "(substring \"abcdefghijklm\" 2 13)");
+  test_compile_aux("\"cdefghijklm\"", "(substring \"abcdefghijklm\" 2 14)");
+  test_compile_aux("\"cdefghijklm\"", "(substring \"abcdefghijklm\" 2 15)");
+  test_compile_aux("\"cdefghijklm\"", "(substring \"abcdefghijklm\" 2 16)");
+  test_compile_aux("\"cdefghijklm\"", "(substring \"abcdefghijklm\" 2 35)");
   }
 
 static void test_current_seconds()

@@ -4441,6 +4441,40 @@ void schemerlicht_primitive_string_ci_geq(schemerlicht_context* ctxt, int a, int
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_substring(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SUBSTRING);
+  schemerlicht_object v;
+  v.type = schemerlicht_object_type_undefined;
+  if (b > 2)
+    {
+    schemerlicht_object* str = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    schemerlicht_object* from = schemerlicht_vector_at(&ctxt->stack, a + c + 2, schemerlicht_object);
+    schemerlicht_object* to = schemerlicht_vector_at(&ctxt->stack, a + c + 3, schemerlicht_object);
+    if (str->type == schemerlicht_object_type_string && from->type == schemerlicht_object_type_fixnum && to->type == schemerlicht_object_type_fixnum)
+      {
+      if (from->value.fx >= 0 && from->value.fx <= to->value.fx)
+        {
+        const schemerlicht_memsize f = cast(schemerlicht_memsize, from->value.fx);
+        schemerlicht_memsize t = cast(schemerlicht_memsize, to->value.fx);
+        if (t > str->value.s.string_length)
+          t = str->value.s.string_length;
+        v.type = schemerlicht_object_type_string;
+        schemerlicht_string_init_ranged(ctxt, &v.value.s, str->value.s.string_ptr + f, str->value.s.string_ptr + t);
+        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+        schemerlicht_set_object(heap_obj, &v);
+        ++ctxt->heap_pos;
+        }
+      }
+    }
+  schemerlicht_set_object(ra, &v);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
   switch (prim_id)
@@ -4784,6 +4818,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_STRING_CI_GEQ:
       schemerlicht_primitive_string_ci_geq(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_SUBSTRING:
+      schemerlicht_primitive_substring(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -4913,5 +4950,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "string-ci>?", SCHEMERLICHT_STRING_CI_GREATER);
   map_insert(ctxt, m, "string-ci<=?", SCHEMERLICHT_STRING_CI_LEQ);
   map_insert(ctxt, m, "string-ci>=?", SCHEMERLICHT_STRING_CI_GEQ);
+  map_insert(ctxt, m, "substring", SCHEMERLICHT_SUBSTRING);
   return m;
   }
