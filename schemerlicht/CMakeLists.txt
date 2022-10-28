@@ -1,4 +1,5 @@
 set(HDRS
+alpha.h
 assignablevarconv.h
 begconv.h
 closure.h
@@ -38,6 +39,7 @@ vm.h
 )
 	
 set(SRCS
+alpha.c
 assignablevarconv.c
 begconv.c
 closure.c

@@ -15,6 +15,7 @@
 #include "schemerlicht/quotecollect.h"
 #include "schemerlicht/globdef.h"
 #include "schemerlicht/quoteconv.h"
+#include "schemerlicht/alpha.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -838,6 +839,41 @@ static void test_quote_conversion()
   test_quote_conversion_aux("'(foo foo foo foo foo foo foo foo foo foo foo)", "( begin ( set! #%q0 ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) ( cons ( string->symbol \"foo\" ) () ) ) ) ) ) ) ) ) ) ) ) ) #%q0 ) ");
   }
 
+static void test_alpha_conversion_aux(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);  
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);  
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_alpha_conversion()
+  {
+  test_alpha_conversion_aux("(let ([x 5][y 6]) x)", "( let ( [ %x_0 5 ] [ %y_1 6 ] ) ( begin %x_0 ) ) ");
+  test_alpha_conversion_aux("(define var (let ([x 5][y 6]) x))", "( define var ( let ( [ %x_0 5 ] [ %y_1 6 ] ) ( begin %x_0 ) ) ) ");
+  }
+
+static void test_alpha_naming()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_string original;
+  schemerlicht_string_init(ctxt, &original, "myvar");
+  schemerlicht_string alpha = schemerlicht_make_alpha_name(ctxt, &original, 123);
+  schemerlicht_string original2 = schemerlicht_get_original_name_from_alpha(ctxt, &alpha);
+  TEST_EQ_STRING("%myvar_123", alpha.string_ptr);
+  TEST_EQ_STRING(original.string_ptr, original2.string_ptr);
+  schemerlicht_string_destroy(ctxt, &original2);
+  schemerlicht_string_destroy(ctxt, &original);
+  schemerlicht_string_destroy(ctxt, &alpha);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -881,4 +917,6 @@ void run_all_conv_tests()
   test_quote_collect_1();
   test_quote_conversion();
   test_call_cc();
+  test_alpha_conversion();
+  test_alpha_naming();
   }
