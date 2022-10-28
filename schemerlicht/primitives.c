@@ -2742,7 +2742,7 @@ void schemerlicht_primitive_arithmetic_shift(schemerlicht_context* ctxt, int a, 
         schemerlicht_object* next_arg = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
         if (next_arg->type == schemerlicht_object_type_fixnum)
           {
-          if (ret.value.fx >= 0)
+          if (next_arg->value.fx >= 0)
             ret.value.fx <<= next_arg->value.fx;
           else
             ret.value.fx >>= (-next_arg->value.fx);
@@ -4276,7 +4276,7 @@ void schemerlicht_primitive_string_geq(schemerlicht_context* ctxt, int a, int b,
 static char tolower(char ch)
   {
   if (ch >= 'A' && ch <= 'Z')
-    ch += ('a'-'A');
+    ch += ('a' - 'A');
   return ch;
   }
 
@@ -4308,7 +4308,7 @@ void schemerlicht_primitive_string_ci_equal(schemerlicht_context* ctxt, int a, i
             v.type = schemerlicht_object_type_false;
             schemerlicht_set_object(ra, &v);
             return;
-            }    
+            }
           }
         v.type = schemerlicht_object_type_true;
         }
@@ -4471,6 +4471,214 @@ void schemerlicht_primitive_substring(schemerlicht_context* ctxt, int a, int b, 
       }
     }
   schemerlicht_set_object(ra, &v);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MAX);
+  if (b == 0)
+    {
+    schemerlicht_object ret;
+    ret.type = schemerlicht_object_type_undefined;
+    schemerlicht_set_object(ra, &ret);
+    }
+  else
+    {
+    schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (first_arg->type != schemerlicht_object_type_fixnum &&
+      first_arg->type != schemerlicht_object_type_flonum &&
+      first_arg->type != schemerlicht_object_type_char
+      )
+      {
+      schemerlicht_object ret;
+      ret.type = schemerlicht_object_type_undefined;
+      schemerlicht_set_object(ra, &ret);
+      return;
+      }
+    schemerlicht_object ret = *first_arg;
+    for (int j = 1; j < b; ++j)
+      {
+      schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+
+      switch (arg->type)
+        {
+        case schemerlicht_object_type_flonum:
+        {
+        switch (ret.type)
+          {
+          case schemerlicht_object_type_flonum:
+            if (arg->value.fl > ret.value.fl)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_fixnum:
+            if (arg->value.fl > ret.value.fx)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_char:
+            if (arg->value.fl > ret.value.ch)
+              ret = *arg;
+            break;
+          }
+        break;
+        }
+        case schemerlicht_object_type_fixnum:
+        {
+        switch (ret.type)
+          {
+          case schemerlicht_object_type_flonum:
+            if (arg->value.fx > ret.value.fl)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_fixnum:
+            if (arg->value.fx > ret.value.fx)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_char:
+            if (arg->value.fx > ret.value.ch)
+              ret = *arg;
+            break;
+          }
+        break;
+        }
+        case schemerlicht_object_type_char:
+        {
+        switch (ret.type)
+          {
+          case schemerlicht_object_type_flonum:
+            if (arg->value.ch > ret.value.fl)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_fixnum:
+            if (arg->value.ch > ret.value.fx)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_char:
+            if (arg->value.ch > ret.value.ch)
+              ret = *arg;
+            break;
+          }
+        break;
+        }
+        default:
+        {
+        ret.type = schemerlicht_object_type_undefined;
+        schemerlicht_set_object(ra, &ret);
+        return;
+        }
+        }
+      }
+    schemerlicht_set_object(ra, &ret);
+    }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_min(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MIN);
+  if (b == 0)
+    {
+    schemerlicht_object ret;
+    ret.type = schemerlicht_object_type_undefined;
+    schemerlicht_set_object(ra, &ret);
+    }
+  else
+    {
+    schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (first_arg->type != schemerlicht_object_type_fixnum &&
+      first_arg->type != schemerlicht_object_type_flonum &&
+      first_arg->type != schemerlicht_object_type_char
+      )
+      {
+      schemerlicht_object ret;
+      ret.type = schemerlicht_object_type_undefined;
+      schemerlicht_set_object(ra, &ret);
+      return;
+      }
+    schemerlicht_object ret = *first_arg;
+    for (int j = 1; j < b; ++j)
+      {
+      schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+
+      switch (arg->type)
+        {
+        case schemerlicht_object_type_flonum:
+        {
+        switch (ret.type)
+          {
+          case schemerlicht_object_type_flonum:
+            if (arg->value.fl < ret.value.fl)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_fixnum:
+            if (arg->value.fl < ret.value.fx)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_char:
+            if (arg->value.fl < ret.value.ch)
+              ret = *arg;
+            break;
+          }
+          break;
+        }
+        case schemerlicht_object_type_fixnum:
+        {
+        switch (ret.type)
+          {
+          case schemerlicht_object_type_flonum:
+            if (arg->value.fx < ret.value.fl)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_fixnum:
+            if (arg->value.fx < ret.value.fx)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_char:
+            if (arg->value.fx < ret.value.ch)
+              ret = *arg;
+            break;
+          }
+          break;
+        }
+        case schemerlicht_object_type_char:
+        {
+        switch (ret.type)
+          {
+          case schemerlicht_object_type_flonum:
+            if (arg->value.ch < ret.value.fl)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_fixnum:
+            if (arg->value.ch < ret.value.fx)
+              ret = *arg;
+            break;
+          case schemerlicht_object_type_char:
+            if (arg->value.ch < ret.value.ch)
+              ret = *arg;
+            break;
+          }
+        break;
+        }
+        default:
+        {
+          ret.type = schemerlicht_object_type_undefined;
+          schemerlicht_set_object(ra, &ret);
+          return;
+        }
+        }
+      }
+    schemerlicht_set_object(ra, &ret);
+    }
   }
 
 ////////////////////////////////////////////////////
@@ -4821,6 +5029,12 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_SUBSTRING:
       schemerlicht_primitive_substring(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_MAX:
+      schemerlicht_primitive_max(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_MIN:
+      schemerlicht_primitive_min(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -4951,5 +5165,7 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "string-ci<=?", SCHEMERLICHT_STRING_CI_LEQ);
   map_insert(ctxt, m, "string-ci>=?", SCHEMERLICHT_STRING_CI_GEQ);
   map_insert(ctxt, m, "substring", SCHEMERLICHT_SUBSTRING);
+  map_insert(ctxt, m, "max", SCHEMERLICHT_MAX);
+  map_insert(ctxt, m, "min", SCHEMERLICHT_MIN);
   return m;
   }

@@ -2238,11 +2238,11 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   //map_insert(ctxt, m, "make-port", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "make-string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "make-vector", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "max", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "max", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "member", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "memv", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "memq", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "min", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "min", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "not", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "null?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "num2str", schemerlicht_et_primitive_call);

@@ -2132,6 +2132,28 @@ static void test_is_list()
   test_compile_aux("#f", "(list? \"a string\")");
   }
 
+static void test_min_max()
+  {
+  test_compile_aux("1", "(max 1)");
+  test_compile_aux("2", "(min 2)");
+  test_compile_aux("1.500000", "(max 1.5)");
+  test_compile_aux("2.200000", "(min 2.2)");
+  test_compile_aux("2.000000", "(max 1.0 2.0)");
+  test_compile_aux("7.200000", "(max 1.0 2.0 -0.4 7.2 2.3 7.1 -11.0)");
+  test_compile_aux("2.000000", "(max 1 2.0)");
+  test_compile_aux("2", "(max 1.0 2)");
+  test_compile_aux("2", "(max 1 2)");
+  test_compile_aux("7", "(max 1 2 7 -3 -11 6 3)");
+  test_compile_aux("1.000000", "(min 1.0 2.0)");
+  test_compile_aux("-11.000000", "(min 1.0 2.0 -0.4 7.2 2.3 7.1 -11.0)");
+  test_compile_aux("1", "(min 1 2.0)");
+  test_compile_aux("1.000000", "(min 1.0 2)");
+  test_compile_aux("1", "(min 1 2)");
+  test_compile_aux("-11", "(min 1 2 7 -3 -11 6 3)");
+  test_compile_aux("1024", "(arithmetic-shift 1 10)");
+  test_compile_aux("31", "(arithmetic-shift 255 -3)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2218,4 +2240,5 @@ void run_all_compiler_tests()
   test_string_ops();
   test_current_seconds();
   test_is_list();
+  test_min_max();
   }
