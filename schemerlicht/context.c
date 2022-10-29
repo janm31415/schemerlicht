@@ -34,6 +34,13 @@ static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->raw_heap);
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);
+  schemerlicht_string* sit = schemerlicht_vector_begin(&ctxt_to_free->overrides, schemerlicht_string);
+  schemerlicht_string* sit_end = schemerlicht_vector_end(&ctxt_to_free->overrides, schemerlicht_string);
+  for (; sit != sit_end; ++sit)
+    {
+    schemerlicht_string_destroy(ctxt, sit);
+    }
+  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->overrides);
   schemerlicht_environment_destroy(ctxt_to_free);
   schemerlicht_free(ctxt, ctxt_to_free, sizeof(schemerlicht_context));
   }
@@ -66,6 +73,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->compile_error_reports, schemerlicht_error_report);
+  schemerlicht_vector_init(ctxt, &ctxt->overrides, schemerlicht_string);
   schemerlicht_environment_init(ctxt);  
   }
 

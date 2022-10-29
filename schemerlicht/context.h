@@ -46,6 +46,7 @@ struct schemerlicht_context
   schemerlicht_map* quote_to_index;
   schemerlicht_map* string_to_symbol;
   schemerlicht_memsize quote_to_index_size;
+  schemerlicht_vector overrides; // stringvec with names of primitives that were overridden
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

@@ -23,6 +23,7 @@
 #include "schemerlicht/environment.h"
 #include "schemerlicht/gc.h"
 #include "schemerlicht/alpha.h"
+#include "schemerlicht/overrides.h"
 
 #include <time.h>
 
@@ -93,6 +94,7 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
 
   schemerlicht_quasiquote_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_overrides_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_alpha_conversion(ctxt, &prog);
@@ -135,6 +137,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_quasiquote_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_overrides_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_alpha_conversion(ctxt, &prog);
@@ -2161,8 +2164,8 @@ static void test_min_max()
 
 static void test_override()
   {
-  test_compile_aux("(3 6)", "(define plus (lambda (x y) (list y x))) (plus 6 3)");
-  //test_compile_aux_w_dump("(3 6)", "(define + (lambda (x y) (list y x))) (+ 6 3)");
+  //test_compile_aux("(3 6)", "(define plus (lambda (x y) (list y x))) (plus 6 3)");
+  test_compile_aux("(3 6)", "(define + (lambda (x y) (list y x))) (+ 6 3)");
   }
 
 static void test_apply()

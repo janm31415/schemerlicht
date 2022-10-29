@@ -4,6 +4,7 @@
 #include "begconv.h"
 #include "parser.h"
 #include "error.h"
+#include "stringvec.h"
 
 #include <string.h>
 
@@ -261,12 +262,25 @@ static void modify_expressions(schemerlicht_context* ctxt, schemerlicht_vector* 
         if (first_arg->type == schemerlicht_type_variable)
           {
           s.name = first_arg->expr.var.name;   
-          schemerlicht_string_destroy(ctxt, &first_arg->expr.var.filename);
+          s.line_nr = first_arg->expr.var.line_nr;
+          s.column_nr = first_arg->expr.var.column_nr;
+          s.filename = first_arg->expr.var.filename;
+          //schemerlicht_string_destroy(ctxt, &first_arg->expr.var.filename);
           }
         else if (first_arg->type == schemerlicht_type_primitive_call)
           {
-          s.name = first_arg->expr.prim.name;          
-          schemerlicht_string_destroy(ctxt, &first_arg->expr.prim.filename);
+          s.name = first_arg->expr.prim.name;      
+          s.line_nr = first_arg->expr.prim.line_nr;
+          s.column_nr = first_arg->expr.prim.column_nr;
+          s.filename = first_arg->expr.prim.filename;
+          //schemerlicht_string_destroy(ctxt, &first_arg->expr.prim.filename);
+          schemerlicht_vector_destroy(ctxt, &first_arg->expr.prim.arguments);
+          if (schemerlicht_string_vector_binary_search(&ctxt->overrides, &s.name) == 0)
+            {
+            schemerlicht_string overridden_prim;
+            schemerlicht_string_copy(ctxt, &overridden_prim, &s.name);
+            schemerlicht_string_vector_insert_sorted(ctxt, &ctxt->overrides, &overridden_prim);
+            }
           }
         else
           {

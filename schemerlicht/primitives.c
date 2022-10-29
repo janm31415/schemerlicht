@@ -4918,7 +4918,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object* continuation = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object); // save the original closure
       schemerlicht_object original_continuation = *continuation;
       schemerlicht_object oper = *op;
-
+      // TODO later: move dummy continuation to the context so that we don't need to recreate it all the time for apply
       schemerlicht_object dummy_continuation;
       dummy_continuation.type = schemerlicht_object_type_closure;
       schemerlicht_object dummy_lambda;
