@@ -20,7 +20,6 @@ limits.h
 map.h
 memory.h
 object.h
-overrides.h
 parser.h
 primitives.h
 quasiquote.h
@@ -60,7 +59,6 @@ lambdatolet.c
 map.c
 memory.c
 object.c
-overrides.c
 parser.c
 primitives.c
 quasiquote.c

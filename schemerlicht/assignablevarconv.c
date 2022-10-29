@@ -3,6 +3,7 @@
 #include "context.h"
 #include "vector.h"
 #include "stringvec.h"
+#include "environment.h"
 
 typedef struct schemerlicht_find_assignable_variables_visitor
   {
@@ -70,6 +71,12 @@ static int previsit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   {
   if (e->expr.set.originates_from_define || e->expr.set.originates_from_quote)
     return 1;
+  schemerlicht_environment_entry entry;
+  if (schemerlicht_environment_find(&entry, ctxt, &e->expr.set.name))
+    {
+    if (entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL) // globals are not on the heap and should not be assignable converted
+      return 1;
+    }
   schemerlicht_find_assignable_variables_visitor* vis = (schemerlicht_find_assignable_variables_visitor*)(v->impl);
   schemerlicht_vector* vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
   schemerlicht_string s;
