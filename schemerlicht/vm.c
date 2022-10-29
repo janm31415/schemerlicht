@@ -470,6 +470,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         }
       else if (target->type == schemerlicht_object_type_closure)
         {
+        schemerlicht_assert(a == 0); // closures restart the stack
         schemerlicht_object* lambda_obj = schemerlicht_vector_at(&target->value.v, 0, schemerlicht_object);
         schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
         schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);

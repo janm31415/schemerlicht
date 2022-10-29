@@ -1409,7 +1409,7 @@ static schemerlicht_expression make_primitive_call(schemerlicht_context* ctxt, t
   p.filename = make_prim_filename(ctxt);
   p.line_nr = (*token_it)->line_nr;
   p.column_nr = (*token_it)->column_nr;
-  schemerlicht_string_copy(ctxt, &p.name, &((*token_it)->value));
+  schemerlicht_string_copy(ctxt, &p.name, &((*token_it)->value));  
   if (popped_token.type != SCHEMERLICHT_T_LEFT_ROUND_BRACKET)
     {
     if (!token_next(ctxt, token_it, token_it_end))
@@ -1479,6 +1479,26 @@ static schemerlicht_expression make_set(schemerlicht_context* ctxt, token** toke
   return schemerlicht_make_set_expression(&s);
   }
 
+static void check_for_apply(schemerlicht_context* ctxt, schemerlicht_parsed_funcall* f)
+  {
+  schemerlicht_expression* fun = schemerlicht_vector_begin(&f->fun, schemerlicht_expression);
+  if (fun->type == schemerlicht_type_variable)
+    {
+    if (strcmp(fun->expr.var.name.string_ptr, "apply") == 0) // this is apply primitive call
+      {
+      schemerlicht_parsed_primitive_call p;
+      p.as_object = 1; // apply should always be as_object for correct cps treatment when the operator for apply is a closure
+      p.name = fun->expr.var.name;
+      p.filename = fun->expr.var.filename;
+      p.line_nr = fun->expr.var.line_nr;
+      p.column_nr = fun->expr.var.column_nr;
+      schemerlicht_vector_init(ctxt, &p.arguments, schemerlicht_expression);
+      fun->expr.prim = p;
+      fun->type = schemerlicht_type_primitive_call;
+      }
+    }
+  }
+
 static schemerlicht_expression make_fun(schemerlicht_context* ctxt, token** token_it, token** token_it_end)
   {
   if (*token_it == *token_it_end)
@@ -1504,6 +1524,7 @@ static schemerlicht_expression make_fun(schemerlicht_context* ctxt, token** toke
       return schemerlicht_make_funcall_expression(&f);
       }
     }
+  check_for_apply(ctxt, &f); // apply is not recognized as primitive, so we need to account for that
   return schemerlicht_make_funcall_expression(&f);
   }
 
@@ -2159,6 +2180,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, ">", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, ">=", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "add1", schemerlicht_et_primitive_call);
+  //map_insert(ctxt, m, "apply", schemerlicht_et_primitive_call); // don't add apply, special case construction where apply should be a primitive object
   map_insert(ctxt, m, "and", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "arithmetic-shift", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "assoc", schemerlicht_et_primitive_call);

@@ -24,6 +24,8 @@
 #include "schemerlicht/gc.h"
 #include "schemerlicht/alpha.h"
 
+#include <time.h>
+
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -1712,7 +1714,10 @@ static void test_ack_performance()
 
 static void test_fib_performance()
   {
+  int c0 = clock();
   test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 40)", 256 * 256);
+  int c1 = clock();
+  printf("Fib time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
   //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 10)");
   }
 
@@ -2154,6 +2159,52 @@ static void test_min_max()
   test_compile_aux("31", "(arithmetic-shift 255 -3)");
   }
 
+static void test_override()
+  {
+  test_compile_aux("(3 6)", "(define plus (lambda (x y) (list y x))) (plus 6 3)");
+  //test_compile_aux_w_dump("(3 6)", "(define + (lambda (x y) (list y x))) (+ 6 3)");
+  }
+
+static void test_apply()
+  {
+  test_compile_aux("0", "(apply + ())");
+  test_compile_aux("7", "(apply + (list 3 4))");
+  test_compile_aux("10", "(apply + (list 1 2 3 4))");
+  test_compile_aux("10", "(apply + 1 2 (list 3 4))");
+  test_compile_aux("36", "(apply + (list 1 2 3 4 5 6 7 8))");
+  test_compile_aux("45", "(apply + (list 1 2 3 4 5 6 7 8 9))");
+  test_compile_aux("55", "(apply + (list 1 2 3 4 5 6 7 8 9 10))");
+  test_compile_aux("55", "(apply + 1 2 3 4 5 6 7 8 9 (list 10))");  
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector '(1 2 3 4 5 6 7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 '(2 3 4 5 6 7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 '(3 4 5 6 7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 '(4 5 6 7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 '(5 6 7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 '(6 7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 6 '(7 8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 6 7 '(8)) '())");
+  test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 6 7 8 ()) '())");
+  
+  test_compile_aux("13", "(let([f(lambda() 12)])( + (apply f '()) 1))");  
+  test_compile_aux("26", "(let([f(lambda(x) ( + x 12))]) ( + (apply f 13 '()) 1))");
+  test_compile_aux("26", "(let([f(lambda(x) ( + x 12))]) ( + (apply f(cons 13 '())) 1))");
+  test_compile_aux("27", "(let([f(lambda(x y z) ( + x(* y z)))])( + (apply f 12 '(7 2)) 1))");
+  test_compile_aux("12", "(let([f(lambda() 12)])(apply f '()))");
+  test_compile_aux("25", "(let([f(lambda(x) ( + x 12))])(apply f 13 '()))");
+  test_compile_aux("25", "(let([f(lambda(x) ( + x 12))])(apply f(cons 13 '())))");
+  test_compile_aux("26", "(let([f(lambda(x y z) ( + x(* y z)))])(apply f 12 '(7 2)))");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector '(1 2 3 4 5 6 7 8))");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 '(2 3 4 5 6 7 8))");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 '(3 4 5 6 7 8)) ");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 3 '(4 5 6 7 8)) ");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 3 4 '(5 6 7 8)) ");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 3 4 5 '(6 7 8)) ");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 3 4 5 6 '(7 8)) ");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 3 4 5 6 7 '(8)) ");
+  test_compile_aux("#(1 2 3 4 5 6 7 8)", "(apply vector 1 2 3 4 5 6 7 8 ())");  
+  test_compile_aux("1800", "(define compose (lambda(f g)(lambda args(f(apply g args))))) (define twice (lambda (x) (* 2 x))) ((compose twice *) 12 75)");  
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2241,4 +2292,6 @@ void run_all_compiler_tests()
   test_current_seconds();
   test_is_list();
   test_min_max();
+  test_override();
+  test_apply();
   }
