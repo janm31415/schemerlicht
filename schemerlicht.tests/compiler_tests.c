@@ -1722,7 +1722,7 @@ static void test_fib_performance()
   test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
   int c1 = clock();
   printf("Fib time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
-  //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 10)");
+  //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 10)");
   }
 
 static void test_lambda_variable_arity_not_using_rest_arg()
@@ -2281,7 +2281,7 @@ void run_all_compiler_tests()
   test_newton();
   test_compile_cc();
   test_ack_performance();
-  test_fib_performance();
+  //test_fib_performance();
   test_lambda_variable_arity_not_using_rest_arg();
   test_lambda_variable_arity_while_using_rest_arg();
   test_lambda_long_list();
