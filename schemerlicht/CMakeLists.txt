@@ -15,6 +15,7 @@ freevaranalysis.h
 func.h
 gc.h
 globdef.h
+inlines.h
 lambdatolet.h
 limits.h
 map.h

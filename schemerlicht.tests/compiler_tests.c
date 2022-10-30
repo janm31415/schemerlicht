@@ -1709,13 +1709,17 @@ static void test_compile_cc()
 static void test_ack_performance()
   {
   //currently less than 2s with large heap (size 256*256*256) on my laptop
-  test_compile_aux_heap("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)", 256 * 256);
+  int c0 = clock();
+  test_compile_aux_heap("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)", 256*256);
+  int c1 = clock();
+  printf("Ack time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
   }
 
 static void test_fib_performance()
   {
   int c0 = clock();
-  test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 40)", 256 * 256);
+  //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 40)", 256 * 256);
+  test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
   int c1 = clock();
   printf("Fib time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
   //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 10)");
@@ -2276,8 +2280,8 @@ void run_all_compiler_tests()
   test_cond();
   test_newton();
   test_compile_cc();
-  //test_ack_performance();
-  //test_fib_performance();
+  test_ack_performance();
+  test_fib_performance();
   test_lambda_variable_arity_not_using_rest_arg();
   test_lambda_variable_arity_while_using_rest_arg();
   test_lambda_long_list();

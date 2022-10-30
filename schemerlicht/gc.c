@@ -154,8 +154,7 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
     switch (obj->type)
       {
       case schemerlicht_object_type_vector:
-      case schemerlicht_object_type_pair:
-      case schemerlicht_object_type_closure:
+      case schemerlicht_object_type_pair:      
       {
       schemerlicht_object* it = schemerlicht_vector_begin(&obj->value.v, schemerlicht_object);
       schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
@@ -163,6 +162,17 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
         {
         collect_object(ctxt, it, state);
         }
+      break;
+      }
+      case schemerlicht_object_type_closure:
+      {
+      schemerlicht_object* it = schemerlicht_vector_begin(&obj->value.v, schemerlicht_object) + 1; // skip fun ptr part of closure
+      schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
+      for (; it != it_end; ++it)
+        {
+        collect_object(ctxt, it, state);
+        }
+      break;
       break;
       }
       }

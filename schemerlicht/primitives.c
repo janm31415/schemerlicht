@@ -3255,30 +3255,34 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSURE);
-  schemerlicht_object v;
-  v.type = schemerlicht_object_type_closure;
-  schemerlicht_vector_init_with_size(ctxt, &v.value.v, b, schemerlicht_object);
+  //schemerlicht_object v;
+  //v.type = schemerlicht_object_type_closure;
+  //schemerlicht_vector_init_with_size(ctxt, &v.value.v, b, schemerlicht_object);
+  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+  heap_obj->type = schemerlicht_object_type_closure;
+  ++ctxt->heap_pos;
+  schemerlicht_vector_init_with_size(ctxt, &heap_obj->value.v, b, schemerlicht_object);
   for (int j = 0; j < b; ++j)
     {
     schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
-    schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&v.value.v, j, schemerlicht_object);
+    schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&heap_obj->value.v, j, schemerlicht_object);
     schemerlicht_set_object(obj_at_pos, arg);
     }
-  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-  schemerlicht_set_object(heap_obj, &v);
-  ++ctxt->heap_pos;
-  schemerlicht_set_object(ra, &v);
+  //schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+  //schemerlicht_set_object(heap_obj, &v);
+  //++ctxt->heap_pos;
+  schemerlicht_set_object(ra, heap_obj);
   }
 
 ////////////////////////////////////////////////////
 
 void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b, int c)
   {
-
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSUREREF);
+#if 0
   schemerlicht_object ret;
   if (b < 2)
     {
@@ -3305,6 +3309,11 @@ void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b
       }
     }
   schemerlicht_set_object(ra, &ret);
+#else
+  schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+  schemerlicht_object* pos = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+  schemerlicht_set_object(ra, schemerlicht_vector_at(&v->value.v, pos->value.fx, schemerlicht_object));
+#endif
   }
 
 ////////////////////////////////////////////////////

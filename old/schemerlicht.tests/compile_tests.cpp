@@ -73,7 +73,7 @@ namespace
       convert_externals_to_vm();
       ops = g_ops;
       stream_out = false;
-      ctxt = create_context(1024 * 1024, 1024, 1024, 1024);
+      ctxt = create_context(1024*1024, 1024, 1024, 1024);
       env = std::make_shared<environment<environment_entry>>(nullptr);
 
       vmcode code;
@@ -5044,6 +5044,6 @@ void run_all_compile_tests()
     macros().test();
 #endif
     //ack_perf_test().test();
-    newton_bugtest().test();
+    //newton_bugtest().test();
     }
   }

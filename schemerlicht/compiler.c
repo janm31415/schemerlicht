@@ -74,6 +74,11 @@ static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* f
     case schemerlicht_type_fixnum:
     {
     schemerlicht_fixnum fx = e->expr.lit.lit.fx.value;
+    if (fx <= SCHEMERLICHT_MAXARG_sBx && fx >= -SCHEMERLICHT_MAXARG_sBx)
+      {
+      make_code_asbx(ctxt, fun, SCHEMERLICHT_OPCODE_SETFIXNUM, fun->freereg, fx);
+      return;
+      }
     obj = make_schemerlicht_object_fixnum(fx);
     break;
     }
@@ -85,24 +90,30 @@ static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* f
     }
     case schemerlicht_type_true:
     {
-    obj = make_schemerlicht_object_true();
-    break;
+    //obj = make_schemerlicht_object_true();
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, fun->freereg, schemerlicht_object_type_true);
+    return;
     }
     case schemerlicht_type_false:
     {
-    obj = make_schemerlicht_object_false();
-    break;
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, fun->freereg, schemerlicht_object_type_false);
+    return;
     }
     case schemerlicht_type_nil:
     {
-    obj = make_schemerlicht_object_nil();
-    break;
+    //obj = make_schemerlicht_object_nil();
+    //break;
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, fun->freereg, schemerlicht_object_type_nil);
+    return;
     }
     case schemerlicht_type_character:
     {
+    //schemerlicht_byte b = e->expr.lit.lit.ch.value;
+    //obj = make_schemerlicht_object_char(b);
+    //break;        
     schemerlicht_byte b = e->expr.lit.lit.ch.value;
-    obj = make_schemerlicht_object_char(b);
-    break;
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETCHAR, fun->freereg, b);
+    return;
     }
     case schemerlicht_type_string:
     {
@@ -283,13 +294,19 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
 
   if (fun->freereg > 0) // all lambda input variables should be in the first couple of registers.
     {
+#if 0
     make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, 0, fun->freereg); // closure at R(0)
     for (schemerlicht_memsize i = 0; i < nr_args; ++i)
       {
       make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, i + 1, fun->freereg + i + 1);
       }
+#else
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVETOP, fun->freereg, nr_args);
+#endif
     }
+#if 0 // SCHEMERLICHT_OPCODE_MOVETOP already sets blocking
   make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, nr_args+1, schemerlicht_object_type_blocking); // for variable arity function calls we need to know where the arguments stop
+#endif
   make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 0);
   }
 

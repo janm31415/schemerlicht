@@ -77,7 +77,10 @@ typedef enum
   {
   SCHEMERLICHT_OPCODE_MOVE,       /*  A B      R(A) := R(B)         */
   SCHEMERLICHT_OPCODE_LOADK,      /*  A Bx	   R(A) := Kst(Bx)      */
+  SCHEMERLICHT_OPCODE_SETFIXNUM,  /*  A sBx    R(A).fx := sBx          Note: slight speedup measured*/
+  SCHEMERLICHT_OPCODE_SETCHAR,    /*  A B      R(A).ch := B         */  
   SCHEMERLICHT_OPCODE_SETTYPE,    /*  A B      type of R(A) := B    */
+  SCHEMERLICHT_OPCODE_MOVETOP,    /*  A B      R(0)..R(B) := R(A)..R(A+B), R(A+B+1)->type := blocking   Note: no speedup measured*/
   SCHEMERLICHT_OPCODE_CALL,       /*  A B C	   R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   SCHEMERLICHT_OPCODE_EQTYPE,     /*  A B      if (type of R(A) == B) then pc++, else perform the following JMP instruction on the next line*/  
   SCHEMERLICHT_OPCODE_JMP,        /*  sBx      PC += sBx					*/
