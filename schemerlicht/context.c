@@ -68,6 +68,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
     it->type = schemerlicht_object_type_blocking;
     }
   ctxt->heap = cast(schemerlicht_object*, ctxt->raw_heap.vector_ptr);
+  ctxt->gc_heap_pos_threshold = heap_size*8/20; // 80% of total heap size
   ctxt->quote_to_index = schemerlicht_map_new(ctxt, 0, 8);
   ctxt->quote_to_index_size = 0;
   ctxt->string_to_symbol = schemerlicht_map_new(ctxt, 0, 8);

@@ -35,7 +35,7 @@ static schemerlicht_object* get_inactive_heap(schemerlicht_context* ctxt)
 
 int schemerlicht_need_to_perform_gc(schemerlicht_context* ctxt)
   {
-  return ctxt->heap_pos > 8 * get_heap_size(ctxt) / 10;
+  return ctxt->heap_pos > ctxt->gc_heap_pos_threshold;
   }
 
 void schemerlicht_check_garbage_collection(schemerlicht_context* ctxt)
@@ -191,10 +191,13 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
   for (schemerlicht_memsize i = 0; i < state->heap_size; ++i)
     {
     schemerlicht_object* obj = state->target_heap + i;
+    if (obj->type == schemerlicht_object_type_blocking)
+      break;
     switch (obj->type)
       {
       case schemerlicht_object_type_vector:
       case schemerlicht_object_type_pair:
+      case schemerlicht_object_type_closure:
       {
       schemerlicht_object* it = schemerlicht_vector_begin(&obj->value.v, schemerlicht_object);
       schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
@@ -205,21 +208,7 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
         }
       break;
       }
-      case schemerlicht_object_type_closure:
-      {
-      schemerlicht_object* it = schemerlicht_vector_begin(&obj->value.v, schemerlicht_object) + 1; // skip fun ptr part of closure
-      schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
-      for (; it != it_end; ++it)
-        {
-        if (is_value_object(it) == 0)
-          collect_object(ctxt, it, state);
-        }
-      break;
-      break;
       }
-      }
-    if (obj->type == schemerlicht_object_type_blocking)
-      break;
     }
   }
 
@@ -238,6 +227,8 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
     {
     schemerlicht_object* obj = state.source_heap + i;
+    if (obj->type == schemerlicht_object_type_blocking)
+      break;
     if (is_marked(obj))
       {
       unmark_object_pointer(obj);

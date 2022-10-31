@@ -37,6 +37,7 @@ struct schemerlicht_context
   schemerlicht_vector raw_heap;
   schemerlicht_object* heap;
   schemerlicht_memsize heap_pos;
+  schemerlicht_memsize gc_heap_pos_threshold;
   int number_of_syntax_errors;
   int number_of_compile_errors;
   schemerlicht_vector syntax_error_reports;

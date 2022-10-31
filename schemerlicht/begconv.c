@@ -48,6 +48,7 @@ static void postvisit_program(schemerlicht_context* ctxt, schemerlicht_visitor* 
       schemerlicht_vector_erase(&p->expressions, &it, schemerlicht_expression);
       schemerlicht_vector_insert(ctxt, &p->expressions, &it, &it2, &it2_end, schemerlicht_expression);
       schemerlicht_vector_destroy(ctxt, &b2.arguments);
+      it_end = schemerlicht_vector_end(&p->expressions, schemerlicht_expression);
       }
     else
       ++it;

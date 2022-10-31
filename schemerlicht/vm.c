@@ -377,6 +377,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else if (target->type == schemerlicht_object_type_closure)
         {
@@ -388,12 +389,12 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else
         {
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-        }
-      schemerlicht_check_garbage_collection(ctxt);
+        }      
       break;
       }
       case SCHEMERLICHT_OPCODE_EQTYPE:
@@ -522,10 +523,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i), schemerlicht_object);
       int b = SCHEMERLICHT_GETARG_sBx(i);
-      schemerlicht_object number;
-      number.type = schemerlicht_object_type_fixnum;
-      number.value.fx = b;
-      schemerlicht_set_object(target, &number);
+      target->type = schemerlicht_object_type_fixnum;
+      target->value.fx = b;      
       break;
       }
       case SCHEMERLICHT_OPCODE_SETCHAR:
@@ -574,6 +573,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else if (target->type == schemerlicht_object_type_closure)
         {
@@ -586,12 +586,12 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = &lambda;
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else
         {
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-        }
-      schemerlicht_check_garbage_collection(ctxt);
+        }      
       break;
       }
       case SCHEMERLICHT_OPCODE_EQTYPE:
