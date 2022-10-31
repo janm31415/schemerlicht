@@ -153,10 +153,11 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       {
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
-    schemerlicht_object prim_as_object = *prim;
-    prim_as_object.type = schemerlicht_object_type_primitive_object; // change type to object
-    int k_pos = get_k(ctxt, fun, &prim_as_object);
-    make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+    //schemerlicht_object prim_as_object = *prim;
+    //prim_as_object.type = schemerlicht_object_type_primitive_object; // change type to object
+    //int k_pos = get_k(ctxt, fun, &prim_as_object);
+    //make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIMOBJ, fun->freereg, prim->value.fx);
     }
   else
     {
@@ -180,9 +181,10 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       }
     else
       {
-      int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
+      //int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
 
-      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+      //make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIM, fun->freereg, prim->value.fx);
       make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 0);
       }
     }
