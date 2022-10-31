@@ -3,6 +3,7 @@
 
 #include "schemerlicht.h"
 #include <cassert>
+#include <limits.h>
 
 #ifndef UNUSED
 #define UNUSED(x) ((void)(x)) /* to avoid warnings */
@@ -48,5 +49,10 @@ typedef uint32_t schemerlicht_instruction;
 
 /* maximum stack for a scheme function */
 #define schemerlicht_maxstack	250
+
+#ifndef schemerlicht_int_gcmark_bit
+#define schemerlicht_int_gcmark_bit 0x8000
+#endif
+
 
 #endif //SCHEMERLICHT_LIMITS_H
