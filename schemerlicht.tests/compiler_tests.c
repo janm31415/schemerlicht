@@ -26,6 +26,8 @@
 
 #include <time.h>
 
+static int print_gc_time = 0;
+
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -113,6 +115,9 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, &func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+
+  if (print_gc_time)
+    printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
@@ -1708,21 +1713,26 @@ static void test_compile_cc()
 
 static void test_ack_performance()
   {
+  print_gc_time = 1;
   //currently less than 2s with large heap (size 256*256*256) on my laptop
   int c0 = clock();
   test_compile_aux_heap("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)", 256*256);
   int c1 = clock();
   printf("Ack time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
+  print_gc_time = 0;
   }
 
 static void test_fib_performance()
   {
+  print_gc_time = 1;
   int c0 = clock();
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 40)", 256 * 256);
-  test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
+  //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
+  test_compile_aux_heap("1346269", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 30)", 256 * 256);
   int c1 = clock();
-  printf("Fib time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
+  printf("Fib time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);  
   //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 10)");
+  print_gc_time = 0;
   }
 
 static void test_lambda_variable_arity_not_using_rest_arg()
@@ -1824,10 +1834,10 @@ static void test_garbage_collection()
     TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
     }
   schemerlicht_run(ctxt, &fun);
-  TEST_EQ_INT(4, ctxt->heap_pos);
+  TEST_EQ_INT(1, ctxt->heap_pos);
   TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
   schemerlicht_run(ctxt, &fun);
-  TEST_EQ_INT(5, ctxt->heap_pos);
+  TEST_EQ_INT(2, ctxt->heap_pos);
   TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
 
   schemerlicht_function_free(ctxt, fun);
@@ -2280,8 +2290,8 @@ void run_all_compiler_tests()
   test_cond();
   test_newton();
   test_compile_cc();
-  test_ack_performance();
-  //test_fib_performance();
+  //test_ack_performance();
+  test_fib_performance();
   test_lambda_variable_arity_not_using_rest_arg();
   test_lambda_variable_arity_while_using_rest_arg();
   test_lambda_long_list();
