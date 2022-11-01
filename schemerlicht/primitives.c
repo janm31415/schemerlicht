@@ -3262,6 +3262,8 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   heap_obj->type = schemerlicht_object_type_closure;
   ++ctxt->heap_pos;
   schemerlicht_vector_init_with_size(ctxt, &heap_obj->value.v, b, schemerlicht_object);
+  memcpy(heap_obj->value.v.vector_ptr, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + a + c + 1, b * sizeof(schemerlicht_object));
+#if 0
   for (int j = 0; j < b; ++j)
     {
     schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
@@ -3271,6 +3273,7 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   //schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   //schemerlicht_set_object(heap_obj, &v);
   //++ctxt->heap_pos;
+#endif
   schemerlicht_set_object(ra, heap_obj);
   }
 

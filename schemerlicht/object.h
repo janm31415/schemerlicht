@@ -42,11 +42,15 @@ typedef struct schemerlicht_object
 
 #define schemerlicht_set_object(obj1, obj2) \
   { \
-  const schemerlicht_object* o2 = (obj2); \
-  schemerlicht_object* o1 = (obj1); \
-  o1->type = o2->type; \
-  o1->value = o2->value; \
+  *(obj1) = *(obj2); \
   }
+    //memcpy(obj1, obj2, sizeof(schemerlicht_object)); \
+  //}
+  //const schemerlicht_object* o2 = (obj2); \
+  //schemerlicht_object* o1 = (obj1); \
+  //o1->type = o2->type; \
+  //o1->value = o2->value; \
+  //}
 
 int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2);
 int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_object* obj2);
