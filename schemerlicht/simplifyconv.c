@@ -321,8 +321,7 @@ static void convert_let_star(schemerlicht_context* ctxt, schemerlicht_visitor* v
   else
     {
     schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
-    schemerlicht_vector_push_back(ctxt, &new_let.expr.let.bindings, *schemerlicht_vector_at(&e->expr.let.bindings, 0, schemerlicht_expression), schemerlicht_expression);
-    schemerlicht_vector_pop_front(&e->expr.let.bindings);
+    schemerlicht_vector_push_back(ctxt, &new_let.expr.let.bindings, *schemerlicht_vector_at(&e->expr.let.bindings, 0, schemerlicht_let_binding), schemerlicht_let_binding);    schemerlicht_vector_pop_front(&e->expr.let.bindings);
     schemerlicht_expression b = schemerlicht_init_begin(ctxt);
     schemerlicht_vector_push_back(ctxt, &b.expr.beg.arguments, *e, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &new_let.expr.let.body, b, schemerlicht_expression);
