@@ -332,62 +332,63 @@ schemerlicht_visitor* schemerlicht_visitor_new(schemerlicht_context* ctxt, void*
   return v;
   }
 
-static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, schemerlicht_visitor_entry* e)
+static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, schemerlicht_visitor_entry* entry_ptr)
   {  
-  schemerlicht_assert(e->expr == 0 || (e->expr->type >= 0 && e->expr->type <= schemerlicht_type_set));
-  switch (e->type)
+  schemerlicht_assert(entry_ptr->expr == 0 || (entry_ptr->expr->type >= 0 && entry_ptr->expr->type <= schemerlicht_type_set));
+  const schemerlicht_visitor_entry e = *entry_ptr; // make a value object, because we'll push back in the visitor vector so that the pointer make become invalid
+  switch (e.type)
     {
     case SCHEMERLICHT_VISITOR_EXPRESSION_PRE:
     {
-    if (vis->previsit_expression(ctxt, vis, e->expr))
+    if (vis->previsit_expression(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_EXPRESSION_POST), schemerlicht_visitor_entry);
-      switch (e->expr->type)
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_EXPRESSION_POST), schemerlicht_visitor_entry);
+      switch (e.expr->type)
         {
         case schemerlicht_type_literal:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LITERAL), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_LITERAL), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_variable:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_VARIABLE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_VARIABLE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_nop:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_NOP), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_NOP), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_primitive_call:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_PRIMCALL_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_PRIMCALL_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_foreign_call:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FOREIGNCALL_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_FOREIGNCALL_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_if:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_IF_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_IF_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_cond:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_COND_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_COND_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_do:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_DO_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_DO_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_case:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_CASE_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_CASE_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_quote:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_QUOTE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_QUOTE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_let:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LET_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_LET_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_lambda:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LAMBDA_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_LAMBDA_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_funcall:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FUNCALL_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_FUNCALL_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_begin:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_BEGIN_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_BEGIN_PRE), schemerlicht_visitor_entry);
           break;
         case schemerlicht_type_set:
-          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_SET_PRE), schemerlicht_visitor_entry);
+          schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_SET_PRE), schemerlicht_visitor_entry);
           break;
         default:
           break;
@@ -397,15 +398,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_EXPRESSION_POST:
     {
-    vis->postvisit_expression(ctxt, vis, e->expr);
+    vis->postvisit_expression(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_BEGIN_PRE:
     {
-    if (vis->previsit_begin(ctxt, vis, e->expr))
+    if (vis->previsit_begin(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_BEGIN_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.beg.arguments);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_BEGIN_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.beg.arguments);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -419,63 +420,63 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_BEGIN_POST:
     {
-    vis->postvisit_begin(ctxt, vis, e->expr);
+    vis->postvisit_begin(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_LITERAL:
     {
-    schemerlicht_literal* lit = &(e->expr->expr.lit);
+    schemerlicht_literal* lit = &(e.expr->expr.lit);
     switch (lit->type)
       {
       case schemerlicht_type_fixnum:
-        vis->visit_fixnum(ctxt, vis, e->expr);
+        vis->visit_fixnum(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_flonum:
-        vis->visit_flonum(ctxt, vis, e->expr);
+        vis->visit_flonum(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_character:
-        vis->visit_character(ctxt, vis, e->expr);
+        vis->visit_character(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_false:
         if (vis->visit_false != NULL)
-          vis->visit_false(ctxt, vis, e->expr);
+          vis->visit_false(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_true:
-        vis->visit_true(ctxt, vis, e->expr);
+        vis->visit_true(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_string:
-        vis->visit_string(ctxt, vis, e->expr);
+        vis->visit_string(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_symbol:
-        vis->visit_symbol(ctxt, vis, e->expr);
+        vis->visit_symbol(ctxt, vis, e.expr);
         break;
       case schemerlicht_type_nil:
-        vis->visit_nil(ctxt, vis, e->expr);
+        vis->visit_nil(ctxt, vis, e.expr);
         break;
       }
     break;
     }
     case SCHEMERLICHT_VISITOR_NOP:
     {
-    vis->visit_nop(ctxt, vis, e->expr);
+    vis->visit_nop(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_VARIABLE:
     {
-    vis->visit_variable(ctxt, vis, e->expr);
+    vis->visit_variable(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_QUOTE:
     {
-    vis->visit_quote(ctxt, vis, e->expr);
+    vis->visit_quote(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_FUNCALL_PRE:
     {
-    if (vis->previsit_funcall(ctxt, vis, e->expr))
+    if (vis->previsit_funcall(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FUNCALL_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.funcall.arguments);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_FUNCALL_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.funcall.arguments);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -484,7 +485,7 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
         {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(expr_rit, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
         }
-      arg = &(e->expr->expr.funcall.fun);
+      arg = &(e.expr->expr.funcall.fun);
       expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       expr_rit = expr_it_end - 1;
@@ -498,15 +499,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_FUNCALL_POST:
     {
-    vis->postvisit_funcall(ctxt, vis, e->expr);
+    vis->postvisit_funcall(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_PRIMCALL_PRE:
     {
-    if (vis->previsit_primcall(ctxt, vis, e->expr))
+    if (vis->previsit_primcall(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_PRIMCALL_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.prim.arguments);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_PRIMCALL_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.prim.arguments);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -520,15 +521,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_PRIMCALL_POST:
     {
-    vis->postvisit_primcall(ctxt, vis, e->expr);
+    vis->postvisit_primcall(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_FOREIGNCALL_PRE:
     {
-    if (vis->previsit_foreigncall(ctxt, vis, e->expr))
+    if (vis->previsit_foreigncall(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_FOREIGNCALL_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.foreign.arguments);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_FOREIGNCALL_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.foreign.arguments);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -542,15 +543,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_FOREIGNCALL_POST:
     {
-    vis->postvisit_foreigncall(ctxt, vis, e->expr);
+    vis->postvisit_foreigncall(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_IF_PRE:
     {
-    if (vis->previsit_if(ctxt, vis, e->expr))
+    if (vis->previsit_if(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_IF_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.i.arguments);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_IF_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.i.arguments);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -564,15 +565,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_IF_POST:
     {
-    vis->postvisit_if(ctxt, vis, e->expr);
+    vis->postvisit_if(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_LAMBDA_PRE:
     {
-    if (vis->previsit_lambda(ctxt, vis, e->expr))
+    if (vis->previsit_lambda(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LAMBDA_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.lambda.body);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_LAMBDA_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.lambda.body);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -586,15 +587,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_LAMBDA_POST:
     {
-    vis->postvisit_lambda(ctxt, vis, e->expr);
+    vis->postvisit_lambda(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_SET_PRE:
     {
-    if (vis->previsit_set(ctxt, vis, e->expr))
+    if (vis->previsit_set(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_SET_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.set.value);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_SET_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.set.value);
       schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
       schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
       schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -608,30 +609,30 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_SET_POST:
     {
-    vis->postvisit_set(ctxt, vis, e->expr);
+    vis->postvisit_set(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_CASE_PRE:
     {
-    if (vis->previsit_case(ctxt, vis, e->expr))
+    if (vis->previsit_case(ctxt, vis, e.expr))
       {
       // note: all expressions essentially are dumped in the visitor, which is only of use for the deletion visitor.
       // case should always be transformed to core forms.
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_CASE_POST), schemerlicht_visitor_entry);
-      schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr->expr.cas.val_expr, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr->expr.cas.val_expr, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_CASE_POST), schemerlicht_visitor_entry);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&e.expr->expr.cas.val_expr, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&e.expr->expr.cas.val_expr, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
         }
-      it = schemerlicht_vector_begin(&e->expr->expr.cas.else_body, schemerlicht_expression);
-      it_end = schemerlicht_vector_end(&e->expr->expr.cas.else_body, schemerlicht_expression);
+      it = schemerlicht_vector_begin(&e.expr->expr.cas.else_body, schemerlicht_expression);
+      it_end = schemerlicht_vector_end(&e.expr->expr.cas.else_body, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
         }
-      schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr->expr.cas.then_bodies, schemerlicht_vector);
-      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr->expr.cas.then_bodies, schemerlicht_vector);
+      schemerlicht_vector* vit = schemerlicht_vector_begin(&e.expr->expr.cas.then_bodies, schemerlicht_vector);
+      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e.expr->expr.cas.then_bodies, schemerlicht_vector);
       for (; vit != vit_end; ++vit)
         {
         it = schemerlicht_vector_begin(vit, schemerlicht_expression);
@@ -646,18 +647,18 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_CASE_POST:
     {
-    vis->postvisit_case(ctxt, vis, e->expr);
+    vis->postvisit_case(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_COND_PRE:
     {
-    if (vis->previsit_cond(ctxt, vis, e->expr))
+    if (vis->previsit_cond(ctxt, vis, e.expr))
       {
       // note: all expressions essentially are dumped in the visitor, which is only of use for the deletion visitor.
       // cond should always be transformed to core forms.
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_COND_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr->expr.cond.arguments, schemerlicht_vector);
-      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr->expr.cond.arguments, schemerlicht_vector);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_COND_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* vit = schemerlicht_vector_begin(&e.expr->expr.cond.arguments, schemerlicht_vector);
+      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e.expr->expr.cond.arguments, schemerlicht_vector);
       for (; vit != vit_end; ++vit)
         {
         schemerlicht_expression* it = schemerlicht_vector_begin(vit, schemerlicht_expression);
@@ -672,30 +673,30 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_COND_POST:
     {
-    vis->postvisit_cond(ctxt, vis, e->expr);
+    vis->postvisit_cond(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_DO_PRE:
     {
-    if (vis->previsit_do(ctxt, vis, e->expr))
+    if (vis->previsit_do(ctxt, vis, e.expr))
       {
       // note: all expressions essentially are dumped in the visitor, which is only of use for the deletion visitor.
       // do should always be transformed to core forms.
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_DO_POST), schemerlicht_visitor_entry);
-      schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr->expr.d.test, schemerlicht_expression);
-      schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr->expr.d.test, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_DO_POST), schemerlicht_visitor_entry);
+      schemerlicht_expression* it = schemerlicht_vector_begin(&e.expr->expr.d.test, schemerlicht_expression);
+      schemerlicht_expression* it_end = schemerlicht_vector_end(&e.expr->expr.d.test, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
         }
-      it = schemerlicht_vector_begin(&e->expr->expr.d.commands, schemerlicht_expression);
-      it_end = schemerlicht_vector_end(&e->expr->expr.d.commands, schemerlicht_expression);
+      it = schemerlicht_vector_begin(&e.expr->expr.d.commands, schemerlicht_expression);
+      it_end = schemerlicht_vector_end(&e.expr->expr.d.commands, schemerlicht_expression);
       for (; it != it_end; ++it)
         {
         schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(it, SCHEMERLICHT_VISITOR_EXPRESSION_PRE), schemerlicht_visitor_entry);
         }
-      schemerlicht_vector* vit = schemerlicht_vector_begin(&e->expr->expr.d.bindings, schemerlicht_vector);
-      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr->expr.d.bindings, schemerlicht_vector);
+      schemerlicht_vector* vit = schemerlicht_vector_begin(&e.expr->expr.d.bindings, schemerlicht_vector);
+      schemerlicht_vector* vit_end = schemerlicht_vector_end(&e.expr->expr.d.bindings, schemerlicht_vector);
       for (; vit != vit_end; ++vit)
         {
         it = schemerlicht_vector_begin(vit, schemerlicht_expression);
@@ -710,15 +711,15 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_DO_POST:
     {
-    vis->postvisit_do(ctxt, vis, e->expr);
+    vis->postvisit_do(ctxt, vis, e.expr);
     break;
     }
     case SCHEMERLICHT_VISITOR_LET_PRE:
     {
-    if (vis->previsit_let(ctxt, vis, e->expr))
+    if (vis->previsit_let(ctxt, vis, e.expr))
       {
-      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LET_BINDINGS_POST), schemerlicht_visitor_entry);
-      schemerlicht_vector* arg = &(e->expr->expr.let.bindings);
+      schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_LET_BINDINGS_POST), schemerlicht_visitor_entry);
+      schemerlicht_vector* arg = &(e.expr->expr.let.bindings);
       schemerlicht_let_binding* expr_it = schemerlicht_vector_begin(arg, schemerlicht_let_binding);
       schemerlicht_let_binding* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_let_binding);
       schemerlicht_let_binding* expr_rit = expr_it_end - 1;
@@ -733,25 +734,25 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_LET_BINDING_PRE:
     {
-    if (vis->previsit_let_binding(ctxt, vis, e->binding))
+    if (vis->previsit_let_binding(ctxt, vis, e.binding))
       {
-      schemerlicht_visitor_entry e1 = make_entry_binding(e->binding, SCHEMERLICHT_VISITOR_LET_BINDING_POST);
+      schemerlicht_visitor_entry e1 = make_entry_binding(e.binding, SCHEMERLICHT_VISITOR_LET_BINDING_POST);
       schemerlicht_vector_push_back(ctxt, &(vis->v), e1, schemerlicht_visitor_entry);
-      schemerlicht_visitor_entry e2 = make_entry(&(e->binding->binding_expr), SCHEMERLICHT_VISITOR_EXPRESSION_PRE);
+      schemerlicht_visitor_entry e2 = make_entry(&(e.binding->binding_expr), SCHEMERLICHT_VISITOR_EXPRESSION_PRE);
       schemerlicht_vector_push_back(ctxt, &(vis->v), e2, schemerlicht_visitor_entry);
       }
     break;
     }
     case SCHEMERLICHT_VISITOR_LET_BINDING_POST:
     {
-    vis->postvisit_let_binding(ctxt, vis, e->binding);
+    vis->postvisit_let_binding(ctxt, vis, e.binding);
     break;
     }
     case SCHEMERLICHT_VISITOR_LET_BINDINGS_POST:
     {
-    vis->postvisit_let_bindings(ctxt, vis, e->expr);
-    schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e->expr, SCHEMERLICHT_VISITOR_LET_POST), schemerlicht_visitor_entry);
-    schemerlicht_vector* arg = &(e->expr->expr.let.body);
+    vis->postvisit_let_bindings(ctxt, vis, e.expr);
+    schemerlicht_vector_push_back(ctxt, &(vis->v), make_entry(e.expr, SCHEMERLICHT_VISITOR_LET_POST), schemerlicht_visitor_entry);
+    schemerlicht_vector* arg = &(e.expr->expr.let.body);
     schemerlicht_expression* expr_it = schemerlicht_vector_begin(arg, schemerlicht_expression);
     schemerlicht_expression* expr_it_end = schemerlicht_vector_end(arg, schemerlicht_expression);
     schemerlicht_expression* expr_rit = expr_it_end - 1;
@@ -764,7 +765,7 @@ static void visit_entry(schemerlicht_context* ctxt, schemerlicht_visitor* vis, s
     }
     case SCHEMERLICHT_VISITOR_LET_POST:
     {
-    vis->postvisit_let(ctxt, vis, e->expr);
+    vis->postvisit_let(ctxt, vis, e.expr);
     break;
     }
     }

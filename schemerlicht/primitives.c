@@ -4266,6 +4266,7 @@ void schemerlicht_primitive_vector_fill(schemerlicht_context* ctxt, int a, int b
         {
         *it = *obj;
         }
+      v.type = schemerlicht_object_type_void;
       }
     else
       {
