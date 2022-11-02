@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_POOL_TESTS_H
+#define SCHEMERLICHT_POOL_TESTS_H
+
+void run_all_pool_tests();
+
+#endif //SCHEMERLICHT_POOL_TESTS_H

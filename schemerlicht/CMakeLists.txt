@@ -22,6 +22,7 @@ map.h
 memory.h
 object.h
 parser.h
+pool.h
 primitives.h
 quasiquote.h
 quotecollect.h
@@ -61,6 +62,7 @@ map.c
 memory.c
 object.c
 parser.c
+pool.c
 primitives.c
 quasiquote.c
 quoteconv.c
