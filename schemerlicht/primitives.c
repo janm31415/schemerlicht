@@ -2964,9 +2964,7 @@ void schemerlicht_primitive_vector(schemerlicht_context* ctxt, int a, int b, int
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_VECTOR);
-  schemerlicht_object v;
-  v.type = schemerlicht_object_type_vector;
-  schemerlicht_vector_init_with_size(ctxt, &v.value.v, b, schemerlicht_object);
+  schemerlicht_object v = make_schemerlicht_object_vector(ctxt, b);  
   for (int j = 0; j < b; ++j)
     {
     schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
@@ -3369,9 +3367,7 @@ void schemerlicht_primitive_make_vector(schemerlicht_context* ctxt, int a, int b
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
-  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MAKE_VECTOR);
-  schemerlicht_object v;
-  v.type = schemerlicht_object_type_vector;
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MAKE_VECTOR);  
   schemerlicht_memsize vector_length = 0;
   if (b > 0)
     {
@@ -3388,7 +3384,7 @@ void schemerlicht_primitive_make_vector(schemerlicht_context* ctxt, int a, int b
         break;
       }
     }
-  schemerlicht_vector_init_with_size(ctxt, &v.value.v, vector_length, schemerlicht_object);
+  schemerlicht_object v = make_schemerlicht_object_vector(ctxt, vector_length);  
   schemerlicht_object dummy;
   dummy.type = schemerlicht_object_type_undefined;
   schemerlicht_object* fill_obj = &dummy;

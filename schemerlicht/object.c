@@ -301,6 +301,31 @@ schemerlicht_object make_schemerlicht_object_closure(schemerlicht_context* ctxt,
   return obj;
   }
 
+schemerlicht_object make_schemerlicht_object_vector(schemerlicht_context* ctxt, int vector_size)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_vector;
+  if (vector_size == 0)
+    {
+    obj.value.v.vector_capacity = 1;
+    obj.value.v.vector_size = 0;
+    obj.value.v.element_size = sizeof(schemerlicht_object);
+    obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool[0]);
+    }
+  else if (vector_size <= SCHEMERLICHT_MAX_POOL)
+    {
+    obj.value.v.vector_capacity = vector_size;
+    obj.value.v.vector_size = vector_size;
+    obj.value.v.element_size = sizeof(schemerlicht_object);
+    obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool[vector_size - 1]);
+    }
+  else
+    {
+    schemerlicht_vector_init_with_size(ctxt, &obj.value.v, vector_size, schemerlicht_object);
+    }
+  return obj;
+  }
+
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   switch (obj->type)
@@ -317,7 +342,14 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     }
     case schemerlicht_object_type_vector:
     {
-    schemerlicht_vector_destroy(ctxt, &(obj->value.v));
+    if (obj->value.v.vector_size > SCHEMERLICHT_MAX_POOL)
+      {
+      schemerlicht_vector_destroy(ctxt, &(obj->value.v));
+      }
+    else
+      {
+      schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_capacity - 1], obj->value.v.vector_ptr);
+      }
     break;
     }
     case schemerlicht_object_type_pair:
@@ -333,7 +365,7 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
       }
     else
       {
-      schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_size-1], obj->value.v.vector_ptr);
+      schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_capacity -1], obj->value.v.vector_ptr);
       }
     break;
     }
