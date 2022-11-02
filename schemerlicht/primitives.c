@@ -3103,9 +3103,9 @@ void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CONS);
-  schemerlicht_object v;
-  v.type = schemerlicht_object_type_pair;
-  schemerlicht_vector_init_with_size(ctxt, &v.value.v, 2, schemerlicht_object);
+  schemerlicht_object v = make_schemerlicht_object_pair(ctxt);
+  //v.type = schemerlicht_object_type_pair;
+  //schemerlicht_vector_init_with_size(ctxt, &v.value.v, 2, schemerlicht_object);
   schemerlicht_object* v0 = schemerlicht_vector_at(&v.value.v, 0, schemerlicht_object);
   schemerlicht_object* v1 = schemerlicht_vector_at(&v.value.v, 1, schemerlicht_object);
   if (b == 0)
@@ -3149,9 +3149,9 @@ void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c
     }
   else
     {
-    schemerlicht_object obj1;
-    obj1.type = schemerlicht_object_type_pair;
-    schemerlicht_vector_init_with_size(ctxt, &obj1.value.v, 2, schemerlicht_object);
+    schemerlicht_object obj1 = make_schemerlicht_object_pair(ctxt);
+    //obj1.type = schemerlicht_object_type_pair;
+    //schemerlicht_vector_init_with_size(ctxt, &obj1.value.v, 2, schemerlicht_object);
     schemerlicht_object* v0 = schemerlicht_vector_at(&obj1.value.v, 0, schemerlicht_object);
     schemerlicht_object* v1 = schemerlicht_vector_at(&obj1.value.v, 1, schemerlicht_object);
     v1->type = schemerlicht_object_type_nil;
@@ -3162,9 +3162,9 @@ void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c
     ++ctxt->heap_pos;
     for (int j = b - 1; j >= 1; --j)
       {
-      schemerlicht_object obj2;
-      obj2.type = schemerlicht_object_type_pair;
-      schemerlicht_vector_init_with_size(ctxt, &obj2.value.v, 2, schemerlicht_object);
+      schemerlicht_object obj2 = make_schemerlicht_object_pair(ctxt);
+      //obj2.type = schemerlicht_object_type_pair;
+      //schemerlicht_vector_init_with_size(ctxt, &obj2.value.v, 2, schemerlicht_object);
       v0 = schemerlicht_vector_at(&obj2.value.v, 0, schemerlicht_object);
       v1 = schemerlicht_vector_at(&obj2.value.v, 1, schemerlicht_object);
       schemerlicht_set_object(v1, heap_obj);

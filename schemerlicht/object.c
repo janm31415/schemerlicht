@@ -1,4 +1,6 @@
 #include "object.h"
+#include "pool.h"
+#include "context.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -269,6 +271,17 @@ schemerlicht_object make_schemerlicht_object_symbol(schemerlicht_context* ctxt, 
   return obj;
   }
 
+schemerlicht_object make_schemerlicht_object_pair(schemerlicht_context* ctxt)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_pair;
+  obj.value.v.vector_capacity = 2;
+  obj.value.v.vector_size = 2;
+  obj.value.v.element_size = sizeof(schemerlicht_object);
+  obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool2);
+  return obj;
+  }
+
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   switch (obj->type)
@@ -290,7 +303,8 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     }
     case schemerlicht_object_type_pair:
     {
-    schemerlicht_vector_destroy(ctxt, &(obj->value.v));
+    schemerlicht_pool_deallocate(&ctxt->pool2, obj->value.v.vector_ptr);
+    //schemerlicht_vector_destroy(ctxt, &(obj->value.v)); 
     break;
     }
     case schemerlicht_object_type_closure:

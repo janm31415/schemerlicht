@@ -14,35 +14,36 @@ static schemerlicht_context* context_new(schemerlicht_context* ctxt)
     return cast(schemerlicht_context*, block);
   }
 
-static void context_free(schemerlicht_context* ctxt, schemerlicht_context* ctxt_to_free)
+static void context_free(schemerlicht_context* ctxt)
   {
-  schemerlicht_map_keys_free(ctxt, ctxt_to_free->quote_to_index);
-  schemerlicht_map_free(ctxt, ctxt_to_free->quote_to_index);
-  schemerlicht_map_values_free(ctxt, ctxt_to_free->string_to_symbol);
-  schemerlicht_map_keys_free(ctxt, ctxt_to_free->string_to_symbol);
-  schemerlicht_map_free(ctxt, ctxt_to_free->string_to_symbol);
-  schemerlicht_syntax_errors_clear(ctxt_to_free);
-  schemerlicht_compile_errors_clear(ctxt_to_free);
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->stack);
-  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt_to_free->raw_heap, schemerlicht_object);
-  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt_to_free->raw_heap, schemerlicht_object);
+  schemerlicht_map_keys_free(ctxt, ctxt->quote_to_index);
+  schemerlicht_map_free(ctxt, ctxt->quote_to_index);
+  schemerlicht_map_values_free(ctxt, ctxt->string_to_symbol);
+  schemerlicht_map_keys_free(ctxt, ctxt->string_to_symbol);
+  schemerlicht_map_free(ctxt, ctxt->string_to_symbol);
+  schemerlicht_syntax_errors_clear(ctxt);
+  schemerlicht_compile_errors_clear(ctxt);
+  schemerlicht_vector_destroy(ctxt, &ctxt->stack);
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->raw_heap, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->raw_heap, schemerlicht_object);
   for (; it != it_end; ++it)
     {
     schemerlicht_object_destroy(ctxt, it);
     }
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->globals); // we don't destroy the objects in the globals list, as they point to constants or heap objects
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->raw_heap);
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->syntax_error_reports);  
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->compile_error_reports);
-  schemerlicht_string* sit = schemerlicht_vector_begin(&ctxt_to_free->overrides, schemerlicht_string);
-  schemerlicht_string* sit_end = schemerlicht_vector_end(&ctxt_to_free->overrides, schemerlicht_string);
+  schemerlicht_vector_destroy(ctxt, &ctxt->globals); // we don't destroy the objects in the globals list, as they point to constants or heap objects
+  schemerlicht_vector_destroy(ctxt, &ctxt->raw_heap);
+  schemerlicht_vector_destroy(ctxt, &ctxt->syntax_error_reports);  
+  schemerlicht_vector_destroy(ctxt, &ctxt->compile_error_reports);
+  schemerlicht_pool_allocator_destroy(ctxt, &ctxt->pool2);
+  schemerlicht_string* sit = schemerlicht_vector_begin(&ctxt->overrides, schemerlicht_string);
+  schemerlicht_string* sit_end = schemerlicht_vector_end(&ctxt->overrides, schemerlicht_string);
   for (; sit != sit_end; ++sit)
     {
     schemerlicht_string_destroy(ctxt, sit);
     }
-  schemerlicht_vector_destroy(ctxt, &ctxt_to_free->overrides);
-  schemerlicht_environment_destroy(ctxt_to_free);
-  schemerlicht_free(ctxt, ctxt_to_free, sizeof(schemerlicht_context));
+  schemerlicht_vector_destroy(ctxt, &ctxt->overrides);
+  schemerlicht_environment_destroy(ctxt);
+  schemerlicht_free(ctxt, ctxt, sizeof(schemerlicht_context));
   }
 
 static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size)
@@ -72,6 +73,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   ctxt->quote_to_index = schemerlicht_map_new(ctxt, 0, 8);
   ctxt->quote_to_index_size = 0;
   ctxt->string_to_symbol = schemerlicht_map_new(ctxt, 0, 8);
+  schemerlicht_pool_allocator_init(ctxt, &ctxt->pool2, 256, sizeof(schemerlicht_object)*2);
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->compile_error_reports, schemerlicht_error_report);
@@ -111,7 +113,7 @@ void schemerlicht_close(schemerlicht_context* ctxt)
   schemerlicht_destroy_cell(ctxt, &ctxt->global->false_sym);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->nil_sym);
   schemerlicht_free(ctxt, ctxt->global, sizeof(schemerlicht_global_context));
-  context_free(NULL, ctxt);
+  context_free(ctxt);
   }
 
 schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size)
@@ -130,5 +132,5 @@ void schemerlicht_context_destroy(schemerlicht_context* ctxt)
   {
   schemerlicht_assert(ctxt->global != NULL);
   schemerlicht_assert(ctxt != ctxt->global->main_context);
-  context_free(ctxt->global->main_context, ctxt);
+  context_free(ctxt);
   }

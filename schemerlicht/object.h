@@ -66,6 +66,7 @@ schemerlicht_object make_schemerlicht_object_nil();
 schemerlicht_object make_schemerlicht_object_char(schemerlicht_byte ch);
 schemerlicht_object make_schemerlicht_object_string(schemerlicht_context* ctxt, const char* s);
 schemerlicht_object make_schemerlicht_object_symbol(schemerlicht_context* ctxt, const char* s);
+schemerlicht_object make_schemerlicht_object_pair(schemerlicht_context* ctxt);
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj);
 
 schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj);

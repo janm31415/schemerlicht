@@ -5,6 +5,7 @@
 #include "object.h"
 #include "map.h"
 #include "reader.h"
+#include "pool.h"
 
 #include <setjmp.h>
 
@@ -49,6 +50,7 @@ struct schemerlicht_context
   schemerlicht_memsize quote_to_index_size;
   schemerlicht_vector overrides; // stringvec with names of primitives that were overridden
   uint64_t time_spent_gc;
+  schemerlicht_pool_allocator pool2; // pool for chunks consisting of 2 schemerlicht_object types
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
