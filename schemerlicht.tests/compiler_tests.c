@@ -1533,34 +1533,6 @@ static void test_newton()
 static void test_compile_cc()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-#if 0
-  schemerlicht_vector tokens = script2tokens(ctxt, "( lambda ( %self1 k f ) ( begin ( f k ( closure ( lambda ( %self0 dummy-k result ) ( begin ( ( closure-ref %self0 1 ) result ) ) ) k ) ) ) )");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-
-  schemerlicht_function* callccfunc = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  //schemerlicht_string s = schemerlicht_fun_to_string(ctxt, func);
-  //printf("%s\n", s.string_ptr);
-  //schemerlicht_string_destroy(ctxt, &s);
-
-  schemerlicht_object* lambdacallcc = schemerlicht_run(ctxt, &callccfunc);//schemerlicht_vector_at(&callccfunc->constants, 0, schemerlicht_object);
-  schemerlicht_object callcc;
-  callcc.type = schemerlicht_object_type_closure;
-  schemerlicht_vector_init(ctxt, &callcc.value.v, schemerlicht_object);
-  schemerlicht_vector_push_back(ctxt, &callcc.value.v, *lambdacallcc, schemerlicht_object);
-
-  schemerlicht_object* heap_obj = schemerlicht_vector_at(&ctxt->heap, ctxt->heap_pos, schemerlicht_object);
-  schemerlicht_set_object(heap_obj, &callcc);
-  schemerlicht_environment_entry entry;
-  entry.position = ctxt->heap_pos;
-  entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
-  schemerlicht_string callcc_name;
-  schemerlicht_string_init(ctxt, &callcc_name, "call/cc");
-  schemerlicht_environment_add(ctxt, &callcc_name, entry);
-  ++ctxt->heap_pos;
-
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-#else
   schemerlicht_vector tokens = script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
@@ -1577,8 +1549,6 @@ static void test_compile_cc()
   schemerlicht_run(ctxt, &callccfunc);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-
-#endif
 
   tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
   prog = make_program(ctxt, &tokens);
@@ -2291,8 +2261,8 @@ void run_all_compiler_tests()
   test_cond();
   test_newton();
   test_compile_cc();
-  //test_ack_performance();
-  //test_fib_performance();
+  test_ack_performance();
+  test_fib_performance();
   test_lambda_variable_arity_not_using_rest_arg();
   test_lambda_variable_arity_while_using_rest_arg();
   test_lambda_long_list();

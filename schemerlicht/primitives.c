@@ -3104,8 +3104,6 @@ void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CONS);
   schemerlicht_object v = make_schemerlicht_object_pair(ctxt);
-  //v.type = schemerlicht_object_type_pair;
-  //schemerlicht_vector_init_with_size(ctxt, &v.value.v, 2, schemerlicht_object);
   schemerlicht_object* v0 = schemerlicht_vector_at(&v.value.v, 0, schemerlicht_object);
   schemerlicht_object* v1 = schemerlicht_vector_at(&v.value.v, 1, schemerlicht_object);
   if (b == 0)
@@ -3150,8 +3148,6 @@ void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c
   else
     {
     schemerlicht_object obj1 = make_schemerlicht_object_pair(ctxt);
-    //obj1.type = schemerlicht_object_type_pair;
-    //schemerlicht_vector_init_with_size(ctxt, &obj1.value.v, 2, schemerlicht_object);
     schemerlicht_object* v0 = schemerlicht_vector_at(&obj1.value.v, 0, schemerlicht_object);
     schemerlicht_object* v1 = schemerlicht_vector_at(&obj1.value.v, 1, schemerlicht_object);
     v1->type = schemerlicht_object_type_nil;
@@ -3163,8 +3159,6 @@ void schemerlicht_primitive_list(schemerlicht_context* ctxt, int a, int b, int c
     for (int j = b - 1; j >= 1; --j)
       {
       schemerlicht_object obj2 = make_schemerlicht_object_pair(ctxt);
-      //obj2.type = schemerlicht_object_type_pair;
-      //schemerlicht_vector_init_with_size(ctxt, &obj2.value.v, 2, schemerlicht_object);
       v0 = schemerlicht_vector_at(&obj2.value.v, 0, schemerlicht_object);
       v1 = schemerlicht_vector_at(&obj2.value.v, 1, schemerlicht_object);
       schemerlicht_set_object(v1, heap_obj);
@@ -3255,13 +3249,10 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSURE);
-  //schemerlicht_object v;
-  //v.type = schemerlicht_object_type_closure;
-  //schemerlicht_vector_init_with_size(ctxt, &v.value.v, b, schemerlicht_object);
+  schemerlicht_object v = make_schemerlicht_object_closure(ctxt, b);  
   schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-  heap_obj->type = schemerlicht_object_type_closure;
+  schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
-  schemerlicht_vector_init_with_size(ctxt, &heap_obj->value.v, b, schemerlicht_object);
   memcpy(heap_obj->value.v.vector_ptr, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + a + c + 1, b * sizeof(schemerlicht_object));
 #if 0
   for (int j = 0; j < b; ++j)
@@ -4932,14 +4923,12 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object original_continuation = *continuation;
       schemerlicht_object oper = *op;
       // TODO later: move dummy continuation to the context so that we don't need to recreate it all the time for apply
-      schemerlicht_object dummy_continuation;
-      dummy_continuation.type = schemerlicht_object_type_closure;
+      schemerlicht_object dummy_continuation = make_schemerlicht_object_closure(ctxt, 1);
       schemerlicht_object dummy_lambda;
       dummy_lambda.type = schemerlicht_object_type_lambda;
       schemerlicht_function* dummy_fun = schemerlicht_function_new(ctxt);
       dummy_lambda.value.ptr = dummy_fun;
-      schemerlicht_vector_init(ctxt, &dummy_continuation.value.v, schemerlicht_object);
-      schemerlicht_vector_push_back(ctxt, &dummy_continuation.value.v, dummy_lambda, schemerlicht_object);      
+      schemerlicht_set_object(schemerlicht_vector_begin(&dummy_continuation.value.v, schemerlicht_object), &dummy_lambda);
       
       //swap place of continuation and operator
       *op = dummy_continuation;
@@ -4969,7 +4958,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);
       *continuation = original_continuation;
-      schemerlicht_vector_destroy(ctxt, &dummy_continuation.value.v);
+      schemerlicht_object_destroy(ctxt, &dummy_continuation);      
       schemerlicht_function_free(ctxt, dummy_fun);
       }
     else

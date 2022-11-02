@@ -9,6 +9,8 @@
 
 #include <setjmp.h>
 
+#define SCHEMERLICHT_MAX_POOL 8
+
 typedef struct schemerlicht_longjmp
   {
   schemerlicht_alignment dummy;
@@ -50,7 +52,7 @@ struct schemerlicht_context
   schemerlicht_memsize quote_to_index_size;
   schemerlicht_vector overrides; // stringvec with names of primitives that were overridden
   uint64_t time_spent_gc;
-  schemerlicht_pool_allocator pool2; // pool for chunks consisting of 2 schemerlicht_object types
+  schemerlicht_pool_allocator pool[SCHEMERLICHT_MAX_POOL];
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

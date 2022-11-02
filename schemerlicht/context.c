@@ -34,7 +34,8 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_vector_destroy(ctxt, &ctxt->raw_heap);
   schemerlicht_vector_destroy(ctxt, &ctxt->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt->compile_error_reports);
-  schemerlicht_pool_allocator_destroy(ctxt, &ctxt->pool2);
+  for (int i = 0; i < SCHEMERLICHT_MAX_POOL; ++i)
+    schemerlicht_pool_allocator_destroy(ctxt, &ctxt->pool[i]);
   schemerlicht_string* sit = schemerlicht_vector_begin(&ctxt->overrides, schemerlicht_string);
   schemerlicht_string* sit_end = schemerlicht_vector_end(&ctxt->overrides, schemerlicht_string);
   for (; sit != sit_end; ++sit)
@@ -73,7 +74,8 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   ctxt->quote_to_index = schemerlicht_map_new(ctxt, 0, 8);
   ctxt->quote_to_index_size = 0;
   ctxt->string_to_symbol = schemerlicht_map_new(ctxt, 0, 8);
-  schemerlicht_pool_allocator_init(ctxt, &ctxt->pool2, 256, sizeof(schemerlicht_object)*2);
+  for (int i = 0; i < SCHEMERLICHT_MAX_POOL; ++i)
+    schemerlicht_pool_allocator_init(ctxt, &ctxt->pool[i], 256, sizeof(schemerlicht_object)*(i+1));
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->compile_error_reports, schemerlicht_error_report);

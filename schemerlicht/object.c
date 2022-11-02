@@ -44,7 +44,7 @@ int schemerlicht_objects_eqv(const schemerlicht_object* obj1, const schemerlicht
 static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
   schemerlicht_assert(obj1->type == obj2->type);
-  schemerlicht_assert(obj1->value.v.vector_size == obj2->value.v.vector_size);  
+  schemerlicht_assert(obj1->value.v.vector_size == obj2->value.v.vector_size);
   schemerlicht_vector left_queue, right_queue;
   schemerlicht_vector_init(ctxt, &left_queue, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &right_queue, schemerlicht_object);
@@ -56,7 +56,7 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
   it_end = schemerlicht_vector_end(&obj2->value.v, schemerlicht_object);
   insertion_pos = schemerlicht_vector_begin(&right_queue, schemerlicht_object);
   schemerlicht_vector_insert(ctxt, &right_queue, &insertion_pos, &it, &it_end, schemerlicht_object);
-  
+
   while (left_queue.vector_size > 0)
     {
     schemerlicht_object* o1 = schemerlicht_vector_back(&left_queue, schemerlicht_object);
@@ -139,7 +139,7 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
         break;
       }
     }
-  
+
   schemerlicht_vector_destroy(ctxt, &left_queue);
   schemerlicht_vector_destroy(ctxt, &right_queue);
   return 1;
@@ -273,12 +273,31 @@ schemerlicht_object make_schemerlicht_object_symbol(schemerlicht_context* ctxt, 
 
 schemerlicht_object make_schemerlicht_object_pair(schemerlicht_context* ctxt)
   {
+  schemerlicht_assert(SCHEMERLICHT_MAX_POOL > 1);
   schemerlicht_object obj;
   obj.type = schemerlicht_object_type_pair;
   obj.value.v.vector_capacity = 2;
   obj.value.v.vector_size = 2;
   obj.value.v.element_size = sizeof(schemerlicht_object);
-  obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool2);
+  obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool[1]);
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_closure(schemerlicht_context* ctxt, int closure_size)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_closure;
+  if (closure_size <= SCHEMERLICHT_MAX_POOL)
+    {
+    obj.value.v.vector_capacity = closure_size;
+    obj.value.v.vector_size = closure_size;
+    obj.value.v.element_size = sizeof(schemerlicht_object);
+    obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool[closure_size - 1]);
+    }
+  else
+    {
+    schemerlicht_vector_init_with_size(ctxt, &obj.value.v, closure_size, schemerlicht_object);
+    }
   return obj;
   }
 
@@ -303,13 +322,19 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     }
     case schemerlicht_object_type_pair:
     {
-    schemerlicht_pool_deallocate(&ctxt->pool2, obj->value.v.vector_ptr);
-    //schemerlicht_vector_destroy(ctxt, &(obj->value.v)); 
+    schemerlicht_pool_deallocate(&ctxt->pool[1], obj->value.v.vector_ptr);
     break;
     }
     case schemerlicht_object_type_closure:
     {
-    schemerlicht_vector_destroy(ctxt, &(obj->value.v));
+    if (obj->value.v.vector_size > SCHEMERLICHT_MAX_POOL)
+      {
+      schemerlicht_vector_destroy(ctxt, &(obj->value.v));
+      }
+    else
+      {
+      schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_size-1], obj->value.v.vector_ptr);
+      }
     break;
     }
     default:
@@ -497,7 +522,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
             {
             task = make_text_task(" ");
             schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
-            }          
+            }
           }
         schemerlicht_runtime_task task = make_object_task(first);
         schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
