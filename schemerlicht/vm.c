@@ -334,8 +334,10 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       const int a = SCHEMERLICHT_GETARG_A(i);
       const int bx = SCHEMERLICHT_GETARG_Bx(i);
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+      printf("  constants size: %d\n", (*fun)->constants.vector_size);
       schemerlicht_object* k = schemerlicht_vector_at(&(*fun)->constants, bx, schemerlicht_object);
       schemerlicht_string obj_str = debug_object_to_string(ctxt, k);
+      printf("  k -> %s\n", obj_str.string_ptr);
       schemerlicht_string_append_cstr(ctxt, s, "   k -> ");
       schemerlicht_string_append(ctxt, s, &obj_str);
       schemerlicht_string_destroy(ctxt, &obj_str);
