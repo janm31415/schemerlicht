@@ -78,7 +78,7 @@ static void compile_literal(schemerlicht_context* ctxt, schemerlicht_function* f
     schemerlicht_fixnum fx = e->expr.lit.lit.fx.value;
     if (fx <= SCHEMERLICHT_MAXARG_sBx && fx >= -SCHEMERLICHT_MAXARG_sBx)
       {
-      make_code_asbx(ctxt, fun, SCHEMERLICHT_OPCODE_SETFIXNUM, fun->freereg, fx);
+      make_code_asbx(ctxt, fun, SCHEMERLICHT_OPCODE_SETFIXNUM, fun->freereg, cast(int, fx));
       return;
       }
     obj = make_schemerlicht_object_fixnum(fx);
@@ -159,7 +159,7 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
     //prim_as_object.type = schemerlicht_object_type_primitive_object; // change type to object
     //int k_pos = get_k(ctxt, fun, &prim_as_object);
     //make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
-    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIMOBJ, fun->freereg, prim->value.fx);
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIMOBJ, fun->freereg, cast(int, prim->value.fx));
     }
   else
     {
@@ -186,7 +186,7 @@ static void compile_prim(schemerlicht_context* ctxt, schemerlicht_function* fun,
       //int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
 
       //make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
-      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIM, fun->freereg, prim->value.fx);
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIM, fun->freereg, cast(int, prim->value.fx));
       make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, fun->freereg, nr_prim_args, 0);
       }
     }
@@ -237,11 +237,11 @@ static void compile_set(schemerlicht_context* ctxt, schemerlicht_function* fun, 
     compile_expression(ctxt, fun, value_expr);
     if (lookup_entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL)
       {
-      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_STOREGLOBAL, fun->freereg, lookup_entry.position);
+      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_STOREGLOBAL, fun->freereg, cast(int, lookup_entry.position));
       }
     else
       {
-      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, lookup_entry.position, fun->freereg);
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, cast(int, lookup_entry.position), fun->freereg);
       }
     }
   }
@@ -259,11 +259,11 @@ static void compile_variable(schemerlicht_context* ctxt, schemerlicht_function* 
     {
     if (lookup_entry.type == SCHEMERLICHT_ENV_TYPE_STACK)
       {
-      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, fun->freereg, lookup_entry.position);
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVE, fun->freereg, cast(int, lookup_entry.position));
       }
     else
       {
-      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADGLOBAL, fun->freereg, lookup_entry.position);
+      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADGLOBAL, fun->freereg, cast(int, lookup_entry.position));
       }
     }
   }

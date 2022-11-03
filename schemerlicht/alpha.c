@@ -143,7 +143,6 @@ static void postvisit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visi
     add_variable(ctxt, vis, &binding->binding_name, &alpha_name);
     binding->binding_name = alpha_name;
     }
-  return 1;
   }
 static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
