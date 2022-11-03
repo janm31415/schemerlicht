@@ -7,6 +7,7 @@
 #include "inlines.h"
 
 #include <stdio.h>
+#include <string.h>
 
 static void make_variable_arity_list(schemerlicht_context* ctxt, int a, int b)
   {

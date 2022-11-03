@@ -7,6 +7,8 @@
 #include "environment.h"
 #include "dump.h"
 
+#include <string.h>
+
 static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e);
 
 static void make_code_abx(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_opcode opc, int a, int bx)
