@@ -295,7 +295,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
       const int b = SCHEMERLICHT_GETARG_B(i);
-#if 1
+#if 0
       for (int j = 0; j <= b; ++j)
         {
         schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -306,7 +306,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       blocking->type = schemerlicht_object_type_blocking;
 #else
       schemerlicht_object* st = cast(schemerlicht_object*, ctxt->stack.vector_ptr);
-      memcpy(st, st + a, (b + 1) * sizeof(schemerlicht_object));
+      memmove(st, st + a, (b + 1) * sizeof(schemerlicht_object));
       schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
       blocking->type = schemerlicht_object_type_blocking;
 #endif
@@ -504,7 +504,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       const int b = SCHEMERLICHT_GETARG_B(i);
       if (a != 0)
         {
-#if 1
+#if 0
         for (int j = 0; j < b; ++j)
           {
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -513,7 +513,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
           }
 #else
         schemerlicht_object* st = cast(schemerlicht_object*, ctxt->stack.vector_ptr);
-        memcpy(st, st + a, b * sizeof(schemerlicht_object));
+        memmove(st, st + a, b * sizeof(schemerlicht_object));
 #endif
         }
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
@@ -552,7 +552,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
       const int b = SCHEMERLICHT_GETARG_B(i);
-#if 1
+#if 0
       for (int j = 0; j <= b; ++j)
         {
         schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -563,7 +563,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       blocking->type = schemerlicht_object_type_blocking;
 #else
       schemerlicht_object* st = cast(schemerlicht_object*, ctxt->stack.vector_ptr);
-      memcpy(st, st + a, (b + 1) * sizeof(schemerlicht_object));
+      memmove(st, st + a, (b + 1) * sizeof(schemerlicht_object));
       schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
       blocking->type = schemerlicht_object_type_blocking;
 #endif
@@ -733,7 +733,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_B(i);
       if (a != 0)
         {
-#if 1
+#if 0
         for (int j = 0; j < b; ++j)
           {
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -742,7 +742,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
           }
 #else
         schemerlicht_object* st = cast(schemerlicht_object*, ctxt->stack.vector_ptr);
-        memcpy(st, st + a, b * sizeof(schemerlicht_object));
+        memmove(st, st + a, b * sizeof(schemerlicht_object));
 #endif
         }
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
