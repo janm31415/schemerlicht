@@ -14,6 +14,21 @@ void TestFail(const char* expval, const char* val, const char* file, int line, c
 void InitTestEngine();
 int CloseTestEngine(int force_report);
 
+#ifdef _WIN32
+#define TestEqInt(expval, val, file, line, func) \
+  if ((int64_t)(expval) != (int64_t)(val)) \
+    { \
+    char expval_str[256]; \
+    char val_str[256]; \
+    sprintf(expval_str, "%lld", (int64_t)(expval)); \
+    sprintf(val_str, "%lld", (int64_t)(val)); \
+    TestFail(expval_str, val_str, file, line, func); \
+    } \
+  else \
+    { \
+    ++testing_success; \
+    }
+#else
 #define TestEqInt(expval, val, file, line, func) \
   if ((int64_t)(expval) != (int64_t)(val)) \
     { \
@@ -27,7 +42,7 @@ int CloseTestEngine(int force_report);
     { \
     ++testing_success; \
     }
-
+#endif
 #define TestEqDouble(expval, val, file, line, func) \
   if ((double)(expval) != (double)(val)) \
     { \
