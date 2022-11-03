@@ -295,7 +295,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
       const int b = SCHEMERLICHT_GETARG_B(i);
-#if 0
+#if 1
       for (int j = 0; j <= b; ++j)
         {
         schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -402,6 +402,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         //schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         inline_functions(a, b, c);
         schemerlicht_string_append_cstr(ctxt, s, "   primitive call\n");
+        printf("  primitive call\n");
         }
       else if (target->type == schemerlicht_object_type_primitive_object)
         {
@@ -412,6 +413,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         //schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1); // skip the closure argument
         inline_functions(a, b - 1, c + 1);
         schemerlicht_string_append_cstr(ctxt, s, "   primitive object call\n");
+        printf("  primitive object call\n");
         //stackstr = schemerlicht_show_stack(ctxt, 0, 9);
         //printf("%s\n", stackstr.string_ptr);
         //schemerlicht_string_destroy(ctxt, &stackstr);
@@ -445,10 +447,16 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = lambda;
+        printf("now starting GC\n");
         schemerlicht_check_garbage_collection(ctxt);
         }
       else
-        {
+        {        
+        printf("Calling an unknown object\n");
+        schemerlicht_string stackstr = schemerlicht_show_stack(ctxt, 0, 9);
+        printf("%s\n", stackstr.string_ptr);
+        schemerlicht_string_destroy(ctxt, &stackstr);
+
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
         }
       break;
@@ -544,7 +552,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
       const int b = SCHEMERLICHT_GETARG_B(i);
-#if 0
+#if 1
       for (int j = 0; j <= b; ++j)
         {
         schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);

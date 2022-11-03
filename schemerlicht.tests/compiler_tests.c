@@ -2238,6 +2238,7 @@ void run_all_compiler_tests()
   test_begin();
   test_halt();  
   test_letrec();
+  #if 1
   test_lambdas();
   test_tailcall();
   test_closures();
@@ -2280,4 +2281,5 @@ void run_all_compiler_tests()
   test_min_max();
   test_override();
   test_apply();
+  #endif
   }
