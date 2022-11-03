@@ -19,7 +19,7 @@
 int main(int argc, const char* argv[])
   {
   (void)argc;
-  (void)argv;
+  (void)argv;  
   InitTestEngine();
   clock_t start_t, end_t;
   start_t = clock();
@@ -47,6 +47,6 @@ int main(int argc, const char* argv[])
     {
     TEST_OUTPUT_LINE("FAILURE: %d out of %d tests failed (%d failures).", testing_fails, testing_success + testing_fails, testing_fails);
     }
-  TEST_OUTPUT_LINE("Test time: %f seconds.", total_t);
+  TEST_OUTPUT_LINE("Test time: %f seconds.", total_t);  
   return CloseTestEngine(1);
   }

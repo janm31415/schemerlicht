@@ -36,12 +36,13 @@ void TestFail(const char* expval, const char* val, const char* file, int line, c
 void InitTestEngine()
   {
   testing_fails = 0;
+  
+#ifdef _MSC_VER
   // Disable stdout buffering to prevent information lost on assertion or core
   // dump.
   setvbuf(stdout, NULL, _IONBF, 0);
   setvbuf(stderr, NULL, _IONBF, 0);
 
-#ifdef _MSC_VER
   // By default, send all reports to STDOUT to prevent CI hangs.
   // Enable assert report box [Abort|Retry|Ignore] if a debugger is present.
   const int dbg_mode = (_CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG) |

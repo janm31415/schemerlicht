@@ -18,7 +18,8 @@ schemerlicht_fixnum schemerlicht_to_fixnum(const char* value)
 #ifdef _WIN32
   return cast(schemerlicht_fixnum, _atoi64(value));
 #else
-  return cast(schemerlicht_fixnum, strtoull(value));
+  char* endptr;
+  return cast(schemerlicht_fixnum, strtoull(value, &endptr, 10));
 #endif
   }
 

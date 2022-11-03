@@ -274,6 +274,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
     {
     const schemerlicht_instruction i = *pc++;
     schemerlicht_string tmp = instruction_to_string(ctxt, i);
+    printf("%s\n", tmp.string_ptr);
     schemerlicht_string_append(ctxt, s, &tmp);
     schemerlicht_string_destroy(ctxt, &tmp);
     schemerlicht_string_append_cstr(ctxt, s, "\n");

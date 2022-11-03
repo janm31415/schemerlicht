@@ -2,7 +2,7 @@
 #define SCHEMERLICHT_LIMITS_H
 
 #include "schemerlicht.h"
-#include <cassert>
+#include <assert.h>
 #include <limits.h>
 
 #ifndef UNUSED

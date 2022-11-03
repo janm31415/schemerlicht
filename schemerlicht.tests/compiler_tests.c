@@ -158,7 +158,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_string_destroy(ctxt, &dumped);
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-
+  printf("Compilation done\n");
   //schemerlicht_string assembly = schemerlicht_fun_to_string(ctxt, func);
   //printf("%s\n", assembly.string_ptr);
   //schemerlicht_string_destroy(ctxt, &assembly);
@@ -167,7 +167,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_string debuginfo;
   schemerlicht_string_init(ctxt, &debuginfo, "");
   schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debuginfo, &func);
-  printf("%s\n", debuginfo.string_ptr);
+  //printf("%s\n", debuginfo.string_ptr);
   schemerlicht_string_destroy(ctxt, &debuginfo);
 
   schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 9);
@@ -1071,23 +1071,24 @@ static void test_halt()
 
 static void test_letrec()
   {
-  test_compile_aux("12", "(letrec () 12)");
+  test_compile_aux("12", "(letrec () 12)");  
   test_compile_aux("10", "(letrec () (let ([x 5]) (+ x x)))");
-  test_compile_aux("7", "(letrec ([f (lambda () 5)]) 7)");
-  test_compile_aux("12", "(letrec ([f (lambda () 5)]) (let ([x 12]) x))");
+  test_compile_aux("7", "(letrec ([f (lambda () 5)]) 7)");  
+  test_compile_aux("12", "(letrec ([f (lambda () 5)]) (let ([x 12]) x))");  
   test_compile_aux("5", "(let ([f (lambda () 5)]) (f))");
   test_compile_aux("5", "(letrec ([f (lambda () 5)]) (f))");
   test_compile_aux("5", "(letrec ([f (lambda () 5)]) (let ([x (f)]) x))");
   test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ (f) 6))");
-  test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ 6 (f)))");
-  test_compile_aux("15", "(letrec ([f (lambda () 5)]) (- 20 (f)))");
-  test_compile_aux("10", "(let ([f (lambda () 5)]) (+ (f) (f)))");
+  test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ 6 (f)))");  
+  test_compile_aux("15", "(letrec ([f (lambda () 5)]) (- 20 (f)))");    
+  test_compile_aux_w_dump("10", "(let ([f (lambda () 5)]) (+ (f) (f)))");
+  #if 0
   test_compile_aux("12", "(letrec ([f (lambda () (+ 5 7))])(f))");
-  test_compile_aux("25", "(letrec ([f (lambda (x) (+ x 12))]) (f 13))");
+  test_compile_aux("25", "(letrec ([f (lambda (x) (+ x 12))]) (f 13))");  
   test_compile_aux("12", "(letrec ([f (lambda (x) (+ x 12))]) (f 0))");
-  test_compile_aux("24", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 0)))");
-  test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");
-  test_compile_aux("41", "(letrec ([f (lambda (x y) (+ x y))] [g (lambda(x) (+ x 12))])(f 16 (f (g 0) (+ 1 (g 0)))))");
+  test_compile_aux("24", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 0)))");  
+  test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");  
+  test_compile_aux("41", "(letrec ([f (lambda (x y) (+ x y))] [g (lambda(x) (+ x 12))])(f 16 (f (g 0) (+ 1 (g 0)))))");  
   test_compile_aux("24", "(letrec ([f (lambda (x) (g x x))][g(lambda(x y) (+ x y))])(f 12))");
   test_compile_aux("34", "(letrec ([f (lambda (x) (+ x 12))]) (f (f 10)))");
   test_compile_aux("36", "(letrec ([f (lambda (x) (+ x 12))]) (f (f (f 0))))");
@@ -1096,6 +1097,7 @@ static void test_letrec()
   test_compile_aux("120", "(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))");
   test_compile_aux_heap("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))", 1000);
   test_compile_aux_heap("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))", 2000); // [JanM] add test later again when GC is in place
+  #endif
   }
 
 static void test_lambdas()
@@ -2193,7 +2195,7 @@ static void test_apply()
 
 void run_all_compiler_tests()
   {
-  test_compile_fixnum();
+  test_compile_fixnum();  
   test_compile_flonum();
   test_compile_bool();
   test_compile_nil();
@@ -2223,7 +2225,7 @@ void run_all_compiler_tests()
   test_is_zero();
   test_is_boolean();
   test_is_char();
-  test_fx_arithmetic();
+  test_fx_arithmetic();  
   test_if();
   test_and();
   test_or();
@@ -2236,8 +2238,9 @@ void run_all_compiler_tests()
   test_vector();
   test_pair();
   test_begin();
-  test_halt();
+  test_halt();  
   test_letrec();
+  #if 0
   test_lambdas();
   test_tailcall();
   test_closures();
@@ -2280,4 +2283,5 @@ void run_all_compiler_tests()
   test_min_max();
   test_override();
   test_apply();
+  #endif
   }

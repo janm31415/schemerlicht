@@ -19,8 +19,8 @@ int CloseTestEngine(int force_report);
     { \
     char expval_str[256]; \
     char val_str[256]; \
-    sprintf(expval_str, "%lld", (int64_t)(expval)); \
-    sprintf(val_str, "%lld", (int64_t)(val)); \
+    sprintf(expval_str, "%ld", (int64_t)(expval)); \
+    sprintf(val_str, "%ld", (int64_t)(val)); \
     TestFail(expval_str, val_str, file, line, func); \
     } \
   else \

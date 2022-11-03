@@ -240,8 +240,8 @@ static void parse_do()
 
 static void test_error_jump()
   {
-  int branch_side_1 = 0;
-  int branch_side_2 = 0;
+  volatile int branch_side_1 = 0;
+  volatile int branch_side_2 = 0;
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_longjmp my_long_jump;
   int val = setjmp(my_long_jump.jmp);
