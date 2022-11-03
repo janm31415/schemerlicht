@@ -504,7 +504,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       const int b = SCHEMERLICHT_GETARG_B(i);
       if (a != 0)
         {
-#if 0
+#if 1
         for (int j = 0; j < b; ++j)
           {
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
@@ -733,7 +733,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_B(i);
       if (a != 0)
         {
-#if 0
+#if 1
         for (int j = 0; j < b; ++j)
           {
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
