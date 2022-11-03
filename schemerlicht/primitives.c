@@ -4949,7 +4949,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object* lambda_obj = schemerlicht_vector_at(&oper.value.v, 0, schemerlicht_object);
       schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
       schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
-      schemerlicht_run(ctxt, &lambda);
+      schemerlicht_run(ctxt, lambda);
 
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);

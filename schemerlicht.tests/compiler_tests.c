@@ -35,7 +35,7 @@ static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const ch
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
 
   TEST_EQ_INT(schemerlicht_object_type_fixnum, res->type);
   TEST_EQ_INT(expected_value, res->value.fx);
@@ -68,7 +68,7 @@ static void test_compile_flonum_aux(schemerlicht_flonum expected_value, const ch
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
 
   TEST_EQ_INT(schemerlicht_object_type_flonum, res->type);
   TEST_EQ_DOUBLE(expected_value, res->value.fl);
@@ -113,7 +113,7 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
   schemerlicht_string_destroy(ctxt, &dumped);
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
 
   if (print_gc_time)
@@ -163,10 +163,10 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   //printf("%s\n", assembly.string_ptr);
   //schemerlicht_string_destroy(ctxt, &assembly);
 
-  //schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  //schemerlicht_object* res = schemerlicht_run(ctxt, func);
   schemerlicht_string debuginfo;
   schemerlicht_string_init(ctxt, &debuginfo, "");
-  schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debuginfo, &func);
+  schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debuginfo, func);
   //printf("%s\n", debuginfo.string_ptr);
   schemerlicht_string_destroy(ctxt, &debuginfo);
 
@@ -926,7 +926,7 @@ static void test_define()
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   int contains_error = ctxt->number_of_compile_errors > 0 ? 1 : 0;
   TEST_EQ_INT(0, contains_error);
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func);
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -936,7 +936,7 @@ static void test_define()
   tokens = script2tokens(ctxt, "x");
   prog = make_program(ctxt, &tokens);
   func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  res = schemerlicht_run(ctxt, &func);
+  res = schemerlicht_run(ctxt, func);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -1081,8 +1081,7 @@ static void test_letrec()
   test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ (f) 6))");
   test_compile_aux("11", "(letrec ([f (lambda () 5)]) (+ 6 (f)))");  
   test_compile_aux("15", "(letrec ([f (lambda () 5)]) (- 20 (f)))");    
-  test_compile_aux_w_dump("10", "(let ([f (lambda () 5)]) (+ (f) (f)))");
-  #if 0
+  test_compile_aux("10", "(let ([f (lambda () 5)]) (+ (f) (f)))");
   test_compile_aux("12", "(letrec ([f (lambda () (+ 5 7))])(f))");
   test_compile_aux("25", "(letrec ([f (lambda (x) (+ x 12))]) (f 13))");  
   test_compile_aux("12", "(letrec ([f (lambda (x) (+ x 12))]) (f 0))");
@@ -1097,7 +1096,6 @@ static void test_letrec()
   test_compile_aux("120", "(letrec ([f (lambda (x acc) (if (zero? x) acc (f(sub1 x) (* acc x))))]) (f 5 1))");
   test_compile_aux_heap("200", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 200))", 1000);
   test_compile_aux_heap("500", "(letrec ([f (lambda (x) (if (zero? x) 0 (+ 1 (f(sub1 x)))))]) (f 500))", 2000); // [JanM] add test later again when GC is in place
-  #endif
   }
 
 static void test_lambdas()
@@ -1548,7 +1546,7 @@ static void test_compile_cc()
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
   schemerlicht_function* callccfunc = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, &callccfunc);
+  schemerlicht_run(ctxt, callccfunc);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
 
@@ -1570,7 +1568,7 @@ static void test_compile_cc()
 
   schemerlicht_function* func1 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
 
-  schemerlicht_object* res = schemerlicht_run(ctxt, &func1);
+  schemerlicht_object* res = schemerlicht_run(ctxt, func1);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("1", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -1595,7 +1593,7 @@ static void test_compile_cc()
 
   schemerlicht_function* func2 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
 
-  res = schemerlicht_run(ctxt, &func2);
+  res = schemerlicht_run(ctxt, func2);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("15", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -1619,7 +1617,7 @@ static void test_compile_cc()
   schemerlicht_closure_conversion(ctxt, &prog);
 
   schemerlicht_function* func3 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  res = schemerlicht_run(ctxt, &func3);
+  res = schemerlicht_run(ctxt, func3);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("35", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -1643,7 +1641,7 @@ static void test_compile_cc()
   schemerlicht_closure_conversion(ctxt, &prog);
 
   schemerlicht_function* func4 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  res = schemerlicht_run(ctxt, &func4);
+  res = schemerlicht_run(ctxt, func4);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("3", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -1667,7 +1665,7 @@ static void test_compile_cc()
   schemerlicht_closure_conversion(ctxt, &prog);
 
   schemerlicht_function* func5 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  res = schemerlicht_run(ctxt, &func5);
+  res = schemerlicht_run(ctxt, func5);
   s = schemerlicht_object_to_string(ctxt, res);
   TEST_EQ_STRING("1005", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
@@ -1690,7 +1688,7 @@ static void test_ack_performance()
   int c0 = clock();
   test_compile_aux_heap("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)", 256*256);
   int c1 = clock();
-  printf("Ack time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);
+  printf("Ack time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
   print_gc_time = 0;
   }
 
@@ -1703,7 +1701,7 @@ static void test_fib_performance()
   //test_compile_aux_heap("1346269", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 30)",  256*256);
   test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
   int c1 = clock();
-  printf("Fib time: %dms\n", (c1 - c0) * 1000 / CLOCKS_PER_SEC);  
+  printf("Fib time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
   //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 10)");
   print_gc_time = 0;
   }
@@ -1799,17 +1797,17 @@ static void test_garbage_collection()
 
   for (int i = 0; i < 80; ++i)
     {
-    schemerlicht_run(ctxt, &fun);
+    schemerlicht_run(ctxt, fun);
     //schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 2);
     //printf("%s\n", stackstring.string_ptr);
     //schemerlicht_string_destroy(ctxt, &stackstring);
     TEST_EQ_INT(i + 1, ctxt->heap_pos);
     TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
     }
-  schemerlicht_run(ctxt, &fun);
+  schemerlicht_run(ctxt, fun);
   TEST_EQ_INT(1, ctxt->heap_pos);
   TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
-  schemerlicht_run(ctxt, &fun);
+  schemerlicht_run(ctxt, fun);
   TEST_EQ_INT(2, ctxt->heap_pos);
   TEST_EQ_INT(0, schemerlicht_need_to_perform_gc(ctxt));
 
@@ -2172,7 +2170,7 @@ static void test_apply()
   test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 6 '(7 8)) '())");
   test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 6 7 '(8)) '())");
   test_compile_aux("(#(1 2 3 4 5 6 7 8))", "(cons(apply vector 1 2 3 4 5 6 7 8 ()) '())");
-  
+
   test_compile_aux("13", "(let([f(lambda() 12)])( + (apply f '()) 1))");  
   test_compile_aux("26", "(let([f(lambda(x) ( + x 12))]) ( + (apply f 13 '()) 1))");
   test_compile_aux("26", "(let([f(lambda(x) ( + x 12))]) ( + (apply f(cons 13 '())) 1))");
@@ -2240,7 +2238,6 @@ void run_all_compiler_tests()
   test_begin();
   test_halt();  
   test_letrec();
-  #if 0
   test_lambdas();
   test_tailcall();
   test_closures();
@@ -2283,5 +2280,4 @@ void run_all_compiler_tests()
   test_min_max();
   test_override();
   test_apply();
-  #endif
   }
