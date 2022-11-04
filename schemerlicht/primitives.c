@@ -4957,6 +4957,50 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object_destroy(ctxt, &dummy_continuation);      
       schemerlicht_function_free(ctxt, dummy_fun);
       }
+    else if (op->type == schemerlicht_object_type_lambda)
+      {
+      schemerlicht_assert(a == 0); // by construction apply is always represented as a funcall. Because of cps construction it means that all registers are available
+      schemerlicht_assert(c == 1); // as apply is represented as object, it means that c == 1 because the vm wants to skip the continuation when calling the primitive apply.
+      schemerlicht_object* continuation = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object); // save the original closure
+      schemerlicht_object original_continuation = *continuation;
+      schemerlicht_object oper = *op;
+      // TODO later: move dummy continuation to the context so that we don't need to recreate it all the time for apply
+      schemerlicht_object dummy_continuation = make_schemerlicht_object_closure(ctxt, 1);
+      schemerlicht_object dummy_lambda;
+      dummy_lambda.type = schemerlicht_object_type_lambda;
+      schemerlicht_function* dummy_fun = schemerlicht_function_new(ctxt);
+      dummy_lambda.value.ptr = dummy_fun;
+      schemerlicht_set_object(schemerlicht_vector_begin(&dummy_continuation.value.v, schemerlicht_object), &dummy_lambda);
+
+      //swap place of continuation and operator
+      *op = dummy_continuation;
+      *continuation = oper;
+
+      // stack state (with guaranteed a == 0):
+      // a + 1 : operator closure
+      // a + 2 : dummy continuation
+      // a + 3 : first arg for operator
+      // a + 4 : second arg for operator
+      // ...
+      // a + 1 + b : last arg for operator
+
+      // move down 
+      for (int i = 0; i < b + 1; ++i)
+        {
+        schemerlicht_object* ri = schemerlicht_vector_at(&ctxt->stack, i, schemerlicht_object);
+        schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, i + 1, schemerlicht_object);
+        *ri = *ri_next;
+        }
+      schemerlicht_assert(oper.type == schemerlicht_object_type_lambda);      
+      schemerlicht_function* lambda = cast(schemerlicht_function*, oper.value.ptr);
+      schemerlicht_run(ctxt, lambda);
+
+      schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
+      schemerlicht_set_object(ra, &ret);
+      *continuation = original_continuation;
+      schemerlicht_object_destroy(ctxt, &dummy_continuation);
+      schemerlicht_function_free(ctxt, dummy_fun);
+      }
     else
       {
       schemerlicht_object ret;

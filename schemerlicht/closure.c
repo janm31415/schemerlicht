@@ -9,7 +9,7 @@
 
 typedef struct schemerlicht_resolve_free_variables_visitor
   {
-  schemerlicht_visitor* visitor;  
+  schemerlicht_visitor* visitor;
   schemerlicht_vector active_lambda;
   } schemerlicht_resolve_free_variables_visitor;
 
@@ -84,29 +84,45 @@ typedef struct schemerlicht_closure_conversion_visitor
 
 static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
-  schemerlicht_closure_conversion_visitor* vis = (schemerlicht_closure_conversion_visitor*)(v->impl);
-  schemerlicht_string name;
-  schemerlicht_string_init(ctxt, &name, "#%self");
-  char number[256];
-  sprintf(number, "%d", vis->self_index);
-  ++vis->self_index;
-  schemerlicht_string_append_cstr(ctxt, &name, number);
-  schemerlicht_string* insert_it = schemerlicht_vector_at(&e->expr.lambda.variables, 0, schemerlicht_string);
-  schemerlicht_vector_insert_element(ctxt, &e->expr.lambda.variables, &insert_it, name, schemerlicht_string);
-
-  schemerlicht_expression prim = schemerlicht_init_primcall(ctxt);
-  schemerlicht_string_init(ctxt, &prim.expr.prim.name, "closure");
-  schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, *e, schemerlicht_expression);
-
-  schemerlicht_string* it = schemerlicht_vector_begin(&e->expr.lambda.free_variables, schemerlicht_string);
-  schemerlicht_string* it_end = schemerlicht_vector_end(&e->expr.lambda.free_variables, schemerlicht_string);
-  for (; it != it_end; ++it)
+  schemerlicht_memsize nr_of_free_variables = e->expr.lambda.free_variables.vector_size;
+  if (nr_of_free_variables == 0)
     {
-    schemerlicht_expression var = schemerlicht_init_variable(ctxt);
-    schemerlicht_string_copy(ctxt, &var.expr.var.name, it);
-    schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, var, schemerlicht_expression);
+    schemerlicht_closure_conversion_visitor* vis = (schemerlicht_closure_conversion_visitor*)(v->impl);
+    schemerlicht_string name;
+    schemerlicht_string_init(ctxt, &name, "#%self");
+    char number[256];
+    sprintf(number, "%d", vis->self_index);
+    ++vis->self_index;
+    schemerlicht_string_append_cstr(ctxt, &name, number);
+    schemerlicht_string* insert_it = schemerlicht_vector_at(&e->expr.lambda.variables, 0, schemerlicht_string);
+    schemerlicht_vector_insert_element(ctxt, &e->expr.lambda.variables, &insert_it, name, schemerlicht_string);
     }
-  *e = prim;
+  else
+    {
+    schemerlicht_closure_conversion_visitor* vis = (schemerlicht_closure_conversion_visitor*)(v->impl);
+    schemerlicht_string name;
+    schemerlicht_string_init(ctxt, &name, "#%self");
+    char number[256];
+    sprintf(number, "%d", vis->self_index);
+    ++vis->self_index;
+    schemerlicht_string_append_cstr(ctxt, &name, number);
+    schemerlicht_string* insert_it = schemerlicht_vector_at(&e->expr.lambda.variables, 0, schemerlicht_string);
+    schemerlicht_vector_insert_element(ctxt, &e->expr.lambda.variables, &insert_it, name, schemerlicht_string);
+
+    schemerlicht_expression prim = schemerlicht_init_primcall(ctxt);
+    schemerlicht_string_init(ctxt, &prim.expr.prim.name, "closure");
+    schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, *e, schemerlicht_expression);
+
+    schemerlicht_string* it = schemerlicht_vector_begin(&e->expr.lambda.free_variables, schemerlicht_string);
+    schemerlicht_string* it_end = schemerlicht_vector_end(&e->expr.lambda.free_variables, schemerlicht_string);
+    for (; it != it_end; ++it)
+      {
+      schemerlicht_expression var = schemerlicht_init_variable(ctxt);
+      schemerlicht_string_copy(ctxt, &var.expr.var.name, it);
+      schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, var, schemerlicht_expression);
+      }
+    *e = prim;
+    }
   }
 
 static schemerlicht_closure_conversion_visitor* schemerlicht_closure_conversion_visitor_new(schemerlicht_context* ctxt)

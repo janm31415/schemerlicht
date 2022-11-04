@@ -1100,12 +1100,12 @@ static void test_letrec()
 
 static void test_lambdas()
   {
-  test_compile_aux("<closure>", "(lambda (x) (+ x x))");
+  test_compile_aux("<lambda>", "(lambda (x) (+ x x))");
   test_compile_aux("3", "((lambda(x) x) 3)");
   test_compile_aux("10", "((lambda(x y) (+ x y)) 3 7)");
   test_compile_aux("8", "(let ([x 5]) ((lambda (y) (+ 3 y)) x ))");
   test_compile_aux("5", "( (lambda () (+ 3 2)) () )");
-  test_compile_aux("<closure>", "(let ([f (lambda () 5)]) f)");
+  test_compile_aux("<lambda>", "(let ([f (lambda () 5)]) f)");
   test_compile_aux("8", "(let ([f (lambda (n) (+ n 5))]) (f 3))");
   test_compile_aux("5", "(let ([f (lambda () 5)]) (f))");
   test_compile_aux("8", "(let ([x 5]) ((lambda (y) (+ x y)) 3) )");
@@ -1202,28 +1202,28 @@ static void test_scheme()
   test_compile_aux("6", "(define x 3) (+ x x)");
   test_compile_aux("3", "(begin (define x 1) (set! x (+ x 1)) (+ x 1))");
   test_compile_aux("10", "((lambda (x) (+ x x)) 5)");
-  test_compile_aux("<closure>", "(define twice (lambda (x) (* 2 x)))");
+  test_compile_aux("<lambda>", "(define twice (lambda (x) (* 2 x)))");
   test_compile_aux("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
-  test_compile_aux("<closure>", "(define cube (lambda (x) (* x x x)))");
+  test_compile_aux("<lambda>", "(define cube (lambda (x) (* x x x)))");
   test_compile_aux("125", "(define cube (lambda (x) (* x x x))) (cube 5)");
-  test_compile_aux("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
-  test_compile_aux("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f)))");
+  test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
+  test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f)))");
   test_compile_aux("20", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat twice) 5)");
   test_compile_aux("80", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) (define repeat (lambda (f) (compose f f))) ((repeat (repeat twice)) 5)");
 
   test_compile_aux("120", "(let ([x 5]) (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact x))");
-  test_compile_aux("<closure>", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))");
+  test_compile_aux("<lambda>", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))");
   test_compile_aux("6", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact 3)");
   test_compile_aux("479001600", "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact 12)");
-  test_compile_aux("<closure>", "(define make_list (lambda (n) (list n)))");
+  test_compile_aux("<lambda>", "(define make_list (lambda (n) (list n)))");
   test_compile_aux("(10)", "(define twice (lambda (x) (* 2 x))) (define make_list (lambda (n) (list n))) (define compose (lambda (f g) (lambda (x) (f (g x)))))  ((compose make_list twice) 5)");
 
-  test_compile_aux("<closure>", "(define abs (lambda (n) (if (> n 0) n (- 0 n))))");
+  test_compile_aux("<lambda>", "(define abs (lambda (n) (if (> n 0) n (- 0 n))))");
   test_compile_aux("(3 0 3)", "(define abs (lambda (n) (if (> n 0) n (- 0 n)))) (list (abs -3) (abs 0) (abs 3))");
-  test_compile_aux("<closure>", "(define make_cons (lambda (m n) (cons m n)))");
+  test_compile_aux("<lambda>", "(define make_cons (lambda (m n) (cons m n)))");
   test_compile_aux("(1 . 2)", "(define make_cons (lambda (m n) (cons m n))) (make_cons 1 2)");
 
-  test_compile_aux("<closure>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
+  test_compile_aux("<lambda>", "(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y)))))))");
   test_compile_aux("<closure>", "(define make_cons (lambda (m n) (cons m n)))(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y))))))) (define zip (combine make_cons))");
   test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(define make_cons (lambda (m n) (cons m n)))(define combine (lambda (f) (lambda (x y) (if (null? x) (quote ()) (f (list (car x) (car y)) ((combine f) (cdr x) (cdr y))))))) (define zip (combine make_cons))(zip (list 1 2 3 4) (list 5 6 7 8))");
   }
@@ -1475,11 +1475,11 @@ static void test_primitive_objects()
   test_compile_aux("7", "(define op (lambda (a b c) (a b c)))  (define three (lambda () 3)) (define four (lambda () 4)) (op + (three) (four))");
   test_compile_aux("7", "(define op (lambda (a b c) (a (b) (c))))  (define three (lambda () 3)) (define four (lambda () 4)) (op + three four)");
   test_compile_aux("8", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (define op (lambda (a b c) (a b c)))  (op + (fib 3) (fib 4))");
-  test_compile_aux("<closure>", "(define twice (lambda (x) (* 2 x)))");
+  test_compile_aux("<lambda>", "(define twice (lambda (x) (* 2 x)))");
   test_compile_aux("10", "(define twice (lambda (x) (* 2 x))) (twice 5)");
-  test_compile_aux("<closure>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
+  test_compile_aux("<lambda>", "(define compose (lambda (f g) (lambda (x) (f (g x)))))");
   test_compile_aux("(10)", "(define twice (lambda (x) (* 2 x))) (define compose (lambda (f g) (lambda (x) (f (g x))))) ((compose list twice) 5)");
-  test_compile_aux("<closure>", "(define abs (lambda (n) ((if (> n 0) + -) 0 n)))");
+  test_compile_aux("<lambda>", "(define abs (lambda (n) ((if (> n 0) + -) 0 n)))");
   test_compile_aux("(3 0 3)", "(define abs (lambda (n) ((if (> n 0) + -) 0 n))) (list (abs -3) (abs 0) (abs 3))");
   }
 
@@ -1687,6 +1687,7 @@ static void test_ack_performance()
   //currently less than 2s with large heap (size 256*256*256) on my laptop
   int c0 = clock();
   test_compile_aux_heap("4093", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 9)", 256*256);
+  //test_compile_aux_heap("32765", "(define (ack m n) (cond((= m 0) (+ n 1)) ((= n 0) (ack(- m 1) 1)) (else (ack(- m 1) (ack m(- n 1)))))) (ack 3 12)", 256 * 256 * 16);
   int c1 = clock();
   printf("Ack time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
   print_gc_time = 0;
@@ -1698,11 +1699,12 @@ static void test_fib_performance()
   int c0 = clock();
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
-  //test_compile_aux_heap("1346269", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 30)",  256*256);
-  test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
+  test_compile_aux_heap("102334155", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 40)", 256 * 256);
+  //test_compile_aux_heap("1346269", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 30)",  256*256);
+  //test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
   int c1 = clock();
   printf("Fib time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
-  //test_compile_aux_w_dump("89", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 10)");
+  //test_compile_aux_w_dump("55", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 10)");
   print_gc_time = 0;
   }
 

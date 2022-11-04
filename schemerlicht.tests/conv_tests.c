@@ -753,7 +753,7 @@ static void test_closure_conversion_2()
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
-  TEST_EQ_STRING("( closure ( lambda ( #%self1 x y z ) ( begin ( let ( [ f ( closure ( lambda ( #%self0 a b ) ( begin ( + ( * a ( closure-ref #%self0 1 ) ) ( 8 b ( closure-ref #%self0 2 ) ) ) ) ) x y ) ] ) ( begin ( - ( f 1 2 ) ( f 3 4 ) ) ) ) ) ) ) ", res.string_ptr);
+  TEST_EQ_STRING("( lambda ( #%self1 x y z ) ( begin ( let ( [ f ( closure ( lambda ( #%self0 a b ) ( begin ( + ( * a ( closure-ref #%self0 1 ) ) ( 8 b ( closure-ref #%self0 2 ) ) ) ) ) x y ) ] ) ( begin ( - ( f 1 2 ) ( f 3 4 ) ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -774,7 +774,7 @@ static void test_call_cc()
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
-  TEST_EQ_STRING("( set! call/cc ( closure ( lambda ( #%self1 k f ) ( begin ( f k ( closure ( lambda ( #%self0 dummy-k result ) ( begin ( ( closure-ref #%self0 1 ) result ) ) ) k ) ) ) ) ) ) ", res.string_ptr);
+  TEST_EQ_STRING("( set! call/cc ( lambda ( #%self1 k f ) ( begin ( f k ( closure ( lambda ( #%self0 dummy-k result ) ( begin ( ( closure-ref #%self0 1 ) result ) ) ) k ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
