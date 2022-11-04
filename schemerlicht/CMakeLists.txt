@@ -2,6 +2,7 @@ set(HDRS
 alpha.h
 assignablevarconv.h
 begconv.h
+callcc.h
 closure.h
 compiler.h
 context.h
@@ -44,6 +45,7 @@ set(SRCS
 alpha.c
 assignablevarconv.c
 begconv.c
+callcc.c
 closure.c
 compiler.c
 context.c

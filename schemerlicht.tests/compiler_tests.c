@@ -23,6 +23,7 @@
 #include "schemerlicht/environment.h"
 #include "schemerlicht/gc.h"
 #include "schemerlicht/alpha.h"
+#include "schemerlicht/callcc.h"
 
 #include <time.h>
 
@@ -1530,6 +1531,111 @@ static void test_newton()
   test_compile_aux("-500", "(define appl (lambda (op n) (op n) ))  (- (appl - -500))");
   }
 
+static void test_compile_aux_callcc(const char* expected_value, const char* script)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_function* callcc = schemerlicht_compile_callcc(ctxt);
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_quasiquote_conversion(ctxt, &prog);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+#if 0
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+
+  if (print_gc_time)
+    printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+
+  TEST_EQ_STRING(expected_value, s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_free(ctxt, func);
+  schemerlicht_function_free(ctxt, callcc);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_compile_cc_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_function* callccfunc = schemerlicht_compile_callcc(ctxt);
+
+#if 0
+  schemerlicht_object callcc;
+  callcc.type = schemerlicht_object_type_lambda;
+  callcc.value.ptr = cast(void*, callccfunc);
+
+  schemerlicht_string callcc_name;
+  schemerlicht_string_init(ctxt, &callcc_name, "call/cc");
+  schemerlicht_environment_entry entry;
+  entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
+  entry.position = ctxt->globals.vector_size;
+  schemerlicht_vector_push_back(ctxt, &ctxt->globals, callcc, schemerlicht_object);
+
+  schemerlicht_environment_add(ctxt, &callcc_name, entry);
+#endif
+
+  schemerlicht_vector tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+#if 0
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+
+  schemerlicht_function* func1 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+
+  schemerlicht_object* res = schemerlicht_run(ctxt, func1);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  TEST_EQ_STRING("1", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+  schemerlicht_function_free(ctxt, func1);
+  schemerlicht_function_free(ctxt, callccfunc);
+  schemerlicht_close(ctxt);
+
+
+  test_compile_aux_callcc("1", "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
+  test_compile_aux_callcc("15", "(call/cc (lambda(throw) (+ 5 (* 10 1))))");
+  test_compile_aux_callcc("35", "(call/cc (lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (escape 3))))))))");
+  test_compile_aux_callcc("3", "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (throw 3))))))))");
+  test_compile_aux_callcc("1005", "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 1)))))))");
+  }
+
 static void test_compile_cc()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -1699,12 +1805,12 @@ static void test_fib_performance()
   int c0 = clock();
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(fx<? n 2) 1]  [else (fx+ (fib (fx- n 2)) (fib(fx- n 1)))]))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
-  test_compile_aux_heap("102334155", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 40)", 256 * 256);
+  //test_compile_aux_heap("102334155", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("1346269", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 30)",  256*256);
   //test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
   int c1 = clock();
   printf("Fib time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
-  //test_compile_aux_w_dump("55", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 10)");
+  test_compile_aux_w_dump("55", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 10)");
   print_gc_time = 0;
   }
 
@@ -2264,8 +2370,9 @@ void run_all_compiler_tests()
   test_cond();
   test_newton();
   test_compile_cc();
-  test_ack_performance();
-  test_fib_performance();
+  test_compile_cc_2();
+  //test_ack_performance();
+  //test_fib_performance();
   test_lambda_variable_arity_not_using_rest_arg();
   test_lambda_variable_arity_while_using_rest_arg();
   test_lambda_long_list();
