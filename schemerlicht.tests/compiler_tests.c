@@ -24,6 +24,7 @@
 #include "schemerlicht/gc.h"
 #include "schemerlicht/alpha.h"
 #include "schemerlicht/callcc.h"
+#include "schemerlicht/foreign.h"
 
 #include <time.h>
 
@@ -2299,6 +2300,52 @@ static void test_apply()
   test_compile_aux("1800", "(define compose (lambda(f g)(lambda args(f(apply g args))))) (define twice (lambda (x) (* 2 x))) ((compose twice *) 12 75)");  
   }
 
+static schemerlicht_fixnum seventeen()
+  {
+  return 17;
+  }
+
+static void test_foreign_1()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, "seventeen", &seventeen, schemerlicht_foreign_fixnum);
+  schemerlicht_register_external_function(ctxt, &ext);
+
+  schemerlicht_vector tokens = script2tokens(ctxt, "(foreign-call seventeen)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_quasiquote_conversion(ctxt, &prog);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+#if 1
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+
+  TEST_EQ_STRING("17", s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_free(ctxt, func);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();  
@@ -2346,7 +2393,6 @@ void run_all_compiler_tests()
   test_begin();
   test_halt();  
   test_letrec();
-  #if 1
   test_lambdas();
   test_tailcall();
   test_closures();
@@ -2390,5 +2436,5 @@ void run_all_compiler_tests()
   test_min_max();
   test_override();
   test_apply();
-  #endif
+  test_foreign_1();
   }

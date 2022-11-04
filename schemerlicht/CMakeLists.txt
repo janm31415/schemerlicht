@@ -12,6 +12,7 @@ defconv.h
 dump.h
 environment.h
 error.h
+foreign.h
 freevaranalysis.h
 func.h
 gc.h
@@ -55,6 +56,7 @@ defconv.c
 dump.c
 environment.c
 error.c
+foreign.c
 freevaranalysis.c
 func.c
 gc.c

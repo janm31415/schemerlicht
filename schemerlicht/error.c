@@ -76,6 +76,7 @@ void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int li
     case SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS: schemerlicht_string_append_cstr(ctxt, &message, "invalid number of arguments"); break;
     case SCHEMERLICHT_ERROR_INVALID_ARGUMENT: schemerlicht_string_append_cstr(ctxt, &message, "invalid argument"); break;
     case SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN: schemerlicht_string_append_cstr(ctxt, &message, "variable unknown"); break;
+    case SCHEMERLICHT_ERROR_EXTERNAL_UNKNOWN: schemerlicht_string_append_cstr(ctxt, &message, "external unknown"); break;
     default: break;
     }
   if (msg->string_length > 0)
@@ -127,6 +128,7 @@ void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int l
     case SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS: schemerlicht_string_append_cstr(ctxt, &message, "invalid number of arguments"); break;
     case SCHEMERLICHT_ERROR_INVALID_ARGUMENT: schemerlicht_string_append_cstr(ctxt, &message, "invalid argument"); break;
     case SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN: schemerlicht_string_append_cstr(ctxt, &message, "variable unknown"); break;
+    case SCHEMERLICHT_ERROR_EXTERNAL_UNKNOWN: schemerlicht_string_append_cstr(ctxt, &message, "external unknown"); break;
     default: break;
     }
   if (msg->string_length > 0)

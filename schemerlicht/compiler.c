@@ -6,6 +6,7 @@
 #include "primitives.h"
 #include "environment.h"
 #include "dump.h"
+#include "foreign.h"
 
 #include <string.h>
 
@@ -279,6 +280,43 @@ static void compile_begin(schemerlicht_context* ctxt, schemerlicht_function* fun
     }
   }
 
+static void compile_foreign(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
+  {
+  schemerlicht_assert(e->type == schemerlicht_type_foreign_call);
+  schemerlicht_object key;
+  key.type = schemerlicht_object_type_string;
+  key.value.s = e->expr.foreign.name;
+  schemerlicht_object* pos = schemerlicht_map_get(ctxt, ctxt->externals_map, &key);
+  if (pos == NULL)
+    {
+    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_EXTERNAL_UNKNOWN, e->expr.foreign.line_nr, e->expr.foreign.column_nr, e->expr.foreign.name.string_ptr);
+    }
+  else
+    {
+    schemerlicht_assert(pos->type == schemerlicht_object_type_fixnum);
+    const schemerlicht_memsize position = cast(schemerlicht_memsize, pos->value.fx);
+    schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
+    const schemerlicht_memsize nr_args = e->expr.foreign.arguments.vector_size;
+    if (nr_args != ext->arguments.vector_size)
+      {
+      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.foreign.line_nr, e->expr.foreign.column_nr, e->expr.foreign.name.string_ptr);
+      return;
+      }
+    for (schemerlicht_memsize i = 0; i < nr_args; ++i)
+      {
+      schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.foreign.arguments, i, schemerlicht_expression);
+      ++fun->freereg;
+      compile_expression(ctxt, fun, arg);
+      }
+    fun->freereg -= nr_args;
+    //int k_pos = get_k(ctxt, fun, prim); // will be added to the constants list
+
+    //make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADK, fun->freereg, k_pos);
+    make_code_asbx(ctxt, fun, SCHEMERLICHT_OPCODE_SETFIXNUM, fun->freereg, cast(int, position));
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_CALL_FOREIGN, fun->freereg, nr_args);
+    }
+  }
+
 static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_funcall);
@@ -415,6 +453,9 @@ static void compile_expression(schemerlicht_context* ctxt, schemerlicht_function
       break;
     case schemerlicht_type_funcall:
       compile_funcall(ctxt, fun, e);
+      break;
+    case schemerlicht_type_foreign_call:
+      compile_foreign(ctxt, fun, e);
       break;
     case schemerlicht_type_nop:
       make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, fun->freereg, schemerlicht_object_type_undefined);

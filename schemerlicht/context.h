@@ -53,6 +53,8 @@ struct schemerlicht_context
   schemerlicht_vector overrides; // stringvec with names of primitives that were overridden
   uint64_t time_spent_gc;
   schemerlicht_pool_allocator pool[SCHEMERLICHT_MAX_POOL];
+  schemerlicht_vector externals;
+  schemerlicht_map* externals_map;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

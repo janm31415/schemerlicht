@@ -90,6 +90,7 @@ typedef enum
   SCHEMERLICHT_OPCODE_LOADGLOBAL, /*  A Bx     R(A) := Global(Bx) */
   SCHEMERLICHT_OPCODE_STOREGLOBAL,/*  A Bx     Global(Bx) := R(A) */
   SCHEMERLICHT_OPCODE_LIST_STACK, /*  A B      R(A) := (list R(A) R(A+1) ... R(A+x)) with x first occurence where R(A+x+1).type == schemerlicht_object_type_blocked */
+  SCHEMERLICHT_OPCODE_CALL_FOREIGN/*  A B      R(A) := R(A)(R(A+1), ..., R(A+B) with R(A) a fixnum indicating the index in ctxt->externals*/
   } schemerlicht_opcode;
 
 #define SCHEMERLICHT_NUM_OPCODES (cast(int, SCHEMERLICHT_OPCODE_RETURN+1))

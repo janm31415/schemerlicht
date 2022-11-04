@@ -5,6 +5,7 @@
 #include "primitives.h"
 #include "gc.h"
 #include "inlines.h"
+#include "foreign.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -229,6 +230,22 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     sprintf(buffer, "%d", a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
+    break;
+    }
+    case SCHEMERLICHT_OPCODE_CALL_FOREIGN:
+    {
+    const int a = SCHEMERLICHT_GETARG_A(i);
+    const int b = SCHEMERLICHT_GETARG_B(i);
+    schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+    schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+    const schemerlicht_memsize position = cast(schemerlicht_memsize, ra->value.fx);
+    schemerlicht_assert(position < ctxt->externals.vector_size);
+    schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
+    schemerlicht_string_append_cstr(ctxt, &s, "CALL FOREIGN R(");
+    sprintf(buffer, "%d", a);
+    schemerlicht_string_append_cstr(ctxt, &s, buffer);
+    schemerlicht_string_append_cstr(ctxt, &s, ") = ");
+    schemerlicht_string_append(ctxt, &s, &ext->name);
     break;
     }
     default:
@@ -525,6 +542,20 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       pc += sbx;
       break;
       }
+      case SCHEMERLICHT_OPCODE_CALL_FOREIGN:
+      {
+      const int a = SCHEMERLICHT_GETARG_A(i);
+      const int b = SCHEMERLICHT_GETARG_B(i);
+      schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+      schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+      const schemerlicht_memsize position = cast(schemerlicht_memsize, ra->value.fx);
+      schemerlicht_assert(position < ctxt->externals.vector_size);
+      schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
+      schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
+      schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a + 1);
+      schemerlicht_set_object(ra, &result);
+      break;
+      }
       case SCHEMERLICHT_OPCODE_RETURN:
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
@@ -775,6 +806,20 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         rx = schemerlicht_vector_at(&ctxt->stack, x, schemerlicht_object);
         }
       make_variable_arity_list(ctxt, a, x - a);
+      break;
+      }
+      case SCHEMERLICHT_OPCODE_CALL_FOREIGN:
+      {
+      const int a = SCHEMERLICHT_GETARG_A(i);
+      const int b = SCHEMERLICHT_GETARG_B(i);
+      schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+      schemerlicht_assert(ra->type == schemerlicht_object_type_fixnum);
+      const schemerlicht_memsize position = cast(schemerlicht_memsize, ra->value.fx);
+      schemerlicht_assert(position < ctxt->externals.vector_size);
+      schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
+      schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
+      schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a+1);
+      schemerlicht_set_object(ra, &result);
       break;
       }
       case SCHEMERLICHT_OPCODE_JMP:
