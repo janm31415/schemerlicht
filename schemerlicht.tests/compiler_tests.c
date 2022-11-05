@@ -2559,6 +2559,36 @@ static void test_r5rs_funs()
   test_compile_aux("8.000000", "(truncate 8.4)");
   test_compile_aux("7.000000", "(truncate 7.5)");
   test_compile_aux("8", "(truncate 8)");
+
+  test_compile_aux("3.000000", "(sqrt 9)");
+  test_compile_aux("1.414214", "(sqrt 2.0)");
+  test_compile_aux("0.841471", "(sin 1.0)");
+  test_compile_aux("0.841471", "(sin 1)");
+  test_compile_aux("0.909297", "(sin 2.0)");
+  test_compile_aux("0.909297", "(sin 2)");  
+  test_compile_aux("0.540302", "(cos 1.0)");
+  test_compile_aux("0.540302", "(cos 1)");
+  test_compile_aux("1.557408", "(tan 1.0)");
+  test_compile_aux("1.557408", "(tan 1)");
+  test_compile_aux("1.570796", "(asin 1.0)");
+  test_compile_aux("1.570796", "(asin 1)");
+  test_compile_aux("1.047198", "(acos 0.5)");
+  test_compile_aux("0.000000", "(acos 1)");
+  test_compile_aux("0.785398", "(atan 1.0)");
+  test_compile_aux("0.785398", "(atan 1)");
+  test_compile_aux("2.079442", "(log 8.0)");
+  test_compile_aux("2.079442", "(log 8)");
+
+  test_compile_aux("8", "(expt 2 3)");
+  test_compile_aux("1", "(expt 2 0)");
+  test_compile_aux("1", "(expt 0 0)");
+  test_compile_aux("1024", "(expt 2 10)");
+  test_compile_aux("16", "(expt 4 2)");
+  test_compile_aux("16.000000", "(expt 4.0 2.0)");
+  test_compile_aux("2.000000", "(expt 4.0 0.5)");
+  test_compile_aux("1.414214", "(expt 2.0 0.5)");
+  test_compile_aux("343", "(expt 7 3)");
+  test_compile_aux("907.492700", "(expt 7 3.5)");  
   }
 
 void run_all_compiler_tests()
