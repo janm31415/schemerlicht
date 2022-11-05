@@ -2328,7 +2328,7 @@ static void test_foreign_1()
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
-#if 1
+#if 0
   schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
   printf("%s\n", dumped.string_ptr);
   schemerlicht_string_destroy(ctxt, &dumped);
@@ -2344,6 +2344,88 @@ static void test_foreign_1()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
+  }
+
+static void test_foreign_aux(const char* expected, const char* script, const char* name, void* address, schemerlicht_foreign_argument_type ret_type)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, name, address, ret_type);
+  schemerlicht_register_external_function(ctxt, &ext);
+
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_quasiquote_conversion(ctxt, &prog);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+#if 0
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+
+  TEST_EQ_STRING(expected, s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_free(ctxt, func);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static schemerlicht_flonum mathpi()
+  {
+  return 3.1415926535897;
+  }
+
+static void dosomething()
+  {  
+  }
+
+static void printHelloWorld()
+  {
+  return "Hello World!";
+  }
+
+static schemerlicht_object createCustomObject()
+  {  
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_true;
+  return obj;
+  }
+
+static schemerlicht_fixnum addone(schemerlicht_fixnum* fx)
+  {
+  return *fx+1;
+  }
+
+static schemerlicht_flonum addonef(schemerlicht_flonum* fl)
+  {
+  return *fl + 1.0;
+  }
+
+static void test_foreign()
+  {
+  test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", &seventeen, schemerlicht_foreign_fixnum);
+  test_foreign_aux("3.141593", "(foreign-call mathpi)", "mathpi", &mathpi, schemerlicht_foreign_flonum);
+  test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", &printHelloWorld, schemerlicht_foreign_char_pointer);
+  test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", &createCustomObject, schemerlicht_foreign_object);
+  test_foreign_aux("8", "(foreign-call addone 7)", "addone", &addone, schemerlicht_foreign_fixnum);
+  test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", &addonef, schemerlicht_foreign_flonum);
   }
 
 void run_all_compiler_tests()
@@ -2437,4 +2519,5 @@ void run_all_compiler_tests()
   test_override();
   test_apply();
   test_foreign_1();
+  test_foreign();
   }

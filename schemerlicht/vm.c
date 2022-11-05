@@ -551,8 +551,8 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       const schemerlicht_memsize position = cast(schemerlicht_memsize, ra->value.fx);
       schemerlicht_assert(position < ctxt->externals.vector_size);
       schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
-      schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
-      schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a + 1);
+      //schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
+      schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a + 1, b);
       schemerlicht_set_object(ra, &result);
       break;
       }
@@ -817,8 +817,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
       const schemerlicht_memsize position = cast(schemerlicht_memsize, ra->value.fx);
       schemerlicht_assert(position < ctxt->externals.vector_size);
       schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
-      schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
-      schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a+1);
+      //schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
+      schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a + 1, b);
       schemerlicht_set_object(ra, &result);
       break;
       }
@@ -840,21 +840,21 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
           schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
           const schemerlicht_object* srcj = schemerlicht_vector_at(&ctxt->stack, a + j, schemerlicht_object);
           schemerlicht_set_object(retj, srcj);
-      }
+          }
 #else
         schemerlicht_object* st = cast(schemerlicht_object*, ctxt->stack.vector_ptr);
         memmove(st, st + a, b * sizeof(schemerlicht_object));
 #endif
-      }
+        }
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
       stack_to_block->type = schemerlicht_object_type_blocking;
       pc = pc_end;
       schemerlicht_check_garbage_collection(ctxt);
       break;
-    }
+      }
       default:
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-  }
+      }
     }
   return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
   }

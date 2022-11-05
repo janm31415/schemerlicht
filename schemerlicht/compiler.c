@@ -297,11 +297,11 @@ static void compile_foreign(schemerlicht_context* ctxt, schemerlicht_function* f
     const schemerlicht_memsize position = cast(schemerlicht_memsize, pos->value.fx);
     schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
     const schemerlicht_memsize nr_args = e->expr.foreign.arguments.vector_size;
-    if (nr_args != ext->arguments.vector_size)
-      {
-      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.foreign.line_nr, e->expr.foreign.column_nr, e->expr.foreign.name.string_ptr);
-      return;
-      }
+    //if (nr_args != ext->arguments.vector_size)
+    //  {
+    //  schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.foreign.line_nr, e->expr.foreign.column_nr, e->expr.foreign.name.string_ptr);
+    //  return;
+    //  }
     for (schemerlicht_memsize i = 0; i < nr_args; ++i)
       {
       schemerlicht_expression* arg = schemerlicht_vector_at(&e->expr.foreign.arguments, i, schemerlicht_expression);
