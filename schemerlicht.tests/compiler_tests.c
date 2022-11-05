@@ -2346,7 +2346,7 @@ static void test_foreign_1()
   schemerlicht_close(ctxt);
   }
 
-static void test_foreign_aux(const char* expected, const char* script, const char* name, void* address, schemerlicht_foreign_argument_type ret_type)
+static void test_foreign_aux(const char* expected, const char* script, const char* name, void* address, schemerlicht_foreign_return_type ret_type)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, name, address, ret_type);
