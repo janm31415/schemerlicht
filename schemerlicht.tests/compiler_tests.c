@@ -2432,7 +2432,7 @@ static void test_foreign()
   {
   test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", &seventeen, schemerlicht_foreign_fixnum);
   test_foreign_aux("3.141593", "(foreign-call mathpi)", "mathpi", &mathpi, schemerlicht_foreign_flonum);
-  test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", &printHelloWorld, schemerlicht_foreign_char_pointer);
+  //test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", &printHelloWorld, schemerlicht_foreign_char_pointer);
   test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", &createCustomObject, schemerlicht_foreign_object);
   test_foreign_aux("8", "(foreign-call addone 7)", "addone", &addone, schemerlicht_foreign_fixnum);
   test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", &addonef, schemerlicht_foreign_flonum);
