@@ -2487,6 +2487,13 @@ static void test_r5rs_funs()
   test_compile_aux("#t", "(integer? 3.00)");
   test_compile_aux("#f", "(integer? 3.14)");
   test_compile_aux("#f", "(integer? #\\a)");
+
+  test_compile_aux("3", "(abs 3)");
+  test_compile_aux("3.200000", "(abs 3.2)");
+  test_compile_aux("3", "(abs -3)");
+  test_compile_aux("3.200000", "(abs -3.2)");
+  test_compile_aux("0", "(abs 0)");
+  test_compile_aux("0.000000", "(abs 0.0)");
   }
 
 void run_all_compiler_tests()
