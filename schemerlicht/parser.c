@@ -2255,20 +2255,6 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "inexact?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "inexact->exact", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer?", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-sign", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-exponent", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-mantissa", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-sin", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-cos", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-tan", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-asin", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-acos", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-atan1", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-log", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-round", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-sqrt", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-truncate", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "ieee754-pi", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "include", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "input-port?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "load", schemerlicht_et_primitive_call);
@@ -2289,6 +2275,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "negative?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "not", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "number?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "number->string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "null?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "num2str", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "odd?", schemerlicht_et_primitive_call);
@@ -2311,6 +2298,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "set-car!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-cdr!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sin", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "string->number", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sqrt", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "str2num", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string", schemerlicht_et_primitive_call);

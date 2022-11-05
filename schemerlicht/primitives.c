@@ -6,9 +6,11 @@
 #include "func.h"
 #include "vm.h"
 
-#include <string.h>
 #include <time.h>
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c)
   {
@@ -5150,9 +5152,14 @@ void schemerlicht_primitive_is_rational(schemerlicht_context* ctxt, int a, int b
   if (b > 0)
     {
     schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
-    if (arg->type == schemerlicht_object_type_fixnum || arg->type == schemerlicht_object_type_flonum)
+    if (arg->type == schemerlicht_object_type_fixnum)
       {
       obj.type = schemerlicht_object_type_true;
+      }
+    else if (arg->type == schemerlicht_object_type_flonum)
+      {
+      if ((arg->value.fl == arg->value.fl) && isfinite(arg->value.fl))
+        obj.type = schemerlicht_object_type_true;
       }
     }
   schemerlicht_set_object(ra, &obj);
@@ -6098,6 +6105,165 @@ void schemerlicht_primitive_sqrt(schemerlicht_context* ctxt, int a, int b, int c
 
 ////////////////////////////////////////////////////
 
+static void to_binary(char* str, schemerlicht_fixnum a)
+  {
+  if (a == 0)
+    {
+    str[0] = '0';
+    str[1] = 0;
+    }
+  else
+    {
+    int len = ceil(log2(a));
+    char* s = str + len;
+    *s-- = 0;
+    while (a > 0)
+      {
+      *s-- = a % 2 + '0';
+      a /= 2;
+      }
+    }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_number_string(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_NUMBER_STRING);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_undefined;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_fixnum || arg->type == schemerlicht_object_type_flonum)
+      {
+      int base = 10;
+      if (b > 1)
+        {
+        schemerlicht_object* arg_base = schemerlicht_vector_at(&ctxt->stack, a + c + 2, schemerlicht_object);
+        if (arg_base->type == schemerlicht_object_type_fixnum || arg_base->type == schemerlicht_object_type_flonum)
+          {
+          schemerlicht_fixnum fx = arg_base->value.fx;
+          if (arg_base->type == schemerlicht_object_type_flonum)
+            fx = cast(schemerlicht_fixnum, arg_base->value.fl);
+          switch (fx)
+            {
+            case 2: base = 2; break;
+            case 8: base = 8; break;
+            case 10: base = 10; break;
+            case 16: base = 16; break;
+            }
+          }
+        }
+      if (arg->type == schemerlicht_object_type_fixnum)
+        {
+        char buffer[256];
+        switch (base)
+          {
+          case 2:
+            to_binary(buffer, arg->value.fx);
+            break;
+          case 8:
+            sprintf(buffer, "%llo", arg->value.fx);
+            break;
+          case 16:
+            sprintf(buffer, "%llx", arg->value.fx);
+            break;
+          default:
+            sprintf(buffer, "%lld", arg->value.fx);
+            break;
+          }
+        obj.type = schemerlicht_object_type_string;
+        schemerlicht_string_init(ctxt, &obj.value.s, buffer);
+        }
+      else if (arg->type == schemerlicht_object_type_flonum)
+        {
+        if (arg->value.fl != arg->value.fl)
+          {
+          obj.type = schemerlicht_object_type_string;
+          schemerlicht_string_init(ctxt, &obj.value.s, "+nan.0");
+          }
+        else if (isfinite(arg->value.fl))
+          {
+          char buffer[256];
+          sprintf(buffer, "%.20g", arg->value.fl);
+          obj.type = schemerlicht_object_type_string;
+          schemerlicht_string_init(ctxt, &obj.value.s, buffer);
+          }
+        else if (arg->value.fl < 0)
+          {
+          obj.type = schemerlicht_object_type_string;
+          schemerlicht_string_init(ctxt, &obj.value.s, "-inf.0");
+          }
+        else
+          {
+          obj.type = schemerlicht_object_type_string;
+          schemerlicht_string_init(ctxt, &obj.value.s, "+inf.0");
+          }
+        }
+      schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+      ++ctxt->heap_pos;
+      schemerlicht_set_object(heap_obj, &obj);
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_string_number(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_NUMBER);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_string && arg->value.s.string_length > 0)
+      {
+      int base = 10;
+      if (b > 1)
+        {
+        schemerlicht_object* arg_base = schemerlicht_vector_at(&ctxt->stack, a + c + 2, schemerlicht_object);
+        if (arg_base->type == schemerlicht_object_type_fixnum || arg_base->type == schemerlicht_object_type_flonum)
+          {
+          schemerlicht_fixnum fx = arg_base->value.fx;
+          if (arg_base->type == schemerlicht_object_type_flonum)
+            fx = cast(schemerlicht_fixnum, arg_base->value.fl);
+          switch (fx)
+            {
+            case 2: base = 2; break;
+            case 8: base = 8; break;
+            case 10: base = 10; break;
+            case 16: base = 16; break;
+            }
+          }
+        }
+      char* endptr;
+      obj.type = schemerlicht_object_type_fixnum;
+      obj.value.fx = strtoll(arg->value.s.string_ptr, &endptr, base);
+      uintptr_t dist = endptr - arg->value.s.string_ptr;
+      if (dist < arg->value.s.string_length)
+        {
+        obj.type = schemerlicht_object_type_flonum;
+        obj.value.fl = strtod(arg->value.s.string_ptr, &endptr);
+        dist = endptr - arg->value.s.string_ptr;
+        if (dist < arg->value.s.string_length)
+          obj.type = schemerlicht_object_type_false;
+        }
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -6553,6 +6719,12 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_SQRT:
       schemerlicht_primitive_sqrt(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_NUMBER_STRING:
+      schemerlicht_primitive_number_string(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_STRING_NUMBER:
+      schemerlicht_primitive_string_number(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -6724,5 +6896,7 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "sqrt", SCHEMERLICHT_SQRT);
   map_insert(ctxt, m, "exact->inexact", SCHEMERLICHT_FIXNUM_FLONUM);
   map_insert(ctxt, m, "inexact->exact", SCHEMERLICHT_FLONUM_FIXNUM);
+  map_insert(ctxt, m, "number->string", SCHEMERLICHT_NUMBER_STRING);
+  map_insert(ctxt, m, "string->number", SCHEMERLICHT_STRING_NUMBER);
   return m;
   }

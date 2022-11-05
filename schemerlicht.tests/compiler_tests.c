@@ -2464,6 +2464,7 @@ static void test_r5rs_funs()
   test_compile_aux("#f", "(number? 'a)");
   test_compile_aux("#t", "(rational? 5)");
   test_compile_aux("#t", "(rational? 5.2)");
+  test_compile_aux("#f", "(rational? (/ 5.0 0.0))");
   test_compile_aux("#f", "(rational? \"test\")");  
   test_compile_aux("#t", "(positive? 5)");
   test_compile_aux("#f", "(negative? 5)");
@@ -2596,6 +2597,22 @@ static void test_r5rs_funs()
   test_compile_aux("3.000000", "(exact->inexact 3)");
   test_compile_aux("#t", "(flonum? (exact->inexact 3))");
   test_compile_aux("#t", "(inexact? (exact->inexact 3))");
+
+  test_compile_aux("\"3.1415984351384360629\"", "(number->string 3.1415984351384361)");
+  test_compile_aux("\"25\"","(number->string 25)");
+  test_compile_aux("\"31\"","(number->string 25 8)");
+  test_compile_aux("\"1a\"","(number->string 26 16)");
+  test_compile_aux("\"+nan.0\"", "(number->string (/ 0.0 0.0))");
+  test_compile_aux("\"+inf.0\"", "(number->string (/ 1.0 0.0))");
+  test_compile_aux("\"-inf.0\"", "(number->string (/ -1.0 0.0))");
+  test_compile_aux("\"111001000\"", "(number->string 456 2)");
+
+  test_compile_aux("#f", "(string->number \"\")");
+  test_compile_aux("25", "(string->number \"25\")");
+  test_compile_aux("21", "(string->number \"25\" 8)");
+  test_compile_aux("255", "(string->number \"ff\" 16)");
+  test_compile_aux("#f", "(string->number \"3.14asdf\")");
+  test_compile_aux("3.140000", "(string->number \"3.14\")");
   }
 
 void run_all_compiler_tests()
