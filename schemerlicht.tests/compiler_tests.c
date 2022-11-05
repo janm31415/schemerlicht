@@ -2418,6 +2418,16 @@ static schemerlicht_flonum addonef(schemerlicht_flonum* fl)
   return *fl + 1.0;
   }
 
+static schemerlicht_fixnum getStringLength(char* str)
+  {
+  return cast(schemerlicht_fixnum, strlen(str));
+  }
+
+static schemerlicht_flonum add_three(schemerlicht_fixnum* a, schemerlicht_fixnum* b, schemerlicht_flonum* c)
+  {
+  return *a + *b + *c;
+  }
+
 static void test_foreign()
   {
   test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", &seventeen, schemerlicht_foreign_fixnum);
@@ -2426,6 +2436,8 @@ static void test_foreign()
   test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", &createCustomObject, schemerlicht_foreign_object);
   test_foreign_aux("8", "(foreign-call addone 7)", "addone", &addone, schemerlicht_foreign_fixnum);
   test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", &addonef, schemerlicht_foreign_flonum);
+  test_foreign_aux("5", "(foreign-call get-string-length \"abcde\")", "get-string-length", &getStringLength, schemerlicht_foreign_fixnum);
+  test_foreign_aux("16.200000", "(foreign-call add_three 7 9 0.2)", "add_three", &add_three, schemerlicht_foreign_flonum);
   }
 
 void run_all_compiler_tests()
