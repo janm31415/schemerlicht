@@ -2225,6 +2225,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "equal?", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "even?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "exact?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "exact->inexact", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "exp", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "expt", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "file-exists?", schemerlicht_et_primitive_call);
@@ -2252,6 +2253,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   //map_insert(ctxt, m, "getenv", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "halt", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "inexact?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "inexact->exact", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "ieee754-sign", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "ieee754-exponent", schemerlicht_et_primitive_call);

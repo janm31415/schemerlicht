@@ -2589,6 +2589,13 @@ static void test_r5rs_funs()
   test_compile_aux("1.414214", "(expt 2.0 0.5)");
   test_compile_aux("343", "(expt 7 3)");
   test_compile_aux("907.492700", "(expt 7 3.5)");  
+
+  test_compile_aux("3", "(inexact->exact 3.14)");
+  test_compile_aux("3", "(inexact->exact 3)");
+  test_compile_aux("3.140000", "(exact->inexact 3.14)");
+  test_compile_aux("3.000000", "(exact->inexact 3)");
+  test_compile_aux("#t", "(flonum? (exact->inexact 3))");
+  test_compile_aux("#t", "(inexact? (exact->inexact 3))");
   }
 
 void run_all_compiler_tests()

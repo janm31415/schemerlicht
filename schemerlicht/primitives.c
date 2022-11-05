@@ -2670,6 +2670,11 @@ void schemerlicht_primitive_fixnum_flonum(schemerlicht_context* ctxt, int a, int
       ret.type = schemerlicht_object_type_flonum;
       ret.value.fl = cast(double, first_arg->value.fx);
       }
+    else if (first_arg->type == schemerlicht_object_type_flonum)
+      {
+      ret.type = schemerlicht_object_type_flonum;
+      ret.value.fl = first_arg->value.fl;
+      }
     else
       {
       ret.type = schemerlicht_object_type_undefined;
@@ -2733,6 +2738,11 @@ void schemerlicht_primitive_flonum_fixnum(schemerlicht_context* ctxt, int a, int
       {
       ret.type = schemerlicht_object_type_fixnum;
       ret.value.fx = cast(schemerlicht_fixnum, first_arg->value.fl);
+      }
+    else if (first_arg->type == schemerlicht_object_type_fixnum)
+      {
+      ret.type = schemerlicht_object_type_fixnum;
+      ret.value.fx = first_arg->value.fx;
       }
     else
       {
@@ -6712,5 +6722,7 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "acos", SCHEMERLICHT_ACOS);
   map_insert(ctxt, m, "atan", SCHEMERLICHT_ATAN);
   map_insert(ctxt, m, "sqrt", SCHEMERLICHT_SQRT);
+  map_insert(ctxt, m, "exact->inexact", SCHEMERLICHT_FIXNUM_FLONUM);
+  map_insert(ctxt, m, "inexact->exact", SCHEMERLICHT_FLONUM_FIXNUM);
   return m;
   }
