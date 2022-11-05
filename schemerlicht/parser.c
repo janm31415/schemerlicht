@@ -2179,10 +2179,14 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "<=", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, ">", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, ">=", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "abs", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "add1", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "append", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "apply", schemerlicht_et_primitive_call); // don't add apply, special case construction where apply should be a primitive object
-  map_insert(ctxt, m, "and", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "and", schemerlicht_et_primitive_call); 
+  map_insert(ctxt, m, "acos", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "asin", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "atan", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "arithmetic-shift", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "assoc", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "assv", schemerlicht_et_primitive_call);
@@ -2194,6 +2198,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "boolean?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "car", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "cdr", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "ceiling", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char->fixnum", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char=?", schemerlicht_et_primitive_call);
@@ -2207,6 +2212,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "closure-ref", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "complex?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "cons", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "cos", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "current-seconds", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "current-milliseconds", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "define", schemerlicht_et_primitive_call);
@@ -2219,6 +2225,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "equal?", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "even?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "exact?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "exp", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "expt", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "file-exists?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fixnum->char", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fixnum->flonum", schemerlicht_et_primitive_call);
@@ -2226,6 +2234,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   //map_insert(ctxt, m, "fixnum-expt", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "flonum?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "flonum->fixnum", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "floor", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "flonum-expt", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "fx=?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fx>?", schemerlicht_et_primitive_call);
@@ -2239,6 +2248,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "fxadd1", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fxsub1", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fxzero?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "gcd", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "getenv", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "halt", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "inexact?", schemerlicht_et_primitive_call);
@@ -2260,9 +2270,11 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   //map_insert(ctxt, m, "include", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "input-port?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "load", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "lcm", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "length", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "list", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "list?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "log", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "make-port", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "make-string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "make-vector", schemerlicht_et_primitive_call);
@@ -2271,6 +2283,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "memv", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "memq", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "min", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "modulo", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "negative?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "not", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "number?", schemerlicht_et_primitive_call);
@@ -2286,14 +2299,17 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "procedure?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "promise?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "putenv", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "quotient", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "quotient", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "rational?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "real?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reclaim", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "reclaim-garbage", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "remainder", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "remainder", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "round", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-car!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-cdr!", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "sin", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "sqrt", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "str2num", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string?", schemerlicht_et_primitive_call);
@@ -2319,6 +2335,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "symbol?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "symbol->string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sub1", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "tan", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "truncate", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "unless", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "vector", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "vector?", schemerlicht_et_primitive_call);

@@ -135,6 +135,26 @@ typedef enum
   SCHEMERLICHT_IS_COMPLEX,
   SCHEMERLICHT_IS_REAL,
   SCHEMERLICHT_IS_INTEGER,
+  SCHEMERLICHT_ABS,
+  SCHEMERLICHT_QUOTIENT,
+  SCHEMERLICHT_REMAINDER,
+  SCHEMERLICHT_MODULO,
+  SCHEMERLICHT_GCD,
+  SCHEMERLICHT_LCM,
+  SCHEMERLICHT_FLOOR,
+  SCHEMERLICHT_CEILING,
+  SCHEMERLICHT_TRUNCATE,
+  SCHEMERLICHT_ROUND,
+  SCHEMERLICHT_EXP,
+  SCHEMERLICHT_EXPT,
+  SCHEMERLICHT_LOG,
+  SCHEMERLICHT_SIN,
+  SCHEMERLICHT_COS,
+  SCHEMERLICHT_TAN,
+  SCHEMERLICHT_ASIN,
+  SCHEMERLICHT_ACOS,
+  SCHEMERLICHT_ATAN,
+  SCHEMERLICHT_SQRT,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -266,6 +286,27 @@ void schemerlicht_primitive_is_even(schemerlicht_context* ctxt, int a, int b, in
 void schemerlicht_primitive_is_complex(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_real(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_integer(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_abs(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_quotient(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_remainder(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_modulo(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_gcd(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_lcm(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_floor(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_ceiling(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_truncate(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_round(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_exp(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_expt(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_log(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_sin(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_cos(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_tan(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_asin(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_acos(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_atan(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_sqrt(schemerlicht_context* ctxt, int a, int b, int c);
+
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

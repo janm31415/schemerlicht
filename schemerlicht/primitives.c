@@ -5347,6 +5347,204 @@ void schemerlicht_primitive_is_integer(schemerlicht_context* ctxt, int a, int b,
   schemerlicht_set_object(ra, &obj);
   }
 
+void schemerlicht_primitive_abs(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ABS);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_quotient(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_QUOTIENT);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_remainder(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_REMAINDER);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_modulo(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MODULO);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_gcd(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_GCD);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_lcm(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_LCM);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_floor(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FLOOR);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_ceiling(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CEILING);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_truncate(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_TRUNCATE);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_round(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ROUND);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_exp(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_EXP);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_expt(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_EXPT);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_log(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_LOG);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_sin(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SIN);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_cos(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_COS);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_tan(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_TAN);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_asin(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ASIN);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_acos(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ACOS);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_atan(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_ATAN);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_sqrt(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SQRT);
+  }
+
 ////////////////////////////////////////////////////
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
@@ -5744,6 +5942,66 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_IS_INTEGER:
       schemerlicht_primitive_is_integer(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_ABS:
+      schemerlicht_primitive_abs(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_QUOTIENT:
+      schemerlicht_primitive_quotient(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_REMAINDER:
+      schemerlicht_primitive_remainder(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_MODULO:
+      schemerlicht_primitive_modulo(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_GCD:
+      schemerlicht_primitive_gcd(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_LCM:
+      schemerlicht_primitive_lcm(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_FLOOR:
+      schemerlicht_primitive_floor(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_CEILING:
+      schemerlicht_primitive_ceiling(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_TRUNCATE:
+      schemerlicht_primitive_truncate(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_ROUND:
+      schemerlicht_primitive_round(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_EXP:
+      schemerlicht_primitive_exp(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_EXPT:
+      schemerlicht_primitive_expt(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_LOG:
+      schemerlicht_primitive_log(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_SIN:
+      schemerlicht_primitive_sin(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_COS:
+      schemerlicht_primitive_cos(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_TAN:
+      schemerlicht_primitive_tan(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_ASIN:
+      schemerlicht_primitive_asin(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_ACOS:
+      schemerlicht_primitive_acos(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_ATAN:
+      schemerlicht_primitive_atan(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_SQRT:
+      schemerlicht_primitive_sqrt(ctxt, a, b, c);
+      break;    
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -5893,5 +6151,25 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "complex?", SCHEMERLICHT_IS_COMPLEX);
   map_insert(ctxt, m, "real?", SCHEMERLICHT_IS_REAL);
   map_insert(ctxt, m, "integer?", SCHEMERLICHT_IS_INTEGER);
+  map_insert(ctxt, m, "abs", SCHEMERLICHT_ABS);
+  map_insert(ctxt, m, "quotient", SCHEMERLICHT_QUOTIENT);
+  map_insert(ctxt, m, "remainder", SCHEMERLICHT_REMAINDER);
+  map_insert(ctxt, m, "modulo", SCHEMERLICHT_MODULO);
+  map_insert(ctxt, m, "gcd", SCHEMERLICHT_GCD);
+  map_insert(ctxt, m, "lcm", SCHEMERLICHT_LCM);
+  map_insert(ctxt, m, "floor", SCHEMERLICHT_FLOOR);
+  map_insert(ctxt, m, "ceiling", SCHEMERLICHT_CEILING);
+  map_insert(ctxt, m, "truncate", SCHEMERLICHT_TRUNCATE);
+  map_insert(ctxt, m, "round", SCHEMERLICHT_ROUND);
+  map_insert(ctxt, m, "exp", SCHEMERLICHT_EXP);
+  map_insert(ctxt, m, "expt", SCHEMERLICHT_EXPT);
+  map_insert(ctxt, m, "log", SCHEMERLICHT_LOG);
+  map_insert(ctxt, m, "sin", SCHEMERLICHT_SIN);
+  map_insert(ctxt, m, "cos", SCHEMERLICHT_COS);
+  map_insert(ctxt, m, "tan", SCHEMERLICHT_TAN);
+  map_insert(ctxt, m, "asin", SCHEMERLICHT_ASIN);
+  map_insert(ctxt, m, "acos", SCHEMERLICHT_ACOS);
+  map_insert(ctxt, m, "atan", SCHEMERLICHT_ATAN);
+  map_insert(ctxt, m, "sqrt", SCHEMERLICHT_SQRT);
   return m;
   }
