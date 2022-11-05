@@ -2532,6 +2532,33 @@ static void test_r5rs_funs()
   test_compile_aux("288", "(lcm 32.0 -36)");
   test_compile_aux("1", "(lcm)");
   test_compile_aux("5.000000", "(lcm 5.0)");
+
+  test_compile_aux("3", "(ceiling 3)");
+  test_compile_aux("3.000000", "(ceiling 3.0)");
+  test_compile_aux("4.000000", "(ceiling 3.0000000001)");
+  test_compile_aux("3.000000", "(ceiling 2.9)");
+  test_compile_aux("-3", "(ceiling -3)");
+  test_compile_aux("-3.000000", "(ceiling -3.1)");
+  test_compile_aux("-2.000000", "(ceiling -2.9)");
+  test_compile_aux("-2.000000", "(ceiling -2.5)");
+  test_compile_aux("-2.000000", "(ceiling -2.1)");
+  test_compile_aux("3", "(floor 3)");
+  test_compile_aux("3.000000", "(floor 3.0)");
+  test_compile_aux("3.000000", "(floor 3.0000000001)");
+  test_compile_aux("2.000000", "(floor 2.9)");
+  test_compile_aux("-3", "(floor -3)");
+  test_compile_aux("-4.000000", "(floor -3.1)");
+  test_compile_aux("-3.000000", "(floor -2.9)");
+  test_compile_aux("-3.000000", "(floor -2.5)");
+  test_compile_aux("-3.000000", "(floor -2.1)");
+  test_compile_aux("8.000000", "(round 8.0)");
+  test_compile_aux("8.000000", "(round 8.4)");
+  test_compile_aux("8.000000", "(round 7.5)");
+  test_compile_aux("8", "(round 8)");
+  test_compile_aux("8.000000", "(truncate 8.0)");
+  test_compile_aux("8.000000", "(truncate 8.4)");
+  test_compile_aux("7.000000", "(truncate 7.5)");
+  test_compile_aux("8", "(truncate 8)");
   }
 
 void run_all_compiler_tests()
