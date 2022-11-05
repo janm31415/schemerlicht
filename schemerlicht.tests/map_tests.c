@@ -45,7 +45,7 @@ static void test_map_2()
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
 
   schemerlicht_object* obj = schemerlicht_map_get_indexed(m, 12);
-  TEST_EQ_INT(0, (int)obj);
+  TEST_EQ_INT(0, (uintptr_t)obj);
 
   obj = schemerlicht_map_insert_indexed(ctxt, m, 12);
   TEST_EQ_INT(schemerlicht_object_type_undefined, obj->type);
@@ -68,7 +68,7 @@ static void test_map_3()
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 10, 4);
 
   schemerlicht_object* obj = schemerlicht_map_get_indexed(m, 200000);
-  TEST_EQ_INT(0, (int)obj);
+  TEST_EQ_INT(0, (uintptr_t)obj);
 
   obj = schemerlicht_map_insert_indexed(ctxt, m, 200000);
   TEST_EQ_INT(schemerlicht_object_type_undefined, obj->type);

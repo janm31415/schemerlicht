@@ -82,7 +82,7 @@ static void test_pool_allocator_2()
     TEST_EQ_DOUBLE(3.0 * i, d3->d[i]);
   for (int i = 0; i < 4; ++i)
     TEST_EQ_DOUBLE(4.0 * i, d4->d[i]);
-  large_object* d5 = cast(double*, schemerlicht_pool_allocate(ctxt, &pool));
+  large_object* d5 = cast(large_object*, schemerlicht_pool_allocate(ctxt, &pool));
   for (int i = 0; i < 4; ++i)
     d5->d[i] = 5.0 * i;
   for (int i = 0; i < 4; ++i)

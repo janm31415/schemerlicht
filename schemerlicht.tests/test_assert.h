@@ -14,7 +14,7 @@ void TestFail(const char* expval, const char* val, const char* file, int line, c
 void InitTestEngine();
 int CloseTestEngine(int force_report);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #define TestEqInt(expval, val, file, line, func) \
   if ((int64_t)(expval) != (int64_t)(val)) \
     { \

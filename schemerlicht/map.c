@@ -271,7 +271,7 @@ static schemerlicht_map_node* schemerlicht_hash_flonum(const schemerlicht_map* m
 
 static schemerlicht_map_node* schemerlicht_hash_pointer(const schemerlicht_map* m, void* ptr)
   {
-  return hashmod(m, (schemerlicht_memsize)ptr);
+  return hashmod(m, (uintptr_t)ptr);
   }
 
 static schemerlicht_memsize hash_string(const char* str)

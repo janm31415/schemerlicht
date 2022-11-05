@@ -615,6 +615,8 @@ static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visito
         case schemerlicht_bt_let_star:
           convert_let_star(ctxt, v, e);
           break;
+        case schemerlicht_bt_let:
+          break;
         }
       if (e->expr.let.named_let)
         {

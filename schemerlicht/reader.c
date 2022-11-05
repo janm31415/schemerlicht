@@ -69,6 +69,8 @@ void schemerlicht_destroy_cell(schemerlicht_context* ctxt, schemerlicht_cell* c)
     schemerlicht_vector_destroy(ctxt, &c->value.vector);
     break;
     }
+    case schemerlicht_ct_invalid_cell:
+    break;
     }
   }
 
@@ -399,6 +401,8 @@ void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_c
       }
     break;
     }
+    case schemerlicht_ct_invalid_cell:
+    break;
     }
   }
 /*
@@ -479,6 +483,8 @@ schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlich
         }
       break;
       }
+      case schemerlicht_ct_invalid_cell:
+      break;
       } // switch (c->type)
     while (counter.vector_size > 0 && *schemerlicht_vector_back(&counter, schemerlicht_memsize) == 0)
       {

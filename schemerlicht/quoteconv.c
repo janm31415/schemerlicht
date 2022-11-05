@@ -176,6 +176,8 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
       parents_to_add = c.value.vector.vector_size;
       break;
       }
+      case schemerlicht_ct_invalid_cell:
+      break;
       }
     if (last_result)
       {
