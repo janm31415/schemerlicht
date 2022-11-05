@@ -1042,10 +1042,16 @@ void schemerlicht_primitive_div(schemerlicht_context* ctxt, int a, int b, int c)
         switch (arg->type)
           {
           case schemerlicht_object_type_fixnum:
-            ret.value.fx /= arg->value.fx;
+            if (arg->value.fx != 0)
+              ret.value.fx /= arg->value.fx;
+            else
+              ret.type = schemerlicht_object_type_undefined;
             break;
           case schemerlicht_object_type_char:
-            ret.value.fx /= cast(schemerlicht_fixnum, arg->value.ch);
+            if (arg->value.ch != 0)
+              ret.value.fx /= cast(schemerlicht_fixnum, arg->value.ch);
+            else
+              ret.type = schemerlicht_object_type_undefined;
             break;
           default:
             schemerlicht_assert(0);
@@ -1100,7 +1106,10 @@ void schemerlicht_primitive_div(schemerlicht_context* ctxt, int a, int b, int c)
       for (int j = 1; j < b; ++j)
         {
         schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
-        ret.value.ch /= arg->value.ch;
+        if (arg->value.ch != 0)
+          ret.value.ch /= arg->value.ch;
+        else
+          ret.type = schemerlicht_object_type_undefined;
         }
       break;
       }
@@ -6264,6 +6273,90 @@ void schemerlicht_primitive_string_number(schemerlicht_context* ctxt, int a, int
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_is_nan(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_NAN);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_undefined;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        obj.type = schemerlicht_object_type_false;        
+        break;
+      case schemerlicht_object_type_flonum:
+        obj.type = arg->value.fl == arg->value.fl ? schemerlicht_object_type_false : schemerlicht_object_type_true;
+        break;
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_inf(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_INF);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_undefined;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        obj.type = schemerlicht_object_type_false;
+        break;
+      case schemerlicht_object_type_flonum:
+        obj.type = isfinite(arg->value.fl) ? schemerlicht_object_type_false : (arg->value.fl == arg->value.fl ? schemerlicht_object_type_true : schemerlicht_object_type_false);
+        break;
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_finite(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_FINITE);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_undefined;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        obj.type = schemerlicht_object_type_true;
+        break;
+      case schemerlicht_object_type_flonum:
+        obj.type = isfinite(arg->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
+        break;
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -6725,6 +6818,15 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_STRING_NUMBER:
       schemerlicht_primitive_string_number(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_IS_NAN:
+      schemerlicht_primitive_is_nan(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_INF:
+      schemerlicht_primitive_is_inf(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_FINITE:
+      schemerlicht_primitive_is_finite(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -6898,5 +7000,8 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "inexact->exact", SCHEMERLICHT_FLONUM_FIXNUM);
   map_insert(ctxt, m, "number->string", SCHEMERLICHT_NUMBER_STRING);
   map_insert(ctxt, m, "string->number", SCHEMERLICHT_STRING_NUMBER);
+  map_insert(ctxt, m, "nan?", SCHEMERLICHT_IS_NAN);
+  map_insert(ctxt, m, "inf?", SCHEMERLICHT_IS_INF);
+  map_insert(ctxt, m, "finite?", SCHEMERLICHT_IS_FINITE);
   return m;
   }

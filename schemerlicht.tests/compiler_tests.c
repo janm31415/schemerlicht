@@ -452,6 +452,8 @@ static void test_div()
   test_compile_aux("1.250000", "(/ 2.5 2)");
   test_compile_aux("-12.500000", "(/ 2.5 2 -0.1)");
   test_compile_aux("#\\004", "(/ #\\008 #\\002)");
+  test_compile_aux("#undefined", "(/ 4 2 0)");
+  test_compile_aux("#undefined", "(/ 4 0)");
   }
 
 static void test_combination_of_math_ops()
@@ -2613,6 +2615,20 @@ static void test_r5rs_funs()
   test_compile_aux("255", "(string->number \"ff\" 16)");
   test_compile_aux("#f", "(string->number \"3.14asdf\")");
   test_compile_aux("3.140000", "(string->number \"3.14\")");
+
+  test_compile_aux("#t", "(finite? 3.14)");
+  test_compile_aux("#t", "(finite? 2)");
+  test_compile_aux("#f", "(finite? (/ 1.0 0.0))");
+  test_compile_aux("#f", "(finite? (/ 0.0 0.0))");
+  test_compile_aux("#f", "(nan? 3.14)");
+  test_compile_aux("#f", "(nan? 2)");
+  test_compile_aux("#f", "(nan? (/ 1.0 0.0))");
+  test_compile_aux("#t", "(nan? (/ 0.0 0.0))");
+  test_compile_aux("#f", "(inf? 3.14)");
+  test_compile_aux("#f", "(inf? 2)");
+  test_compile_aux("#t", "(inf? (/ 1.0 0.0))");
+  test_compile_aux("#f", "(inf? (/ 0.0 0.0))");  
+  test_compile_aux("#undefined", "(inf? (/ 0 0))");
   }
 
 void run_all_compiler_tests()

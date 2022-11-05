@@ -34,8 +34,13 @@
         case SCHEMERLICHT_DIV: \
         case SCHEMERLICHT_FXDIV: \
           { \
-          target->value.fx = arg1->value.fx / arg2->value.fx; \
-          target->type = schemerlicht_object_type_fixnum; \
+          if (arg2->value.fx == 0) \
+            target->type = schemerlicht_object_type_undefined; \
+          else \
+            { \
+            target->value.fx = arg1->value.fx / arg2->value.fx; \
+            target->type = schemerlicht_object_type_fixnum; \
+            } \
           break; \
           } \
         case SCHEMERLICHT_NOT_EQUAL: \

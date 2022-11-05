@@ -156,7 +156,10 @@ typedef enum
   SCHEMERLICHT_ATAN,
   SCHEMERLICHT_SQRT,
   SCHEMERLICHT_NUMBER_STRING,
-  SCHEMERLICHT_STRING_NUMBER
+  SCHEMERLICHT_STRING_NUMBER,
+  SCHEMERLICHT_IS_NAN,
+  SCHEMERLICHT_IS_INF,
+  SCHEMERLICHT_IS_FINITE,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -310,6 +313,9 @@ void schemerlicht_primitive_atan(schemerlicht_context* ctxt, int a, int b, int c
 void schemerlicht_primitive_sqrt(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_number_string(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_string_number(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_nan(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_inf(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_finite(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
