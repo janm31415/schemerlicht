@@ -2494,6 +2494,31 @@ static void test_r5rs_funs()
   test_compile_aux("3.200000", "(abs -3.2)");
   test_compile_aux("0", "(abs 0)");
   test_compile_aux("0.000000", "(abs 0.0)");
+
+  test_compile_aux("3", "(quotient 10 3)");
+  test_compile_aux("-3", "(quotient -10 3)");
+  test_compile_aux("3", "(quotient 10.0 3)");
+  test_compile_aux("-3", "(quotient -10.0 3)");
+  test_compile_aux("3", "(quotient 10.0 3.0)");
+  test_compile_aux("-3", "(quotient -10.0 3.0)");
+  test_compile_aux("3", "(quotient 10 3.0)");
+  test_compile_aux("-3", "(quotient -10 3.0)");
+  test_compile_aux("1", "(remainder 10 3)");
+  test_compile_aux("-1", "(remainder -10 3)");
+  test_compile_aux("1", "(remainder 10.0 3)");
+  test_compile_aux("-1", "(remainder -10.0 3)");
+  test_compile_aux("1", "(remainder 10.0 3.0)");
+  test_compile_aux("-1", "(remainder -10.0 3.0)");
+  test_compile_aux("1", "(remainder 10 3.0)");
+  test_compile_aux("-1", "(remainder -10 3.0)");
+  test_compile_aux("1", "(modulo 10 3)");
+  test_compile_aux("2", "(modulo -10 3)");
+  test_compile_aux("1", "(modulo 10.0 3)");
+  test_compile_aux("-1", "(modulo -10.0 -3)");
+  test_compile_aux("1", "(modulo 10.0 3.0)");
+  test_compile_aux("2", "(modulo -10.0 3.0)");
+  test_compile_aux("-2", "(modulo 10 -3.0)");
+  test_compile_aux("2", "(modulo -10 3.0)");
   }
 
 void run_all_compiler_tests()
