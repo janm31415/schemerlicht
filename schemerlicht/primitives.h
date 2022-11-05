@@ -123,7 +123,18 @@ typedef enum
   SCHEMERLICHT_MAX,
   SCHEMERLICHT_MIN,
   SCHEMERLICHT_APPLY,
-  SCHEMERLICHT_APPEND
+  SCHEMERLICHT_APPEND,
+  SCHEMERLICHT_IS_EXACT,
+  SCHEMERLICHT_IS_INEXACT,
+  SCHEMERLICHT_IS_NUMBER,
+  SCHEMERLICHT_IS_RATIONAL,
+  SCHEMERLICHT_IS_POSITIVE,
+  SCHEMERLICHT_IS_NEGATIVE,
+  SCHEMERLICHT_IS_ODD,
+  SCHEMERLICHT_IS_EVEN,
+  SCHEMERLICHT_IS_COMPLEX,
+  SCHEMERLICHT_IS_REAL,
+  SCHEMERLICHT_IS_INTEGER,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -244,6 +255,17 @@ void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c)
 void schemerlicht_primitive_min(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_exact(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_inexact(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_number(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_rational(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_positive(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_negative(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_odd(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_even(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_complex(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_real(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_integer(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

@@ -2454,6 +2454,39 @@ static void test_r5rs_funs()
   test_compile_aux("()", "(append '())");
   test_compile_aux("()", "(append '() '() '())");
   test_compile_aux("(1 2 3)", "(append '(1 2 3))");
+
+  test_compile_aux("#t", "(exact? 3)");
+  test_compile_aux("#f", "(exact? 3.14)");
+  test_compile_aux("#f", "(inexact? 3)");
+  test_compile_aux("#t", "(inexact? 3.14)");
+  test_compile_aux("#t", "(number? 3)");
+  test_compile_aux("#t", "(number? 3.14)");
+  test_compile_aux("#f", "(number? 'a)");
+  test_compile_aux("#t", "(rational? 5)");
+  test_compile_aux("#t", "(rational? 5.2)");
+  test_compile_aux("#f", "(rational? \"test\")");  
+  test_compile_aux("#t", "(positive? 5)");
+  test_compile_aux("#f", "(negative? 5)");
+  test_compile_aux("#t", "(positive? 5.2)");
+  test_compile_aux("#f", "(negative? 5.2)");
+  test_compile_aux("#f", "(positive? -5)");
+  test_compile_aux("#t", "(negative? -5)");
+  test_compile_aux("#f", "(positive? -5.2)");
+  test_compile_aux("#t", "(negative? -5.2)");
+  test_compile_aux("#f", "(even? -5)");
+  test_compile_aux("#t", "(even? -6)");
+  test_compile_aux("#t", "(odd? -5)");
+  test_compile_aux("#f", "(odd? -6)");
+  test_compile_aux("#t", "(complex? 3)");
+  test_compile_aux("#t", "(complex? 3.14)");
+  test_compile_aux("#f", "(complex? #\\a)");
+  test_compile_aux("#t", "(real? 3)");
+  test_compile_aux("#t", "(real? 3.14)");
+  test_compile_aux("#f", "(real? #\\a)");
+  test_compile_aux("#t", "(integer? 3)");
+  test_compile_aux("#t", "(integer? 3.00)");
+  test_compile_aux("#f", "(integer? 3.14)");
+  test_compile_aux("#f", "(integer? #\\a)");
   }
 
 void run_all_compiler_tests()

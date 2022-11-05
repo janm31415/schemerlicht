@@ -4148,7 +4148,7 @@ void schemerlicht_primitive_string_append(schemerlicht_context* ctxt, int a, int
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
-  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_APPEND    );
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_APPEND);
   schemerlicht_object v;
   v.type = schemerlicht_object_type_string;
   schemerlicht_string_init(ctxt, &v.value.s, "");
@@ -5052,16 +5052,299 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
         *schemerlicht_vector_at(&last_list_obj->value.v, 0, schemerlicht_object) = *v0;
         last_list_obj = schemerlicht_vector_at(&last_list_obj->value.v, 1, schemerlicht_object);
         last_list_obj->type = schemerlicht_object_type_nil;
-        current_list = v1;        
+        current_list = v1;
         }
       if (current_list->type != schemerlicht_object_type_nil)
         {
         schemerlicht_runerror(ctxt, "non list object as argument to append");
         break;
         }
-      }    
+      }
     schemerlicht_set_object(ra, heap_obj);
     }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_exact(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_EXACT);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_fixnum)
+      {
+      obj.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_inexact(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_INEXACT);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_flonum)
+      {
+      obj.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_number(schemerlicht_context* ctxt, int a, int b, int c)
+  {  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_NUMBER);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_fixnum || arg->type == schemerlicht_object_type_flonum)
+      {
+      obj.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_rational(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_RATIONAL);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_fixnum || arg->type == schemerlicht_object_type_flonum)
+      {
+      obj.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_positive(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_POSITIVE);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        if (arg->value.fx >= 0)
+          obj.type = schemerlicht_object_type_true;
+        break;
+      case schemerlicht_object_type_flonum:
+        if (arg->value.fl >= 0)
+          obj.type = schemerlicht_object_type_true;
+        break;
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_negative(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_NEGATIVE);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        if (arg->value.fx < 0)
+          obj.type = schemerlicht_object_type_true;
+        break;
+      case schemerlicht_object_type_flonum:
+        if (arg->value.fl < 0)
+          obj.type = schemerlicht_object_type_true;
+        break;
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_odd(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_ODD);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        if ((arg->value.fx % 2) != 0)
+          obj.type = schemerlicht_object_type_true;
+        break;
+      case schemerlicht_object_type_flonum:
+      {
+      schemerlicht_fixnum fx = cast(schemerlicht_fixnum, arg->value.fl);
+      if ((arg->value.fl == cast(schemerlicht_flonum, fx)) && ((arg->value.fx % 2) != 0))
+        obj.type = schemerlicht_object_type_true;
+      break;
+      }
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_even(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_EVEN);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        if ((arg->value.fx % 2) == 0)
+          obj.type = schemerlicht_object_type_true;
+        break;
+      case schemerlicht_object_type_flonum:
+      {
+      schemerlicht_fixnum fx = cast(schemerlicht_fixnum, arg->value.fl);
+      if ((arg->value.fl == cast(schemerlicht_flonum, fx)) && ((arg->value.fx % 2) == 0))
+        obj.type = schemerlicht_object_type_true;
+      break;
+      }
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_complex(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_COMPLEX);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_fixnum || arg->type == schemerlicht_object_type_flonum)
+      {
+      obj.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_real(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_REAL);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    if (arg->type == schemerlicht_object_type_fixnum || arg->type == schemerlicht_object_type_flonum)
+      {
+      obj.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_integer(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_INTEGER);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
+    switch (arg->type)
+      {
+      case schemerlicht_object_type_fixnum:
+        obj.type = schemerlicht_object_type_true;
+        break;
+      case schemerlicht_object_type_flonum:
+      {
+      schemerlicht_fixnum fx = cast(schemerlicht_fixnum, arg->value.fl);
+      if ((arg->value.fl == cast(schemerlicht_flonum, fx)))
+        obj.type = schemerlicht_object_type_true;
+      break;
+      }
+      default:
+        break;
+      }
+    }
+  schemerlicht_set_object(ra, &obj);
   }
 
 ////////////////////////////////////////////////////
@@ -5428,6 +5711,39 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_APPEND:
       schemerlicht_primitive_append(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_IS_EXACT:
+      schemerlicht_primitive_is_exact(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_INEXACT:
+      schemerlicht_primitive_is_inexact(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_NUMBER:
+      schemerlicht_primitive_is_number(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_RATIONAL:
+      schemerlicht_primitive_is_rational(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_POSITIVE:
+      schemerlicht_primitive_is_positive(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_NEGATIVE:
+      schemerlicht_primitive_is_negative(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_ODD:
+      schemerlicht_primitive_is_odd(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_EVEN:
+      schemerlicht_primitive_is_even(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_COMPLEX:
+      schemerlicht_primitive_is_complex(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_REAL:
+      schemerlicht_primitive_is_real(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_INTEGER:
+      schemerlicht_primitive_is_integer(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -5566,5 +5882,16 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "min", SCHEMERLICHT_MIN);
   map_insert(ctxt, m, "apply", SCHEMERLICHT_APPLY);
   map_insert(ctxt, m, "append", SCHEMERLICHT_APPEND);
+  map_insert(ctxt, m, "exact?", SCHEMERLICHT_IS_EXACT);
+  map_insert(ctxt, m, "inexact?", SCHEMERLICHT_IS_INEXACT);
+  map_insert(ctxt, m, "number?", SCHEMERLICHT_IS_NUMBER);
+  map_insert(ctxt, m, "rational?", SCHEMERLICHT_IS_RATIONAL);
+  map_insert(ctxt, m, "positive?", SCHEMERLICHT_IS_POSITIVE);
+  map_insert(ctxt, m, "negative?", SCHEMERLICHT_IS_NEGATIVE);
+  map_insert(ctxt, m, "odd?", SCHEMERLICHT_IS_ODD);
+  map_insert(ctxt, m, "even?", SCHEMERLICHT_IS_EVEN);
+  map_insert(ctxt, m, "complex?", SCHEMERLICHT_IS_COMPLEX);
+  map_insert(ctxt, m, "real?", SCHEMERLICHT_IS_REAL);
+  map_insert(ctxt, m, "integer?", SCHEMERLICHT_IS_INTEGER);
   return m;
   }
