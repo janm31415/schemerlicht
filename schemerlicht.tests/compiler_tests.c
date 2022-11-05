@@ -2519,6 +2519,19 @@ static void test_r5rs_funs()
   test_compile_aux("2", "(modulo -10.0 3.0)");
   test_compile_aux("-2", "(modulo 10 -3.0)");
   test_compile_aux("2", "(modulo -10 3.0)");
+
+  test_compile_aux("4", "(gcd 32 -36)");
+  test_compile_aux("4", "(gcd 32.0 -36)");
+  test_compile_aux("4", "(gcd 32 -36)");
+  test_compile_aux("4", "(gcd 32.0 -36)");
+  test_compile_aux("0", "(gcd)");
+  test_compile_aux("2", "(gcd 2)");
+  test_compile_aux("4", "(gcd 32.0 -36 16 -4)");
+  test_compile_aux("2", "(gcd 32.0 -36 16 -4 6)");
+  test_compile_aux("288", "(lcm 32 -36)");
+  test_compile_aux("288", "(lcm 32.0 -36)");
+  test_compile_aux("1", "(lcm)");
+  test_compile_aux("5.000000", "(lcm 5.0)");
   }
 
 void run_all_compiler_tests()
