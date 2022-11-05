@@ -2180,6 +2180,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, ">", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, ">=", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "add1", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "append", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "apply", schemerlicht_et_primitive_call); // don't add apply, special case construction where apply should be a primitive object
   map_insert(ctxt, m, "and", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "arithmetic-shift", schemerlicht_et_primitive_call);

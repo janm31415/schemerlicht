@@ -118,6 +118,12 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
 
+  if (ctxt->number_of_compile_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
 
@@ -2440,6 +2446,16 @@ static void test_foreign()
   test_foreign_aux("16.200000", "(foreign-call add_three 7 9 0.2)", "add_three", &add_three, schemerlicht_foreign_flonum);
   }
 
+static void test_r5rs_funs()
+  {
+  test_compile_aux("(1 2 3 4)", "(append (list 1 2) (list 3 4))");
+  test_compile_aux("(1 2 3 4)", "(append '(1 2) '(3 4))");
+  test_compile_aux("(1 2 3 4 5 6 7 8)", "(append '(1 2) '(3 4) '(5 6) '(7 8))");
+  test_compile_aux("()", "(append '())");
+  test_compile_aux("()", "(append '() '() '())");
+  test_compile_aux("(1 2 3)", "(append '(1 2 3))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();  
@@ -2532,4 +2548,5 @@ void run_all_compiler_tests()
   test_apply();
   test_foreign_1();
   test_foreign();
+  test_r5rs_funs();
   }

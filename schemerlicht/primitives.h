@@ -122,7 +122,8 @@ typedef enum
   SCHEMERLICHT_SUBSTRING,
   SCHEMERLICHT_MAX,
   SCHEMERLICHT_MIN,
-  SCHEMERLICHT_APPLY
+  SCHEMERLICHT_APPLY,
+  SCHEMERLICHT_APPEND
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -242,6 +243,7 @@ void schemerlicht_primitive_substring(schemerlicht_context* ctxt, int a, int b, 
 void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_min(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

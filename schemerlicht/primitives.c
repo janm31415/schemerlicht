@@ -2964,7 +2964,7 @@ void schemerlicht_primitive_vector(schemerlicht_context* ctxt, int a, int b, int
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_VECTOR);
-  schemerlicht_object v = make_schemerlicht_object_vector(ctxt, b);  
+  schemerlicht_object v = make_schemerlicht_object_vector(ctxt, b);
   for (int j = 0; j < b; ++j)
     {
     schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
@@ -3247,7 +3247,7 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSURE);
-  schemerlicht_object v = make_schemerlicht_object_closure(ctxt, b);  
+  schemerlicht_object v = make_schemerlicht_object_closure(ctxt, b);
   schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
@@ -3305,6 +3305,7 @@ void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b
   schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
   schemerlicht_object* pos = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
   schemerlicht_set_object(ra, schemerlicht_vector_at(&v->value.v, pos->value.fx, schemerlicht_object));
+  UNUSED(b);
 #endif
   }
 
@@ -3367,7 +3368,7 @@ void schemerlicht_primitive_make_vector(schemerlicht_context* ctxt, int a, int b
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
-  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MAKE_VECTOR);  
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MAKE_VECTOR);
   schemerlicht_memsize vector_length = 0;
   if (b > 0)
     {
@@ -3384,7 +3385,7 @@ void schemerlicht_primitive_make_vector(schemerlicht_context* ctxt, int a, int b
         break;
       }
     }
-  schemerlicht_object v = make_schemerlicht_object_vector(ctxt, vector_length);  
+  schemerlicht_object v = make_schemerlicht_object_vector(ctxt, vector_length);
   schemerlicht_object dummy;
   dummy.type = schemerlicht_object_type_undefined;
   schemerlicht_object* fill_obj = &dummy;
@@ -4147,7 +4148,7 @@ void schemerlicht_primitive_string_append(schemerlicht_context* ctxt, int a, int
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
-  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_APPEND);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_APPEND    );
   schemerlicht_object v;
   v.type = schemerlicht_object_type_string;
   schemerlicht_string_init(ctxt, &v.value.s, "");
@@ -4881,10 +4882,10 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
-  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_APPLY);  
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_APPLY);
 
   if (b > 1)
-    {    
+    {
     schemerlicht_object* last_arg = schemerlicht_vector_at(&ctxt->stack, a + c + b, schemerlicht_object);
     --b;
     while (last_arg->type == schemerlicht_object_type_pair)
@@ -4904,13 +4905,13 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
     // a + c + 3: second arg for op
     // ...
     // a + c + b: last arg
-     
+
     schemerlicht_object* op = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
     if (op->type == schemerlicht_object_type_primitive || op->type == schemerlicht_object_type_primitive_object)
       {
-      schemerlicht_call_primitive(ctxt, op->value.fx, a+c+1, b-1, 0);
+      schemerlicht_call_primitive(ctxt, op->value.fx, a + c + 1, b - 1, 0);
       schemerlicht_set_object(ra, op);
-      }  
+      }
     else if (op->type == schemerlicht_object_type_closure)
       {
       schemerlicht_assert(a == 0); // by construction apply is always represented as a funcall. Because of cps construction it means that all registers are available
@@ -4925,11 +4926,11 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_function* dummy_fun = schemerlicht_function_new(ctxt);
       dummy_lambda.value.ptr = dummy_fun;
       schemerlicht_set_object(schemerlicht_vector_begin(&dummy_continuation.value.v, schemerlicht_object), &dummy_lambda);
-      
+
       //swap place of continuation and operator
       *op = dummy_continuation;
       *continuation = oper;
-      
+
       // stack state (with guaranteed a == 0):
       // a + 1 : operator closure
       // a + 2 : dummy continuation
@@ -4939,10 +4940,10 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       // a + 1 + b : last arg for operator
 
       // move down 
-      for (int i = 0; i < b+1; ++i)
+      for (int i = 0; i < b + 1; ++i)
         {
         schemerlicht_object* ri = schemerlicht_vector_at(&ctxt->stack, i, schemerlicht_object);
-        schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, i+1, schemerlicht_object);
+        schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, i + 1, schemerlicht_object);
         *ri = *ri_next;
         }
       schemerlicht_assert(oper.type == schemerlicht_object_type_closure);
@@ -4954,7 +4955,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);
       *continuation = original_continuation;
-      schemerlicht_object_destroy(ctxt, &dummy_continuation);      
+      schemerlicht_object_destroy(ctxt, &dummy_continuation);
       schemerlicht_function_free(ctxt, dummy_fun);
       }
     else if (op->type == schemerlicht_object_type_lambda)
@@ -4991,7 +4992,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
         schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, i + 1, schemerlicht_object);
         *ri = *ri_next;
         }
-      schemerlicht_assert(oper.type == schemerlicht_object_type_lambda);      
+      schemerlicht_assert(oper.type == schemerlicht_object_type_lambda);
       schemerlicht_function* lambda = cast(schemerlicht_function*, oper.value.ptr);
       schemerlicht_run(ctxt, lambda);
 
@@ -5015,372 +5016,54 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
     schemerlicht_set_object(ra, &ret);
     }
   }
-
 ////////////////////////////////////////////////////
-#if 0
-void* g_prim_arr[SCHEMERLICHT_MIN + 1];
 
-void init_primitive_ptrs(void** prim_arr, schemerlicht_context* ctxt)
+void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int c)
   {
-  for (int prim_id = 0; prim_id <= SCHEMERLICHT_MIN; ++prim_id)
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_APPEND);
+  if (b == 0)
     {
-    switch (prim_id)
+    schemerlicht_object ret;
+    ret.type = schemerlicht_object_type_undefined;
+    schemerlicht_set_object(ra, &ret);
+    }
+  else
+    {
+    schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+    ++ctxt->heap_pos;
+    heap_obj->type = schemerlicht_object_type_nil;
+    schemerlicht_object* last_list_obj = heap_obj;
+    for (int i = 0; i < b; ++i)
       {
-      case SCHEMERLICHT_ADD1:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_add1;
-        break;
-      case SCHEMERLICHT_SUB1:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_sub1;
-        break;
-      case SCHEMERLICHT_ADD:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_add;
-        break;
-      case SCHEMERLICHT_SUB:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_sub;
-        break;
-      case SCHEMERLICHT_MUL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_mul;
-        break;
-      case SCHEMERLICHT_DIV:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_div;
-        break;
-      case SCHEMERLICHT_EQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_equal;
-        break;
-      case SCHEMERLICHT_NOT_EQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_not_equal;
-        break;
-      case SCHEMERLICHT_LESS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_less;
-        break;
-      case SCHEMERLICHT_LEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_leq;
-        break;
-      case SCHEMERLICHT_GREATER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_greater;
-        break;
-      case SCHEMERLICHT_GEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_geq;
-        break;
-      case SCHEMERLICHT_IS_FIXNUM:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_fixnum;
-        break;
-      case SCHEMERLICHT_IS_FLONUM:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_flonum;
-        break;
-      case SCHEMERLICHT_IS_NULL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_null;
-        break;
-      case SCHEMERLICHT_IS_ZERO:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_zero;
-        break;
-      case SCHEMERLICHT_IS_BOOLEAN:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_boolean;
-        break;
-      case SCHEMERLICHT_IS_CHAR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_char;
-        break;
-      case SCHEMERLICHT_NOT:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_not;
-        break;
-      case SCHEMERLICHT_FXADD1:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxadd1;
-        break;
-      case SCHEMERLICHT_FXSUB1:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxsub1;
-        break;
-      case SCHEMERLICHT_FXADD:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxadd;
-        break;
-      case SCHEMERLICHT_FXSUB:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxsub;
-        break;
-      case SCHEMERLICHT_FXMUL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxmul;
-        break;
-      case SCHEMERLICHT_FXDIV:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxdiv;
-        break;
-      case SCHEMERLICHT_FXEQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxequal;
-        break;
-      case SCHEMERLICHT_FXLESS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxless;
-        break;
-      case SCHEMERLICHT_FXLEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxleq;
-        break;
-      case SCHEMERLICHT_FXGREATER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxgreater;
-        break;
-      case SCHEMERLICHT_FXGEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxgeq;
-        break;
-      case SCHEMERLICHT_FXZERO:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fxzero;
-        break;
-      case SCHEMERLICHT_FLADD1:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fladd1;
-        break;
-      case SCHEMERLICHT_FLSUB1:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flsub1;
-        break;
-      case SCHEMERLICHT_FLADD:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fladd;
-        break;
-      case SCHEMERLICHT_FLSUB:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flsub;
-        break;
-      case SCHEMERLICHT_FLMUL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flmul;
-        break;
-      case SCHEMERLICHT_FLDIV:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fldiv;
-        break;
-      case SCHEMERLICHT_FLEQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flequal;
-        break;
-      case SCHEMERLICHT_FLLESS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flless;
-        break;
-      case SCHEMERLICHT_FLLEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flleq;
-        break;
-      case SCHEMERLICHT_FLGREATER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flgreater;
-        break;
-      case SCHEMERLICHT_FLGEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flgeq;
-        break;
-      case SCHEMERLICHT_FLZERO:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flzero;
-        break;
-      case SCHEMERLICHT_CHAREQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_charequal;
-        break;
-      case SCHEMERLICHT_CHARLESS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_charless;
-        break;
-      case SCHEMERLICHT_CHARLEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_charleq;
-        break;
-      case SCHEMERLICHT_CHARGREATER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_chargreater;
-        break;
-      case SCHEMERLICHT_CHARGEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_chargeq;
-        break;
-      case SCHEMERLICHT_FIXNUM_CHAR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fixnum_char;
-        break;
-      case SCHEMERLICHT_CHAR_FIXNUM:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_char_fixnum;
-        break;
-      case SCHEMERLICHT_FIXNUM_FLONUM:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_fixnum_flonum;
-        break;
-      case SCHEMERLICHT_FLONUM_FIXNUM:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_flonum_fixnum;
-        break;
-      case SCHEMERLICHT_BITWISE_AND:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_bitwise_and;
-        break;
-      case SCHEMERLICHT_BITWISE_OR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_bitwise_or;
-        break;
-      case SCHEMERLICHT_BITWISE_NOT:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_bitwise_not;
-        break;
-      case SCHEMERLICHT_BITWISE_XOR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_bitwise_xor;
-        break;
-      case SCHEMERLICHT_ARITHMETIC_SHIFT:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_arithmetic_shift;
-        break;
-      case SCHEMERLICHT_VECTOR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_vector;
-        break;
-      case SCHEMERLICHT_VECTORREF:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_vector_ref;
-        break;
-      case SCHEMERLICHT_VECTORSET:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_vector_set;
-        break;
-      case SCHEMERLICHT_IS_VECTOR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_vector;
-        break;
-      case SCHEMERLICHT_IS_PAIR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_pair;
-        break;
-      case SCHEMERLICHT_CONS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_cons;
-        break;
-      case SCHEMERLICHT_CDR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_cdr;
-        break;
-      case SCHEMERLICHT_CAR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_car;
-        break;
-      case SCHEMERLICHT_HALT:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_halt;
-        break;
-      case SCHEMERLICHT_CLOSURE:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_closure;
-        break;
-      case SCHEMERLICHT_CLOSUREREF:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_closure_ref;
-        break;
-      case SCHEMERLICHT_IS_CLOSURE:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_closure;
-        break;
-      case SCHEMERLICHT_LIST:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_list;
-        break;
-      case SCHEMERLICHT_MAKE_VECTOR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_make_vector;
-        break;
-      case SCHEMERLICHT_MAKE_STRING:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_make_string;
-        break;
-      case SCHEMERLICHT_VECTOR_LENGTH:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_vector_length;
-        break;
-      case SCHEMERLICHT_STRING_LENGTH:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_length;
-        break;
-      case SCHEMERLICHT_STRING_REF:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_ref;
-        break;
-      case SCHEMERLICHT_STRING_SET:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_set;
-        break;
-      case SCHEMERLICHT_STRING_HASH:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_hash;
-        break;
-      case SCHEMERLICHT_IS_STRING:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_string;
-        break;
-      case SCHEMERLICHT_EQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_eq;
-        break;
-      case SCHEMERLICHT_EQV:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_eqv;
-        break;
-      case SCHEMERLICHT_IS_EQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_equal;
-        break;
-      case SCHEMERLICHT_STRING:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string;
-        break;
-      case SCHEMERLICHT_STRING_TO_SYMBOL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_to_symbol;
-        break;
-      case SCHEMERLICHT_LENGTH:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_length;
-        break;
-      case SCHEMERLICHT_SET_CAR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_set_car;
-        break;
-      case SCHEMERLICHT_SET_CDR:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_set_cdr;
-        break;
-      case SCHEMERLICHT_IS_SYMBOL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_symbol;
-        break;
-      case SCHEMERLICHT_IS_PROCEDURE:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_procedure;
-        break;
-      case SCHEMERLICHT_RECLAIM:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_reclaim;
-        break;
-      case SCHEMERLICHT_MEMV:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_memv;
-        break;
-      case SCHEMERLICHT_MEMQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_memq;
-        break;
-      case SCHEMERLICHT_MEMBER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_member;
-        break;
-      case SCHEMERLICHT_ASSV:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_assv;
-        break;
-      case SCHEMERLICHT_ASSQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_assq;
-        break;
-      case SCHEMERLICHT_ASSOC:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_assoc;
-        break;
-      case SCHEMERLICHT_SYMBOL_TO_STRING:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_symbol_to_string;
-        break;
-      case SCHEMERLICHT_STRING_COPY:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_copy;
-        break;
-      case SCHEMERLICHT_STRING_APPEND:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_append;
-        break;
-      case SCHEMERLICHT_STRING_FILL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_fill;
-        break;
-      case SCHEMERLICHT_VECTOR_FILL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_vector_fill;
-        break;
-      case SCHEMERLICHT_CURRENT_SECONDS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_current_seconds;
-        break;
-      case SCHEMERLICHT_CURRENT_MILLISECONDS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_current_milliseconds;
-        break;
-      case SCHEMERLICHT_IS_LIST:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_is_list;
-        break;
-      case SCHEMERLICHT_STRING_EQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_equal;
-        break;
-      case SCHEMERLICHT_STRING_LESS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_less;
-        break;
-      case SCHEMERLICHT_STRING_GREATER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_greater;
-        break;
-      case SCHEMERLICHT_STRING_LEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_leq;
-        break;
-      case SCHEMERLICHT_STRING_GEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_geq;
-        break;
-      case SCHEMERLICHT_STRING_CI_EQUAL:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_ci_equal;
-        break;
-      case SCHEMERLICHT_STRING_CI_LESS:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_ci_less;
-        break;
-      case SCHEMERLICHT_STRING_CI_GREATER:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_ci_greater;
-        break;
-      case SCHEMERLICHT_STRING_CI_LEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_ci_leq;
-        break;
-      case SCHEMERLICHT_STRING_CI_GEQ:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_string_ci_geq;
-        break;
-      case SCHEMERLICHT_SUBSTRING:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_substring;
-        break;
-      case SCHEMERLICHT_MAX:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_max;
-        break;
-      case SCHEMERLICHT_MIN:
-        prim_arr[prim_id] = (void*)&schemerlicht_primitive_min;
-        break;
-      default:
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-        break;
-      }
+      schemerlicht_object* current_list = schemerlicht_vector_at(&ctxt->stack, a + c + 1 + i, schemerlicht_object);
+      if (current_list->type != schemerlicht_object_type_pair && current_list->type != schemerlicht_object_type_nil)
+        {
+        schemerlicht_runerror(ctxt, "non list object as argument to append");
+        break;
+        }
+      while (current_list->type == schemerlicht_object_type_pair)
+        {
+        schemerlicht_object* v0 = schemerlicht_vector_at(&current_list->value.v, 0, schemerlicht_object);
+        schemerlicht_object* v1 = schemerlicht_vector_at(&current_list->value.v, 1, schemerlicht_object);
+        *last_list_obj = make_schemerlicht_object_pair(ctxt);
+        *schemerlicht_vector_at(&last_list_obj->value.v, 0, schemerlicht_object) = *v0;
+        last_list_obj = schemerlicht_vector_at(&last_list_obj->value.v, 1, schemerlicht_object);
+        last_list_obj->type = schemerlicht_object_type_nil;
+        current_list = v1;        
+        }
+      if (current_list->type != schemerlicht_object_type_nil)
+        {
+        schemerlicht_runerror(ctxt, "non list object as argument to append");
+        break;
+        }
+      }    
+    schemerlicht_set_object(ra, heap_obj);
     }
   }
-#endif
+
 ////////////////////////////////////////////////////
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
@@ -5742,6 +5425,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_APPLY:
       schemerlicht_primitive_apply(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_APPEND:
+      schemerlicht_primitive_append(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -5879,5 +5565,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "max", SCHEMERLICHT_MAX);
   map_insert(ctxt, m, "min", SCHEMERLICHT_MIN);
   map_insert(ctxt, m, "apply", SCHEMERLICHT_APPLY);
+  map_insert(ctxt, m, "append", SCHEMERLICHT_APPEND);
   return m;
   }
