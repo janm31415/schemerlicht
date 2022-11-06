@@ -168,7 +168,14 @@ typedef enum
   SCHEMERLICHT_IS_FINITE,
   SCHEMERLICHT_LIST_REF,
   SCHEMERLICHT_LIST_TAIL,
-  SCHEMERLICHT_REVERSE
+  SCHEMERLICHT_REVERSE,
+  SCHEMERLICHT_CHAR_UPCASE,
+  SCHEMERLICHT_CHAR_DOWNCASE,
+  SCHEMERLICHT_CHAR_IS_UPPER,
+  SCHEMERLICHT_CHAR_IS_LOWER,
+  SCHEMERLICHT_CHAR_IS_ALPHA,
+  SCHEMERLICHT_CHAR_IS_NUMERIC,
+  SCHEMERLICHT_CHAR_IS_WHITESPACE,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -334,6 +341,13 @@ void schemerlicht_primitive_is_finite(schemerlicht_context* ctxt, int a, int b, 
 void schemerlicht_primitive_list_ref(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_list_tail(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_reverse(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_upcase(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_downcase(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_is_upper(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_is_lower(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_is_alpha(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_is_numeric(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_char_is_whitespace(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

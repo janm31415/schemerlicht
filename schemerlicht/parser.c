@@ -2212,6 +2212,13 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "char-ci<?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-ci>=?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-ci<=?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-downcase", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-upcase", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-upper-case?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-lower-case?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-alphabetic?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-numeric?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "char-whitespace?", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "close-file", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure?", schemerlicht_et_primitive_call);
