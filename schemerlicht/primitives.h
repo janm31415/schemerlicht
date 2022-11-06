@@ -96,6 +96,7 @@ typedef enum
   SCHEMERLICHT_IS_SYMBOL,
   SCHEMERLICHT_IS_PROCEDURE,
   SCHEMERLICHT_RECLAIM,
+  SCHEMERLICHT_RECLAIM_GARBAGE,
   SCHEMERLICHT_MEMV,
   SCHEMERLICHT_MEMQ,
   SCHEMERLICHT_MEMBER,
@@ -160,6 +161,9 @@ typedef enum
   SCHEMERLICHT_IS_NAN,
   SCHEMERLICHT_IS_INF,
   SCHEMERLICHT_IS_FINITE,
+  SCHEMERLICHT_LIST_REF,
+  SCHEMERLICHT_LIST_TAIL,
+  SCHEMERLICHT_REVERSE
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -252,6 +256,7 @@ void schemerlicht_primitive_set_cdr(schemerlicht_context* ctxt, int a, int b, in
 void schemerlicht_primitive_is_symbol(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_procedure(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_reclaim(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_reclaim_garbage(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_memv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_memq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_member(schemerlicht_context* ctxt, int a, int b, int c);
@@ -316,6 +321,9 @@ void schemerlicht_primitive_string_number(schemerlicht_context* ctxt, int a, int
 void schemerlicht_primitive_is_nan(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_inf(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_finite(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_list_ref(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_list_tail(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_reverse(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

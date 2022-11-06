@@ -2316,7 +2316,7 @@ static schemerlicht_fixnum seventeen()
 static void test_foreign_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, "seventeen", &seventeen, schemerlicht_foreign_fixnum);
+  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, "seventeen", cast(void*, &seventeen), schemerlicht_foreign_fixnum);
   schemerlicht_register_external_function(ctxt, &ext);
 
   schemerlicht_vector tokens = script2tokens(ctxt, "(foreign-call seventeen)");
@@ -2438,14 +2438,14 @@ static schemerlicht_flonum add_three(schemerlicht_fixnum* a, schemerlicht_fixnum
 
 static void test_foreign()
   {
-  test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", &seventeen, schemerlicht_foreign_fixnum);
-  test_foreign_aux("3.141593", "(foreign-call mathpi)", "mathpi", &mathpi, schemerlicht_foreign_flonum);
-  test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", &printHelloWorld, schemerlicht_foreign_char_pointer);
-  test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", &createCustomObject, schemerlicht_foreign_object);
-  test_foreign_aux("8", "(foreign-call addone 7)", "addone", &addone, schemerlicht_foreign_fixnum);
-  test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", &addonef, schemerlicht_foreign_flonum);
-  test_foreign_aux("5", "(foreign-call get-string-length \"abcde\")", "get-string-length", &getStringLength, schemerlicht_foreign_fixnum);
-  test_foreign_aux("16.200000", "(foreign-call add_three 7 9 0.2)", "add_three", &add_three, schemerlicht_foreign_flonum);
+  test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", cast(void*, &seventeen), schemerlicht_foreign_fixnum);
+  test_foreign_aux("3.141593", "(foreign-call mathpi)", "mathpi", cast(void*, &mathpi), schemerlicht_foreign_flonum);
+  test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", cast(void*, &printHelloWorld), schemerlicht_foreign_char_pointer);
+  test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", cast(void*, &createCustomObject), schemerlicht_foreign_object);
+  test_foreign_aux("8", "(foreign-call addone 7)", "addone", cast(void*, &addone), schemerlicht_foreign_fixnum);
+  test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", cast(void*, &addonef), schemerlicht_foreign_flonum);
+  test_foreign_aux("5", "(foreign-call get-string-length \"abcde\")", "get-string-length", cast(void*, &getStringLength), schemerlicht_foreign_fixnum);
+  test_foreign_aux("16.200000", "(foreign-call add_three 7 9 0.2)", "add_three", cast(void*, &add_three), schemerlicht_foreign_flonum);
   }
 
 static void test_r5rs_funs()
@@ -2629,6 +2629,16 @@ static void test_r5rs_funs()
   test_compile_aux("#t", "(inf? (/ 1.0 0.0))");
   test_compile_aux("#f", "(inf? (/ 0.0 0.0))");  
   test_compile_aux("#undefined", "(inf? (/ 0 0))");
+
+  test_compile_aux("(5 4 3 2 1)", "(reverse (list 1 2 3 4 5))");
+  test_compile_aux("()", "(reverse (list))");
+  test_compile_aux("(4 5 6)", "(list-tail (list 1 2 3 4 5 6) 3)");
+  test_compile_aux("(4 5 6)", "(list-tail '(1 2 3 4 5 6) 3)");
+  test_compile_aux("(4 5 6)", "(list-tail '(1 2 3 4 5 6) 3)");
+  test_compile_aux("4", "(list-ref '(1 2 3 4 5 6) 3)");
+  test_compile_aux("4", "(list-ref (list 1 2 3 4 5 6) 3)");
+  test_compile_aux("c", "(list-ref '(a b c d) 2)");
+  test_compile_aux("c", "(list-ref '(a b c d) (inexact->exact (round 1.8)))");
   }
 
 void run_all_compiler_tests()

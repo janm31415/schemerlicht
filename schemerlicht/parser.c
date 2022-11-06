@@ -2261,6 +2261,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "lcm", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "length", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "list", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "list-ref", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "list-tail", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "list?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "log", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "make-port", schemerlicht_et_primitive_call);  
@@ -2292,8 +2294,9 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "rational?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "real?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reclaim", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "reclaim-garbage", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "reclaim-garbage", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "remainder", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "reverse", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "round", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-car!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-cdr!", schemerlicht_et_primitive_call);
