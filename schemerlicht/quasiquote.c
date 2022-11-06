@@ -427,9 +427,10 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
       schemerlicht_expression expr1 = qq_expand_list(ctxt, p0, depth);
       schemerlicht_expression expr2 = qq_expand(ctxt, p1, depth);
       schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
-      schemerlicht_expression v = schemerlicht_init_variable(ctxt);
-      schemerlicht_string_init(ctxt, &v.expr.var.name, "append");      
-      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, v, schemerlicht_expression);
+      schemerlicht_expression p = schemerlicht_init_primcall(ctxt);
+      schemerlicht_string_init(ctxt, &p.expr.prim.name, "append");
+      p.expr.prim.as_object = 1;      
+      schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, p, schemerlicht_expression);
       schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr1, schemerlicht_expression);
       schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr2, schemerlicht_expression);
       schemerlicht_vector_destroy(ctxt, &c->value.vector);
@@ -458,9 +459,10 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
       }
     schemerlicht_expression expr = qq_expand(ctxt, &list_cell, depth);
     schemerlicht_expression f = schemerlicht_init_funcall(ctxt);
-    schemerlicht_expression v = schemerlicht_init_variable(ctxt);
-    schemerlicht_string_init(ctxt, &v.expr.var.name, "list->vector");
-    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, v, schemerlicht_expression);
+    schemerlicht_expression p = schemerlicht_init_primcall(ctxt);
+    schemerlicht_string_init(ctxt, &p.expr.prim.name, "list->vector");
+    p.expr.prim.as_object = 1;
+    schemerlicht_vector_push_back(ctxt, &f.expr.funcall.fun, p, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &f.expr.funcall.arguments, expr, schemerlicht_expression);    
     schemerlicht_vector_destroy(ctxt, &c->value.vector);
     return f;

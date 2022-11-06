@@ -29,7 +29,8 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->raw_heap, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    schemerlicht_object_destroy(ctxt, it);
+    if (it->type != schemerlicht_object_type_symbol) // symbols are unique and stored in the string to symbol map
+      schemerlicht_object_destroy(ctxt, it);
     }
   schemerlicht_vector_destroy(ctxt, &ctxt->globals); // we don't destroy the objects in the globals list, as they point to constants or heap objects
   schemerlicht_vector_destroy(ctxt, &ctxt->raw_heap);

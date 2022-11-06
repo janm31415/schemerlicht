@@ -2454,6 +2454,8 @@ static void test_r5rs_funs()
   test_compile_aux("(1 2 3 4)", "(append (list 1 2) (list 3 4))");
   test_compile_aux("(1 2 3 4)", "(append '(1 2) '(3 4))");
   test_compile_aux("(1 2 3 4 5 6 7 8)", "(append '(1 2) '(3 4) '(5 6) '(7 8))");
+  test_compile_aux("(1 2 3 4 5 6 . 35)", "(append '(1 2) '(3 4) '(5 6) 35)");
+  test_compile_aux("(1 2 3 4 5 6 . cons)", "(append '(1 2) '(3 4) '(5 6) 'cons)");
   test_compile_aux("()", "(append '())");
   test_compile_aux("()", "(append '() '() '())");
   test_compile_aux("(1 2 3)", "(append '(1 2 3))");
@@ -2793,6 +2795,24 @@ static void test_control_ops()
 "     v) #; blabla\n");
   }
 
+static void test_quasiquote()
+  {
+  test_compile_aux("(list 3 4)", "`(list ,(+ 1 2) 4)");
+  test_compile_aux("(list a (quote a))", "(let ((name 'a)) `(list ,name ',name))");
+  test_compile_aux_r5rs("(a 3 4 5 6 b)", "`(a ,(+ 1 2) ,@(map abs '(4 -5 6)) b)");
+  test_compile_aux("((foo 7) . cons)", "`((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))");
+  test_compile_aux_r5rs("#(10 5 2.000000 4.000000 3.000000 8)", "`#(10 5 ,(sqrt 4) ,@(map sqrt '(16 9)) 8)");
+  test_compile_aux("(a (quasiquote (b c)))", "`(a `(b c))");
+  test_compile_aux("(a (quasiquote (b c (quote d))))", "`(a `(b c 'd))");
+  test_compile_aux("(a (quasiquote (b c (quasiquote d))))", "`(a `(b c `d))");
+  test_compile_aux("(a (quasiquote (b c (quasiquote (quasiquote d)))))", "`(a `(b c ``d))");
+  test_compile_aux("(a (quasiquote (b c (quasiquote (quote d)))))", "`(a `(b c `'d))");
+  test_compile_aux("(quote (quote (quote d)))", "`'''d");
+  test_compile_aux("(a (quasiquote (b (unquote (+ 1 2)))))", "`(a `(b ,(+ 1 2)))");
+  test_compile_aux("(a (quasiquote (b (unquote (+ 1 2)) (unquote (foo 4 d)) e)) f)", "`(a `(b ,(+ 1 2) ,(foo ,(+ 1 3) d) e) f)");
+  test_compile_aux("(a (quasiquote (b (unquote x) (unquote (quote y)) d)) e)", "(let ((name1 'x) (name2 'y)) `(a `(b ,,name1 ,',name2 d) e))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2889,4 +2909,5 @@ void run_all_compiler_tests()
   test_chars();
   test_list_conversions();
   test_control_ops();
+  test_quasiquote();
   }

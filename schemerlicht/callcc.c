@@ -31,7 +31,9 @@ static schemerlicht_vector script2tokens(schemerlicht_context* ctxt, const char*
 
 schemerlicht_function* schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   {  
-  schemerlicht_vector tokens = script2tokens(ctxt, "( define call/cc ( lambda ( %self1 %k_0 %f_1 ) ( begin ( %f_1 %k_0 ( closure ( lambda ( %self0 %dummy-k_2 %result_3 ) ( begin ( ( closure-ref %self0 1 ) %result_3 ) ) ) %k_0 ) ) ) ) )");
+  char* script = "( define call/cc ( lambda ( %self1 %k_0 %f_1 ) ( begin ( %f_1 %k_0 ( closure ( lambda ( %self0 %dummy-k_2 %result_3 ) ( begin ( ( closure-ref %self0 1 ) %result_3 ) ) ) %k_0 ) ) ) ) )\n"
+    "(define call-with-current-continuation call/cc)";
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);  
