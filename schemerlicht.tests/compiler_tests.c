@@ -2779,6 +2779,18 @@ static void test_control_ops()
   test_compile_aux_r5rs("(1 4 27 256 3125)", "(map (lambda (n) (expt n n)) '(1 2 3 4 5))");
   test_compile_aux_r5rs("(5 7 9)", "(map + '(1 2 3) '(4 5 6))");
   test_compile_aux_r5rs("(1 2)", "(let ([count 0]) (map (lambda (ignored) (set! count (+ count 1)) count) '(a b)))");
+
+  test_compile_aux_r5rs("#(0 1 4 9 16)", "(let ([v (make-vector 5)]) (for-each (lambda (i) (vector-set! v i (* i i))) '(0 1 2 3 4)) v)");
+  test_compile_aux_r5rs("3", "3 #;(let ([v (make-vector 5)]) (for-each (lambda (i) (vector-set! v i (* i i))) '(0 1 2 3 4)) v)");
+  test_compile_aux_r5rs("#(0 1 4 9 16)","#|\n"
+"Here is a multiline comment, similar\n"
+"to /* and */ in c/c++\n"
+"|#\n"
+"(let ([v (make-vector 5)])\n"
+"     (for-each #; here is comment\n"
+"        (lambda (i) (vector-set! v i (* i i))) ; here is also comment\n"
+"        '(0 1 2 3 4))\n"
+"     v) #; blabla\n");
   }
 
 void run_all_compiler_tests()
