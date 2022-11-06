@@ -25,6 +25,7 @@
 #include "schemerlicht/alpha.h"
 #include "schemerlicht/callcc.h"
 #include "schemerlicht/foreign.h"
+#include "schemerlicht/r5rs.h"
 
 #include <time.h>
 
@@ -2727,6 +2728,59 @@ static void test_list_conversions()
   test_compile_aux("#(dididit dah)", "(list->vector '(dididit dah))");
   }
 
+static void test_compile_aux_r5rs(const char* expected_value, const char* script)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_function* callcc = schemerlicht_compile_callcc(ctxt);
+  schemerlicht_function* r5rs = schemerlicht_compile_r5rs(ctxt);
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_quasiquote_conversion(ctxt, &prog);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+#if 0
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+
+  if (print_gc_time)
+    printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+
+  TEST_EQ_STRING(expected_value, s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_free(ctxt, func);
+  schemerlicht_function_free(ctxt, callcc);
+  schemerlicht_function_free(ctxt, r5rs);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_control_ops()
+  {
+  test_compile_aux_r5rs("(b e h)", "(map cadr '((a b) (d e) (g h)))");
+  test_compile_aux_r5rs("(1 4 27 256 3125)", "(map (lambda (n) (expt n n)) '(1 2 3 4 5))");
+  test_compile_aux_r5rs("(5 7 9)", "(map + '(1 2 3) '(4 5 6))");
+  test_compile_aux_r5rs("(1 2)", "(let ([count 0]) (map (lambda (ignored) (set! count (+ count 1)) count) '(a b)))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2822,4 +2876,5 @@ void run_all_compiler_tests()
   test_r5rs_funs();
   test_chars();
   test_list_conversions();
+  test_control_ops();
   }

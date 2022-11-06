@@ -14,6 +14,8 @@
 #include "freevaranalysis.h"
 #include "closure.h"
 #include "dump.h"
+#include "quotecollect.h"
+#include "quoteconv.h"
 
 #include <string.h>
 
@@ -58,7 +60,33 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   "(define cddaar(lambda(x) (cdr(cdr(car(car x))))))"
   "(define cddadr(lambda(x) (cdr(cdr(car(cdr x))))))"
   "(define cdddar(lambda(x) (cdr(cdr(cdr(car x))))))"
-  "(define cddddr(lambda(x) (cdr(cdr(cdr(cdr x))))))";
+  "(define cddddr(lambda(x) (cdr(cdr(cdr(cdr x))))))"
+  "(define map(lambda(proc lst1 . lsts)"
+  "   (if (null? lsts)"
+  "      (let loop([lst lst1])"
+  "        (if (null? lst)"
+  "          '()"
+  "          (cons (proc (car lst)) (loop(cdr lst)))"
+  "          ))"
+  "      (let loop ([lsts(cons lst1 lsts)])"
+  "        (let ([hds(let loop2([lsts lsts])"
+  "          (if (null? lsts)"
+  "            '()"
+  "            (let([x(car lsts)])"
+  "              (and (not (null? x))"
+  "                (let([r(loop2(cdr lsts))])"
+  "                  (and r(cons(car x) r))"
+  "                  )))))])"
+  "          (if hds"
+  "          (cons(apply proc hds)"
+  "            (loop(let loop3([lsts lsts])"
+  "              (if (null? lsts)"
+  "                '()"
+  "                (cons(cdar lsts) (loop3(cdr lsts)))"
+  "                ))))"
+  "            '()"
+  "            ))))))";
+
 
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);  
@@ -67,9 +95,9 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   //schemerlicht_alpha_conversion(ctxt, &prog);
-  //schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
-  //schemerlicht_quote_conversion(ctxt, &prog, &quotes);
-  //schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
@@ -77,9 +105,9 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
 
-  schemerlicht_function* callccfunc = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, callccfunc);
+  schemerlicht_function* r5rs = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_run(ctxt, r5rs);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  return callccfunc;
+  return r5rs;
   }
