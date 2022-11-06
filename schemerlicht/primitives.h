@@ -47,6 +47,11 @@ typedef enum
   SCHEMERLICHT_CHARLEQ,
   SCHEMERLICHT_CHARGREATER,
   SCHEMERLICHT_CHARGEQ,
+  SCHEMERLICHT_CHARCIEQUAL,
+  SCHEMERLICHT_CHARCILESS,
+  SCHEMERLICHT_CHARCILEQ,
+  SCHEMERLICHT_CHARCIGREATER,
+  SCHEMERLICHT_CHARCIGEQ,
   SCHEMERLICHT_IS_FIXNUM,
   SCHEMERLICHT_IS_FLONUM,
   SCHEMERLICHT_IS_NULL,
@@ -214,6 +219,11 @@ void schemerlicht_primitive_charless(schemerlicht_context* ctxt, int a, int b, i
 void schemerlicht_primitive_charleq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_chargreater(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_chargeq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_charciequal(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_charciless(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_charcileq(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_charcigreater(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_charcigeq(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_fixnum_char(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_fixnum_flonum(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_char_fixnum(schemerlicht_context* ctxt, int a, int b, int c);
