@@ -2715,6 +2715,18 @@ static void test_chars()
   test_compile_aux("#t", "(char-whitespace? #\\tab)");
   }
 
+static void test_list_conversions()
+  {
+  test_compile_aux("(#\\a #\\b #\\c)", "(string->list \"abc\")");
+  test_compile_aux("\"abc\"", "(list->string (list #\\a #\\b #\\c))");
+  test_compile_aux("", "(list->string '())");
+  test_compile_aux("(\"abc\" 3 2.1)", "(vector->list (vector \"abc\" 3 2.1))");
+  test_compile_aux("#(#\\a #\\b #\\c)", "(list->vector (list #\\a #\\b #\\c))");
+  test_compile_aux("#()", "(list->vector '())");
+  test_compile_aux("(dah dah didah)", "(vector->list '#(dah dah didah))");
+  test_compile_aux("#(dididit dah)", "(list->vector '(dididit dah))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2809,4 +2821,5 @@ void run_all_compiler_tests()
   test_foreign();
   test_r5rs_funs();
   test_chars();
+  test_list_conversions();
   }

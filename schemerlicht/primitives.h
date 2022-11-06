@@ -176,6 +176,10 @@ typedef enum
   SCHEMERLICHT_CHAR_IS_ALPHA,
   SCHEMERLICHT_CHAR_IS_NUMERIC,
   SCHEMERLICHT_CHAR_IS_WHITESPACE,
+  SCHEMERLICHT_STRING_LIST,
+  SCHEMERLICHT_LIST_STRING,
+  SCHEMERLICHT_VECTOR_LIST,
+  SCHEMERLICHT_LIST_VECTOR
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -348,6 +352,10 @@ void schemerlicht_primitive_char_is_lower(schemerlicht_context* ctxt, int a, int
 void schemerlicht_primitive_char_is_alpha(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_char_is_numeric(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_char_is_whitespace(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_string_list(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_vector_list(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_list_vector(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

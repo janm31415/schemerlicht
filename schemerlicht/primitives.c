@@ -6938,6 +6938,46 @@ void schemerlicht_primitive_char_is_whitespace(schemerlicht_context* ctxt, int a
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_string_list(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_STRING_LIST);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_LIST_STRING);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_vector_list(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_VECTOR_LIST);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_list_vector(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_LIST_VECTOR);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -7456,6 +7496,18 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_CHAR_IS_WHITESPACE:
       schemerlicht_primitive_char_is_whitespace(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_STRING_LIST:
+      schemerlicht_primitive_string_list(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_LIST_STRING:
+      schemerlicht_primitive_list_string(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_VECTOR_LIST:
+      schemerlicht_primitive_vector_list(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_LIST_VECTOR:
+      schemerlicht_primitive_list_vector(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -7650,5 +7702,9 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "char-alphabetic?", SCHEMERLICHT_CHAR_IS_ALPHA);
   map_insert(ctxt, m, "char-numeric?", SCHEMERLICHT_CHAR_IS_NUMERIC);
   map_insert(ctxt, m, "char-whitespace?", SCHEMERLICHT_CHAR_IS_WHITESPACE);
+  map_insert(ctxt, m, "string->list", SCHEMERLICHT_STRING_LIST);
+  map_insert(ctxt, m, "list->string", SCHEMERLICHT_LIST_STRING);
+  map_insert(ctxt, m, "vector->list", SCHEMERLICHT_VECTOR_LIST);
+  map_insert(ctxt, m, "list->vector", SCHEMERLICHT_LIST_VECTOR);
   return m;
     }
