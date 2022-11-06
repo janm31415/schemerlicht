@@ -29,6 +29,7 @@ primitives.h
 quasiquote.h
 quotecollect.h
 quoteconv.h
+r5rs.h
 reader.h
 schemerlicht.h
 simplifyconv.h
@@ -71,6 +72,7 @@ primitives.c
 quasiquote.c
 quoteconv.c
 quotecollect.c
+r5rs.c
 reader.c
 simplifyconv.c
 stream.c
