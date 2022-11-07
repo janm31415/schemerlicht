@@ -23,6 +23,9 @@
 #define schemerlicht_object_type_primitive 14
 #define schemerlicht_object_type_primitive_object 15
 #define schemerlicht_object_type_blocking 16 // used for indicating where gc can stop or where the variable arity lambda list stops
+#define schemerlicht_object_type_port 17
+#define schemerlicht_object_type_promise 18
+
 
 typedef union
   {
@@ -69,6 +72,8 @@ schemerlicht_object make_schemerlicht_object_symbol(schemerlicht_context* ctxt, 
 schemerlicht_object make_schemerlicht_object_pair(schemerlicht_context* ctxt);
 schemerlicht_object make_schemerlicht_object_closure(schemerlicht_context* ctxt, int closure_size);
 schemerlicht_object make_schemerlicht_object_vector(schemerlicht_context* ctxt, int vector_size);
+schemerlicht_object make_schemerlicht_object_port(schemerlicht_context* ctxt);
+schemerlicht_object make_schemerlicht_object_promise(schemerlicht_context* ctxt);
 
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj);
 

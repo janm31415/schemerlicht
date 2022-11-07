@@ -301,6 +301,29 @@ schemerlicht_object make_schemerlicht_object_closure(schemerlicht_context* ctxt,
   return obj;
   }
 
+schemerlicht_object make_schemerlicht_object_port(schemerlicht_context* ctxt)
+  {
+  schemerlicht_assert(SCHEMERLICHT_MAX_POOL > 6);
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_port;
+  obj.value.v.vector_capacity = 7;
+  obj.value.v.vector_size = 7;
+  obj.value.v.element_size = sizeof(schemerlicht_object);
+  obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool[6]);
+  return obj;
+  }
+
+schemerlicht_object make_schemerlicht_object_promise(schemerlicht_context* ctxt)
+  {
+  schemerlicht_object obj;
+  obj.type = schemerlicht_object_type_promise;
+  obj.value.v.vector_capacity = 1;
+  obj.value.v.vector_size = 1;
+  obj.value.v.element_size = sizeof(schemerlicht_object);
+  obj.value.v.vector_ptr = schemerlicht_pool_allocate(ctxt, &ctxt->pool[0]);
+  return obj;
+  }
+
 schemerlicht_object make_schemerlicht_object_vector(schemerlicht_context* ctxt, int vector_size)
   {
   schemerlicht_object obj;
@@ -350,6 +373,16 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
       {
       schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_capacity - 1], obj->value.v.vector_ptr);
       }
+    break;
+    }
+    case schemerlicht_object_type_port:
+    {
+    schemerlicht_pool_deallocate(&ctxt->pool[6], obj->value.v.vector_ptr);
+    break;
+    }
+    case schemerlicht_object_type_promise:
+    {
+    schemerlicht_pool_deallocate(&ctxt->pool[0], obj->value.v.vector_ptr);
     break;
     }
     case schemerlicht_object_type_pair:
@@ -505,6 +538,16 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
             }
           schemerlicht_string_append_cstr(ctxt, &s, str);
           }
+        break;
+        }
+        case schemerlicht_object_type_port:
+        {
+        schemerlicht_string_append_cstr(ctxt, &s, "<port>");
+        break;
+        }
+        case schemerlicht_object_type_promise:
+        {
+        schemerlicht_string_append_cstr(ctxt, &s, "<promise>");
         break;
         }
         case schemerlicht_object_type_vector:

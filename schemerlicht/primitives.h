@@ -179,7 +179,11 @@ typedef enum
   SCHEMERLICHT_STRING_LIST,
   SCHEMERLICHT_LIST_STRING,
   SCHEMERLICHT_VECTOR_LIST,
-  SCHEMERLICHT_LIST_VECTOR
+  SCHEMERLICHT_LIST_VECTOR,
+  SCHEMERLICHT_MAKE_PROMISE,
+  SCHEMERLICHT_IS_PROMISE,
+  SCHEMERLICHT_SLOT_REF,
+  SCHEMERLICHT_SLOT_SET
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -356,6 +360,10 @@ void schemerlicht_primitive_string_list(schemerlicht_context* ctxt, int a, int b
 void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_vector_list(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_list_vector(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_make_promise(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_promise(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_slot_ref(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_slot_set(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

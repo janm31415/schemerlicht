@@ -2793,6 +2793,17 @@ static void test_control_ops()
 "        (lambda (i) (vector-set! v i (* i i))) ; here is also comment\n"
 "        '(0 1 2 3 4))\n"
 "     v) #; blabla\n");
+
+  test_compile_aux("1", "(%slot-ref (cons 1 2) 0)");
+  test_compile_aux("2", "(%slot-ref (cons 1 2) 1)");
+  test_compile_aux_r5rs("<promise>", "(define p (make-promise(lambda() (+ 5 6))))");
+  test_compile_aux_r5rs("#t", "(define p (make-promise(lambda() (+ 5 6)))) (promise? p)");
+  test_compile_aux_r5rs("#t", "(define p (make-promise(lambda() (+ 5 6)))) (closure? (%slot-ref p 0))");
+  test_compile_aux_r5rs("11", "(define p (make-promise(lambda() (+ 5 6)))) (force p)");
+  test_compile_aux_r5rs("11", "(define p (make-promise(lambda() (+ 5 6)))) (force p) (force p)");
+  test_compile_aux_r5rs("13", "(define p (make-promise(lambda() (+ 5 6)))) (force p) (force p) (force 13)");
+  test_compile_aux_r5rs("<promise>", "(define p (delay (* 3 4)))");
+  test_compile_aux_r5rs("12", "(define p (delay (* 3 4))) (force p)");
   }
 
 static void test_quasiquote()

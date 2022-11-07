@@ -105,7 +105,26 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   "             (if (null? lsts)\n"
   "               '()\n"
   "               (cons(cdar lsts) (loop3(cdr lsts)))\n"
-  "               )))))))))\n";
+  "               )))))))))\n"
+  "  (define force(lambda(p)\n"
+  "    (if (promise? p)\n"
+  "      ((%slot-ref p 0))\n"
+  "      p\n"
+  "      )))\n"  
+  "  (define make-promise(lambda(proc)\n"
+  "    (let([result-ready? #f]\n"
+  "      [result #f])\n"
+  "      (%make-promise(lambda()\n"
+  "        (if result-ready?\n"
+  "          result\n"
+  "          (let([x(proc)])\n"
+  "            (if result-ready?\n"
+  "              result\n"
+  "              (begin(set! result-ready? #t)\n"
+  "                (set! result x)\n"
+  "                result\n"
+  "              )))))))))\n";
+
 
 
 
