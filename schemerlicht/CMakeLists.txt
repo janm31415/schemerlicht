@@ -36,6 +36,7 @@ simplifyconv.h
 stream.h
 string.h
 stringvec.h
+syscalls.h
 tailcall.h
 token.h
 vector.h
@@ -78,6 +79,7 @@ simplifyconv.c
 stream.c
 string.c
 stringvec.c
+syscalls.c
 tailcall.c
 token.c
 visitor.c

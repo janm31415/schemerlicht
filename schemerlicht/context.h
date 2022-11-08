@@ -11,6 +11,8 @@
 
 #define SCHEMERLICHT_MAX_POOL 8
 
+#define SCHEMERLICHT_STRING_PORT_ID -2
+
 typedef struct schemerlicht_longjmp
   {
   schemerlicht_alignment dummy;
