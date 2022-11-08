@@ -7832,6 +7832,36 @@ void schemerlicht_primitive_is_char_ready(schemerlicht_context* ctxt, int a, int
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_WRITE);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_DISPLAY);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_READ);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -8416,6 +8446,15 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_IS_CHAR_READY:
       schemerlicht_primitive_is_char_ready(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_WRITE:
+      schemerlicht_primitive_write(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_DISPLAY:
+      schemerlicht_primitive_display(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_READ:
+      schemerlicht_primitive_read(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -8632,5 +8671,8 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "%flush-output-port", SCHEMERLICHT_FLUSH_OUTPUT_PORT);
   map_insert(ctxt, m, "eof-object?", SCHEMERLICHT_IS_EOF);
   map_insert(ctxt, m, "%char-ready?", SCHEMERLICHT_IS_CHAR_READY);
+  map_insert(ctxt, m, "%write", SCHEMERLICHT_WRITE);
+  map_insert(ctxt, m, "%display", SCHEMERLICHT_DISPLAY);
+  map_insert(ctxt, m, "%read", SCHEMERLICHT_READ);
   return m;
   }

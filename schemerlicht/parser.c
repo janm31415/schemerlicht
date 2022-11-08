@@ -2234,6 +2234,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   //map_insert(ctxt, m, "defmacro", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "define-macro", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "delay", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "%display", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eq?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eqv?", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "eof-object?", schemerlicht_et_primitive_call);
@@ -2315,6 +2316,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "quotient", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "rational?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "real?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "%read", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "%read-char", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reclaim", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reclaim-garbage", schemerlicht_et_primitive_call);
@@ -2364,6 +2366,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "vector-set!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "vector->list", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "when", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "%write", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "%write-char", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "zero?", schemerlicht_et_primitive_call);
 

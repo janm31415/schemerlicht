@@ -197,7 +197,10 @@ typedef enum
   SCHEMERLICHT_CLOSE_OUTPUT_PORT,
   SCHEMERLICHT_FLUSH_OUTPUT_PORT,
   SCHEMERLICHT_IS_EOF,
-  SCHEMERLICHT_IS_CHAR_READY
+  SCHEMERLICHT_IS_CHAR_READY,
+  SCHEMERLICHT_WRITE,
+  SCHEMERLICHT_DISPLAY,
+  SCHEMERLICHT_READ
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -392,6 +395,9 @@ void schemerlicht_primitive_close_output_port(schemerlicht_context* ctxt, int a,
 void schemerlicht_primitive_flush_output_port(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_eof(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_is_char_ready(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
