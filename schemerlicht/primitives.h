@@ -183,7 +183,18 @@ typedef enum
   SCHEMERLICHT_MAKE_PROMISE,
   SCHEMERLICHT_IS_PROMISE,
   SCHEMERLICHT_SLOT_REF,
-  SCHEMERLICHT_SLOT_SET
+  SCHEMERLICHT_SLOT_SET,
+  SCHEMERLICHT_MAKE_PORT,
+  SCHEMERLICHT_IS_PORT,
+  SCHEMERLICHT_WRITE_CHAR,
+  SCHEMERLICHT_READ_CHAR,
+  SCHEMERLICHT_PEEK_CHAR,
+  SCHEMERLICHT_IS_INPUT_PORT,
+  SCHEMERLICHT_IS_OUTPUT_PORT,
+  SCHEMERLICHT_OPEN_INPUT_FILE,
+  SCHEMERLICHT_OPEN_OUTPUT_FILE,
+  SCHEMERLICHT_CLOSE_INPUT_PORT,
+  SCHEMERLICHT_CLOSE_OUTPUT_PORT,
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -364,6 +375,17 @@ void schemerlicht_primitive_make_promise(schemerlicht_context* ctxt, int a, int 
 void schemerlicht_primitive_is_promise(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_slot_ref(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_slot_set(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_make_port(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_port(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_write_char(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_read_char(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_peek_char(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_input_port(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_output_port(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_open_input_file(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_open_output_file(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_close_input_port(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_close_output_port(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

@@ -2219,7 +2219,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "char-alphabetic?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-numeric?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-whitespace?", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "close-file", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "close-input-file", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "close-output-file", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure-ref", schemerlicht_et_primitive_call);
@@ -2267,10 +2268,10 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "inexact?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "inexact->exact", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "inf?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "input-port?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer->char", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "include", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "input-port?", schemerlicht_et_primitive_call);
+  //map_insert(ctxt, m, "include", schemerlicht_et_primitive_call);  
   //map_insert(ctxt, m, "load", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "lcm", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "length", schemerlicht_et_primitive_call);
@@ -2281,7 +2282,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "list->vector", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "list?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "log", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "make-port", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "%make-port", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "%make-promise", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "make-string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "make-vector", schemerlicht_et_primitive_call);
@@ -2299,10 +2300,12 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "null?", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "odd?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "or", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "open-file", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "output-port?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "open-input-file", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "open-output-file", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "output-port?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "pair?", schemerlicht_et_primitive_call);  
-  //map_insert(ctxt, m, "port?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "peek-char", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "port?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "positive?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "procedure?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "promise?", schemerlicht_et_primitive_call);
@@ -2310,6 +2313,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "quotient", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "rational?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "real?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "read-char", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reclaim", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reclaim-garbage", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "remainder", schemerlicht_et_primitive_call);
@@ -2358,6 +2362,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "vector-set!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "vector->list", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "when", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "write-char", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "zero?", schemerlicht_et_primitive_call);
 
   return m;

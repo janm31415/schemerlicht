@@ -7286,6 +7286,217 @@ void schemerlicht_primitive_slot_set(schemerlicht_context* ctxt, int a, int b, i
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_make_port(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_MAKE_PORT);
+  if (b < 6)
+    {
+    ra->type = schemerlicht_object_type_undefined;
+    }
+  else
+    {
+    schemerlicht_object v = make_schemerlicht_object_port(ctxt);
+
+    for (int i = 0; i < 6; ++i)
+      {
+      schemerlicht_object* ri = schemerlicht_vector_at(&ctxt->stack, a + c + 1 + i, schemerlicht_object);
+      schemerlicht_object* oi = schemerlicht_vector_at(&v.value.v, i, schemerlicht_object);
+      schemerlicht_set_object(oi, ri);
+      switch (i)
+        {
+        case 0:
+          if (ri->type != schemerlicht_object_type_true && ri->type != schemerlicht_object_type_false)
+            {
+            schemerlicht_runerror(ctxt, "first argument of %make-port should be #t or #f.");
+            }
+          break;
+        case 1:
+          if (ri->type != schemerlicht_object_type_string)
+            {
+            schemerlicht_runerror(ctxt, "second argument of %make-port should be a string indicating the port name.");
+            }
+          break;
+        case 2:
+          if (ri->type != schemerlicht_object_type_fixnum)
+            {
+            schemerlicht_runerror(ctxt, "third argument of %make-port should be a fixnum representing the file descriptor.");
+            }
+          break;
+        case 3:
+          if (ri->type != schemerlicht_object_type_string)
+            {
+            schemerlicht_runerror(ctxt, "fourth argument of %make-port should be a string representing the port buffer.");
+            }
+          break;
+        case 4:
+          if (ri->type != schemerlicht_object_type_fixnum)
+            {
+            schemerlicht_runerror(ctxt, "fifth argument of %make-port should be an index pointing to the next position in the buffer.");
+            }
+          break;
+        case 5:
+          if (ri->type != schemerlicht_object_type_fixnum)
+            {
+            schemerlicht_runerror(ctxt, "sixth argument of %make-port should be an index representing the size of the buffer.");
+            }
+          break;
+        default:
+          break;
+        }
+      }    
+
+    schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+    schemerlicht_set_object(heap_obj, &v);
+    ++ctxt->heap_pos;
+    schemerlicht_set_object(ra, &v);
+    }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_port(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_PORT);
+  schemerlicht_object ret;
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_port)
+      ret.type = schemerlicht_object_type_true;
+    else
+      ret.type = schemerlicht_object_type_false;
+    }
+  else
+    {
+    ret.type = schemerlicht_object_type_false;
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_write_char(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_WRITE_CHAR);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_read_char(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_READ_CHAR);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_peek_char(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_PEEK_CHAR);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_input_port(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_INPUT_PORT);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_port)
+      {
+      schemerlicht_object* is_input = schemerlicht_vector_at(&v->value.v, 0, schemerlicht_object);
+      if (is_input->type == schemerlicht_object_type_true)
+        ret.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_output_port(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_OUTPUT_PORT);
+  schemerlicht_object ret;
+  ret.type = schemerlicht_object_type_false;
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_port)
+      {
+      schemerlicht_object* is_input = schemerlicht_vector_at(&v->value.v, 0, schemerlicht_object);
+      if (is_input->type != schemerlicht_object_type_true)
+        ret.type = schemerlicht_object_type_true;
+      }
+    }
+  schemerlicht_set_object(ra, &ret);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_open_input_file(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_OPEN_INPUT_FILE);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_open_output_file(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_OPEN_OUTPUT_FILE);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_close_input_port(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSE_INPUT_PORT);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_close_output_port(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSE_OUTPUT_PORT);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -7828,6 +8039,39 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_SLOT_SET:
       schemerlicht_primitive_slot_set(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_MAKE_PORT:
+      schemerlicht_primitive_make_port(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_PORT:
+      schemerlicht_primitive_is_port(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_WRITE_CHAR:
+      schemerlicht_primitive_write_char(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_READ_CHAR:
+      schemerlicht_primitive_read_char(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_PEEK_CHAR:
+      schemerlicht_primitive_peek_char(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_INPUT_PORT:
+      schemerlicht_primitive_is_input_port(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_OUTPUT_PORT:
+      schemerlicht_primitive_is_output_port(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_OPEN_INPUT_FILE:
+      schemerlicht_primitive_open_input_file(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_OPEN_OUTPUT_FILE:
+      schemerlicht_primitive_open_output_file(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_CLOSE_INPUT_PORT:
+      schemerlicht_primitive_close_input_port(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_CLOSE_OUTPUT_PORT:
+      schemerlicht_primitive_close_output_port(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -8030,5 +8274,17 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "promise?", SCHEMERLICHT_IS_PROMISE);
   map_insert(ctxt, m, "%slot-ref", SCHEMERLICHT_SLOT_REF);
   map_insert(ctxt, m, "%slot-set!", SCHEMERLICHT_SLOT_SET);
+  map_insert(ctxt, m, "%make-port", SCHEMERLICHT_MAKE_PORT);
+  map_insert(ctxt, m, "port?", SCHEMERLICHT_IS_PORT);
+  map_insert(ctxt, m, "write-char", SCHEMERLICHT_WRITE_CHAR);
+  map_insert(ctxt, m, "read-char", SCHEMERLICHT_READ_CHAR);
+  map_insert(ctxt, m, "peek-char", SCHEMERLICHT_PEEK_CHAR);
+  map_insert(ctxt, m, "input-port?", SCHEMERLICHT_IS_INPUT_PORT);
+  map_insert(ctxt, m, "output-port?", SCHEMERLICHT_IS_OUTPUT_PORT);
+  map_insert(ctxt, m, "open-input-file", SCHEMERLICHT_OPEN_INPUT_FILE);
+  map_insert(ctxt, m, "open-output-file", SCHEMERLICHT_OPEN_OUTPUT_FILE);
+  map_insert(ctxt, m, "close-input-port", SCHEMERLICHT_CLOSE_INPUT_PORT);
+  map_insert(ctxt, m, "close-output-port", SCHEMERLICHT_CLOSE_OUTPUT_PORT);
+
   return m;
   }

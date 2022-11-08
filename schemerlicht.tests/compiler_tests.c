@@ -2824,6 +2824,18 @@ static void test_quasiquote()
   test_compile_aux("(a (quasiquote (b (unquote x) (unquote (quote y)) d)) e)", "(let ((name1 'x) (name2 'y)) `(a `(b ,,name1 ,',name2 d) e))");
   }
 
+static void test_port()
+  {
+  test_compile_aux("#t", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (port? default-port)");
+  test_compile_aux("#f", "(port? (vector #f \"stdout\" 1 (make-string 1024) 0 1024))");
+  test_compile_aux("#f", "(output-port? (vector #f \"stdout\" 1 (make-string 1024) 0 1024))");
+  test_compile_aux("#f", "(input-port? (vector #f \"stdout\" 1 (make-string 1024) 0 1024))");
+  test_compile_aux("#t", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
+  test_compile_aux("#f", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
+  test_compile_aux("#t", "(define default-port (%make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
+  test_compile_aux("#f", "(define default-port (%make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2921,4 +2933,5 @@ void run_all_compiler_tests()
   test_list_conversions();
   test_control_ops();
   test_quasiquote();
+  test_port();
   }
