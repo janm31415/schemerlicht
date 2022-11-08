@@ -2862,6 +2862,17 @@ static void test_port()
     "(%flush-output-port my_file) (close-output-port my_file)"
     "(define read_file (open-input-file \"out.txt\"))"
     "(%peek-char read_file)(%peek-char read_file)(%peek-char read_file)(%peek-char read_file)(%peek-char read_file)(%peek-char read_file)");
+  test_compile_aux("#f", "(eof-object? 3)");
+  test_compile_aux("#t", "(define my_file (open-output-file \"out.txt\"))"
+    "(%write-char #\\f my_file) (%write-char #\\o my_file) (%write-char #\\o my_file)"
+    "(%flush-output-port my_file) (close-output-port my_file)"
+    "(define read_file (open-input-file \"out.txt\"))"
+    "(%read-char read_file) (%read-char read_file) (%read-char read_file) (eof-object? (%read-char read_file))");
+  test_compile_aux("#f", "(define read_file (open-input-file \"out.txt\")) (%char-ready? read_file)");
+  test_compile_aux("#t", "(define read_file (open-input-file \"out.txt\")) (%read-char read_file) (%char-ready? read_file)");
+  test_compile_aux("#t", "(define read_file (open-input-file \"out.txt\")) (%peek-char read_file) (%char-ready? read_file)");
+  test_compile_aux("#f", "(define read_file (open-input-file \"out.txt\")) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%char-ready? read_file)");
+  test_compile_aux("#t", "(define read_file (open-input-file \"out.txt\")) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%char-ready? read_file)");
   }
 
 void run_all_compiler_tests()

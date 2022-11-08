@@ -2219,6 +2219,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "char-alphabetic?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-numeric?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-whitespace?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "%char-ready?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "close-input-port", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "close-output-port", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure", schemerlicht_et_primitive_call);
@@ -2235,7 +2236,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "delay", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eq?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eqv?", schemerlicht_et_primitive_call);  
-  //map_insert(ctxt, m, "eof-object?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "eof-object?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "equal?", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "even?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "exact?", schemerlicht_et_primitive_call);
