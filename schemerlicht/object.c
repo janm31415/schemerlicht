@@ -542,7 +542,10 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         }
         case schemerlicht_object_type_port:
         {
-        schemerlicht_string_append_cstr(ctxt, &s, "<port>");
+        schemerlicht_string_append_cstr(ctxt, &s, "<port>: ");
+        schemerlicht_object* port_name = schemerlicht_vector_at(&current_task.obj->value.v, 1, schemerlicht_object);
+        schemerlicht_runtime_task task = make_object_task(port_name);
+        schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
         break;
         }
         case schemerlicht_object_type_promise:

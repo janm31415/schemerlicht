@@ -2219,8 +2219,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "char-alphabetic?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-numeric?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "char-whitespace?", schemerlicht_et_primitive_call);
-  map_insert(ctxt, m, "close-input-file", schemerlicht_et_primitive_call);
-  map_insert(ctxt, m, "close-output-file", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "close-input-port", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "close-output-port", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "closure-ref", schemerlicht_et_primitive_call);

@@ -2,9 +2,11 @@
 
 #ifdef _WIN32
 #include <io.h>
+#include <sys\stat.h>
 #else
 #include <unistd.h>
 #endif
+#include <fcntl.h>
 
 int schemerlicht_write(int fd, const void* buffer, unsigned int count)
   {
@@ -14,5 +16,38 @@ int schemerlicht_write(int fd, const void* buffer, unsigned int count)
   return _write(fd, buffer, count);
 #else
   return write(fd, buffer, count);
+#endif
+  }
+
+int schemerlicht_open_output_file(const char* filename)
+  {
+#ifdef _WIN32
+  return _open(filename, _O_CREAT | O_WRONLY | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
+#elif defined(__APPLE__)
+  return open(filename, O_CREAT | O_WRONLY | O_TRUNC, __S_IREAD | __S_IWRITE);
+#else // unix
+  return open(filename, O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
+#endif
+  }
+
+int schemerlicht_open_input_file(const char* filename)
+  {
+#ifdef _WIN32
+  return _open(filename, _O_RDONLY | O_BINARY, _S_IREAD | _S_IWRITE);
+#elif defined(__APPLE__)
+  return open(filename, O_RDONLY, __S_IREAD | __S_IWRITE);
+#else // unix
+  return open(filename, O_RDONLY, S_IREAD | S_IWRITE);
+#endif
+  }
+
+int schemerlicht_close_file(int fd)
+  {
+  if (fd < 0)
+    return 0;
+#ifdef _WIN32
+  return _close(fd);
+#else
+  return close(fd);
 #endif
   }

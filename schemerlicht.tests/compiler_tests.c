@@ -2835,6 +2835,8 @@ static void test_port()
   test_compile_aux("#t", "(define default-port (%make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
   test_compile_aux("#f", "(define default-port (%make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
   test_compile_aux("#<void>", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (%write-char #\\f default-port) (%write-char #\\o default-port) (%write-char #\\o default-port) (%write-char #\\013 default-port) (%flush-output-port default-port)");
+  test_compile_aux("<port>: \"out.txt\"", "(define my_file (open-output-file \"out.txt\"))");
+  test_compile_aux("#<void>", "(define my_file (open-output-file \"out.txt\")) (close-output-port my_file)");
   }
 
 void run_all_compiler_tests()
