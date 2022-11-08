@@ -7468,6 +7468,44 @@ void schemerlicht_primitive_read_char(schemerlicht_context* ctxt, int a, int b, 
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_READ_CHAR);
+  if (b > 0)
+    {    
+    schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (p->type == schemerlicht_object_type_port && schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type == schemerlicht_object_type_true)
+      {
+      int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);      
+      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
+      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+      schemerlicht_fixnum bytes_read = schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx;
+      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+      if (current_pos >= bytes_read)
+        { // read buffer
+        int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, buffer_length);
+        current_pos = 0;
+        schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
+        schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx = cast(schemerlicht_fixnum, bytes_last_read);
+        if (bytes_last_read == 0)
+          {
+          ra->type = schemerlicht_object_type_eof;
+          return;
+          }
+        }      
+      char ch = buffer->value.s.string_ptr[current_pos];
+      ra->type = schemerlicht_object_type_char;
+      ra->value.ch = ch;
+      schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = current_pos + 1;
+      }
+    else
+      {
+      ra->type = schemerlicht_object_type_undefined;
+      schemerlicht_runerror(ctxt, "%read-char expects a port as argument.");
+      }
+    }
+  else
+    {
+    ra->type = schemerlicht_object_type_undefined;
+    schemerlicht_runerror(ctxt, "%read-char expects a port as argument.");
+    }
   }
 
 ////////////////////////////////////////////////////
@@ -7478,6 +7516,43 @@ void schemerlicht_primitive_peek_char(schemerlicht_context* ctxt, int a, int b, 
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_PEEK_CHAR);
+  if (b > 0)
+    {
+    schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (p->type == schemerlicht_object_type_port && schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type == schemerlicht_object_type_true)
+      {
+      int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
+      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
+      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+      schemerlicht_fixnum bytes_read = schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx;
+      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+      if (current_pos >= bytes_read)
+        { // read buffer
+        int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, buffer_length);
+        current_pos = 0;
+        schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
+        schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx = cast(schemerlicht_fixnum, bytes_last_read);
+        if (bytes_last_read == 0)
+          {
+          ra->type = schemerlicht_object_type_eof;
+          return;
+          }
+        }
+      char ch = buffer->value.s.string_ptr[current_pos];
+      ra->type = schemerlicht_object_type_char;
+      ra->value.ch = ch;
+      }
+    else
+      {
+      ra->type = schemerlicht_object_type_undefined;
+      schemerlicht_runerror(ctxt, "%peek-char expects a port as argument.");
+      }
+    }
+  else
+    {
+    ra->type = schemerlicht_object_type_undefined;
+    schemerlicht_runerror(ctxt, "%peek-char expects a port as argument.");
+    }
   }
 
 ////////////////////////////////////////////////////

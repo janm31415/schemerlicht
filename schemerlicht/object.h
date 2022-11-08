@@ -25,6 +25,7 @@
 #define schemerlicht_object_type_blocking 16 // used for indicating where gc can stop or where the variable arity lambda list stops
 #define schemerlicht_object_type_port 17
 #define schemerlicht_object_type_promise 18
+#define schemerlicht_object_type_eof 19
 
 
 typedef union

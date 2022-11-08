@@ -15,6 +15,7 @@ int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_
     case schemerlicht_object_type_false:
     case schemerlicht_object_type_nil:
     case schemerlicht_object_type_void:
+    case schemerlicht_object_type_eof:
     case schemerlicht_object_type_blocking:
       return 1;
     case schemerlicht_object_type_primitive:
@@ -76,6 +77,7 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
       case schemerlicht_object_type_false:
       case schemerlicht_object_type_nil:
       case schemerlicht_object_type_void:
+      case schemerlicht_object_type_eof:
       case schemerlicht_object_type_blocking:
         break;
       case schemerlicht_object_type_primitive:
@@ -156,6 +158,7 @@ int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_ob
     case schemerlicht_object_type_false:
     case schemerlicht_object_type_nil:
     case schemerlicht_object_type_void:
+    case schemerlicht_object_type_eof:
     case schemerlicht_object_type_blocking:
       return 1;
     case schemerlicht_object_type_primitive:
@@ -398,7 +401,7 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
       }
     else
       {
-      schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_capacity -1], obj->value.v.vector_ptr);
+      schemerlicht_pool_deallocate(&ctxt->pool[obj->value.v.vector_capacity - 1], obj->value.v.vector_ptr);
       }
     break;
     }
@@ -478,6 +481,9 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           break;
         case schemerlicht_object_type_lambda:
           schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");
+          break;
+        case schemerlicht_object_type_eof:
+          schemerlicht_string_append_cstr(ctxt, &s, "#eof");
           break;
         case schemerlicht_object_type_void:
           schemerlicht_string_append_cstr(ctxt, &s, "#<void>");

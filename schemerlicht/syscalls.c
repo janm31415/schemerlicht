@@ -19,6 +19,17 @@ int schemerlicht_write(int fd, const void* buffer, unsigned int count)
 #endif
   }
 
+int schemerlicht_read(int fd, const void* buffer, unsigned int buffer_size)
+  {
+  if (fd < 0)
+    return 0;
+#ifdef _WIN32
+  return _read(fd, buffer, buffer_size);
+#else
+  return read(fd, buffer, buffer_size);
+#endif
+  }
+
 int schemerlicht_open_output_file(const char* filename)
   {
 #ifdef _WIN32
