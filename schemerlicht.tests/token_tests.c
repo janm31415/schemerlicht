@@ -21,13 +21,13 @@ static void test_number_recognition()
 
   int is_real;
   int is_scientific;
-  TEST_EQ_INT(1, is_number(&is_real, &is_scientific, "1"));
+  TEST_EQ_INT(1, schemerlicht_is_number(&is_real, &is_scientific, "1"));
   TEST_EQ_INT(0, is_real);
   TEST_EQ_INT(0, is_scientific);
-  TEST_EQ_INT(1, is_number(&is_real, &is_scientific, "1.0"));
+  TEST_EQ_INT(1, schemerlicht_is_number(&is_real, &is_scientific, "1.0"));
   TEST_EQ_INT(1, is_real);
   TEST_EQ_INT(0, is_scientific);
-  TEST_EQ_INT(1, is_number(&is_real, &is_scientific, "1e+0"));
+  TEST_EQ_INT(1, schemerlicht_is_number(&is_real, &is_scientific, "1e+0"));
   TEST_EQ_INT(1, is_real);
   TEST_EQ_INT(1, is_scientific);
   }

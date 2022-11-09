@@ -8,7 +8,7 @@
 
 SCHEMERLICHT_API schemerlicht_flonum schemerlicht_to_flonum(const char* value);
 SCHEMERLICHT_API schemerlicht_fixnum schemerlicht_to_fixnum(const char* value);
-SCHEMERLICHT_API int is_number(int* is_real, int* is_scientific, const char* value);
+SCHEMERLICHT_API int schemerlicht_is_number(int* is_real, int* is_scientific, const char* value);
 
 enum token_type
   {
@@ -37,8 +37,8 @@ typedef struct token
   int column_nr;
   } token;
 
-token make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, schemerlicht_string* value);
-token make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value);
+token schemerlicht_make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, schemerlicht_string* value);
+token schemerlicht_make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value);
 
 /*
 * return vector contains token types
