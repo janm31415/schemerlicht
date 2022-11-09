@@ -7462,6 +7462,33 @@ void schemerlicht_primitive_flush_output_port(schemerlicht_context* ctxt, int a,
 
 ////////////////////////////////////////////////////
 
+static int get_char(char* ch, schemerlicht_object* p, int read)
+  {
+  schemerlicht_assert(p->type == schemerlicht_object_type_port);
+  schemerlicht_assert(schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type == schemerlicht_object_type_true);
+  int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
+  schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
+  schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+  schemerlicht_fixnum bytes_read = schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx;
+  schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+  if (current_pos >= bytes_read)
+    { // read buffer
+    int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, buffer_length);
+    current_pos = 0;
+    schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
+    schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx = cast(schemerlicht_fixnum, bytes_last_read);
+    if (bytes_last_read == 0)
+      {      
+      return 0;
+      }
+    }
+  *ch = buffer->value.s.string_ptr[current_pos];  
+  schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = current_pos + read;
+  return 1;
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_primitive_read_char(schemerlicht_context* ctxt, int a, int b, int c)
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7473,27 +7500,14 @@ void schemerlicht_primitive_read_char(schemerlicht_context* ctxt, int a, int b, 
     schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     if (p->type == schemerlicht_object_type_port && schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type == schemerlicht_object_type_true)
       {
-      int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);      
-      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
-      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
-      schemerlicht_fixnum bytes_read = schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx;
-      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-      if (current_pos >= bytes_read)
-        { // read buffer
-        int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, buffer_length);
-        current_pos = 0;
-        schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
-        schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx = cast(schemerlicht_fixnum, bytes_last_read);
-        if (bytes_last_read == 0)
-          {
-          ra->type = schemerlicht_object_type_eof;
-          return;
-          }
-        }      
-      char ch = buffer->value.s.string_ptr[current_pos];
-      ra->type = schemerlicht_object_type_char;
-      ra->value.ch = ch;
-      schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = current_pos + 1;
+      if (get_char(&ra->value.ch, p, 1))
+        {
+        ra->type = schemerlicht_object_type_char;
+        }
+      else
+        {
+        ra->type = schemerlicht_object_type_eof;          
+        }
       }
     else
       {
@@ -7521,26 +7535,14 @@ void schemerlicht_primitive_peek_char(schemerlicht_context* ctxt, int a, int b, 
     schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     if (p->type == schemerlicht_object_type_port && schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type == schemerlicht_object_type_true)
       {
-      int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
-      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
-      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
-      schemerlicht_fixnum bytes_read = schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx;
-      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-      if (current_pos >= bytes_read)
-        { // read buffer
-        int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, buffer_length);
-        current_pos = 0;
-        schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
-        schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx = cast(schemerlicht_fixnum, bytes_last_read);
-        if (bytes_last_read == 0)
-          {
-          ra->type = schemerlicht_object_type_eof;
-          return;
-          }
+      if (get_char(&ra->value.ch, p, 0))
+        {
+        ra->type = schemerlicht_object_type_char;
         }
-      char ch = buffer->value.s.string_ptr[current_pos];
-      ra->type = schemerlicht_object_type_char;
-      ra->value.ch = ch;
+      else
+        {
+        ra->type = schemerlicht_object_type_eof;
+        }
       }
     else
       {
@@ -7838,6 +7840,67 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_WRITE);
+  if (b < 2)
+    {
+    schemerlicht_runerror(ctxt, "%write expects an object and an output port as argument.");
+    ra->type = schemerlicht_object_type_undefined;
+    }
+  else
+    {
+    schemerlicht_object* obj = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+    if (p->type == schemerlicht_object_type_port && schemerlicht_vector_at(&p->value.v, 0, schemerlicht_object)->type != schemerlicht_object_type_true)
+      {
+      ra->type = schemerlicht_object_type_void;
+      schemerlicht_string str = schemerlicht_object_to_string(ctxt, obj);
+      int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
+      if (fileid == SCHEMERLICHT_STRING_PORT_ID)
+        {
+        schemerlicht_fixnum required_length = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx + str.string_length;
+        schemerlicht_fixnum available_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+        if (required_length > available_length)
+          {
+          schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+          schemerlicht_string dummy;
+          schemerlicht_string_init_with_size(ctxt, &dummy, max(required_length-available_length, 256), 0);
+          schemerlicht_string_append(ctxt, &s, &dummy);
+          schemerlicht_string_destroy(ctxt, &dummy);
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += max(required_length - available_length, 256);
+          }
+        }
+      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
+      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+      char* chars_to_write = str.string_ptr;
+      char* chars_to_write_end = str.string_ptr + str.string_length;
+
+      while (chars_to_write < chars_to_write_end)
+        {
+        intptr_t dist = chars_to_write_end - chars_to_write;
+        schemerlicht_fixnum buffer_size_remaining = buffer_length - current_pos;
+        if (buffer_size_remaining < dist)
+          {
+          memcpy(buffer->value.s.string_ptr + current_pos, chars_to_write, buffer_size_remaining);
+          schemerlicht_write(fileid, buffer->value.s.string_ptr, buffer_length);
+          current_pos = 0;
+          chars_to_write += buffer_size_remaining;
+          }
+        else
+          {
+          memcpy(buffer->value.s.string_ptr + current_pos, chars_to_write, dist);
+          current_pos += dist;
+          chars_to_write += dist;
+          schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = current_pos;
+          }
+        }
+      schemerlicht_string_destroy(ctxt, &str);
+      }
+    else
+      {
+      schemerlicht_runerror(ctxt, "%write expects an object and an output port as argument.");
+      ra->type = schemerlicht_object_type_undefined;
+      }
+    }
   }
 
 ////////////////////////////////////////////////////
@@ -7848,6 +7911,67 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_DISPLAY);
+  if (b < 2)
+    {
+    schemerlicht_runerror(ctxt, "%display expects an object and an output port as argument.");
+    ra->type = schemerlicht_object_type_undefined;
+    }
+  else
+    {
+    schemerlicht_object* obj = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+    if (p->type == schemerlicht_object_type_port && schemerlicht_vector_at(&p->value.v, 0, schemerlicht_object)->type != schemerlicht_object_type_true)
+      {
+      ra->type = schemerlicht_object_type_void;
+      schemerlicht_string str = schemerlicht_object_to_string(ctxt, obj);
+      int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
+      if (fileid == SCHEMERLICHT_STRING_PORT_ID)
+        {
+        schemerlicht_fixnum required_length = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx + str.string_length;
+        schemerlicht_fixnum available_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+        if (required_length > available_length)
+          {
+          schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+          schemerlicht_string dummy;
+          schemerlicht_string_init_with_size(ctxt, &dummy, max(required_length - available_length, 256), 0);
+          schemerlicht_string_append(ctxt, &s, &dummy);
+          schemerlicht_string_destroy(ctxt, &dummy);
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += max(required_length - available_length, 256);
+          }
+        }
+      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
+      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+      char* chars_to_write = str.string_ptr;
+      char* chars_to_write_end = str.string_ptr + str.string_length;
+
+      while (chars_to_write < chars_to_write_end)
+        {
+        intptr_t dist = chars_to_write_end - chars_to_write;
+        schemerlicht_fixnum buffer_size_remaining = buffer_length - current_pos;
+        if (buffer_size_remaining < dist)
+          {
+          memcpy(buffer->value.s.string_ptr + current_pos, chars_to_write, buffer_size_remaining);
+          schemerlicht_write(fileid, buffer->value.s.string_ptr, buffer_length);
+          current_pos = 0;
+          chars_to_write += buffer_size_remaining;
+          }
+        else
+          {
+          memcpy(buffer->value.s.string_ptr + current_pos, chars_to_write, dist);
+          current_pos += dist;
+          chars_to_write += dist;
+          schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = current_pos;
+          }
+        }
+      schemerlicht_string_destroy(ctxt, &str);
+      }
+    else
+      {
+      schemerlicht_runerror(ctxt, "%display expects an object and an output port as argument.");
+      ra->type = schemerlicht_object_type_undefined;
+      }
+    }
   }
 
 ////////////////////////////////////////////////////
@@ -7858,6 +7982,23 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_READ);
+  if (b < 1)
+    {
+    schemerlicht_runerror(ctxt, "%read expects an input port as argument.");
+    ra->type = schemerlicht_object_type_undefined;
+    }
+  else
+    {    
+    schemerlicht_object* p = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (p->type == schemerlicht_object_type_port && schemerlicht_vector_at(&p->value.v, 0, schemerlicht_object)->type == schemerlicht_object_type_true)
+      {
+      }
+    else
+      {
+      schemerlicht_runerror(ctxt, "%read expects an input port as argument.");
+      ra->type = schemerlicht_object_type_undefined;
+      }
+    }
   }
 
 ////////////////////////////////////////////////////

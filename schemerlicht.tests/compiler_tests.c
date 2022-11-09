@@ -2873,6 +2873,18 @@ static void test_port()
   test_compile_aux("#t", "(define read_file (open-input-file \"out.txt\")) (%peek-char read_file) (%char-ready? read_file)");
   test_compile_aux("#f", "(define read_file (open-input-file \"out.txt\")) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%char-ready? read_file)");
   test_compile_aux("#t", "(define read_file (open-input-file \"out.txt\")) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%char-ready? read_file)");
+
+  test_compile_aux("#<void>", "(define wf (open-output-file \"out2.txt\"))"
+  "(%write (+ 7 9) wf)"
+  "(%flush-output-port wf)"
+  "(close-output-port wf)"
+  );
+  test_compile_aux("#<void>", "(define wf (open-output-file \"out2.txt\"))"
+    "(%slot-set! wf 5 1)"
+    "(%write (+ 7 9) wf)"
+    "(%flush-output-port wf)"
+    "(close-output-port wf)"
+  );
   }
 
 void run_all_compiler_tests()
