@@ -244,6 +244,11 @@ static int get_char(char* ch, schemerlicht_stream* str, int read)
   return 1;
   }
 
+static void next_char(schemerlicht_stream* str)
+  {
+  ++str->position;
+  }
+
 typedef struct read_token_state
   {
   int line_nr;
@@ -258,16 +263,15 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
   int is_a_character = 0;
 
   char s;
-  int valid_chars_remaining = get_char(&s, str, 1);
+  int valid_chars_remaining = get_char(&s, str, 0);
   while (valid_chars_remaining)
     {
     if (ignore_character(s))
       {
       if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-        {
-        --str->position; // necessary for line_nr and column_nr to be correct
+        {        
         return 1;
-        }
+        }      
       is_a_character = 0;
       while (ignore_character(s) && valid_chars_remaining)
         {
@@ -276,7 +280,8 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
           ++state->line_nr;
           state->column_nr = 0;
           }
-        valid_chars_remaining = get_char(&s, str, 1);
+        ++str->position;
+        valid_chars_remaining = get_char(&s, str, 0);
         ++state->column_nr;
         }
       if (!valid_chars_remaining)
@@ -292,16 +297,17 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         {
         if (is_a_symbol && buff->string_length == 0) // #(
           {
+          ++str->position;
           is_a_symbol = 0;
           *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_LEFT_ROUND_BRACKET, state->line_nr, state->column_nr, "#(");
           ++state->column_nr;
           return 1;
           }
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_LEFT_ROUND_BRACKET, state->line_nr, state->column_nr, "(");
         ++state->column_nr;
         return 1;
@@ -309,10 +315,10 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case ')':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, state->line_nr, state->column_nr, ")");
         ++state->column_nr;
         return 1;
@@ -320,10 +326,10 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case '[':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_LEFT_SQUARE_BRACKET, state->line_nr, state->column_nr, "[");
         ++state->column_nr;
         return 1;
@@ -331,10 +337,10 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case ']':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_RIGHT_SQUARE_BRACKET, state->line_nr, state->column_nr, "]");
         ++state->column_nr;
         return 1;
@@ -344,17 +350,17 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         if (is_a_symbol)
           break;
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         char t;
         int valid_peek = get_char(&t, str, 0); // peek
         if (valid_peek && t == ';') //treat as comment
           {
           while (valid_chars_remaining && s != '\n') // comment, so skip till end of the line
             valid_chars_remaining = get_char(&s, str, 1);
-          valid_chars_remaining = get_char(&s, str, 1);
+          valid_chars_remaining = get_char(&s, str, 0);
           ++state->line_nr;
           state->column_nr = 1;
           }
@@ -387,13 +393,13 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
                 end_of_comment_found = 1;
               }
             }
-          valid_chars_remaining = get_char(&s, str, 1);
+          valid_chars_remaining = get_char(&s, str, 0);
           ++state->column_nr;
           }
         else
           {
           is_a_symbol = 1;
-          valid_chars_remaining = get_char(&s, str, 1);
+          valid_chars_remaining = get_char(&s, str, 0);
           ++state->column_nr;
           }
         break;
@@ -401,13 +407,13 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case ';':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         while (valid_chars_remaining && s != '\n') // comment, so skip till end of the line
           valid_chars_remaining = get_char(&s, str, 1);
-        valid_chars_remaining = get_char(&s, str, 1);
+        valid_chars_remaining = get_char(&s, str, 0);
         ++state->line_nr;
         state->column_nr = 1;
         break;
@@ -415,10 +421,10 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case '\'':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_QUOTE, state->line_nr, state->column_nr, "'");
         ++state->column_nr;
         return 1;
@@ -426,7 +432,10 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case '`':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
+          {
           return 1;
+          }
+        ++str->position;
         *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_BACKQUOTE, state->line_nr, state->column_nr, "`");
         ++state->column_nr;
         return 1;
@@ -434,16 +443,17 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case ',':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         char t;
         int valid_peek = get_char(&t, str, 0); // peek
         if (valid_peek && t == '@')
           {
           *tok = make_token_cstr(ctxt, SCHEMERLICHT_T_UNQUOTE_SPLICING, state->line_nr, state->column_nr, ",@");
-          valid_chars_remaining = get_char(&s, str, 1);
+          ++str->position;
+          //valid_chars_remaining = get_char(&s, str, 0); // not necessary
           state->column_nr += 2;
           return 1;
           }
@@ -458,10 +468,10 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
         case '"':
         {
         if (treat_buffer_token(ctxt, buff, tok, state->line_nr, state->column_nr, &is_a_symbol))
-          {
-          --str->position;
+          {          
           return 1;
           }
+        ++str->position;
         int temp_column_nr = state->column_nr;
         int temp_line_nr = state->line_nr;
         schemerlicht_string tmp;
@@ -507,7 +517,8 @@ static int read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_strin
     if (str_position == str->position && valid_chars_remaining)
       {
       schemerlicht_string_push_back(ctxt, buff, s);
-      valid_chars_remaining = get_char(&s, str, 1);
+      ++str->position;
+      valid_chars_remaining = get_char(&s, str, 0);
       ++state->column_nr;
       }
 
