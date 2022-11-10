@@ -11,4 +11,6 @@ int schemerlicht_open_input_file(const char* filename);
 
 int schemerlicht_close_file(int fd);
 
+long schemerlicht_tell(int fd);
+
 #endif //SCHEMERLICHT_SYSCALLS_H

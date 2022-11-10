@@ -50,8 +50,10 @@ int schemerlicht_read_token(token* tok, schemerlicht_context* ctxt, schemerlicht
 
 typedef int (*schemerlicht_get_char_fun)(char*, void*, int);
 typedef void (*schemerlicht_next_char_fun)(void*);
-typedef void* (*schemerlicht_get_position_fun)(void*);
+typedef schemerlicht_fixnum (*schemerlicht_get_position_fun)(void*);
 int schemerlicht_read_token_polymorph(token* tok, schemerlicht_context* ctxt, schemerlicht_string* buff, void* str, schemerlicht_read_token_state* state, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position);
+
+void schemerlicht_token_destroy(schemerlicht_context* ctxt, token* tok);
 
 /*
 * return vector contains token types

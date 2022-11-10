@@ -2885,6 +2885,9 @@ static void test_port()
     "(%flush-output-port wf)"
     "(close-output-port wf)"
   );
+  test_compile_aux("#<void>", "(define rf (open-input-file \"out2.txt\"))"
+    "(%read rf)"
+    "(close-input-port rf)");
   }
 
 void run_all_compiler_tests()

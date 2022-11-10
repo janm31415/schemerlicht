@@ -62,3 +62,12 @@ int schemerlicht_close_file(int fd)
   return close(fd);
 #endif
   }
+
+long schemerlicht_tell(int fd)
+  {
+#ifdef _WIN32
+  return _tell(fd);
+#else
+  return tell(fd);
+#endif
+  }
