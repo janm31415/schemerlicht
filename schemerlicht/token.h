@@ -40,6 +40,19 @@ typedef struct token
 token schemerlicht_make_token(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, schemerlicht_string* value);
 token schemerlicht_make_token_cstr(schemerlicht_context* ctxt, int type, int line_nr, int column_nr, const char* value);
 
+typedef struct schemerlicht_read_token_state
+  {
+  int line_nr;
+  int column_nr;
+  } schemerlicht_read_token_state;
+
+int schemerlicht_read_token(token* tok, schemerlicht_context* ctxt, schemerlicht_string* buff, schemerlicht_stream* str, schemerlicht_read_token_state* state);
+
+typedef int (*schemerlicht_get_char_fun)(char*, void*, int);
+typedef void (*schemerlicht_next_char_fun)(void*);
+typedef void* (*schemerlicht_get_position_fun)(void*);
+int schemerlicht_read_token_polymorph(token* tok, schemerlicht_context* ctxt, schemerlicht_string* buff, void* str, schemerlicht_read_token_state* state, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position);
+
 /*
 * return vector contains token types
 */

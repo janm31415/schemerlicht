@@ -1817,10 +1817,10 @@ static void test_fib_performance()
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("102334155", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("1346269", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 30)",  256*256);
-  //test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
+  test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
   int c1 = clock();
   printf("Fib time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
-  test_compile_aux_w_dump("55", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 10)");
+  //test_compile_aux_w_dump("55", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 10)");
   print_gc_time = 0;
   }
 
