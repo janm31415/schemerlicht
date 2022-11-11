@@ -5,6 +5,7 @@
 #include "vector.h"
 #include "string.h"
 #include "token.h"
+#include "object.h"
 
 enum schemerlicht_cell_type
   {
@@ -42,5 +43,9 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlic
 void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_cell* c, schemerlicht_string* s);
 
 SCHEMERLICHT_API schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlicht_cell* c);
+
+schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, schemerlicht_cell* c);
+
+int schemerlicht_is_char(schemerlicht_cell* c, char* ch);
 
 #endif //SCHEMERLICHT_READER_H

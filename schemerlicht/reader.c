@@ -381,7 +381,7 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlic
     if (is_vector)
       c = get_vector(ctxt, &items);
     else
-      c = get_pair(ctxt, &items);    
+      c = get_pair(ctxt, &items);
     schemerlicht_vector_destroy(ctxt, &items);
     return c;
     }
@@ -417,7 +417,7 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlic
       }
     else
       {
-      schemerlicht_cell c = atom(ctxt, &tok);    
+      schemerlicht_cell c = atom(ctxt, &tok);
       schemerlicht_token_destroy(ctxt, &tok);
       return c;
       }
@@ -599,4 +599,210 @@ schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlich
   schemerlicht_vector_destroy(ctxt, &counter);
   schemerlicht_vector_destroy(ctxt, &size);
   return output;
+  }
+
+schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, schemerlicht_cell* inputcell)
+  {
+  schemerlicht_object result;
+  schemerlicht_object* last_result = NULL;
+  schemerlicht_vector parent;
+  schemerlicht_vector_init(ctxt, &parent, schemerlicht_object*);
+  schemerlicht_vector todo;
+  schemerlicht_vector_init(ctxt, &todo, schemerlicht_cell);
+  schemerlicht_vector_push_back(ctxt, &todo, *inputcell, schemerlicht_cell);
+
+  while (todo.vector_size > 0)
+    {
+    schemerlicht_object res;
+    schemerlicht_cell c = *schemerlicht_vector_back(&todo, schemerlicht_cell);
+    schemerlicht_vector_pop_back(&todo);
+    schemerlicht_memsize parents_to_add = 0;
+    if (parent.vector_size > 0)
+      {
+      last_result = *schemerlicht_vector_back(&parent, schemerlicht_object*);
+      schemerlicht_vector_pop_back(&parent);
+      }
+    switch (c.type)
+      {
+      case schemerlicht_ct_fixnum:
+      {
+      res.type = schemerlicht_object_type_fixnum;
+      res.value.fx = schemerlicht_to_fixnum(c.value.str.string_ptr);
+      break;
+      }
+      case schemerlicht_ct_flonum:
+      {
+      res.type = schemerlicht_object_type_flonum;
+      res.value.fl = schemerlicht_to_flonum(c.value.str.string_ptr);
+      break;
+      }
+      case schemerlicht_ct_string:
+      {
+      const char* from = c.value.str.string_ptr + 1;
+      const char* to = c.value.str.string_ptr + c.value.str.string_length - 1;
+      res.type = schemerlicht_object_type_string;
+      schemerlicht_string_init_ranged(ctxt, &res.value.s, from, to);
+      break;
+      }
+      case schemerlicht_ct_symbol:
+      {
+      char chval;
+      if (schemerlicht_cell_equals(&c, &ctxt->global->true_sym))
+        {
+        res.type = schemerlicht_object_type_true;
+        }
+      else if (schemerlicht_cell_equals(&c, &ctxt->global->false_sym))
+        {
+        res.type = schemerlicht_object_type_false;
+        }
+      else if (schemerlicht_is_char(&c, &chval))
+        {
+        res.type = schemerlicht_object_type_char;
+        res.value.ch = chval;
+        }
+      else
+        {
+        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &c.value.str);
+        if (symbol != NULL)
+          {
+          schemerlicht_set_object(&res, symbol);
+          }
+        else
+          {
+          schemerlicht_object key;
+          key.type = schemerlicht_object_type_string;
+          schemerlicht_string_copy(ctxt, &key.value.s, &c.value.str);
+          schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
+          new_symbol->type = schemerlicht_object_type_symbol;
+          schemerlicht_string_copy(ctxt, &new_symbol->value.s, &c.value.str);
+          schemerlicht_set_object(&res, new_symbol);
+          }
+        }
+      break;
+      }
+      case schemerlicht_ct_pair:
+      {
+      if (schemerlicht_cell_equals(&c, &ctxt->global->nil_sym))
+        {
+        res.type = schemerlicht_object_type_nil;
+        }
+      else
+        {
+        schemerlicht_assert(c.value.vector.vector_size == 2);
+        res = make_schemerlicht_object_pair(ctxt);
+        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+        schemerlicht_set_object(heap_obj, &res);
+        ++ctxt->heap_pos;
+        schemerlicht_cell* c0 = schemerlicht_vector_at(&c.value.vector, 0, schemerlicht_cell);
+        schemerlicht_cell* c1 = schemerlicht_vector_at(&c.value.vector, 1, schemerlicht_cell);
+        schemerlicht_vector_push_back(ctxt, &todo, *c1, schemerlicht_cell);
+        schemerlicht_vector_push_back(ctxt, &todo, *c0, schemerlicht_cell);
+        parents_to_add = 2;
+        }
+      break;
+      }
+      case schemerlicht_ct_vector:
+      {
+      res = make_schemerlicht_object_vector(ctxt, c.value.vector.vector_size);
+      schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+      schemerlicht_set_object(heap_obj, &res);
+      ++ctxt->heap_pos;
+      schemerlicht_cell* it = schemerlicht_vector_begin(&c.value.vector, schemerlicht_cell);
+      schemerlicht_cell* it_end = schemerlicht_vector_end(&c.value.vector, schemerlicht_cell);
+      schemerlicht_cell* rit = it_end - 1;
+      schemerlicht_cell* rit_end = it - 1;
+      for (; rit != rit_end; --rit)
+        {
+        schemerlicht_vector_push_back(ctxt, &todo, *rit, schemerlicht_cell);
+        }
+      parents_to_add = c.value.vector.vector_size;
+      break;
+      }
+      case schemerlicht_ct_invalid_cell:
+        break;
+      }
+    if (last_result)
+      {
+      schemerlicht_vector_push_back(ctxt, &last_result->value.v, res, schemerlicht_object);
+      schemerlicht_object* add_to_parent = schemerlicht_vector_back(&last_result->value.v, schemerlicht_object);
+      for (int i = 0; i < parents_to_add; ++i)
+        {
+        schemerlicht_vector_push_back(ctxt, &parent, add_to_parent, schemerlicht_object*);
+        }
+      }
+    else
+      {
+      result = res;
+      for (int i = 0; i < parents_to_add; ++i)
+        {
+        schemerlicht_vector_push_back(ctxt, &parent, &result, schemerlicht_object*);
+        }
+      }
+    }
+
+  schemerlicht_vector_destroy(ctxt, &parent);
+  schemerlicht_vector_destroy(ctxt, &todo);
+  return result;
+  }
+
+int schemerlicht_is_char(schemerlicht_cell* c, char* ch)
+  {
+  if (c->value.str.string_length < 2)
+    return 0;
+  if (c->value.str.string_ptr[0] == '#' && c->value.str.string_ptr[1] == '\\')
+    {
+    schemerlicht_memsize len = c->value.str.string_length - 2;
+    const char* str = c->value.str.string_ptr + 2;
+    if (len == 0)
+      {
+      *ch = 32;
+      return 1;
+      }
+    else if (len == 1)
+      {
+      *ch = *str;
+      return 1;
+      }
+    else if (strcmp(str, "backspace") == 0)
+      {
+      *ch = 8;
+      return 1;
+      }
+    else if (strcmp(str, "tab") == 0)
+      {
+      *ch = 9;
+      return 1;
+      }
+    else if (strcmp(str, "newline") == 0)
+      {
+      *ch = 10;
+      return 1;
+      }
+    else if (strcmp(str, "linefeed") == 0)
+      {
+      *ch = 10;
+      return 1;
+      }
+    else if (strcmp(str, "vtab") == 0)
+      {
+      *ch = 11;
+      return 1;
+      }
+    else if (strcmp(str, "page") == 0)
+      {
+      *ch = 12;
+      return 1;
+      }
+    else if (strcmp(str, "return") == 0)
+      {
+      *ch = 13;
+      return 1;
+      }
+    else if (strcmp(str, "space") == 0)
+      {
+      *ch = 32;
+      return 1;
+      }
+    }
+  return 0;
   }

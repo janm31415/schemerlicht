@@ -11,67 +11,6 @@
 #include <string.h>
 #include <stdio.h>
 
-static int _is_char(schemerlicht_cell* c, char* ch)
-  {
-  if (c->value.str.string_length < 2)
-    return 0;
-  if (c->value.str.string_ptr[0] == '#' && c->value.str.string_ptr[1] == '\\')
-    {
-    schemerlicht_memsize len = c->value.str.string_length - 2;
-    const char* str = c->value.str.string_ptr + 2;
-    if (len == 0)
-      {
-      *ch = 32;
-      return 1;
-      }
-    else if (len == 1)
-      {
-      *ch = *str;
-      return 1;
-      }
-    else if (strcmp(str, "backspace") == 0)
-      {
-      *ch = 8;
-      return 1;
-      }
-    else if (strcmp(str, "tab") == 0)
-      {
-      *ch = 9;
-      return 1;
-      }
-    else if (strcmp(str, "newline") == 0)
-      {
-      *ch = 10;
-      return 1;
-      }
-    else if (strcmp(str, "linefeed") == 0)
-      {
-      *ch = 10;
-      return 1;
-      }
-    else if (strcmp(str, "vtab") == 0)
-      {
-      *ch = 11;
-      return 1;
-      }
-    else if (strcmp(str, "page") == 0)
-      {
-      *ch = 12;
-      return 1;
-      }
-    else if (strcmp(str, "return") == 0)
-      {
-      *ch = 13;
-      return 1;
-      }
-    else if (strcmp(str, "space") == 0)
-      {
-      *ch = 32;
-      return 1;
-      }
-    }
-  return 0;
-  }
 
 static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_cell* inputcell)
   {
@@ -127,7 +66,7 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
         {
         res = schemerlicht_init_false(ctxt);
         }
-      else if (_is_char(&c, &chval))
+      else if (schemerlicht_is_char(&c, &chval))
         {
         res = schemerlicht_init_char(ctxt);
         res.expr.lit.lit.ch.value = chval;
