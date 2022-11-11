@@ -256,7 +256,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
 
 static schemerlicht_string debug_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
-  schemerlicht_string res = schemerlicht_object_to_string(ctxt, obj);
+  schemerlicht_string res = schemerlicht_object_to_string(ctxt, obj, 0);
   if (obj->type == schemerlicht_object_type_lambda)
     {
     char buffer[256];
@@ -899,7 +899,7 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ": ");
     schemerlicht_object* stack_item = schemerlicht_vector_at(&ctxt->stack, i, schemerlicht_object);
-    schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, stack_item);
+    schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, stack_item, 0);
     schemerlicht_string_append(ctxt, &s, &tmp);
     schemerlicht_string_destroy(ctxt, &tmp);
     schemerlicht_string_push_back(ctxt, &s, '\n');

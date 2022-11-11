@@ -444,7 +444,7 @@ static schemerlicht_runtime_task make_text_task(const char* txt)
   return task;
   }
 
-schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* input_obj)
+schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* input_obj, int display)
   {
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, "");
@@ -510,16 +510,19 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         break;
         }
         case schemerlicht_object_type_string:
-          schemerlicht_string_append_cstr(ctxt, &s, "\"");
+          if (!display)
+            schemerlicht_string_append_cstr(ctxt, &s, "\"");
           schemerlicht_string_append(ctxt, &s, &current_task.obj->value.s);
-          schemerlicht_string_push_back(ctxt, &s, '"');
+          if (!display)
+            schemerlicht_string_push_back(ctxt, &s, '"');
           break;
         case schemerlicht_object_type_symbol:
           schemerlicht_string_append(ctxt, &s, &current_task.obj->value.s);
           break;
         case schemerlicht_object_type_char:
         {
-        schemerlicht_string_append_cstr(ctxt, &s, "#\\");
+        if (!display)
+          schemerlicht_string_append_cstr(ctxt, &s, "#\\");
         if (current_task.obj->value.ch > 31 && current_task.obj->value.ch < 127)
           {
           schemerlicht_string_push_back(ctxt, &s, current_task.obj->value.ch);

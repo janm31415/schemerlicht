@@ -7853,7 +7853,7 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
     if (p->type == schemerlicht_object_type_port && schemerlicht_vector_at(&p->value.v, 0, schemerlicht_object)->type != schemerlicht_object_type_true)
       {
       ra->type = schemerlicht_object_type_void;
-      schemerlicht_string str = schemerlicht_object_to_string(ctxt, obj);
+      schemerlicht_string str = schemerlicht_object_to_string(ctxt, obj, 0);
       int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
       if (fileid == SCHEMERLICHT_STRING_PORT_ID)
         {
@@ -7924,7 +7924,7 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
     if (p->type == schemerlicht_object_type_port && schemerlicht_vector_at(&p->value.v, 0, schemerlicht_object)->type != schemerlicht_object_type_true)
       {
       ra->type = schemerlicht_object_type_void;
-      schemerlicht_string str = schemerlicht_object_to_string(ctxt, obj);
+      schemerlicht_string str = schemerlicht_object_to_string(ctxt, obj, 1);
       int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
       if (fileid == SCHEMERLICHT_STRING_PORT_ID)
         {

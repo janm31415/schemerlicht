@@ -117,7 +117,7 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   if (ctxt->number_of_compile_errors > 0)
     {
@@ -189,7 +189,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
     printf("%s\n", it->message.string_ptr);
     }
 
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
@@ -938,7 +938,7 @@ static void test_define()
   int contains_error = ctxt->number_of_compile_errors > 0 ? 1 : 0;
   TEST_EQ_INT(0, contains_error);
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   schemerlicht_function_free(ctxt, func);
@@ -948,7 +948,7 @@ static void test_define()
   prog = make_program(ctxt, &tokens);
   func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   res = schemerlicht_run(ctxt, func);
-  s = schemerlicht_object_to_string(ctxt, res);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("5", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   schemerlicht_function_free(ctxt, func);
@@ -1569,7 +1569,7 @@ static void test_compile_aux_callcc(const char* expected_value, const char* scri
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
@@ -1628,7 +1628,7 @@ static void test_compile_cc_2()
   schemerlicht_function* func1 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
 
   schemerlicht_object* res = schemerlicht_run(ctxt, func1);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("1", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1685,7 +1685,7 @@ static void test_compile_cc()
   schemerlicht_function* func1 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
 
   schemerlicht_object* res = schemerlicht_run(ctxt, func1);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("1", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1710,7 +1710,7 @@ static void test_compile_cc()
   schemerlicht_function* func2 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
 
   res = schemerlicht_run(ctxt, func2);
-  s = schemerlicht_object_to_string(ctxt, res);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("15", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1734,7 +1734,7 @@ static void test_compile_cc()
 
   schemerlicht_function* func3 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   res = schemerlicht_run(ctxt, func3);
-  s = schemerlicht_object_to_string(ctxt, res);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("35", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1758,7 +1758,7 @@ static void test_compile_cc()
 
   schemerlicht_function* func4 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   res = schemerlicht_run(ctxt, func4);
-  s = schemerlicht_object_to_string(ctxt, res);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("3", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1782,7 +1782,7 @@ static void test_compile_cc()
 
   schemerlicht_function* func5 = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   res = schemerlicht_run(ctxt, func5);
-  s = schemerlicht_object_to_string(ctxt, res);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
   TEST_EQ_STRING("1005", s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -2344,7 +2344,7 @@ static void test_foreign_1()
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   TEST_EQ_STRING("17", s.string_ptr);
 
@@ -2385,7 +2385,7 @@ static void test_foreign_aux(const char* expected, const char* script, const cha
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   TEST_EQ_STRING(expected, s.string_ptr);
 
@@ -2759,7 +2759,7 @@ static void test_compile_aux_r5rs(const char* expected_value, const char* script
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
@@ -2954,6 +2954,35 @@ static void test_read()
     "res");
   }
 
+static void test_write()
+  {
+  test_compile_aux("\"50#\\ 3.141590\"FOO\"\n\"FOO\\\"BAR\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+  "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
+  "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
+  "(define ostr (open-output-string))\n"
+  "(%write 50 ostr) (%write #\\032 ostr)\n"
+  "(%write 3.14159 ostr)\n"
+  "(%write \"FOO\" ostr)\n"
+  "(%write-char #\\newline ostr)\n"
+  "(%write \"FOO\\\"BAR\" ostr)\n"
+  "(get-output-string ostr)\n"
+  );
+  }
+
+static void test_display()
+  {
+  test_compile_aux("\"50 3.141590\nFOOBAR\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+    "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
+    "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
+    "(define ostr (open-output-string))\n"
+    "(%display 50 ostr) (%display #\\032 ostr)\n"
+    "(%display 3.14159 ostr)\n"
+    "(%write-char #\\newline ostr)\n"
+    "(%display \"FOOBAR\" ostr)\n"
+    "(get-output-string ostr)\n"
+  );
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -3053,4 +3082,6 @@ void run_all_compiler_tests()
   test_quasiquote();
   test_port();
   test_read();
+  test_write();
+  test_display();
   }
