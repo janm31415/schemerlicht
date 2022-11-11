@@ -2937,6 +2937,21 @@ static void test_read()
     "(define res (%read rf))"
     "(close-input-port rf)"
     "res");
+  test_compile_aux("(((1 2) 3 4) 78)", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("#(1 2 3)", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("#eof", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
   }
 
 void run_all_compiler_tests()

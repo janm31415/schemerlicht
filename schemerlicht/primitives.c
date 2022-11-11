@@ -8025,8 +8025,13 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
       schemerlicht_dump_cell_to_string(ctxt, &cell, &buff);
       printf("%s\n", buff.string_ptr);
 #endif
-      schemerlicht_object obj = schemerlicht_cell_to_object(ctxt, &cell);
-      schemerlicht_set_object(ra, &obj);
+      if (cell.type == schemerlicht_ct_invalid_cell)
+        ra->type = schemerlicht_object_type_eof;
+      else
+        {
+        schemerlicht_object obj = schemerlicht_cell_to_object(ctxt, &cell);
+        schemerlicht_set_object(ra, &obj);
+        }
       schemerlicht_string_destroy(ctxt, &buff);
       schemerlicht_destroy_cell(ctxt, &cell);
       }
