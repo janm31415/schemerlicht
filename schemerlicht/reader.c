@@ -346,14 +346,17 @@ static schemerlicht_cell make_invalid_cell()
   return c;
   }
 
-schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlicht_string* buff, void* stream, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position)
+schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, token* first_token, schemerlicht_string* buff, void* stream, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position)
   {
   schemerlicht_read_token_state state;
   state.line_nr = 1;
   state.column_nr = 1;
   token tok;
-
-  if (!schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position))
+  if (first_token)
+    {
+    tok = *first_token;
+    }
+  else if (first_token == NULL && !schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position))
     {
     return make_invalid_cell();
     }
@@ -362,21 +365,18 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlic
     int is_vector = 0;
     if (strcmp(tok.value.string_ptr, "#(") == 0)
       is_vector = 1;
-    schemerlicht_token_destroy(ctxt, &tok);
-    if (!schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position))
-      {
-      return make_invalid_cell();
-      }
     schemerlicht_vector items;
     schemerlicht_vector_init(ctxt, &items, schemerlicht_cell);
     int tokens_remaining = 1;
+    schemerlicht_token_destroy(ctxt, &tok);
+    tokens_remaining = schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position);
     while (tokens_remaining && (tok.type != SCHEMERLICHT_T_RIGHT_ROUND_BRACKET))
       {
-      schemerlicht_cell new_cell = schemerlicht_read_datum(ctxt, buff, stream, get_char, next_char, get_position);
+      schemerlicht_cell new_cell = schemerlicht_read_datum(ctxt, &tok, buff, stream, get_char, next_char, get_position);
       schemerlicht_vector_push_back(ctxt, &items, new_cell, schemerlicht_cell);
-      schemerlicht_token_destroy(ctxt, &tok);
       tokens_remaining = schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position);
       }
+    schemerlicht_token_destroy(ctxt, &tok);
     schemerlicht_cell c;
     if (is_vector)
       c = get_vector(ctxt, &items);
@@ -410,7 +410,7 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlic
       schemerlicht_cell p2;
       p2.type = schemerlicht_ct_pair;
       schemerlicht_vector_init(ctxt, &p2.value.vector, schemerlicht_cell);
-      schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_read_datum(ctxt, buff, stream, get_char, next_char, get_position), schemerlicht_cell);
+      schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_read_datum(ctxt, NULL, buff, stream, get_char, next_char, get_position), schemerlicht_cell);
       schemerlicht_vector_push_back(ctxt, &p2.value.vector, schemerlicht_make_nil_sym_cell(ctxt), schemerlicht_cell);
       schemerlicht_vector_push_back(ctxt, &c.value.vector, p2, schemerlicht_cell);
       return c;
@@ -690,6 +690,7 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
         {
         schemerlicht_assert(c.value.vector.vector_size == 2);
         res = make_schemerlicht_object_pair(ctxt);
+        res.value.v.vector_size = 0; // we set the size to 0, so that we can push back without memory consequences
         schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
         schemerlicht_set_object(heap_obj, &res);
         ++ctxt->heap_pos;
@@ -704,6 +705,7 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
       case schemerlicht_ct_vector:
       {
       res = make_schemerlicht_object_vector(ctxt, c.value.vector.vector_size);
+      res.value.v.vector_size = 0; // we set the size to 0, so that we can push back without memory consequences
       schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
       schemerlicht_set_object(heap_obj, &res);
       ++ctxt->heap_pos;

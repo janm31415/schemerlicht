@@ -8020,7 +8020,11 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
       {
       schemerlicht_string buff;
       schemerlicht_string_init(ctxt, &buff, "");
-      schemerlicht_cell cell = schemerlicht_read_datum(ctxt, &buff, cast(void*, p), &_port_get_char, &_port_next_char, &_port_get_position);
+      schemerlicht_cell cell = schemerlicht_read_datum(ctxt, NULL, &buff, cast(void*, p), &_port_get_char, &_port_next_char, &_port_get_position);
+#if 0
+      schemerlicht_dump_cell_to_string(ctxt, &cell, &buff);
+      printf("%s\n", buff.string_ptr);
+#endif
       schemerlicht_object obj = schemerlicht_cell_to_object(ctxt, &cell);
       schemerlicht_set_object(ra, &obj);
       schemerlicht_string_destroy(ctxt, &buff);

@@ -2891,6 +2891,54 @@ static void test_port()
     "res");
   }
 
+static void test_read()
+  { 
+  test_compile_aux("21", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("22.330000", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("(16)", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("(3.140000)", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("#t", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("#f", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("()", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("alpha", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("(1 2 3 4 5)", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -2989,4 +3037,5 @@ void run_all_compiler_tests()
   test_control_ops();
   test_quasiquote();
   test_port();
+  test_read();
   }

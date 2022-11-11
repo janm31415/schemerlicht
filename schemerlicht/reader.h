@@ -38,7 +38,7 @@ schemerlicht_cell schemerlicht_make_nil_sym_cell(schemerlicht_context* ctxt);
 
 schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** token_it, token** token_it_end, int quasiquote);
 
-schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, schemerlicht_string* buff, void* stream, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position);
+schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, token* first_token, schemerlicht_string* buff, void* stream, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position);
 
 void schemerlicht_dump_cell_to_string(schemerlicht_context* ctxt, schemerlicht_cell* c, schemerlicht_string* s);
 
