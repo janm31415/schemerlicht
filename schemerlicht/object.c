@@ -368,7 +368,7 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     }
     case schemerlicht_object_type_vector:
     {
-    if (obj->value.v.vector_size > SCHEMERLICHT_MAX_POOL)
+    if (obj->value.v.vector_capacity > SCHEMERLICHT_MAX_POOL)
       {
       schemerlicht_vector_destroy(ctxt, &(obj->value.v));
       }
@@ -395,7 +395,7 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
     }
     case schemerlicht_object_type_closure:
     {
-    if (obj->value.v.vector_size > SCHEMERLICHT_MAX_POOL)
+    if (obj->value.v.vector_capacity > SCHEMERLICHT_MAX_POOL)
       {
       schemerlicht_vector_destroy(ctxt, &(obj->value.v));
       }
@@ -622,4 +622,121 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
 
   schemerlicht_vector_destroy(ctxt, &tasks);
   return s;
+  }
+
+
+schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, schemerlicht_object* input_obj)
+  {
+  schemerlicht_object result;
+  schemerlicht_object* last_result = NULL;
+  schemerlicht_vector parent;
+  schemerlicht_vector_init(ctxt, &parent, schemerlicht_object*);
+  schemerlicht_vector todo;
+  schemerlicht_vector_init(ctxt, &todo, schemerlicht_object);
+  schemerlicht_vector_push_back(ctxt, &todo, *input_obj, schemerlicht_object);
+
+  while (todo.vector_size > 0)
+    {
+    schemerlicht_object res;
+    schemerlicht_object obj = *schemerlicht_vector_back(&todo, schemerlicht_object);
+    schemerlicht_vector_pop_back(&todo);
+    schemerlicht_memsize parents_to_add = 0;
+    if (parent.vector_size > 0)
+      {
+      last_result = *schemerlicht_vector_back(&parent, schemerlicht_object*);
+      schemerlicht_vector_pop_back(&parent);
+      }
+    switch (obj.type)
+      {
+      case schemerlicht_object_type_undefined:
+      case schemerlicht_object_type_char:
+      case schemerlicht_object_type_fixnum:
+      case schemerlicht_object_type_flonum:      
+      case schemerlicht_object_type_true:
+      case schemerlicht_object_type_false:
+      case schemerlicht_object_type_nil:
+      case schemerlicht_object_type_void:
+      case schemerlicht_object_type_lambda:
+      case schemerlicht_object_type_primitive:
+      case schemerlicht_object_type_primitive_object:
+      case schemerlicht_object_type_blocking:
+      case schemerlicht_object_type_eof:
+      {
+        schemerlicht_set_object(&res, &obj);
+        break;
+      }
+      case schemerlicht_object_type_symbol:
+      {
+        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &obj.value.s);
+        if (symbol != NULL)
+          {
+          schemerlicht_set_object(&res, symbol);
+          }
+        else
+          {
+          schemerlicht_object key;
+          key.type = schemerlicht_object_type_string;
+          schemerlicht_string_copy(ctxt, &key.value.s, &obj.value.s);
+          schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
+          new_symbol->type = schemerlicht_object_type_symbol;
+          schemerlicht_string_copy(ctxt, &new_symbol->value.s, &obj.value.s);
+          schemerlicht_set_object(&res, new_symbol);
+          }
+        break;
+      }
+      case schemerlicht_object_type_string:
+      {
+        res.type = schemerlicht_object_type_string;
+        schemerlicht_string_copy(ctxt, &res.value.s, &obj.value.s);
+        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+        schemerlicht_set_object(heap_obj, &res);
+        ++ctxt->heap_pos;
+        break;
+      }
+      case schemerlicht_object_type_closure:        
+      case schemerlicht_object_type_vector:
+      case schemerlicht_object_type_pair:
+      case schemerlicht_object_type_port:
+      case schemerlicht_object_type_promise:        
+      {
+        res = make_schemerlicht_object_vector(ctxt, obj.value.v.vector_size);
+        res.type = obj.type;
+        res.value.v.vector_size = 0; // we set the size to 0, so that we can push back without memory consequences
+        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+        schemerlicht_set_object(heap_obj, &res);
+        ++ctxt->heap_pos;
+        schemerlicht_object* it = schemerlicht_vector_begin(&obj.value.v, schemerlicht_object);
+        schemerlicht_object* it_end = schemerlicht_vector_end(&obj.value.v, schemerlicht_object);
+        schemerlicht_object* rit = it_end - 1;
+        schemerlicht_object* rit_end = it - 1;
+        for (; rit != rit_end; --rit)
+          {
+          schemerlicht_vector_push_back(ctxt, &todo, *rit, schemerlicht_object);
+          }
+        parents_to_add = obj.value.v.vector_size;
+        break;
+      }
+      }
+    if (last_result)
+      {
+      schemerlicht_vector_push_back(ctxt, &last_result->value.v, res, schemerlicht_object);
+      schemerlicht_object* add_to_parent = schemerlicht_vector_back(&last_result->value.v, schemerlicht_object);
+      for (int i = 0; i < parents_to_add; ++i)
+        {
+        schemerlicht_vector_push_back(ctxt, &parent, add_to_parent, schemerlicht_object*);
+        }
+      }
+    else
+      {
+      result = res;
+      for (int i = 0; i < parents_to_add; ++i)
+        {
+        schemerlicht_vector_push_back(ctxt, &parent, &result, schemerlicht_object*);
+        }
+      }
+    }
+
+  schemerlicht_vector_destroy(ctxt, &parent);
+  schemerlicht_vector_destroy(ctxt, &todo);  
+  return result;
   }

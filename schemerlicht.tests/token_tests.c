@@ -35,8 +35,8 @@ static void test_number_recognition()
 schemerlicht_vector script2tokens(schemerlicht_context* ctxt, const char* script)
   {
   schemerlicht_stream str;
-  schemerlicht_stream_init(ctxt, &str, 10);
   schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(script));
+  schemerlicht_stream_init(ctxt, &str, len);  
   schemerlicht_stream_write(ctxt, &str, script, len, 0);
   schemerlicht_stream_rewind(&str);
   schemerlicht_vector tokens = tokenize(ctxt, &str);

@@ -24,6 +24,7 @@ map.h
 memory.h
 object.h
 parser.h
+preprocess.h
 pool.h
 primitives.h
 quasiquote.h
@@ -68,6 +69,7 @@ map.c
 memory.c
 object.c
 parser.c
+preprocess.c
 pool.c
 primitives.c
 quasiquote.c

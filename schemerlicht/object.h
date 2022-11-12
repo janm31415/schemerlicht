@@ -80,4 +80,6 @@ void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object
 
 schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj, int display);
 
+schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, schemerlicht_object* obj);
+
 #endif //SCHEMERLICHT_OBJECT_H

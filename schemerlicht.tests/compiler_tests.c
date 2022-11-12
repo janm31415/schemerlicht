@@ -2996,6 +2996,15 @@ static void test_getenv()
   test_compile_aux("#t", "(file-exists? \"out.txt\")"); // this file was created in one of the previous tests
   }
 
+static void test_eval()
+  {
+  test_compile_aux("21", "(eval '(* 7 3))");
+  test_compile_aux("(7 . 3)", "(eval '(cons 7 3))");
+  test_compile_aux("#(1 2 3 4 5 6 7)", "(eval '(vector 1 2 3 4 5 6 7))");
+  test_compile_aux("#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)", "(eval '(vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))");
+  test_compile_aux("#((1 2 3) #(3.000000 40.000000) 3 \"abc\" 5 6 7)", "(eval '(vector (list 1 2 3) (vector 3.0 40.0) 3 \"abc\" 5 6 7))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -3098,4 +3107,5 @@ void run_all_compiler_tests()
   test_write();
   test_display();
   test_getenv();
+  test_eval();
   }

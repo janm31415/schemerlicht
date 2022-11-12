@@ -7,6 +7,8 @@
 #include "vm.h"
 #include "syscalls.h"
 #include "reader.h"
+#include "preprocess.h"
+#include "compiler.h"
 
 #include <time.h>
 #include <math.h>
@@ -8061,6 +8063,37 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_EVAL);
+  if (b == 0)
+    {
+    ra->type = schemerlicht_object_type_undefined;
+    }
+  else
+    {
+    schemerlicht_object* q = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_string s = schemerlicht_object_to_string(ctxt, q, 0);
+    schemerlicht_context* eval_ctxt = schemerlicht_context_init(ctxt, ctxt->raw_heap.vector_size);
+
+    schemerlicht_stream str;
+    schemerlicht_memsize len = s.string_length;
+    schemerlicht_stream_init(eval_ctxt, &str, len);
+    schemerlicht_stream_write(eval_ctxt, &str, s.string_ptr, len, 0);
+    schemerlicht_stream_rewind(&str);
+    schemerlicht_vector tokens = tokenize(eval_ctxt, &str);
+    schemerlicht_stream_close(eval_ctxt, &str);
+    schemerlicht_program prog = make_program(eval_ctxt, &tokens);
+    schemerlicht_preprocess(eval_ctxt, &prog);
+    schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
+    schemerlicht_function* func = schemerlicht_compile_expression(eval_ctxt, expr);
+    schemerlicht_object* res = schemerlicht_run(eval_ctxt, func);
+    schemerlicht_object res_copy = schemerlicht_object_deep_copy(ctxt, res);
+    schemerlicht_function_free(eval_ctxt, func);
+    destroy_tokens_vector(eval_ctxt, &tokens);
+    schemerlicht_program_destroy(eval_ctxt, &prog);
+
+    schemerlicht_context_destroy(eval_ctxt);
+    schemerlicht_string_destroy(ctxt, &s);
+    schemerlicht_set_object(ra, &res_copy);
+    }
   }
 
 ////////////////////////////////////////////////////
