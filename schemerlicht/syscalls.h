@@ -17,4 +17,6 @@ const char* schemerlicht_getenv(const char* name);
 
 int schemerlicht_putenv(const char* name, const char* value);
 
+int schemerlicht_file_exists(const char* filename);
+
 #endif //SCHEMERLICHT_SYSCALLS_H

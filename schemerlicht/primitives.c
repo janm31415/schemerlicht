@@ -8134,6 +8134,40 @@ void schemerlicht_primitive_getenv(schemerlicht_context* ctxt, int a, int b, int
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FILE_EXISTS);
+  if (b == 0)
+    {
+    ra->type = schemerlicht_object_type_false;
+    }
+  else
+    {
+    schemerlicht_object* str = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (str->type == schemerlicht_object_type_string)
+      {
+      int exists = schemerlicht_file_exists(str->value.s.string_ptr);
+      if (exists)
+        {
+        ra->type = schemerlicht_object_type_true;
+        }
+      else
+        {
+        ra->type = schemerlicht_object_type_false;
+        }
+      }
+    else
+      {
+      ra->type = schemerlicht_object_type_false;
+      }
+    }
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -8739,6 +8773,9 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_PUTENV:
       schemerlicht_primitive_putenv(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_FILE_EXISTS:
+      schemerlicht_primitive_file_exists(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -8962,5 +8999,6 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "eval", SCHEMERLICHT_EVAL);
   map_insert(ctxt, m, "getenv", SCHEMERLICHT_GETENV);
   map_insert(ctxt, m, "putenv", SCHEMERLICHT_PUTENV);
+  map_insert(ctxt, m, "file-exists?", SCHEMERLICHT_FILE_EXISTS);
   return m;
   }

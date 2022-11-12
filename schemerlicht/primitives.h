@@ -204,7 +204,8 @@ typedef enum
   SCHEMERLICHT_LOAD,
   SCHEMERLICHT_EVAL,
   SCHEMERLICHT_GETENV,
-  SCHEMERLICHT_PUTENV
+  SCHEMERLICHT_PUTENV,
+  SCHEMERLICHT_FILE_EXISTS
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -406,6 +407,7 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
 void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_putenv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_getenv(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

@@ -8,6 +8,7 @@
 #endif
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 int schemerlicht_write(int fd, const void* buffer, unsigned int count)
   {
@@ -85,4 +86,16 @@ int schemerlicht_putenv(const char* name, const char* value)
 #else
   return setenv(name, value, 1);
 #endif
+  }
+
+int schemerlicht_file_exists(const char* filename)
+  {
+  int res = 0;
+  FILE* f = fopen(filename, "r");
+  if (f)
+    {
+    res = 1;
+    fclose(f);
+    }
+  return res;
   }

@@ -2991,6 +2991,9 @@ static void test_getenv()
   test_compile_aux("\"DummyValue\"", "(getenv \"SchemerlichtTest\")");
   test_compile_aux("#t", "(putenv \"SchemerlichtTest\" \"Dummy\")");
   test_compile_aux("\"Dummy\"", "(getenv \"SchemerlichtTest\")");
+
+  test_compile_aux("#f", "(file-exists? \"ThisFileDoesProbablyNotExist\")");
+  test_compile_aux("#t", "(file-exists? \"out.txt\")"); // this file was created in one of the previous tests
   }
 
 void run_all_compiler_tests()

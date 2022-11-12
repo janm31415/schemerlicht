@@ -2246,7 +2246,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "exp", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "expt", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "finite?", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "file-exists?", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "file-exists?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fixnum->char", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fixnum->flonum", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "fixnum?", schemerlicht_et_primitive_call);  
