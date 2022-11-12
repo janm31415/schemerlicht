@@ -3029,6 +3029,8 @@ static void test_load()
 static void test_macros()
   {
   test_compile_aux("8", "(define-macro (eight) '(+ 3 5))  (eight)");
+  test_compile_aux("7", "(define-macro (sum x y) `(+ ,x ,y))  (sum 3 4)");
+  test_compile_aux("10", "(define-macro (when2 test . args) `(if ,test (begin ,@args) #f))  (when2 (> 5 2) 7 8 9 10)");
   }
 
 void run_all_compiler_tests()

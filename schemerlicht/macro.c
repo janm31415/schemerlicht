@@ -123,7 +123,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
     if (fun->expr.funcall.arguments.vector_size >= 2 && schemerlicht_vector_at(&fun->expr.funcall.arguments, fun->expr.funcall.arguments.vector_size - 2, schemerlicht_expression)->type == schemerlicht_type_literal)
       {
       schemerlicht_expression* lit = schemerlicht_vector_at(&fun->expr.funcall.arguments, fun->expr.funcall.arguments.vector_size - 2, schemerlicht_expression);
-      if (lit->type == schemerlicht_type_flonum)
+      if (lit->expr.lit.type == schemerlicht_type_flonum)
         {
         if (lit->expr.lit.lit.fl.value != 0.f)
           {
