@@ -57,6 +57,7 @@ struct schemerlicht_context
   schemerlicht_pool_allocator pool[SCHEMERLICHT_MAX_POOL];
   schemerlicht_vector externals;
   schemerlicht_map* externals_map;
+  schemerlicht_vector lambdas;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

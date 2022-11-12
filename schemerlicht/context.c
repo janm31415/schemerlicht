@@ -5,6 +5,7 @@
 #include "error.h"
 #include "environment.h"
 #include "foreign.h"
+#include "func.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {
@@ -53,7 +54,14 @@ static void context_free(schemerlicht_context* ctxt)
     schemerlicht_external_function_destroy(ctxt, fit);
     }
   schemerlicht_vector_destroy(ctxt, &ctxt->externals);
-  schemerlicht_environment_destroy(ctxt);
+  schemerlicht_environment_destroy(ctxt);  
+  schemerlicht_function** lit = schemerlicht_vector_begin(&ctxt->lambdas, schemerlicht_function*);
+  schemerlicht_function** lit_end = schemerlicht_vector_end(&ctxt->lambdas, schemerlicht_function*);
+  for (; lit != lit_end; ++lit)
+    {
+    schemerlicht_function_free(ctxt, *lit);
+    }
+  schemerlicht_vector_destroy(ctxt, &ctxt->lambdas);
   schemerlicht_free(ctxt, ctxt, sizeof(schemerlicht_context));
   }
 
@@ -93,6 +101,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_vector_init(ctxt, &ctxt->externals, schemerlicht_external_function);
   ctxt->externals_map = schemerlicht_map_new(ctxt, 0, 4);
   schemerlicht_environment_init(ctxt);  
+  schemerlicht_vector_init(ctxt, &ctxt->lambdas, schemerlicht_function*);
   }
 
 schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)

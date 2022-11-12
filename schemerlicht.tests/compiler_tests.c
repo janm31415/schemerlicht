@@ -923,7 +923,7 @@ static void test_compile_error_aux(const char* script, const char* first_error_m
 
 static void test_compile_errors()
   {
-  test_compile_error_aux("(let ([x 5]) y)", "compile error (1,14): variable unknown: y");
+  //test_compile_error_aux("(let ([x 5]) y)", "compile error (1,14): variable unknown: y"); // used to be an error, but now unlinked variables are allowed as they might be resolved later on by a load operation
   }
 
 static void test_define()
@@ -3005,6 +3005,11 @@ static void test_eval()
   test_compile_aux("#((1 2 3) #(3.000000 40.000000) 3 \"abc\" 5 6 7)", "(eval '(vector (list 1 2 3) (vector 3.0 40.0) 3 \"abc\" 5 6 7))");
   }
 
+static void test_load()
+  {
+  test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(load \"data/load_test.scm\") (zip (list 1 2 3 4) (list 5 6 7 8))");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -3108,4 +3113,5 @@ void run_all_compiler_tests()
   test_display();
   test_getenv();
   test_eval();
+  test_load();
   }
