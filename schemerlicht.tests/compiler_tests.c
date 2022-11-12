@@ -2983,6 +2983,16 @@ static void test_display()
   );
   }
 
+static void test_getenv()
+  {
+  test_compile_aux("#f", "(getenv \"SchemerlichtTest\")");
+  test_compile_aux("#f", "(putenv \"SchemerlichtTest\")");
+  test_compile_aux("#t", "(putenv \"SchemerlichtTest\" \"DummyValue\")");
+  test_compile_aux("\"DummyValue\"", "(getenv \"SchemerlichtTest\")");
+  test_compile_aux("#t", "(putenv \"SchemerlichtTest\" \"Dummy\")");
+  test_compile_aux("\"Dummy\"", "(getenv \"SchemerlichtTest\")");
+  }
+
 void run_all_compiler_tests()
   {
   test_compile_fixnum();
@@ -3084,4 +3094,5 @@ void run_all_compiler_tests()
   test_read();
   test_write();
   test_display();
+  test_getenv();
   }

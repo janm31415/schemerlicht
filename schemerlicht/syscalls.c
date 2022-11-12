@@ -7,6 +7,7 @@
 #include <unistd.h>
 #endif
 #include <fcntl.h>
+#include <stdlib.h>
 
 int schemerlicht_write(int fd, const void* buffer, unsigned int count)
   {
@@ -19,7 +20,7 @@ int schemerlicht_write(int fd, const void* buffer, unsigned int count)
 #endif
   }
 
-int schemerlicht_read(int fd, const void* buffer, unsigned int buffer_size)
+int schemerlicht_read(int fd, void* buffer, unsigned int buffer_size)
   {
   if (fd < 0)
     return 0;
@@ -69,5 +70,19 @@ long schemerlicht_tell(int fd)
   return _tell(fd);
 #else
   return tell(fd);
+#endif
+  }
+
+const char* schemerlicht_getenv(const char* name)
+  {
+  return getenv(name);
+  }
+
+int schemerlicht_putenv(const char* name, const char* value)
+  {
+#ifdef _WIN32
+  return (int)_putenv_s(name, value);
+#else
+  return setenv(name, value, 1);
 #endif
   }

@@ -8045,6 +8045,95 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_LOAD);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_EVAL);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_putenv(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_PUTENV);
+  if (b < 2)
+    {
+    ra->type = schemerlicht_object_type_false;
+    }
+  else
+    {
+    schemerlicht_object* s1 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_object* s2 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+    if (s1->type == schemerlicht_object_type_string && s2->type == schemerlicht_object_type_string)
+      {
+      int res = schemerlicht_putenv(s1->value.s.string_ptr, s2->value.s.string_ptr);
+      if (res == 0)
+        ra->type = schemerlicht_object_type_true;
+      else
+        ra->type = schemerlicht_object_type_false;
+      }
+    else
+      {
+      ra->type = schemerlicht_object_type_false;
+      }
+    }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_getenv(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_GETENV);
+  if (b == 0)
+    {
+    ra->type = schemerlicht_object_type_false;
+    }
+  else
+    {
+    schemerlicht_object* str = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (str->type == schemerlicht_object_type_string)
+      {
+      const char* env = schemerlicht_getenv(str->value.s.string_ptr);
+      if (env)
+        {
+        schemerlicht_object s = make_schemerlicht_object_string(ctxt, env);        
+        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+        schemerlicht_set_object(heap_obj, &s);
+        ++ctxt->heap_pos;
+        schemerlicht_set_object(ra, &s);
+        }
+      else
+        {
+        ra->type = schemerlicht_object_type_false;
+        }
+      }
+    else
+      {
+      ra->type = schemerlicht_object_type_false;
+      }
+    }
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
 #if 0
@@ -8638,6 +8727,18 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_READ:
       schemerlicht_primitive_read(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_LOAD:
+      schemerlicht_primitive_load(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_EVAL:
+      schemerlicht_primitive_eval(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_GETENV:
+      schemerlicht_primitive_getenv(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_PUTENV:
+      schemerlicht_primitive_putenv(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -8857,5 +8958,9 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "%write", SCHEMERLICHT_WRITE);
   map_insert(ctxt, m, "%display", SCHEMERLICHT_DISPLAY);
   map_insert(ctxt, m, "%read", SCHEMERLICHT_READ);
+  map_insert(ctxt, m, "load", SCHEMERLICHT_LOAD);
+  map_insert(ctxt, m, "eval", SCHEMERLICHT_EVAL);
+  map_insert(ctxt, m, "getenv", SCHEMERLICHT_GETENV);
+  map_insert(ctxt, m, "putenv", SCHEMERLICHT_PUTENV);
   return m;
   }

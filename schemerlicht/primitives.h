@@ -200,7 +200,11 @@ typedef enum
   SCHEMERLICHT_IS_CHAR_READY,
   SCHEMERLICHT_WRITE,
   SCHEMERLICHT_DISPLAY,
-  SCHEMERLICHT_READ
+  SCHEMERLICHT_READ,
+  SCHEMERLICHT_LOAD,
+  SCHEMERLICHT_EVAL,
+  SCHEMERLICHT_GETENV,
+  SCHEMERLICHT_PUTENV
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -398,6 +402,10 @@ void schemerlicht_primitive_is_char_ready(schemerlicht_context* ctxt, int a, int
 void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_putenv(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_getenv(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
