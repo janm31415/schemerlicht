@@ -20,6 +20,7 @@ globdef.h
 inlines.h
 lambdatolet.h
 limits.h
+macro.h
 map.h
 memory.h
 object.h
@@ -65,6 +66,7 @@ func.c
 gc.c
 globdef.c
 lambdatolet.c
+macro.c
 map.c
 memory.c
 object.c

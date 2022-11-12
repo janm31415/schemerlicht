@@ -26,6 +26,7 @@
 #include "schemerlicht/callcc.h"
 #include "schemerlicht/foreign.h"
 #include "schemerlicht/r5rs.h"
+#include "schemerlicht/macro.h"
 
 #include <time.h>
 
@@ -96,6 +97,7 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
+  schemerlicht_expand_macros(ctxt, &prog);
   schemerlicht_quasiquote_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -147,6 +149,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_expand_macros(ctxt, &prog);
   schemerlicht_quasiquote_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -3014,11 +3017,18 @@ static void test_eval()
   test_compile_aux("#undefined", "(define e (null-environment)) (eval '(define x (* 7 3)) e) x");
   test_compile_aux("#undefined", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x)");
   test_compile_aux("21", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x e)");
+  test_compile_aux("21", "(define e (interaction-environment)) (eval '(define x (* 7 3)) e) x");
+  test_compile_aux("21", "(eval '(define x (* 7 3))) x");
   }
 
 static void test_load()
   {
   test_compile_aux("((1 5) (2 6) (3 7) (4 8))", "(load \"data/load_test.scm\") (zip (list 1 2 3 4) (list 5 6 7 8))");
+  }
+
+static void test_macros()
+  {
+  test_compile_aux("8", "(define-macro (eight) '(+ 3 5))  (eight)");
   }
 
 void run_all_compiler_tests()
@@ -3125,4 +3135,5 @@ void run_all_compiler_tests()
   test_getenv();
   test_eval();
   test_load();
+  test_macros();
   }

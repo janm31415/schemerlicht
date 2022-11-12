@@ -15,9 +15,11 @@
 #include "quasiquote.h"
 #include "alpha.h"
 #include "vector.h"
+#include "macro.h"
 
 void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* prog)
   {
+  schemerlicht_expand_macros(ctxt, prog);
   schemerlicht_quasiquote_conversion(ctxt, prog);
   schemerlicht_define_conversion(ctxt, prog);
   schemerlicht_single_begin_conversion(ctxt, prog);

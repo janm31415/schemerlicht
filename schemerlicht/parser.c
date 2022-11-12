@@ -2231,8 +2231,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "current-seconds", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "current-milliseconds", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "define", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "defmacro", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "define-macro", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "defmacro", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "define-macro", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "delay", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "%display", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eq?", schemerlicht_et_primitive_call);
@@ -2276,8 +2276,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "input-port?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer->char", schemerlicht_et_primitive_call);
-  map_insert(ctxt, m, "interaction-environment", schemerlicht_et_primitive_call);
-  //map_insert(ctxt, m, "include", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "interaction-environment", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "load", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "lcm", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "length", schemerlicht_et_primitive_call);
