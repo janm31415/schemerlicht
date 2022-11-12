@@ -9,6 +9,8 @@
 #include "reader.h"
 #include "preprocess.h"
 #include "compiler.h"
+#include "callcc.h"
+#include "r5rs.h"
 
 #include <time.h>
 #include <math.h>
@@ -8114,8 +8116,15 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
     {
     schemerlicht_object* q = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     schemerlicht_string s = schemerlicht_object_to_string(ctxt, q, 0);
-    schemerlicht_context* eval_ctxt = schemerlicht_context_init(ctxt, ctxt->raw_heap.vector_size);
-
+    schemerlicht_context* eval_ctxt = ctxt;
+    if (b > 1)
+      {
+      schemerlicht_object* e = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+      if (e->type == schemerlicht_object_type_environment)
+        {
+        eval_ctxt = cast(schemerlicht_context*, e->value.ptr);
+        }
+      }
     schemerlicht_stream str;
     schemerlicht_memsize len = s.string_length;
     schemerlicht_stream_init(eval_ctxt, &str, len);
@@ -8132,8 +8141,6 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
     schemerlicht_function_free(eval_ctxt, func);
     destroy_tokens_vector(eval_ctxt, &tokens);
     schemerlicht_program_destroy(eval_ctxt, &prog);
-
-    schemerlicht_context_destroy(eval_ctxt);
     schemerlicht_string_destroy(ctxt, &s);
     schemerlicht_set_object(ra, &res_copy);
     }
@@ -8240,6 +8247,98 @@ void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b
       ra->type = schemerlicht_object_type_false;
       }
     }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_interaction_environment(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_INTERACTION_ENVIRONMENT);
+  ra->type = schemerlicht_object_type_environment;
+  ra->value.ptr = cast(void*, ctxt);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_is_environment(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_ENVIRONMENT);
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_environment)
+      ra->type = schemerlicht_object_type_true;
+    else
+      ra->type = schemerlicht_object_type_false;
+    }
+  else
+    {
+    ra->type = schemerlicht_object_type_false;
+    }
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_null_environment(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_NULL_ENVIRONMENT);
+  schemerlicht_memsize heapsize = ctxt->raw_heap.vector_size;
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_fixnum)
+      {
+      heapsize = cast(schemerlicht_memsize, v->value.fx);
+      }
+    else if (v->type == schemerlicht_object_type_flonum)
+      {
+      heapsize = cast(schemerlicht_memsize, v->value.fl);
+      }
+    }
+  ra->type = schemerlicht_object_type_environment;
+  schemerlicht_context* new_ctxt = schemerlicht_context_init(ctxt, heapsize);
+  schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
+  ra->value.ptr = cast(void*, new_ctxt);
+  }
+
+////////////////////////////////////////////////////
+
+void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a, int b, int c)
+  {
+  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
+  schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+  schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_SCHEME_ENVIRONMENT);
+  schemerlicht_memsize heapsize = ctxt->raw_heap.vector_size;
+  if (b > 0)
+    {
+    schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    if (v->type == schemerlicht_object_type_fixnum)
+      {
+      heapsize = cast(schemerlicht_memsize, v->value.fx);
+      }
+    else if (v->type == schemerlicht_object_type_flonum)
+      {
+      heapsize = cast(schemerlicht_memsize, v->value.fl);
+      }
+    }
+  ra->type = schemerlicht_object_type_environment;
+  schemerlicht_context* new_ctxt = schemerlicht_context_init(ctxt, heapsize);
+  schemerlicht_function* callcc = schemerlicht_compile_callcc(new_ctxt);
+  schemerlicht_function* r5rs = schemerlicht_compile_r5rs(new_ctxt);
+  schemerlicht_vector_push_back(new_ctxt, &new_ctxt->lambdas, callcc, schemerlicht_function*);
+  schemerlicht_vector_push_back(new_ctxt, &new_ctxt->lambdas, r5rs, schemerlicht_function*);
+  schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
+  ra->value.ptr = cast(void*, new_ctxt);
   }
 
 ////////////////////////////////////////////////////
@@ -8852,6 +8951,18 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     case SCHEMERLICHT_FILE_EXISTS:
       schemerlicht_primitive_file_exists(ctxt, a, b, c);
       break;
+    case SCHEMERLICHT_INTERACTION_ENVIRONMENT:
+      schemerlicht_primitive_interaction_environment(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_IS_ENVIRONMENT:
+      schemerlicht_primitive_is_environment(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_NULL_ENVIRONMENT:
+      schemerlicht_primitive_null_environment(ctxt, a, b, c);
+      break;
+    case SCHEMERLICHT_SCHEME_ENVIRONMENT:
+      schemerlicht_primitive_scheme_environment(ctxt, a, b, c);
+      break;
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
@@ -9076,5 +9187,9 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "getenv", SCHEMERLICHT_GETENV);
   map_insert(ctxt, m, "putenv", SCHEMERLICHT_PUTENV);
   map_insert(ctxt, m, "file-exists?", SCHEMERLICHT_FILE_EXISTS);
+  map_insert(ctxt, m, "interaction-environment", SCHEMERLICHT_INTERACTION_ENVIRONMENT);
+  map_insert(ctxt, m, "environment?", SCHEMERLICHT_IS_ENVIRONMENT);
+  map_insert(ctxt, m, "null-environment", SCHEMERLICHT_NULL_ENVIRONMENT);
+  map_insert(ctxt, m, "scheme-environment", SCHEMERLICHT_SCHEME_ENVIRONMENT);
   return m;
   }

@@ -26,6 +26,7 @@
 #define schemerlicht_object_type_port 17
 #define schemerlicht_object_type_promise 18
 #define schemerlicht_object_type_eof 19
+#define schemerlicht_object_type_environment 20
 
 
 typedef union

@@ -2237,6 +2237,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "%display", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eq?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eqv?", schemerlicht_et_primitive_call);  
+  map_insert(ctxt, m, "environment?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "eof-object?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "equal?", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "eval", schemerlicht_et_primitive_call);
@@ -2275,6 +2276,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "input-port?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "integer->char", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "interaction-environment", schemerlicht_et_primitive_call);
   //map_insert(ctxt, m, "include", schemerlicht_et_primitive_call);  
   map_insert(ctxt, m, "load", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "lcm", schemerlicht_et_primitive_call);
@@ -2299,6 +2301,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "nan?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "negative?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "not", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "null-environment", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "number?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "number->string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "null?", schemerlicht_et_primitive_call);  
@@ -2324,6 +2327,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "remainder", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "reverse", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "round", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "scheme-environment", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-car!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-cdr!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sin", schemerlicht_et_primitive_call);

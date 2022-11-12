@@ -58,6 +58,7 @@ struct schemerlicht_context
   schemerlicht_vector externals;
   schemerlicht_map* externals_map;
   schemerlicht_vector lambdas;
+  schemerlicht_vector environments; // pointers to other context instantiations that can be used by eval
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

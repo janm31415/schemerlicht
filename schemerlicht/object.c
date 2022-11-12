@@ -30,6 +30,7 @@ int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_
     case schemerlicht_object_type_string:
       return obj1->value.s.string_ptr == obj2->value.s.string_ptr ? 1 : 0;
     case schemerlicht_object_type_lambda:
+    case schemerlicht_object_type_environment:
       return obj1->value.ptr == obj2->value.ptr;
     default:
       return obj1->value.v.vector_ptr == obj2->value.v.vector_ptr;
@@ -116,6 +117,7 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
           }
         break;
       case schemerlicht_object_type_lambda:
+      case schemerlicht_object_type_environment:
         if (o1->value.ptr != o2->value.ptr)
           {
           schemerlicht_vector_destroy(ctxt, &left_queue);
@@ -173,6 +175,7 @@ int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_ob
     case schemerlicht_object_type_string:
       return strcmp(obj1->value.s.string_ptr, obj2->value.s.string_ptr) == 0 ? 1 : 0;
     case schemerlicht_object_type_lambda:
+    case schemerlicht_object_type_environment:
       return obj1->value.ptr == obj2->value.ptr;
     default:
       if (obj1->value.v.vector_size != obj2->value.v.vector_size)
@@ -482,6 +485,9 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         case schemerlicht_object_type_lambda:
           schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");
           break;
+        case schemerlicht_object_type_environment:
+          schemerlicht_string_append_cstr(ctxt, &s, "<environment>");
+          break;
         case schemerlicht_object_type_eof:
           schemerlicht_string_append_cstr(ctxt, &s, "#eof");
           break;
@@ -657,6 +663,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       case schemerlicht_object_type_nil:
       case schemerlicht_object_type_void:
       case schemerlicht_object_type_lambda:
+      case schemerlicht_object_type_environment:
       case schemerlicht_object_type_primitive:
       case schemerlicht_object_type_primitive_object:
       case schemerlicht_object_type_blocking:

@@ -205,7 +205,11 @@ typedef enum
   SCHEMERLICHT_EVAL,
   SCHEMERLICHT_GETENV,
   SCHEMERLICHT_PUTENV,
-  SCHEMERLICHT_FILE_EXISTS
+  SCHEMERLICHT_FILE_EXISTS,
+  SCHEMERLICHT_INTERACTION_ENVIRONMENT,
+  SCHEMERLICHT_IS_ENVIRONMENT,
+  SCHEMERLICHT_NULL_ENVIRONMENT,
+  SCHEMERLICHT_SCHEME_ENVIRONMENT
   } schemerlicht_primitives;
 
 void schemerlicht_primitive_add1(schemerlicht_context* ctxt, int a, int b, int c);
@@ -408,6 +412,10 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
 void schemerlicht_primitive_putenv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_getenv(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_interaction_environment(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_is_environment(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_null_environment(schemerlicht_context* ctxt, int a, int b, int c);
+void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a, int b, int c);
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 

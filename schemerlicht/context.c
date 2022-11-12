@@ -62,6 +62,13 @@ static void context_free(schemerlicht_context* ctxt)
     schemerlicht_function_free(ctxt, *lit);
     }
   schemerlicht_vector_destroy(ctxt, &ctxt->lambdas);
+  schemerlicht_context** cit = schemerlicht_vector_begin(&ctxt->environments, schemerlicht_context*);
+  schemerlicht_context** cit_end = schemerlicht_vector_end(&ctxt->environments, schemerlicht_context*);
+  for (; cit != cit_end; ++cit)
+    {
+    context_free(*cit);
+    }
+  schemerlicht_vector_destroy(ctxt, &ctxt->environments);
   schemerlicht_free(ctxt, ctxt, sizeof(schemerlicht_context));
   }
 
@@ -102,6 +109,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   ctxt->externals_map = schemerlicht_map_new(ctxt, 0, 4);
   schemerlicht_environment_init(ctxt);  
   schemerlicht_vector_init(ctxt, &ctxt->lambdas, schemerlicht_function*);
+  schemerlicht_vector_init(ctxt, &ctxt->environments, schemerlicht_context*);
   }
 
 schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)

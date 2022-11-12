@@ -2998,11 +2998,22 @@ static void test_getenv()
 
 static void test_eval()
   {
+  test_compile_aux("<environment>", "(interaction-environment)");
+  test_compile_aux("#t", "(environment? (interaction-environment))");
+  test_compile_aux("#f", "(environment? \"Hello\")");
+  test_compile_aux("#f", "(environment? 5)");
+  test_compile_aux("#t", "(environment? (null-environment))");
+  test_compile_aux("#t", "(environment? (scheme-environment))");
   test_compile_aux("21", "(eval '(* 7 3))");
   test_compile_aux("(7 . 3)", "(eval '(cons 7 3))");
   test_compile_aux("#(1 2 3 4 5 6 7)", "(eval '(vector 1 2 3 4 5 6 7))");
   test_compile_aux("#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)", "(eval '(vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))");
   test_compile_aux("#((1 2 3) #(3.000000 40.000000) 3 \"abc\" 5 6 7)", "(eval '(vector (list 1 2 3) (vector 3.0 40.0) 3 \"abc\" 5 6 7))");
+
+  test_compile_aux("21", "(define e (null-environment)) (eval '(define x (* 7 3)) e)");
+  test_compile_aux("#undefined", "(define e (null-environment)) (eval '(define x (* 7 3)) e) x");
+  test_compile_aux("#undefined", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x)");
+  test_compile_aux("21", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x e)");
   }
 
 static void test_load()
