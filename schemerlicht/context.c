@@ -23,6 +23,8 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_map_values_free(ctxt, ctxt->string_to_symbol);
   schemerlicht_map_keys_free(ctxt, ctxt->string_to_symbol);
   schemerlicht_map_free(ctxt, ctxt->string_to_symbol);
+  schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
+  schemerlicht_map_free(ctxt, ctxt->macro_map);
   schemerlicht_syntax_errors_clear(ctxt);
   schemerlicht_compile_errors_clear(ctxt);
   schemerlicht_vector_destroy(ctxt, &ctxt->stack);
@@ -99,6 +101,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   ctxt->quote_to_index = schemerlicht_map_new(ctxt, 0, 8);
   ctxt->quote_to_index_size = 0;
   ctxt->string_to_symbol = schemerlicht_map_new(ctxt, 0, 8);
+  ctxt->macro_map = schemerlicht_map_new(ctxt, 0, 4);
   for (int i = 0; i < SCHEMERLICHT_MAX_POOL; ++i)
     schemerlicht_pool_allocator_init(ctxt, &ctxt->pool[i], 256, sizeof(schemerlicht_object)*(i+1));
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);

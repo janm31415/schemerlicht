@@ -8,6 +8,29 @@
 #include "preprocess.h"
 #include "func.h"
 #include "compiler.h"
+#include "map.h"
+#include "reader.h"
+#include "stream.h"
+#include "token.h"
+#include "vm.h"
+
+static schemerlicht_cell expression_to_cell(schemerlicht_context* ctxt, schemerlicht_expression* expr)
+  {
+  schemerlicht_string s = schemerlicht_dump_expression(ctxt, expr);
+  schemerlicht_stream str;
+  schemerlicht_memsize len = s.string_length;
+  schemerlicht_stream_init(ctxt, &str, len);
+  schemerlicht_stream_write(ctxt, &str, s.string_ptr, len, 0);
+  schemerlicht_stream_rewind(&str);
+  schemerlicht_vector tokens = tokenize(ctxt, &str);
+  schemerlicht_stream_close(ctxt, &str);
+  schemerlicht_string_destroy(ctxt, &s);
+  token* token_it = schemerlicht_vector_begin(&tokens, token);
+  token* token_it_end = schemerlicht_vector_end(&tokens, token);
+  schemerlicht_cell out_cell = schemerlicht_read_quote(ctxt, &token_it, &token_it_end, 1);
+  destroy_tokens_vector(ctxt, &tokens);
+  return out_cell;
+  }
 
 typedef struct schemerlicht_macro_finder_visitor
   {
@@ -80,6 +103,43 @@ static schemerlicht_string copy_name(schemerlicht_context* ctxt, schemerlicht_ex
   else
     schemerlicht_string_copy(ctxt, &name, &expr->expr.var.name);
   return name;
+  }
+
+static void add_to_macro_map(schemerlicht_context* ctxt, schemerlicht_string* macro_name, int variable_arity, schemerlicht_memsize number_of_arguments)
+  {   
+  schemerlicht_object key;
+  key.type = schemerlicht_object_type_string;
+  schemerlicht_string_copy(ctxt, &key.value.s, macro_name);
+  schemerlicht_object* value = schemerlicht_map_insert(ctxt, ctxt->macro_map, &key);
+  value->type = schemerlicht_object_type_fixnum;
+  value->value.fx = cast(schemerlicht_fixnum, number_of_arguments);
+  if (variable_arity)
+    {
+    value->value.fx = -value->value.fx;
+    }
+  }
+
+static int find_in_macro_map(schemerlicht_context* ctxt, int* variable_arity, schemerlicht_memsize* number_of_arguments, schemerlicht_string* macro_name)
+  {
+  schemerlicht_object key;
+  key.type = schemerlicht_object_type_string;
+  key.value.s = *macro_name;
+  schemerlicht_object* value = schemerlicht_map_get(ctxt, ctxt->macro_map, &key);
+  if (value)
+    {
+    if (value->value.fx < 0)
+      {
+      *variable_arity = 1;
+      *number_of_arguments = cast(schemerlicht_memsize, -value->value.fx);
+      }
+    else
+      {
+      *variable_arity = 0;
+      *number_of_arguments = cast(schemerlicht_memsize, value->value.fx);
+      }
+    return 1;
+    }
+  return 0;
   }
 
 static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_program* program)
@@ -214,6 +274,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
     schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, macrovar, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &prim.expr.prim.arguments, lam, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &prog_out.expressions, prim, schemerlicht_expression);
+    add_to_macro_map(ctxt, &macro_name, variable_arity, variable_names.vector_size);
     }
 
   schemerlicht_macro_finder_visitor_free(ctxt, v);
@@ -221,19 +282,146 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
   return prog_out;
   }
 
+typedef struct schemerlicht_macro_expander_visitor
+  {
+  int macros_expanded;
+  schemerlicht_visitor* visitor;  
+  } schemerlicht_macro_expander_visitor;
+
+
+static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  schemerlicht_macro_expander_visitor* vis = (schemerlicht_macro_expander_visitor*)(v->impl);  
+  schemerlicht_expression* var = schemerlicht_vector_begin(&e->expr.funcall.fun, schemerlicht_expression);
+  if (var->type == schemerlicht_type_variable)
+    {
+    int variable_arity;
+    schemerlicht_memsize number_of_arguments;
+    if (find_in_macro_map(ctxt, &variable_arity, &number_of_arguments, &var->expr.var.name))
+      {
+      if (variable_arity == 0)
+        {
+        if (e->expr.funcall.arguments.vector_size != number_of_arguments)
+          {
+          schemerlicht_compile_error(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
+          return 0;
+          }        
+        }
+      else
+        {
+        if (e->expr.funcall.arguments.vector_size < number_of_arguments)
+          {
+          schemerlicht_compile_error(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
+          return 0;
+          }
+        }
+      
+      schemerlicht_expression* arg_it = schemerlicht_vector_begin(&e->expr.funcall.arguments, schemerlicht_expression);
+      schemerlicht_expression* arg_it_end = schemerlicht_vector_end(&e->expr.funcall.arguments, schemerlicht_expression);
+
+      for (; arg_it != arg_it_end; ++arg_it)
+        {
+        schemerlicht_expression q = schemerlicht_init_quote(ctxt);
+        q.expr.quote.arg = expression_to_cell(ctxt, arg_it);
+        schemerlicht_expression_destroy(ctxt, arg_it);
+        *arg_it = q;
+        }
+
+      schemerlicht_program pr;
+      schemerlicht_vector_init(ctxt, &pr.expressions, schemerlicht_expression);
+      schemerlicht_vector_push_back(ctxt, &pr.expressions, *e, schemerlicht_expression);
+      schemerlicht_preprocess(ctxt, &pr);
+      schemerlicht_expression* expr = schemerlicht_vector_at(&pr.expressions, 0, schemerlicht_expression);
+      schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
+      schemerlicht_object* res = schemerlicht_run(ctxt, func);
+      schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
+      schemerlicht_function_free(ctxt, func);
+
+      schemerlicht_stream str;
+      schemerlicht_memsize len = s.string_length;
+      schemerlicht_stream_init(ctxt, &str, len);
+      schemerlicht_stream_write(ctxt, &str, s.string_ptr, len, 0);
+      schemerlicht_stream_rewind(&str);
+      schemerlicht_vector tokens = tokenize(ctxt, &str);
+      schemerlicht_stream_close(ctxt, &str);
+      schemerlicht_string_destroy(ctxt, &s);
+      schemerlicht_program result = make_program(ctxt, &tokens);
+      destroy_tokens_vector(ctxt, &tokens);
+      schemerlicht_program_destroy(ctxt, &pr);
+
+      if (result.expressions.vector_size == 0)
+        {
+        *e = schemerlicht_init_nop(ctxt);     
+        schemerlicht_vector_destroy(ctxt, &result.expressions);
+        }
+      else if (result.expressions.vector_size == 1)
+        {
+        *e = *schemerlicht_vector_begin(&result.expressions, schemerlicht_expression);
+        schemerlicht_vector_destroy(ctxt, &result.expressions);
+        }
+      else
+        {
+        *e = schemerlicht_init_begin(ctxt);
+        schemerlicht_vector_destroy(ctxt, &e->expr.beg.arguments);
+        e->expr.beg.arguments = result.expressions;
+        }      
+      return 0;
+      }
+    }
+
+  return 1;
+  }
+
+static schemerlicht_macro_expander_visitor* schemerlicht_macro_expander_visitor_new(schemerlicht_context* ctxt)
+  {
+  schemerlicht_macro_expander_visitor* v = schemerlicht_new(ctxt, schemerlicht_macro_expander_visitor);
+  v->visitor = schemerlicht_visitor_new(ctxt, v);
+  v->visitor->previsit_funcall = previsit_funcall;
+  v->macros_expanded = 0;
+  return v;
+  }
+
+static void schemerlicht_macro_expander_visitor_free(schemerlicht_context* ctxt, schemerlicht_macro_expander_visitor* v)
+  {
+  if (v)
+    {
+    v->visitor->destroy(ctxt, v->visitor);    
+    schemerlicht_delete(ctxt, v);
+    }
+  }
+
+
+static int expand_existing_macros(schemerlicht_context* ctxt, schemerlicht_program* prog)
+  {
+  schemerlicht_macro_expander_visitor* v = schemerlicht_macro_expander_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, v->visitor, prog);
+  int macros_expanded = v->macros_expanded;
+  schemerlicht_macro_expander_visitor_free(ctxt, v);
+  return macros_expanded;
+  }
+
 void schemerlicht_expand_macros(schemerlicht_context* ctxt, schemerlicht_program* program)
   {
-  schemerlicht_program pr = get_macros(ctxt, program);
-  if (pr.expressions.vector_size > 0)
+  int macros_expanded = 1;
+  while (macros_expanded)
     {
-    schemerlicht_string s = schemerlicht_dump(ctxt, &pr);
-    printf("%s\n", s.string_ptr);
-    schemerlicht_string_destroy(ctxt, &s);
-    schemerlicht_preprocess(ctxt, &pr);
-    schemerlicht_expression* expr = schemerlicht_vector_at(&pr.expressions, 0, schemerlicht_expression);
-    schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
-    schemerlicht_object* res = schemerlicht_run(ctxt, func);
-    schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+    macros_expanded = 0;
+    schemerlicht_program macro_program = get_macros(ctxt, program);
+    if (macro_program.expressions.vector_size > 0)
+      {
+#if 0
+      schemerlicht_string s = schemerlicht_dump(ctxt, &macro_program);
+      printf("%s\n", s.string_ptr);
+      schemerlicht_string_destroy(ctxt, &s);
+#endif
+
+      schemerlicht_preprocess(ctxt, &macro_program);
+      schemerlicht_expression* expr = schemerlicht_vector_at(&macro_program.expressions, 0, schemerlicht_expression);
+      schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
+      schemerlicht_object* res = schemerlicht_run(ctxt, func);
+      schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+      macros_expanded = expand_existing_macros(ctxt, program);
+      }
+    schemerlicht_program_destroy(ctxt, &macro_program);
     }
-  schemerlicht_program_destroy(ctxt, &pr);
   }
