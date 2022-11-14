@@ -662,7 +662,10 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
         }
       else
         {
-        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &c.value.str);
+        schemerlicht_object key;
+        key.type = schemerlicht_object_type_string;
+        key.value.s = c.value.str;
+        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &key);
         if (symbol != NULL)
           {
           schemerlicht_set_object(&res, symbol);

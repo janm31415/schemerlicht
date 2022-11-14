@@ -5530,7 +5530,7 @@ void schemerlicht_primitive_is_integer(schemerlicht_context* ctxt, int a, int b,
       case schemerlicht_object_type_flonum:
       {
       schemerlicht_fixnum fx = cast(schemerlicht_fixnum, arg->value.fl);
-      if ((arg->value.fl == cast(schemerlicht_flonum, fx)))
+        if (arg->value.fl == cast(schemerlicht_flonum, fx))
         obj.type = schemerlicht_object_type_true;
       break;
       }
@@ -7412,7 +7412,7 @@ void schemerlicht_primitive_write_char(schemerlicht_context* ctxt, int a, int b,
           schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
           schemerlicht_string dummy;
           schemerlicht_string_init_with_size(ctxt, &dummy, 256, 0);
-          schemerlicht_string_append(ctxt, &s, &dummy);
+          schemerlicht_string_append(ctxt, &s->value.s, &dummy);
           schemerlicht_string_destroy(ctxt, &dummy);
           schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += 256;
           }
@@ -7467,7 +7467,7 @@ void schemerlicht_primitive_flush_output_port(schemerlicht_context* ctxt, int a,
 
 ////////////////////////////////////////////////////
 
-static int get_char(char* ch, schemerlicht_object* p, int read)
+static int get_char(schemerlicht_byte* ch, schemerlicht_object* p, int read)
   {
   schemerlicht_assert(p->type == schemerlicht_object_type_port);
   schemerlicht_assert(schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type == schemerlicht_object_type_true);
@@ -7990,7 +7990,10 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
 static int _port_get_char(char* ch, void* p, int read)
   {
   schemerlicht_object* prt = cast(schemerlicht_object*, p);
-  return get_char(ch, prt, read);
+  schemerlicht_byte b;
+  int result = get_char(&b, prt, read);
+  *ch = cast(char, b);
+  return result;
   }
 
 static void _port_next_char(void* p)

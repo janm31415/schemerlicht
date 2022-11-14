@@ -115,7 +115,7 @@ static void visit_variable_replace_visitor(schemerlicht_context* ctxt, schemerli
 
 static schemerlicht_replace_variable_visitor* schemerlicht_replace_variable_visitor_new(schemerlicht_context* ctxt)
   {
-  schemerlicht_is_mutable_variable_visitor* v = schemerlicht_new(ctxt, schemerlicht_replace_variable_visitor);
+  schemerlicht_replace_variable_visitor* v = schemerlicht_new(ctxt, schemerlicht_replace_variable_visitor);
   v->visitor = schemerlicht_visitor_new(ctxt, v); 
   v->visitor->visit_variable = visit_variable_replace_visitor;
   return v;

@@ -674,7 +674,10 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       }
       case schemerlicht_object_type_symbol:
       {
-        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &obj.value.s);
+        schemerlicht_object key;
+        key.type = schemerlicht_object_type_string;
+        key.value.s = obj.value.s;
+        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &key);
         if (symbol != NULL)
           {
           schemerlicht_set_object(&res, symbol);

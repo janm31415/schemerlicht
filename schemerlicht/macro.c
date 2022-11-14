@@ -449,7 +449,7 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
         {
         if (e->expr.funcall.arguments.vector_size != number_of_arguments)
           {
-          schemerlicht_compile_error(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
           return 0;
           }
         }
@@ -457,7 +457,7 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
         {
         if (e->expr.funcall.arguments.vector_size < number_of_arguments)
           {
-          schemerlicht_compile_error(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
           return 0;
           }
         }

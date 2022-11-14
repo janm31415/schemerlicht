@@ -211,7 +211,7 @@ int schemerlicht_read_token_polymorph(token* tok, schemerlicht_context* ctxt, sc
         break;
       }
 
-    const void* str_position = get_position(str);
+    const schemerlicht_fixnum str_position = get_position(str);
     if (!is_a_character) // any special sign can appear as a character, e.g. #\(
       {
       switch (s)
@@ -434,7 +434,7 @@ int schemerlicht_read_token_polymorph(token* tok, schemerlicht_context* ctxt, sc
         } // switch (s)
       }
 
-    if (str_position == get_position(str) && valid_chars_remaining)
+    if ((str_position == get_position(str)) && valid_chars_remaining)
       {
       schemerlicht_string_push_back(ctxt, buff, s);
       next_char(str);
