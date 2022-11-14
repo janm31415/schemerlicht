@@ -27,10 +27,12 @@
 #include "schemerlicht/foreign.h"
 #include "schemerlicht/r5rs.h"
 #include "schemerlicht/macro.h"
+#include "schemerlicht/preprocess.h"
 
 #include <time.h>
 
 static int print_gc_time = 0;
+static int full_preprocessor = 0;
 
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
@@ -97,21 +99,28 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
-  schemerlicht_expand_macros(ctxt, &prog);
-  schemerlicht_quasiquote_conversion(ctxt, &prog);
-  schemerlicht_define_conversion(ctxt, &prog);
-  schemerlicht_single_begin_conversion(ctxt, &prog);
-  schemerlicht_simplify_to_core_forms(ctxt, &prog);
-  schemerlicht_alpha_conversion(ctxt, &prog);
-  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
-  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
-  schemerlicht_quote_collection_destroy(ctxt, &quotes);
-  schemerlicht_global_define_environment_allocation(ctxt, &prog);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
-  schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_free_variable_analysis(ctxt, &prog);
-  schemerlicht_closure_conversion(ctxt, &prog);
+  if (full_preprocessor)
+    {
+    schemerlicht_preprocess(ctxt, &prog);
+    }
+  else
+    {
+    schemerlicht_expand_macros(ctxt, &prog);
+    schemerlicht_quasiquote_conversion(ctxt, &prog);
+    schemerlicht_define_conversion(ctxt, &prog);
+    schemerlicht_single_begin_conversion(ctxt, &prog);
+    schemerlicht_simplify_to_core_forms(ctxt, &prog);
+    schemerlicht_alpha_conversion(ctxt, &prog);
+    schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+    schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+    schemerlicht_quote_collection_destroy(ctxt, &quotes);
+    schemerlicht_global_define_environment_allocation(ctxt, &prog);
+    schemerlicht_continuation_passing_style(ctxt, &prog);
+    schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+    schemerlicht_assignable_variable_conversion(ctxt, &prog);
+    schemerlicht_free_variable_analysis(ctxt, &prog);
+    schemerlicht_closure_conversion(ctxt, &prog);
+    }
 #if 0
   schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
   printf("%s\n", dumped.string_ptr);
@@ -149,21 +158,28 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_expand_macros(ctxt, &prog);
-  schemerlicht_quasiquote_conversion(ctxt, &prog);
-  schemerlicht_define_conversion(ctxt, &prog);
-  schemerlicht_single_begin_conversion(ctxt, &prog);
-  schemerlicht_simplify_to_core_forms(ctxt, &prog);
-  schemerlicht_alpha_conversion(ctxt, &prog);
-  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
-  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
-  schemerlicht_quote_collection_destroy(ctxt, &quotes);
-  schemerlicht_global_define_environment_allocation(ctxt, &prog);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
-  schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_free_variable_analysis(ctxt, &prog);
-  schemerlicht_closure_conversion(ctxt, &prog);
+  if (full_preprocessor)
+    {
+    schemerlicht_preprocess(ctxt, &prog);
+    }
+  else
+    {
+    schemerlicht_expand_macros(ctxt, &prog);
+    schemerlicht_quasiquote_conversion(ctxt, &prog);
+    schemerlicht_define_conversion(ctxt, &prog);
+    schemerlicht_single_begin_conversion(ctxt, &prog);
+    schemerlicht_simplify_to_core_forms(ctxt, &prog);
+    schemerlicht_alpha_conversion(ctxt, &prog);
+    schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+    schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+    schemerlicht_quote_collection_destroy(ctxt, &quotes);
+    schemerlicht_global_define_environment_allocation(ctxt, &prog);
+    schemerlicht_continuation_passing_style(ctxt, &prog);
+    schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+    schemerlicht_assignable_variable_conversion(ctxt, &prog);
+    schemerlicht_free_variable_analysis(ctxt, &prog);
+    schemerlicht_closure_conversion(ctxt, &prog);
+    }
 #if 1
   schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
   printf("%s\n", dumped.string_ptr);
@@ -1820,7 +1836,7 @@ static void test_fib_performance()
   //test_compile_aux_heap("165580141", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("102334155", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 40)", 256 * 256);
   //test_compile_aux_heap("1346269", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 30)",  256*256);
-  test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256*256);
+  test_compile_aux_heap("9227465", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 35)", 256 * 256);
   int c1 = clock();
   printf("Fib time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
   //test_compile_aux_w_dump("55", "(define(fib n)(if (< n 2) n (+(fib(- n 1))(fib(- n 2))))) (fib 10)");
@@ -2787,15 +2803,15 @@ static void test_control_ops()
 
   test_compile_aux_r5rs("#(0 1 4 9 16)", "(let ([v (make-vector 5)]) (for-each (lambda (i) (vector-set! v i (* i i))) '(0 1 2 3 4)) v)");
   test_compile_aux_r5rs("3", "3 #;(let ([v (make-vector 5)]) (for-each (lambda (i) (vector-set! v i (* i i))) '(0 1 2 3 4)) v)");
-  test_compile_aux_r5rs("#(0 1 4 9 16)","#|\n"
-"Here is a multiline comment, similar\n"
-"to /* and */ in c/c++\n"
-"|#\n"
-"(let ([v (make-vector 5)])\n"
-"     (for-each #; here is comment\n"
-"        (lambda (i) (vector-set! v i (* i i))) ; here is also comment\n"
-"        '(0 1 2 3 4))\n"
-"     v) #; blabla\n");
+  test_compile_aux_r5rs("#(0 1 4 9 16)", "#|\n"
+    "Here is a multiline comment, similar\n"
+    "to /* and */ in c/c++\n"
+    "|#\n"
+    "(let ([v (make-vector 5)])\n"
+    "     (for-each #; here is comment\n"
+    "        (lambda (i) (vector-set! v i (* i i))) ; here is also comment\n"
+    "        '(0 1 2 3 4))\n"
+    "     v) #; blabla\n");
 
   test_compile_aux("1", "(%slot-ref (cons 1 2) 0)");
   test_compile_aux("2", "(%slot-ref (cons 1 2) 1)");
@@ -2878,9 +2894,9 @@ static void test_port()
   test_compile_aux("#t", "(define read_file (open-input-file \"out.txt\")) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%read-char read_file) (%char-ready? read_file)");
 
   test_compile_aux("#<void>", "(define wf (open-output-file \"out2.txt\"))"
-  "(%write (+ 7 9) wf)"
-  "(%flush-output-port wf)"
-  "(close-output-port wf)"
+    "(%write (+ 7 9) wf)"
+    "(%flush-output-port wf)"
+    "(close-output-port wf)"
   );
   test_compile_aux("#<void>", "(define wf (open-output-file \"out2.txt\"))"
     "(%slot-set! wf 5 1)"
@@ -2895,7 +2911,7 @@ static void test_port()
   }
 
 static void test_read()
-  { 
+  {
   test_compile_aux("21", "(define rf (open-input-file \"data/read_test.txt\"))"
     "(define res (%read rf))"
     "(close-input-port rf)"
@@ -2960,15 +2976,15 @@ static void test_read()
 static void test_write()
   {
   test_compile_aux("\"50#\\ 3.141590\"FOO\"\n\"FOO\\\"BAR\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
-  "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
-  "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
-  "(define ostr (open-output-string))\n"
-  "(%write 50 ostr) (%write #\\032 ostr)\n"
-  "(%write 3.14159 ostr)\n"
-  "(%write \"FOO\" ostr)\n"
-  "(%write-char #\\newline ostr)\n"
-  "(%write \"FOO\\\"BAR\" ostr)\n"
-  "(get-output-string ostr)\n"
+    "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
+    "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
+    "(define ostr (open-output-string))\n"
+    "(%write 50 ostr) (%write #\\032 ostr)\n"
+    "(%write 3.14159 ostr)\n"
+    "(%write \"FOO\" ostr)\n"
+    "(%write-char #\\newline ostr)\n"
+    "(%write \"FOO\\\"BAR\" ostr)\n"
+    "(get-output-string ostr)\n"
   );
   }
 
@@ -3038,107 +3054,112 @@ static void test_macros()
 
 void run_all_compiler_tests()
   {
-  test_compile_fixnum();
-  test_compile_flonum();
-  test_compile_bool();
-  test_compile_nil();
-  test_compile_char();
-  test_compile_string();
-  test_single_argument_primitives();
-  test_add_fixnums();
-  test_add_flonums();
-  test_add_chars();
-  test_add_mixed();
-  test_sub();
-  test_mul();
-  test_div();
-  test_combination_of_math_ops();
-  test_equality();
-  test_inequality();
-  test_less();
-  test_leq();
-  test_greater();
-  test_geq();
-  test_compare_incorrect_argument();
-  test_arithmetic();
-  test_is_fixnum();
-  test_not();
-  test_is_null();
-  test_is_flonum();
-  test_is_zero();
-  test_is_boolean();
-  test_is_char();
-  test_fx_arithmetic();
-  test_if();
-  test_and();
-  test_or();
-  test_let();
-  test_let_star();
-  test_compile_errors();
-  test_define();
-  test_fixnum_char_flonum_conversions();
-  test_bitwise_ops();
-  test_vector();
-  test_pair();
-  test_begin();
-  test_halt();
-  test_letrec();
-  test_lambdas();
-  test_tailcall();
-  test_closures();
-  test_set();
-  test_letrec2();
-  test_inner_define();
-  test_global_define();
-  test_list();
-  test_scheme();
-  test_fibonacci();
-  test_vectors();
-  test_strings();
-  test_quotes();
-  test_length();
-  test_set_car_cdr();
-  test_when_unless();
-  test_symbol();
-  test_primitive_objects();
-  test_applying_thunks();
-  test_parameter_passing();
-  test_cond();
-  test_newton();
-  test_compile_cc();
-  test_compile_cc_2();
-  //test_ack_performance();
-  //test_fib_performance();
-  test_lambda_variable_arity_not_using_rest_arg();
-  test_lambda_variable_arity_while_using_rest_arg();
-  test_lambda_long_list();
-  test_lambda_variable_arity_while_using_rest_arg_and_closure();
-  test_garbage_collection();
-  test_is_equal();
-  test_memv_memq_member();
-  test_case();
-  test_named_let();
-  test_list_ops();
-  test_symbol_ops();
-  test_string_ops();
-  test_current_seconds();
-  test_is_list();
-  test_min_max();
-  test_override();
-  test_apply();
-  test_foreign_1();
-  test_foreign();
-  test_r5rs_funs();
-  test_chars();
-  test_list_conversions();
-  test_control_ops();
-  test_quasiquote();
-  test_port();
-  test_read();
-  test_write();
-  test_display();
-  test_getenv();
-  test_eval();
-  test_load();
-  test_macros();
+  for (int i = 0; i < 2; ++i)
+    {
+    full_preprocessor = i;
+    test_compile_fixnum();
+    test_compile_flonum();
+    test_compile_bool();
+    test_compile_nil();
+    test_compile_char();
+    test_compile_string();
+    test_single_argument_primitives();
+    test_add_fixnums();
+    test_add_flonums();
+    test_add_chars();
+    test_add_mixed();
+    test_sub();
+    test_mul();
+    test_div();
+    test_combination_of_math_ops();
+    test_equality();
+    test_inequality();
+    test_less();
+    test_leq();
+    test_greater();
+    test_geq();
+    test_compare_incorrect_argument();
+    test_arithmetic();
+    test_is_fixnum();
+    test_not();
+    test_is_null();
+    test_is_flonum();
+    test_is_zero();
+    test_is_boolean();
+    test_is_char();
+    test_fx_arithmetic();
+    test_if();
+    test_and();
+    test_or();
+    test_let();
+    test_let_star();
+    test_compile_errors();
+    test_define();
+    test_fixnum_char_flonum_conversions();
+    test_bitwise_ops();
+    test_vector();
+    test_pair();
+    test_begin();
+    test_halt();
+    test_letrec();
+    test_lambdas();
+    test_tailcall();
+    test_closures();
+    test_set();
+    test_letrec2();
+    test_inner_define();
+    test_global_define();
+    test_list();
+    test_scheme();
+    test_fibonacci();
+    test_vectors();
+    test_strings();
+    test_quotes();
+    test_length();
+    test_set_car_cdr();
+    test_when_unless();
+    test_symbol();
+    test_primitive_objects();
+    test_applying_thunks();
+    test_parameter_passing();
+    test_cond();
+    test_newton();
+    test_compile_cc();
+    test_compile_cc_2();
+    //test_ack_performance();
+    //test_fib_performance();
+    test_lambda_variable_arity_not_using_rest_arg();
+    test_lambda_variable_arity_while_using_rest_arg();
+    test_lambda_long_list();
+    test_lambda_variable_arity_while_using_rest_arg_and_closure();
+    test_garbage_collection();
+    test_is_equal();
+    test_memv_memq_member();
+    test_case();
+    test_named_let();
+    test_list_ops();
+    test_symbol_ops();
+    test_string_ops();
+    test_current_seconds();
+    test_is_list();
+    test_min_max();
+    test_override();
+    test_apply();
+    test_foreign_1();
+    test_foreign();
+    test_r5rs_funs();
+    test_chars();
+    test_list_conversions();
+    test_control_ops();
+    test_quasiquote();
+    test_port();
+    test_read();
+    test_write();
+    test_display();
+    if (i == 0)
+      test_getenv(); // only run once, as the environment will be modified
+    test_eval();
+    test_load();
+    test_macros();
+    }
   }

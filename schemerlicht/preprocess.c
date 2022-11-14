@@ -17,6 +17,7 @@
 #include "vector.h"
 #include "macro.h"
 #include "constprop.h"
+#include "constfold.h"
 
 void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* prog)
   {
@@ -36,4 +37,5 @@ void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* p
   schemerlicht_constant_propagation(ctxt, prog);
   schemerlicht_free_variable_analysis(ctxt, prog);
   schemerlicht_closure_conversion(ctxt, prog);
+  schemerlicht_constant_folding(ctxt, prog);
   }

@@ -189,17 +189,15 @@ static void replace_expression_by_result(schemerlicht_context* ctxt, schemerlich
 
 static void fold_primcall(schemerlicht_context* ctxt, schemerlicht_expression* e)
   {
-  if (all_arguments_are_simple_literals(e))
+  schemerlicht_assert(all_arguments_are_simple_literals(e));
+  schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
+  if (prim != NULL)
     {
-    schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
-    if (prim != NULL)
+    if (prepare_primitive_call(ctxt, e, prim))
       {
-      if (prepare_primitive_call(ctxt, e, prim))
-        {
-        schemerlicht_call_primitive(ctxt, prim->value.fx, 0, cast(int, e->expr.prim.arguments.vector_size), 0);
-        schemerlicht_object* result = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
-        replace_expression_by_result(ctxt, e, result);
-        }
+      schemerlicht_call_primitive(ctxt, prim->value.fx, 0, cast(int, e->expr.prim.arguments.vector_size), 0);
+      schemerlicht_object* result = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+      replace_expression_by_result(ctxt, e, result);
       }
     }
   }
@@ -208,10 +206,12 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
   {
   if (e->expr.prim.as_object || (e->expr.prim.arguments.vector_size == 0))
     return;
+  if (!all_arguments_are_simple_literals(e))
+    return;
   if (schemerlicht_string_vector_binary_search(&ctxt->global->foldable_primitives, &e->expr.prim.name))
     {
     fold_primcall(ctxt, e);
-    } 
+    }
   }
 
 static void postvisit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
@@ -275,7 +275,7 @@ static void postvisit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
           schemerlicht_string_destroy(ctxt, &e->expr.i.filename);
           *e = value;
           }
-        }     
+        }
       }
     }
 
@@ -351,113 +351,113 @@ schemerlicht_vector schemerlicht_generate_foldable_primitives_set(schemerlicht_c
   foldable_prim_insert(ctxt, &v, ">");
   foldable_prim_insert(ctxt, &v, "<=");
   foldable_prim_insert(ctxt, &v, ">=");
-  foldable_prim_insert(ctxt, &v,  "fixnum?");
-  foldable_prim_insert(ctxt, &v,  "flonum?");
-  foldable_prim_insert(ctxt, &v,  "null?");
-  foldable_prim_insert(ctxt, &v,  "zero?");
-  foldable_prim_insert(ctxt, &v,  "boolean?");
-  foldable_prim_insert(ctxt, &v,  "char?");
-  foldable_prim_insert(ctxt, &v,  "not");
-  foldable_prim_insert(ctxt, &v,  "fxadd1");
-  foldable_prim_insert(ctxt, &v,  "fxsub1");
-  foldable_prim_insert(ctxt, &v,  "fx+");
-  foldable_prim_insert(ctxt, &v,  "fx-");
-  foldable_prim_insert(ctxt, &v,  "fx*");
-  foldable_prim_insert(ctxt, &v,  "fx/");
-  foldable_prim_insert(ctxt, &v,  "fx=?");
-  foldable_prim_insert(ctxt, &v,  "fx<?");
-  foldable_prim_insert(ctxt, &v,  "fx<=?");
-  foldable_prim_insert(ctxt, &v,  "fx>?");
-  foldable_prim_insert(ctxt, &v,  "fx>=?");
-  foldable_prim_insert(ctxt, &v,  "fxzero?");
-  foldable_prim_insert(ctxt, &v,  "fladd1");
-  foldable_prim_insert(ctxt, &v,  "flsub1");
-  foldable_prim_insert(ctxt, &v,  "fl+");
-  foldable_prim_insert(ctxt, &v,  "fl-");
-  foldable_prim_insert(ctxt, &v,  "fl*");
-  foldable_prim_insert(ctxt, &v,  "fl/");
-  foldable_prim_insert(ctxt, &v,  "fl=?");
-  foldable_prim_insert(ctxt, &v,  "fl<?");
-  foldable_prim_insert(ctxt, &v,  "fl<=?");
-  foldable_prim_insert(ctxt, &v,  "fl>?");
-  foldable_prim_insert(ctxt, &v,  "fl>=?");
-  foldable_prim_insert(ctxt, &v,  "flzero?");
-  foldable_prim_insert(ctxt, &v,  "char=?");
-  foldable_prim_insert(ctxt, &v,  "char<?");
-  foldable_prim_insert(ctxt, &v,  "char<=?");
-  foldable_prim_insert(ctxt, &v,  "char>?");
-  foldable_prim_insert(ctxt, &v,  "char>=?");
-  foldable_prim_insert(ctxt, &v,  "char-ci=?");
-  foldable_prim_insert(ctxt, &v,  "char-ci<?");
-  foldable_prim_insert(ctxt, &v,  "char-ci<=?");
-  foldable_prim_insert(ctxt, &v,  "char-ci>?");
-  foldable_prim_insert(ctxt, &v,  "char-ci>=?");
-  foldable_prim_insert(ctxt, &v,  "fixnum->char");
-  foldable_prim_insert(ctxt, &v,  "integer->char");
-  foldable_prim_insert(ctxt, &v,  "char->fixnum");
-  foldable_prim_insert(ctxt, &v,  "char->integer");
-  foldable_prim_insert(ctxt, &v,  "fixnum->flonum");
-  foldable_prim_insert(ctxt, &v,  "flonum->fixnum");
-  foldable_prim_insert(ctxt, &v,  "bitwise-and");
-  foldable_prim_insert(ctxt, &v,  "bitwise-or");
-  foldable_prim_insert(ctxt, &v,  "bitwise-not");
-  foldable_prim_insert(ctxt, &v,  "bitwise-xor");
-  foldable_prim_insert(ctxt, &v,  "arithmetic-shift");  
-  foldable_prim_insert(ctxt, &v,  "vector?");
-  foldable_prim_insert(ctxt, &v,  "pair?");      
-  foldable_prim_insert(ctxt, &v,  "closure?");
-  foldable_prim_insert(ctxt, &v,  "string?");
-  foldable_prim_insert(ctxt, &v,  "eq?");
-  foldable_prim_insert(ctxt, &v,  "eqv?");
-  foldable_prim_insert(ctxt, &v,  "equal?");
-  foldable_prim_insert(ctxt, &v,  "symbol?");
-  foldable_prim_insert(ctxt, &v,  "procedure?");
-  foldable_prim_insert(ctxt, &v,  "list?");
-  foldable_prim_insert(ctxt, &v,  "max");
-  foldable_prim_insert(ctxt, &v,  "min");
-  foldable_prim_insert(ctxt, &v,  "exact?");
-  foldable_prim_insert(ctxt, &v,  "inexact?");
-  foldable_prim_insert(ctxt, &v,  "number?");
-  foldable_prim_insert(ctxt, &v,  "rational?");
-  foldable_prim_insert(ctxt, &v,  "positive?");
-  foldable_prim_insert(ctxt, &v,  "negative?");
-  foldable_prim_insert(ctxt, &v,  "odd?");
-  foldable_prim_insert(ctxt, &v,  "even?");
-  foldable_prim_insert(ctxt, &v,  "complex?");
-  foldable_prim_insert(ctxt, &v,  "real?");
-  foldable_prim_insert(ctxt, &v,  "integer?");
-  foldable_prim_insert(ctxt, &v,  "abs");
-  foldable_prim_insert(ctxt, &v,  "quotient");
-  foldable_prim_insert(ctxt, &v,  "remainder");
-  foldable_prim_insert(ctxt, &v,  "modulo");
-  foldable_prim_insert(ctxt, &v,  "gcd");
-  foldable_prim_insert(ctxt, &v,  "lcm");
-  foldable_prim_insert(ctxt, &v,  "floor");
-  foldable_prim_insert(ctxt, &v,  "ceiling");
-  foldable_prim_insert(ctxt, &v,  "truncate");
-  foldable_prim_insert(ctxt, &v,  "round");
-  foldable_prim_insert(ctxt, &v,  "exp");
-  foldable_prim_insert(ctxt, &v,  "expt");
-  foldable_prim_insert(ctxt, &v,  "log");
-  foldable_prim_insert(ctxt, &v,  "sin");
-  foldable_prim_insert(ctxt, &v,  "cos");
-  foldable_prim_insert(ctxt, &v,  "tan");
-  foldable_prim_insert(ctxt, &v,  "asin");
-  foldable_prim_insert(ctxt, &v,  "acos");
-  foldable_prim_insert(ctxt, &v,  "atan");
-  foldable_prim_insert(ctxt, &v,  "sqrt");
-  foldable_prim_insert(ctxt, &v,  "exact->inexact");
-  foldable_prim_insert(ctxt, &v,  "inexact->exact");  
-  foldable_prim_insert(ctxt, &v,  "nan?");
-  foldable_prim_insert(ctxt, &v,  "inf?");
-  foldable_prim_insert(ctxt, &v,  "finite?");  
-  foldable_prim_insert(ctxt, &v,  "char-upcase");
-  foldable_prim_insert(ctxt, &v,  "char-downcase");
-  foldable_prim_insert(ctxt, &v,  "char-upper-case?");
-  foldable_prim_insert(ctxt, &v,  "char-lower-case?");
-  foldable_prim_insert(ctxt, &v,  "char-alphabetic?");
-  foldable_prim_insert(ctxt, &v,  "char-numeric?");
-  foldable_prim_insert(ctxt, &v,  "char-whitespace?");
+  foldable_prim_insert(ctxt, &v, "fixnum?");
+  foldable_prim_insert(ctxt, &v, "flonum?");
+  foldable_prim_insert(ctxt, &v, "null?");
+  foldable_prim_insert(ctxt, &v, "zero?");
+  foldable_prim_insert(ctxt, &v, "boolean?");
+  foldable_prim_insert(ctxt, &v, "char?");
+  foldable_prim_insert(ctxt, &v, "not");
+  foldable_prim_insert(ctxt, &v, "fxadd1");
+  foldable_prim_insert(ctxt, &v, "fxsub1");
+  foldable_prim_insert(ctxt, &v, "fx+");
+  foldable_prim_insert(ctxt, &v, "fx-");
+  foldable_prim_insert(ctxt, &v, "fx*");
+  foldable_prim_insert(ctxt, &v, "fx/");
+  foldable_prim_insert(ctxt, &v, "fx=?");
+  foldable_prim_insert(ctxt, &v, "fx<?");
+  foldable_prim_insert(ctxt, &v, "fx<=?");
+  foldable_prim_insert(ctxt, &v, "fx>?");
+  foldable_prim_insert(ctxt, &v, "fx>=?");
+  foldable_prim_insert(ctxt, &v, "fxzero?");
+  foldable_prim_insert(ctxt, &v, "fladd1");
+  foldable_prim_insert(ctxt, &v, "flsub1");
+  foldable_prim_insert(ctxt, &v, "fl+");
+  foldable_prim_insert(ctxt, &v, "fl-");
+  foldable_prim_insert(ctxt, &v, "fl*");
+  foldable_prim_insert(ctxt, &v, "fl/");
+  foldable_prim_insert(ctxt, &v, "fl=?");
+  foldable_prim_insert(ctxt, &v, "fl<?");
+  foldable_prim_insert(ctxt, &v, "fl<=?");
+  foldable_prim_insert(ctxt, &v, "fl>?");
+  foldable_prim_insert(ctxt, &v, "fl>=?");
+  foldable_prim_insert(ctxt, &v, "flzero?");
+  foldable_prim_insert(ctxt, &v, "char=?");
+  foldable_prim_insert(ctxt, &v, "char<?");
+  foldable_prim_insert(ctxt, &v, "char<=?");
+  foldable_prim_insert(ctxt, &v, "char>?");
+  foldable_prim_insert(ctxt, &v, "char>=?");
+  foldable_prim_insert(ctxt, &v, "char-ci=?");
+  foldable_prim_insert(ctxt, &v, "char-ci<?");
+  foldable_prim_insert(ctxt, &v, "char-ci<=?");
+  foldable_prim_insert(ctxt, &v, "char-ci>?");
+  foldable_prim_insert(ctxt, &v, "char-ci>=?");
+  foldable_prim_insert(ctxt, &v, "fixnum->char");
+  foldable_prim_insert(ctxt, &v, "integer->char");
+  foldable_prim_insert(ctxt, &v, "char->fixnum");
+  foldable_prim_insert(ctxt, &v, "char->integer");
+  foldable_prim_insert(ctxt, &v, "fixnum->flonum");
+  foldable_prim_insert(ctxt, &v, "flonum->fixnum");
+  foldable_prim_insert(ctxt, &v, "bitwise-and");
+  foldable_prim_insert(ctxt, &v, "bitwise-or");
+  foldable_prim_insert(ctxt, &v, "bitwise-not");
+  foldable_prim_insert(ctxt, &v, "bitwise-xor");
+  foldable_prim_insert(ctxt, &v, "arithmetic-shift");
+  foldable_prim_insert(ctxt, &v, "vector?");
+  foldable_prim_insert(ctxt, &v, "pair?");
+  foldable_prim_insert(ctxt, &v, "closure?");
+  foldable_prim_insert(ctxt, &v, "string?");
+  foldable_prim_insert(ctxt, &v, "eq?");
+  foldable_prim_insert(ctxt, &v, "eqv?");
+  foldable_prim_insert(ctxt, &v, "equal?");
+  foldable_prim_insert(ctxt, &v, "symbol?");
+  foldable_prim_insert(ctxt, &v, "procedure?");
+  foldable_prim_insert(ctxt, &v, "list?");
+  foldable_prim_insert(ctxt, &v, "max");
+  foldable_prim_insert(ctxt, &v, "min");
+  foldable_prim_insert(ctxt, &v, "exact?");
+  foldable_prim_insert(ctxt, &v, "inexact?");
+  foldable_prim_insert(ctxt, &v, "number?");
+  foldable_prim_insert(ctxt, &v, "rational?");
+  foldable_prim_insert(ctxt, &v, "positive?");
+  foldable_prim_insert(ctxt, &v, "negative?");
+  foldable_prim_insert(ctxt, &v, "odd?");
+  foldable_prim_insert(ctxt, &v, "even?");
+  foldable_prim_insert(ctxt, &v, "complex?");
+  foldable_prim_insert(ctxt, &v, "real?");
+  foldable_prim_insert(ctxt, &v, "integer?");
+  foldable_prim_insert(ctxt, &v, "abs");
+  foldable_prim_insert(ctxt, &v, "quotient");
+  foldable_prim_insert(ctxt, &v, "remainder");
+  foldable_prim_insert(ctxt, &v, "modulo");
+  foldable_prim_insert(ctxt, &v, "gcd");
+  foldable_prim_insert(ctxt, &v, "lcm");
+  foldable_prim_insert(ctxt, &v, "floor");
+  foldable_prim_insert(ctxt, &v, "ceiling");
+  foldable_prim_insert(ctxt, &v, "truncate");
+  foldable_prim_insert(ctxt, &v, "round");
+  foldable_prim_insert(ctxt, &v, "exp");
+  foldable_prim_insert(ctxt, &v, "expt");
+  foldable_prim_insert(ctxt, &v, "log");
+  foldable_prim_insert(ctxt, &v, "sin");
+  foldable_prim_insert(ctxt, &v, "cos");
+  foldable_prim_insert(ctxt, &v, "tan");
+  foldable_prim_insert(ctxt, &v, "asin");
+  foldable_prim_insert(ctxt, &v, "acos");
+  foldable_prim_insert(ctxt, &v, "atan");
+  foldable_prim_insert(ctxt, &v, "sqrt");
+  foldable_prim_insert(ctxt, &v, "exact->inexact");
+  foldable_prim_insert(ctxt, &v, "inexact->exact");
+  foldable_prim_insert(ctxt, &v, "nan?");
+  foldable_prim_insert(ctxt, &v, "inf?");
+  foldable_prim_insert(ctxt, &v, "finite?");
+  foldable_prim_insert(ctxt, &v, "char-upcase");
+  foldable_prim_insert(ctxt, &v, "char-downcase");
+  foldable_prim_insert(ctxt, &v, "char-upper-case?");
+  foldable_prim_insert(ctxt, &v, "char-lower-case?");
+  foldable_prim_insert(ctxt, &v, "char-alphabetic?");
+  foldable_prim_insert(ctxt, &v, "char-numeric?");
+  foldable_prim_insert(ctxt, &v, "char-whitespace?");
   schemerlicht_string_vector_sort(&v);
   return v;
   }
