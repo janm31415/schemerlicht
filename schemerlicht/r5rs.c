@@ -6,8 +6,6 @@
 #include "vm.h"
 #include "preprocess.h"
 
-#include <string.h>
-
 void schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   {
   char* script = "(define caar(lambda(x) (car(car x))))\n"
@@ -197,7 +195,7 @@ void schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
 
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_preprocess(ctxt, &prog); 
+  schemerlicht_preprocess_internal_libs(ctxt, &prog);
   schemerlicht_function* r5rs = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_run(ctxt, r5rs);
   destroy_tokens_vector(ctxt, &tokens);

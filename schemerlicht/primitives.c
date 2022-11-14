@@ -11,6 +11,7 @@
 #include "compiler.h"
 #include "callcc.h"
 #include "r5rs.h"
+#include "inputoutput.h"
 
 #include <time.h>
 #include <math.h>
@@ -8344,6 +8345,7 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
   schemerlicht_context* new_ctxt = schemerlicht_context_init(ctxt, heapsize);
   schemerlicht_compile_callcc(new_ctxt);
   schemerlicht_compile_r5rs(new_ctxt);
+  schemerlicht_compile_input_output(new_ctxt);
   schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
   ra->value.ptr = cast(void*, new_ctxt);
   }

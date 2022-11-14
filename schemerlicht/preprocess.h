@@ -5,5 +5,6 @@
 #include "parser.h"
 
 void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* prog);
+void schemerlicht_preprocess_internal_libs(schemerlicht_context* ctxt, schemerlicht_program* prog);
 
 #endif //SCHEMERLICHT_PREPROCESS_H

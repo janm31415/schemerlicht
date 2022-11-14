@@ -20,6 +20,7 @@ func.h
 gc.h
 globdef.h
 inlines.h
+inputoutput.h
 lambdatolet.h
 limits.h
 macro.h
@@ -69,6 +70,7 @@ freevaranalysis.c
 func.c
 gc.c
 globdef.c
+inputoutput.c
 lambdatolet.c
 macro.c
 map.c
