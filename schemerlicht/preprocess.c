@@ -16,6 +16,7 @@
 #include "alpha.h"
 #include "vector.h"
 #include "macro.h"
+#include "constprop.h"
 
 void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* prog)
   {
@@ -32,6 +33,7 @@ void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* p
   schemerlicht_continuation_passing_style(ctxt, prog);
   schemerlicht_lambda_to_let_conversion(ctxt, prog);
   schemerlicht_assignable_variable_conversion(ctxt, prog);
+  schemerlicht_constant_propagation(ctxt, prog);
   schemerlicht_free_variable_analysis(ctxt, prog);
   schemerlicht_closure_conversion(ctxt, prog);
   }

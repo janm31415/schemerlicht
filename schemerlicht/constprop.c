@@ -210,7 +210,11 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
         schemerlicht_vector_destroy(ctxt, &e->expr.let.bindings);
         schemerlicht_vector_destroy(ctxt, &e->expr.let.body);
         schemerlicht_string_destroy(ctxt, &e->expr.let.let_name);
-        schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables); // this vector should be empty
+        schemerlicht_string* av_it = schemerlicht_vector_begin(&e->expr.let.assignable_variables, schemerlicht_string);
+        schemerlicht_string* av_it_end = schemerlicht_vector_end(&e->expr.let.assignable_variables, schemerlicht_string);
+        for (; av_it != av_it_end; ++av_it)
+          schemerlicht_string_destroy(ctxt, av_it);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables); 
         *e = new_expr;
         }
       else
@@ -220,7 +224,12 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
         schemerlicht_vector_destroy(ctxt, &e->expr.let.bindings);
         schemerlicht_vector_destroy(ctxt, &e->expr.let.body);
         schemerlicht_string_destroy(ctxt, &e->expr.let.let_name);
-        schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables); // this vector should be empty
+        schemerlicht_assert(e->expr.let.assignable_variables.vector_size == 0);
+        schemerlicht_string* av_it = schemerlicht_vector_begin(&e->expr.let.assignable_variables, schemerlicht_string);
+        schemerlicht_string* av_it_end = schemerlicht_vector_end(&e->expr.let.assignable_variables, schemerlicht_string);
+        for (; av_it != av_it_end; ++av_it)
+          schemerlicht_string_destroy(ctxt, av_it);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables);
         *e = new_expr;
         }
       }

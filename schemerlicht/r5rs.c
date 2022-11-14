@@ -4,6 +4,8 @@
 #include "token.h"
 #include "compiler.h"
 #include "vm.h"
+#include "preprocess.h"
+/*
 #include "simplifyconv.h"
 #include "begconv.h"
 #include "globdef.h"
@@ -16,6 +18,8 @@
 #include "dump.h"
 #include "quotecollect.h"
 #include "quoteconv.h"
+#include "constprop.h"
+*/
 
 #include <string.h>
 
@@ -203,6 +207,8 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
 
   schemerlicht_vector tokens = script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_preprocess(ctxt, &prog);
+  /*
   //schemerlicht_quasiquote_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -217,7 +223,7 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
-
+  */
   schemerlicht_function* r5rs = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_run(ctxt, r5rs);
   destroy_tokens_vector(ctxt, &tokens);
