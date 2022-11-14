@@ -5,6 +5,7 @@ begconv.h
 callcc.h
 closure.h
 compiler.h
+constprop.h
 context.h
 cps.h
 copy.h
@@ -55,6 +56,7 @@ closure.c
 compiler.c
 context.c
 cps.c
+constprop.c
 copy.c
 defconv.c
 dump.c

@@ -16,6 +16,7 @@
 #include "schemerlicht/globdef.h"
 #include "schemerlicht/quoteconv.h"
 #include "schemerlicht/alpha.h"
+#include "schemerlicht/constprop.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -874,6 +875,25 @@ static void test_alpha_naming()
   schemerlicht_close(ctxt);
   }
 
+static void test_constant_propagation_aux(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_constant_propagation(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_constant_propagation()
+  {
+  test_constant_propagation_aux("(let ((x 5)) (let ((y x)) (+ y y)))", "( + 5 5 ) ");
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -919,4 +939,5 @@ void run_all_conv_tests()
   test_call_cc();
   test_alpha_conversion();
   test_alpha_naming();
+  test_constant_propagation();
   }
