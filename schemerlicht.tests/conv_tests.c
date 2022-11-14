@@ -930,6 +930,8 @@ static void test_constant_folding()
   test_constant_folding_aux("(+ 5 7)", "12 ");
   test_constant_folding_aux("(+ 5 7 9 10)", "31 ");
   test_constant_folding_aux("(+ 5.2 7.3)", "12.500000 ");
+  test_constant_folding_aux("(- 5)", "-5 ");
+  test_constant_folding_aux("(/ (* 3 (- (+ 23 9) 20.0) 1.5) 2)", "27.000000 ");
   }
 
 void run_all_conv_tests()

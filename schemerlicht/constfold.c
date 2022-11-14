@@ -80,7 +80,8 @@ typedef struct schemerlicht_constant_folding_visitor
   schemerlicht_visitor* visitor;
   } schemerlicht_constant_folding_visitor;
 
-static int all_arguments_are_literals(schemerlicht_expression* e)
+// simple as in: no heap memory used
+static int all_arguments_are_simple_literals(schemerlicht_expression* e)
   {
   schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
   schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.prim.arguments, schemerlicht_expression);
@@ -89,20 +90,7 @@ static int all_arguments_are_literals(schemerlicht_expression* e)
     {
     if (it->type != schemerlicht_type_literal)
       return 0;
-    }
-  return 1;
-  }
-
-static int all_arguments_are_numbers(schemerlicht_expression* e)
-  {
-  schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
-  schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.prim.arguments, schemerlicht_expression);
-  schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr.prim.arguments, schemerlicht_expression);
-  for (; it != it_end; ++it)
-    {
-    if (it->type != schemerlicht_type_literal)
-      return 0;
-    if (it->expr.lit.type != schemerlicht_type_fixnum && it->expr.lit.type != schemerlicht_type_flonum)
+    if (it->expr.lit.type == schemerlicht_type_string || it->expr.lit.type == schemerlicht_type_symbol)
       return 0;
     }
   return 1;
@@ -117,14 +105,9 @@ static schemerlicht_object* find_primitive(schemerlicht_context* ctxt, schemerli
   return res;
   }
 
-static int prepare_primitive_call(schemerlicht_context* ctxt, schemerlicht_expression* e)
+static int prepare_primitive_call(schemerlicht_context* ctxt, schemerlicht_expression* e, schemerlicht_object* prim)
   {
   schemerlicht_assert(e->type == schemerlicht_type_primitive_call);
-  schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
-  if (prim == NULL)
-    {
-    return 0;
-    }
   schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
   schemerlicht_set_object(target, prim);
 
@@ -203,6 +186,23 @@ static void replace_expression_by_result(schemerlicht_context* ctxt, schemerlich
     }
   }
 
+static void fold_primcall(schemerlicht_context* ctxt, schemerlicht_expression* e)
+  {
+  if (all_arguments_are_simple_literals(e))
+    {
+    schemerlicht_object* prim = find_primitive(ctxt, &e->expr.prim.name);
+    if (prim != NULL)
+      {
+      if (prepare_primitive_call(ctxt, e, prim))
+        {
+        schemerlicht_call_primitive(ctxt, prim->value.fx, 0, cast(int, e->expr.prim.arguments.vector_size), 0);
+        schemerlicht_object* result = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+        replace_expression_by_result(ctxt, e, result);
+        }
+      }
+    }
+  }
+
 static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   if (e->expr.prim.as_object || (e->expr.prim.arguments.vector_size == 0))
@@ -211,15 +211,22 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
     {
     case '+':
     {
-    if (all_arguments_are_numbers(e))
-      {
-      if (prepare_primitive_call(ctxt, e))
-        {        
-        schemerlicht_call_primitive(ctxt, SCHEMERLICHT_ADD, 0, cast(int, e->expr.prim.arguments.vector_size), 0);
-        schemerlicht_object* result = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
-        replace_expression_by_result(ctxt, e, result);
-        }
-      }
+    fold_primcall(ctxt, e);
+    break;
+    }
+    case '-':
+    {
+    fold_primcall(ctxt, e);
+    break;
+    }
+    case '*':
+    {
+    fold_primcall(ctxt, e);
+    break;
+    }
+    case '/':
+    {
+    fold_primcall(ctxt, e);
     break;
     }
     default:
