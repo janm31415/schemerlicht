@@ -167,6 +167,28 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
           ++it;
           }
         }
+      else if (it->binding_expr.type == schemerlicht_type_variable)
+        {
+        key.value.s = it->binding_expr.expr.var.name;
+        schemerlicht_object* value2 = schemerlicht_map_get(ctxt, vis->is_unmutable, &key);
+        if (value2 != NULL && value2->value.fx)
+          {
+          schemerlicht_replace_variable_visitor* repl = schemerlicht_replace_variable_visitor_new(ctxt);
+          repl->var_name = it->binding_name;
+          repl->replace_by_this_expr = it->binding_expr;
+          schemerlicht_expression* body = schemerlicht_vector_begin(&e->expr.let.body, schemerlicht_expression);
+          schemerlicht_visit_expression(ctxt, repl->visitor, body);
+          schemerlicht_replace_variable_visitor_free(ctxt, repl);
+          schemerlicht_expression_destroy(ctxt, &it->binding_expr);
+          schemerlicht_string_destroy(ctxt, &it->binding_name);
+          schemerlicht_vector_erase(&e->expr.let.bindings, &it, schemerlicht_let_binding);
+          it_end = schemerlicht_vector_end(&e->expr.let.bindings, schemerlicht_let_binding);
+          }
+        else
+          {
+          ++it;
+          }
+        }
       else
         {
         ++it;
@@ -175,6 +197,32 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
     else
       {
       ++it;
+      }
+    if (e->expr.let.bindings.vector_size == 0)
+      {
+      schemerlicht_expression* body = schemerlicht_vector_begin(&e->expr.let.body, schemerlicht_expression);
+      if (body->type == schemerlicht_type_begin && body->expr.beg.arguments.vector_size == 1)
+        {
+        schemerlicht_expression new_expr = *schemerlicht_vector_begin(&body->expr.beg.arguments, schemerlicht_expression);
+        schemerlicht_string_destroy(ctxt, &body->expr.beg.filename);
+        schemerlicht_vector_destroy(ctxt, &body->expr.beg.arguments);
+        schemerlicht_string_destroy(ctxt, &e->expr.let.filename);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.bindings);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.body);
+        schemerlicht_string_destroy(ctxt, &e->expr.let.let_name);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables); // this vector should be empty
+        *e = new_expr;
+        }
+      else
+        {
+        schemerlicht_expression new_expr = *body;
+        schemerlicht_string_destroy(ctxt, &e->expr.let.filename);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.bindings);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.body);
+        schemerlicht_string_destroy(ctxt, &e->expr.let.let_name);
+        schemerlicht_vector_destroy(ctxt, &e->expr.let.assignable_variables); // this vector should be empty
+        *e = new_expr;
+        }
       }
     }
   }
