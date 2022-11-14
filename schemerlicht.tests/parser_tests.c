@@ -12,7 +12,7 @@
 static void parse_fixnum_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "5");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "5");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -29,7 +29,7 @@ static void parse_fixnum_1()
 static void parse_fixnum_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "-5555");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "-5555");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -46,7 +46,7 @@ static void parse_fixnum_2()
 static void parse_flonum()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "3.14");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "3.14");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -63,7 +63,7 @@ static void parse_flonum()
 static void parse_nil()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "()");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "()");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -79,7 +79,7 @@ static void parse_nil()
 static void parse_true()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "#t");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#t");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -95,7 +95,7 @@ static void parse_true()
 static void parse_false()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "#f");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#f");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -111,7 +111,7 @@ static void parse_false()
 static void parse_string()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "\"test\"");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "\"test\"");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -127,7 +127,7 @@ static void parse_string()
 static void parse_character()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "#\\45");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#\\45");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -144,7 +144,7 @@ static void parse_character()
 static void parse_character_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "#\\space");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#\\space");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -161,7 +161,7 @@ static void parse_character_2()
 static void parse_begin()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(begin 1 2 3 4 5)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(begin 1 2 3 4 5)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -175,7 +175,7 @@ static void parse_begin()
 static void parse_primcall()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(+ 1 2)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(+ 1 2)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -189,7 +189,7 @@ static void parse_primcall()
 static void parse_case()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -202,7 +202,7 @@ static void parse_case()
 static void parse_cond()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(cond(#f)(#f 12)(12 13))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(cond(#f)(#f 12)(12 13))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -215,7 +215,7 @@ static void parse_cond()
 static void parse_cond_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(cond((cons 1 2) => (lambda(x) (cdr x))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(cond((cons 1 2) => (lambda(x) (cdr x))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -228,7 +228,7 @@ static void parse_cond_2()
 static void parse_do()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(do ([vec (make-vector 5)] [i 0 (+ i 1)])((= i 5) vec)(vector-set! vec i i))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(do ([vec (make-vector 5)] [i 0 (+ i 1)])((= i 5) vec)(vector-set! vec i i))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -264,7 +264,7 @@ static void test_error_jump()
 static void parse_error_aux(const char* script, const char* first_error_message)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   int contains_error = ctxt->number_of_syntax_errors > 0 ? 1 : 0;  
   TEST_EQ_INT(1, contains_error);

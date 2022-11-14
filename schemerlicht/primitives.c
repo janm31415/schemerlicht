@@ -8342,10 +8342,8 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
     }
   ra->type = schemerlicht_object_type_environment;
   schemerlicht_context* new_ctxt = schemerlicht_context_init(ctxt, heapsize);
-  schemerlicht_function* callcc = schemerlicht_compile_callcc(new_ctxt);
-  schemerlicht_function* r5rs = schemerlicht_compile_r5rs(new_ctxt);
-  schemerlicht_vector_push_back(new_ctxt, &new_ctxt->lambdas, callcc, schemerlicht_function*);
-  schemerlicht_vector_push_back(new_ctxt, &new_ctxt->lambdas, r5rs, schemerlicht_function*);
+  schemerlicht_compile_callcc(new_ctxt);
+  schemerlicht_compile_r5rs(new_ctxt);
   schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
   ra->value.ptr = cast(void*, new_ctxt);
   }

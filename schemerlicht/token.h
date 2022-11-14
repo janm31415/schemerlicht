@@ -62,4 +62,6 @@ SCHEMERLICHT_API schemerlicht_vector tokenize(schemerlicht_context* ctxt, scheme
 
 SCHEMERLICHT_API void destroy_tokens_vector(schemerlicht_context* ctxt, schemerlicht_vector* tokens);
 
+schemerlicht_vector schemerlicht_script2tokens(schemerlicht_context* ctxt, const char* script);
+
 #endif //SCHEMERLICHT_TOKEN_H

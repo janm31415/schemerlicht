@@ -37,7 +37,7 @@ static int full_preprocessor = 0;
 static void test_compile_fixnum_aux(schemerlicht_fixnum expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
@@ -70,7 +70,7 @@ static void test_compile_fixnum()
 static void test_compile_flonum_aux(schemerlicht_flonum expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
@@ -96,7 +96,7 @@ static void test_compile_flonum()
 static void test_compile_aux_heap(const char* expected_value, const char* script, int heap_size)
   {
   schemerlicht_context* ctxt = schemerlicht_open(heap_size);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   if (full_preprocessor)
@@ -156,7 +156,7 @@ static void test_compile_aux(const char* expected_value, const char* script)
 static void test_compile_aux_w_dump(const char* expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   if (full_preprocessor)
     {
@@ -922,7 +922,7 @@ static void test_let_star()
 static void test_compile_error_aux(const char* script, const char* first_error_message)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
@@ -948,7 +948,7 @@ static void test_compile_errors()
 static void test_define()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define x 5) x");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define x 5) x");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_define_conversion(ctxt, &prog);
@@ -963,7 +963,7 @@ static void test_define()
   schemerlicht_function_free(ctxt, func);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  tokens = script2tokens(ctxt, "x");
+  tokens = schemerlicht_script2tokens(ctxt, "x");
   prog = make_program(ctxt, &tokens);
   func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   res = schemerlicht_run(ctxt, func);
@@ -1563,8 +1563,8 @@ static void test_newton()
 static void test_compile_aux_callcc(const char* expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_function* callcc = schemerlicht_compile_callcc(ctxt);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_compile_callcc(ctxt);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_quasiquote_conversion(ctxt, &prog);
@@ -1597,7 +1597,6 @@ static void test_compile_aux_callcc(const char* expected_value, const char* scri
 
   schemerlicht_string_destroy(ctxt, &s);
   schemerlicht_function_free(ctxt, func);
-  schemerlicht_function_free(ctxt, callcc);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
@@ -1606,7 +1605,7 @@ static void test_compile_aux_callcc(const char* expected_value, const char* scri
 static void test_compile_cc_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_function* callccfunc = schemerlicht_compile_callcc(ctxt);
+  schemerlicht_compile_callcc(ctxt);
 
 #if 0
   schemerlicht_object callcc;
@@ -1623,7 +1622,7 @@ static void test_compile_cc_2()
   schemerlicht_environment_add(ctxt, &callcc_name, entry);
 #endif
 
-  schemerlicht_vector tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1654,7 +1653,6 @@ static void test_compile_cc_2()
   schemerlicht_program_destroy(ctxt, &prog);
 
   schemerlicht_function_free(ctxt, func1);
-  schemerlicht_function_free(ctxt, callccfunc);
   schemerlicht_close(ctxt);
 
 
@@ -1668,7 +1666,7 @@ static void test_compile_cc_2()
 static void test_compile_cc()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1685,7 +1683,7 @@ static void test_compile_cc()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
 
-  tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
+  tokens = schemerlicht_script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (throw 1)))))");
   prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1710,7 +1708,7 @@ static void test_compile_cc()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
 
-  tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 1))))");
+  tokens = schemerlicht_script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 1))))");
   prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1735,7 +1733,7 @@ static void test_compile_cc()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
 
-  tokens = script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (escape 3))))))))");
+  tokens = schemerlicht_script2tokens(ctxt, "(call/cc (lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (escape 3))))))))");
   prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1759,7 +1757,7 @@ static void test_compile_cc()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
 
-  tokens = script2tokens(ctxt, "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (throw 3))))))))");
+  tokens = schemerlicht_script2tokens(ctxt, "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 (throw 3))))))))");
   prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1783,7 +1781,7 @@ static void test_compile_cc()
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
 
-  tokens = script2tokens(ctxt, "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 1)))))))");
+  tokens = schemerlicht_script2tokens(ctxt, "(call/cc(lambda(throw) (+ 5 (* 10 (call/cc(lambda(escape) (* 100 1)))))))");
   prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -1916,7 +1914,7 @@ static void test_lambda_variable_arity_while_using_rest_arg_and_closure()
 static void test_garbage_collection()
   {
   schemerlicht_context* ctxt = schemerlicht_open(200);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(vector 1 2 3)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(vector 1 2 3)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -2339,7 +2337,7 @@ static void test_foreign_1()
   schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, "seventeen", cast(void*, &seventeen), schemerlicht_foreign_fixnum);
   schemerlicht_register_external_function(ctxt, &ext);
 
-  schemerlicht_vector tokens = script2tokens(ctxt, "(foreign-call seventeen)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(foreign-call seventeen)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_quasiquote_conversion(ctxt, &prog);
@@ -2380,7 +2378,7 @@ static void test_foreign_aux(const char* expected, const char* script, const cha
   schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, name, address, ret_type);
   schemerlicht_register_external_function(ctxt, &ext);
 
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_quasiquote_conversion(ctxt, &prog);
@@ -2752,9 +2750,9 @@ static void test_list_conversions()
 static void test_compile_aux_r5rs(const char* expected_value, const char* script)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_function* callcc = schemerlicht_compile_callcc(ctxt);
-  schemerlicht_function* r5rs = schemerlicht_compile_r5rs(ctxt);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_compile_callcc(ctxt);
+  schemerlicht_compile_r5rs(ctxt);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_quasiquote_conversion(ctxt, &prog);
@@ -2787,8 +2785,6 @@ static void test_compile_aux_r5rs(const char* expected_value, const char* script
 
   schemerlicht_string_destroy(ctxt, &s);
   schemerlicht_function_free(ctxt, func);
-  schemerlicht_function_free(ctxt, callcc);
-  schemerlicht_function_free(ctxt, r5rs);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);

@@ -515,3 +515,15 @@ void destroy_tokens_vector(schemerlicht_context* ctxt, schemerlicht_vector* toke
     }
   schemerlicht_vector_destroy(ctxt, tokens);
   }
+
+schemerlicht_vector schemerlicht_script2tokens(schemerlicht_context* ctxt, const char* script)
+  {
+  schemerlicht_stream str;
+  schemerlicht_stream_init(ctxt, &str, 10);
+  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(script));
+  schemerlicht_stream_write(ctxt, &str, script, len, 0);
+  schemerlicht_stream_rewind(&str);
+  schemerlicht_vector tokens = tokenize(ctxt, &str);
+  schemerlicht_stream_close(ctxt, &str);
+  return tokens;
+  }

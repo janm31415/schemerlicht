@@ -5,37 +5,10 @@
 #include "compiler.h"
 #include "vm.h"
 #include "preprocess.h"
-/*
-#include "simplifyconv.h"
-#include "begconv.h"
-#include "globdef.h"
-#include "defconv.h"
-#include "cps.h"
-#include "lambdatolet.h"
-#include "assignablevarconv.h"
-#include "freevaranalysis.h"
-#include "closure.h"
-#include "dump.h"
-#include "quotecollect.h"
-#include "quoteconv.h"
-#include "constprop.h"
-*/
 
 #include <string.h>
 
-static schemerlicht_vector script2tokens(schemerlicht_context* ctxt, const char* script)
-  {
-  schemerlicht_stream str;
-  schemerlicht_stream_init(ctxt, &str, 10);
-  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(script));
-  schemerlicht_stream_write(ctxt, &str, script, len, 0);
-  schemerlicht_stream_rewind(&str);
-  schemerlicht_vector tokens = tokenize(ctxt, &str);
-  schemerlicht_stream_close(ctxt, &str);
-  return tokens;
-  }
-
-schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
+void schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   {
   char* script = "(define caar(lambda(x) (car(car x))))\n"
     "(define cadr(lambda(x) (car(cdr x))))\n"
@@ -202,31 +175,32 @@ schemerlicht_function* schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
     "     (if (eq? l 0)\n"
     "       (%read standard-input-port)\n"
     "       (%read (car args))\n"
-    "       ))))\n";
+    "       ))))\n"
+   " (define values #f)\n"
+   " (define call-with-values #f)\n"   
+   " (let((magic(cons 'multiple 'values)))\n"
+   "   (define magic?\n"
+   "     (lambda(x)\n"
+   "       (and (pair? x) (eq? (car x) magic))))\n"   
+   "   (set! values\n"
+   "   (lambda args\n"
+   "   (if (and (not (null? args)) (null? (cdr args)))\n"
+   "     (car args)\n"
+   "     (cons magic args))))\n"   
+   "   (set! call-with-values\n"
+   "   (lambda(producer consumer)\n"
+   "     (let((x(producer)))\n"
+   "       (if (magic? x)\n"
+   "         (apply consumer(cdr x))\n"
+   "         (consumer x))))))\n";
 
 
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_preprocess(ctxt, &prog);
-  /*
-  //schemerlicht_quasiquote_conversion(ctxt, &prog);
-  schemerlicht_define_conversion(ctxt, &prog);
-  schemerlicht_single_begin_conversion(ctxt, &prog);
-  schemerlicht_simplify_to_core_forms(ctxt, &prog);
-  //schemerlicht_alpha_conversion(ctxt, &prog);
-  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
-  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
-  schemerlicht_quote_collection_destroy(ctxt, &quotes);
-  schemerlicht_global_define_environment_allocation(ctxt, &prog);
-  schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
-  schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_free_variable_analysis(ctxt, &prog);
-  schemerlicht_closure_conversion(ctxt, &prog);
-  */
+  schemerlicht_preprocess(ctxt, &prog); 
   schemerlicht_function* r5rs = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_run(ctxt, r5rs);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  return r5rs;
+  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, r5rs, schemerlicht_function*);
   }

@@ -24,7 +24,7 @@
 static void test_convert_define()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define x 5)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define x 5)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
 
@@ -41,7 +41,7 @@ static void test_convert_define()
 static void test_convert_define_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 5]) (define foo (lambda (y) (bar x y))) (define bar (lambda (a b) (+ (* a b) a))) (foo (+ x 3)))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([x 5]) (define foo (lambda (y) (bar x y))) (define bar (lambda (a b) (+ (* a b) a))) (foo (+ x 3)))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
 
@@ -58,7 +58,7 @@ static void test_convert_define_2()
 static void test_convert_define_3()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define y 5) (let ([z y]) ( + z 1) ) ");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define y 5) (let ([z y]) ( + z 1) ) ");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
 
@@ -75,7 +75,7 @@ static void test_convert_define_3()
 static void test_convert_define_4()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define ( foo x ) ( * x x )) ");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define ( foo x ) ( * x x )) ");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
 
@@ -92,7 +92,7 @@ static void test_convert_define_4()
 static void test_convert_define_5()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define (f . x) (apply + x)) (f 1 2 3 4 5)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define (f . x) (apply + x)) (f 1 2 3 4 5)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
 
@@ -109,7 +109,7 @@ static void test_convert_define_5()
 static void test_convert_define_6()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define ( + x ) ( * x x )) ");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define ( + x ) ( * x x )) ");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
 
@@ -126,7 +126,7 @@ static void test_convert_define_6()
 static void test_single_begin_conv()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define x 5) (define y 6)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define x 5) (define y 6)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_single_begin_conversion(ctxt, &prog);
 
@@ -143,7 +143,7 @@ static void test_single_begin_conv()
 static void test_single_begin_conv_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(begin (define x 5)) (begin (begin (define y 6)))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(begin (define x 5)) (begin (begin (define y 6)))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_single_begin_conversion(ctxt, &prog);
 
@@ -160,7 +160,7 @@ static void test_single_begin_conv_2()
 static void simplify_to_core_conversion_and()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(and)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(and)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -177,7 +177,7 @@ static void simplify_to_core_conversion_and()
 static void simplify_to_core_conversion_and_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(and 3)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(and 3)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -194,7 +194,7 @@ static void simplify_to_core_conversion_and_2()
 static void simplify_to_core_conversion_and_3()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(and 3 4)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(and 3 4)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -211,7 +211,7 @@ static void simplify_to_core_conversion_and_3()
 static void simplify_to_core_conversion_or()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(or)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(or)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -228,7 +228,7 @@ static void simplify_to_core_conversion_or()
 static void simplify_to_core_conversion_or_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(or 3)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(or 3)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -245,7 +245,7 @@ static void simplify_to_core_conversion_or_2()
 static void simplify_to_core_conversion_or_3()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(or 3 4)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(or 3 4)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -262,7 +262,7 @@ static void simplify_to_core_conversion_or_3()
 static void simplify_to_core_conversion_letrec()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(letrec ([f (lambda () 5)]) (- 20 (f)))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(letrec ([f (lambda () 5)]) (- 20 (f)))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -279,7 +279,7 @@ static void simplify_to_core_conversion_letrec()
 static void simplify_to_core_conversion_let_star()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let* ([x (+ 1 2)] [y(+ 3 4)])(+ x y))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let* ([x (+ 1 2)] [y(+ 3 4)])(+ x y))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
@@ -296,7 +296,7 @@ static void simplify_to_core_conversion_let_star()
 static void simplify_to_core_conversion_named_let()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define (number->list n) (let loop((n n) (acc '())) (if (< n 10) (cons n acc) (loop(quotient n 10) (cons(remainder n 10) acc)))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define (number->list n) (let loop((n n) (acc '())) (if (< n 10) (cons n acc) (loop(quotient n 10) (cons(remainder n 10) acc)))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);  
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
@@ -319,7 +319,7 @@ static void simplify_to_core_conversion_named_let()
 static void simplify_to_core_conversion_case()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -337,7 +337,7 @@ static void simplify_to_core_conversion_case()
 static void simplify_to_core_conversion_cond()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(cond(#f)(#f 12)(12 13))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(cond(#f)(#f 12)(12 13))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -355,7 +355,7 @@ static void simplify_to_core_conversion_cond()
 static void simplify_to_core_conversion_cond_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(cond[(cons 1 2) => (lambda(x) (cdr x))])");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(cond[(cons 1 2) => (lambda(x) (cdr x))])");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -373,7 +373,7 @@ static void simplify_to_core_conversion_cond_2()
 static void simplify_to_core_conversion_do()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(do ([vec (make-vector 5)] [i 0 (+ i 1)])((= i 5) vec)(vector-set! vec i i))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(do ([vec (make-vector 5)] [i 0 (+ i 1)])((= i 5) vec)(vector-set! vec i i))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -391,7 +391,7 @@ static void simplify_to_core_conversion_do()
 static void simplify_to_core_conversion_when()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(when (< x 2) (+ 1 2) (* 3 4))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(when (< x 2) (+ 1 2) (* 3 4))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -409,7 +409,7 @@ static void simplify_to_core_conversion_when()
 static void simplify_to_core_conversion_unless()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(unless (< x 2) (+ 1 2) (* 3 4))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(unless (< x 2) (+ 1 2) (* 3 4))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -427,7 +427,7 @@ static void simplify_to_core_conversion_unless()
 static void simplify_to_core_conversion_delay()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(set! p (delay (* 3 4)))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(set! p (delay (* 3 4)))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
@@ -445,7 +445,7 @@ static void simplify_to_core_conversion_delay()
 static void tail_call_analysis()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define fact (lambda (x) (if (= x 0) 1 ( * x ( fact (- x 1))))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define fact (lambda (x) (if (= x 0) 1 ( * x ( fact (- x 1))))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_tail_call_analysis(ctxt, &prog);
   int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
@@ -457,7 +457,7 @@ static void tail_call_analysis()
 static void tail_call_analysis_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define fact (lambda (x) (define fact-tail (lambda (x accum) (if (= x 0) accum (fact-tail (- x 1) (* x accum))))) (fact-tail x 1) ) )");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define fact (lambda (x) (define fact-tail (lambda (x accum) (if (= x 0) accum (fact-tail (- x 1) (* x accum))))) (fact-tail x 1) ) )");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_tail_call_analysis(ctxt, &prog);
   int only_tails = schemerlicht_program_only_has_tail_calls(ctxt, &prog);
@@ -470,7 +470,7 @@ static void tail_call_analysis_2()
 static void cps(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_continuation_passing_style(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -487,7 +487,7 @@ static void cps(const char* script, const char* expected)
 static void test_cps_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define square (lambda (x) (* x x))) ( + (square 5) 1)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define square (lambda (x) (* x x))) ( + (square 5) 1)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -543,7 +543,7 @@ static void test_cps()
 static void test_quasiquote(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_quasiquote_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -592,7 +592,7 @@ static void test_quasiquote_conversion()
 static void test_lambda_to_let_conversion()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "((lambda (x y) (+ x y)) 1 2)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "((lambda (x y) (+ x y)) 1 2)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -606,7 +606,7 @@ static void test_lambda_to_let_conversion()
 static void test_find_assignable_variables()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_find_assignable_variables(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -623,7 +623,7 @@ static void test_find_assignable_variables()
 static void test_assignable_variable_conversion()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 12]) (let([y(let([z #f]) (set! z 14))])  z))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let([x 12]) (let([y(let([z #f]) (set! z 14))])  z))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -637,7 +637,7 @@ static void test_assignable_variable_conversion()
 static void test_assignable_variable_conversion_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([f (lambda (c) (cons (lambda (v) (set! c v)) (lambda () c)))]) (let ([p (f 0)]) ( (car p) 12) ((cdr p))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([f (lambda (c) (cons (lambda (v) (set! c v)) (lambda () c)))]) (let ([p (f 0)]) ( (car p) 12) ((cdr p))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -651,7 +651,7 @@ static void test_assignable_variable_conversion_2()
 static void test_assignable_variable_conversion_3()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 3]) (set! x 5))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([x 3]) (set! x 5))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -665,7 +665,7 @@ static void test_assignable_variable_conversion_3()
 static void test_assignable_variable_conversion_4()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let([x 5])(define foo(lambda(y) (bar x y))) (define bar(lambda(a b) (+(* a b) a))) (foo(+ x 3)))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -684,7 +684,7 @@ static void test_assignable_variable_conversion_4()
 static void test_free_var_analysis()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
@@ -733,7 +733,7 @@ static void test_free_var_analysis()
 static void test_closure_conversion_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([x 5]) (lambda (y) (lambda () (+ x y))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);  
   schemerlicht_single_begin_conversion(ctxt, &prog);  
   schemerlicht_free_variable_analysis(ctxt, &prog);
@@ -749,7 +749,7 @@ static void test_closure_conversion_1()
 static void test_closure_conversion_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(lambda (x y z) (let ([ f (lambda (a b) (+ (* a x) (8 b y)))]) (- (f 1 2) (f 3 4))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(lambda (x y z) (let ([ f (lambda (a b) (+ (* a x) (8 b y)))]) (- (f 1 2) (f 3 4))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
@@ -765,7 +765,7 @@ static void test_closure_conversion_2()
 static void test_call_cc()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_single_begin_conversion(ctxt, &prog);
@@ -786,7 +786,7 @@ static void test_call_cc()
 static void test_quote_collect_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "'r 'g 'b 'g");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "'r 'g 'b 'g");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
   TEST_EQ_INT(3, quotes.vector_size);
@@ -808,7 +808,7 @@ static void test_quote_collect_1()
 static void test_quote_conversion_aux(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);  
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
@@ -844,7 +844,7 @@ static void test_quote_conversion()
 static void test_alpha_conversion_aux(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);  
   schemerlicht_alpha_conversion(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -879,7 +879,7 @@ static void test_alpha_naming()
 static void test_constant_propagation_aux(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);  
   schemerlicht_constant_propagation(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
@@ -898,7 +898,7 @@ static void test_constant_propagation()
 static void test_constant_folding_aux(const char* script, const char* expected)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_constant_folding(ctxt, &prog);

@@ -40,7 +40,7 @@ static void test_sym_cells()
 static void test_read_vector_cells()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "#(1 2 3)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#(1 2 3)");
 
   token* token_it = schemerlicht_vector_begin(&tokens, token);
   token* token_it_end = schemerlicht_vector_end(&tokens, token);
@@ -59,7 +59,7 @@ static void test_read_vector_cells()
 static void test_read_pair_cells_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, "(1 2 3)");
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(1 2 3)");
 
   token* token_it = schemerlicht_vector_begin(&tokens, token);
   token* token_it_end = schemerlicht_vector_end(&tokens, token);
@@ -79,7 +79,7 @@ static void test_dump_cell(const char* script)
   {
 
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
 
   token* token_it = schemerlicht_vector_begin(&tokens, token);
   token* token_it_end = schemerlicht_vector_end(&tokens, token);
