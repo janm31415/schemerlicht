@@ -6,6 +6,7 @@
 #include "map.h"
 #include "reader.h"
 #include "pool.h"
+#include "vector.h"
 
 #include <setjmp.h>
 
@@ -31,6 +32,7 @@ typedef struct schemerlicht_global_context
   schemerlicht_cell true_sym;
   schemerlicht_cell false_sym;
   schemerlicht_cell nil_sym;
+  schemerlicht_vector foldable_primitives;
   } schemerlicht_global_context; 
 
 // per thread state

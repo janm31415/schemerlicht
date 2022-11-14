@@ -6,6 +6,7 @@
 #include "environment.h"
 #include "foreign.h"
 #include "func.h"
+#include "constfold.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {
@@ -131,6 +132,7 @@ schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)
     g->true_sym = schemerlicht_make_true_sym_cell(ctxt);
     g->false_sym = schemerlicht_make_false_sym_cell(ctxt);
     g->nil_sym = schemerlicht_make_nil_sym_cell(ctxt);
+    g->foldable_primitives = schemerlicht_generate_foldable_primitives_set(ctxt);
     context_init(ctxt, heap_size);
     }
   return ctxt;
@@ -146,6 +148,13 @@ void schemerlicht_close(schemerlicht_context* ctxt)
   schemerlicht_destroy_cell(ctxt, &ctxt->global->true_sym);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->false_sym);
   schemerlicht_destroy_cell(ctxt, &ctxt->global->nil_sym);
+  schemerlicht_string* sit = schemerlicht_vector_begin(&ctxt->global->foldable_primitives, schemerlicht_string);
+  schemerlicht_string* sit_end = schemerlicht_vector_end(&ctxt->global->foldable_primitives, schemerlicht_string);
+  for (; sit != sit_end; ++sit)
+    {
+    schemerlicht_string_destroy(ctxt, sit);
+    }
+  schemerlicht_vector_destroy(ctxt, &ctxt->global->foldable_primitives);
   schemerlicht_free(ctxt, ctxt->global, sizeof(schemerlicht_global_context));
   context_free(ctxt);
   }
