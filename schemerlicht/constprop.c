@@ -4,6 +4,8 @@
 #include "map.h"
 #include "copy.h"
 
+#include <string.h>
+
 typedef struct schemerlicht_is_mutable_variable_visitor
   {
   schemerlicht_visitor* visitor;

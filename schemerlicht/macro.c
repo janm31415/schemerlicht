@@ -14,6 +14,8 @@
 #include "token.h"
 #include "vm.h"
 
+#include <string.h>
+
 static schemerlicht_cell expression_to_cell(schemerlicht_context* ctxt, schemerlicht_expression* expr)
   {
   schemerlicht_string s = schemerlicht_dump_expression(ctxt, expr);

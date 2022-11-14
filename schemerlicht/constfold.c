@@ -4,6 +4,8 @@
 #include "primitives.h"
 #include "stringvec.h"
 
+#include <string.h>
+
 static int is_nonmutable(schemerlicht_expression* e)
   {
   // warning: recursive operation: todo, make non recursive

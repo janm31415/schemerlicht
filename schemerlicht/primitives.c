@@ -7867,10 +7867,13 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
           {
           schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
           schemerlicht_string dummy;
-          schemerlicht_string_init_with_size(ctxt, &dummy, max(required_length - available_length, 256), 0);
-          schemerlicht_string_append(ctxt, &s, &dummy);
+          schemerlicht_memsize size_init = 256;
+          if (required_length - available_length > size_init)
+            size_init = required_length - available_length;
+          schemerlicht_string_init_with_size(ctxt, &dummy, size_init, 0);
+          schemerlicht_string_append(ctxt, &s->value.s, &dummy);
           schemerlicht_string_destroy(ctxt, &dummy);
-          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += max(required_length - available_length, 256);
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += size_init;
           }
         }
       schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
@@ -7938,10 +7941,13 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
           {
           schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
           schemerlicht_string dummy;
-          schemerlicht_string_init_with_size(ctxt, &dummy, max(required_length - available_length, 256), 0);
-          schemerlicht_string_append(ctxt, &s, &dummy);
+          schemerlicht_memsize size_init = 256;
+          if (required_length - available_length > size_init)
+            size_init = required_length - available_length;
+          schemerlicht_string_init_with_size(ctxt, &dummy, size_init, 0);
+          schemerlicht_string_append(ctxt, &s->value.s, &dummy);
           schemerlicht_string_destroy(ctxt, &dummy);
-          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += max(required_length - available_length, 256);
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += size_init;
           }
         }
       schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;

@@ -37,9 +37,9 @@ int schemerlicht_open_output_file(const char* filename)
 #ifdef _WIN32
   return _open(filename, _O_CREAT | O_WRONLY | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
 #elif defined(__APPLE__)
-  return open(filename, O_CREAT | O_WRONLY | O_TRUNC, __S_IREAD | __S_IWRITE);
-#else // unix
   return open(filename, O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
+#else // unix
+  return open(filename, O_CREAT | O_WRONLY | O_TRUNC, __S_IREAD | __S_IWRITE);
 #endif
   }
 
@@ -48,9 +48,9 @@ int schemerlicht_open_input_file(const char* filename)
 #ifdef _WIN32
   return _open(filename, _O_RDONLY | O_BINARY, _S_IREAD | _S_IWRITE);
 #elif defined(__APPLE__)
-  return open(filename, O_RDONLY, __S_IREAD | __S_IWRITE);
-#else // unix
   return open(filename, O_RDONLY, S_IREAD | S_IWRITE);
+#else // unix
+  return open(filename, O_RDONLY, __S_IREAD | __S_IWRITE);
 #endif
   }
 
@@ -70,7 +70,7 @@ long schemerlicht_tell(int fd)
 #ifdef _WIN32
   return _tell(fd);
 #else
-  return tell(fd);
+  return lseek(fd, 0, SEEK_CUR);
 #endif
   }
 
