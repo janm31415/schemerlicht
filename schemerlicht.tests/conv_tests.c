@@ -17,6 +17,7 @@
 #include "schemerlicht/quoteconv.h"
 #include "schemerlicht/alpha.h"
 #include "schemerlicht/constprop.h"
+#include "schemerlicht/constfold.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -879,7 +880,7 @@ static void test_constant_propagation_aux(const char* script, const char* expect
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = script2tokens(ctxt, script);
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = make_program(ctxt, &tokens);  
   schemerlicht_constant_propagation(ctxt, &prog);
   schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
   TEST_EQ_STRING(expected, res.string_ptr);
@@ -892,6 +893,38 @@ static void test_constant_propagation_aux(const char* script, const char* expect
 static void test_constant_propagation()
   {
   test_constant_propagation_aux("(let ((x 5)) (let ((y x)) (+ y y)))", "( + 5 5 ) ");
+  }
+
+static void test_constant_folding_aux(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_constant_folding(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_constant_folding()
+  {
+  test_constant_folding_aux("(if #t 1 2)", "1 ");
+  test_constant_folding_aux("(if #f 1 2)", "2 ");
+  test_constant_folding_aux("(if (and #f (f 2)) 123 (g 3))", "( g 3 ) ");
+
+  test_constant_folding_aux("(if (if (flonum? x) #t #f) (a) (b))", "( if ( flonum? x ) ( a ) ( b ) ) ");
+
+  test_constant_folding_aux("(if (> 3 2) 1 1)", "1 ");
+  test_constant_folding_aux("(if (> 3 2) 2.5 2.5)", "2.500000 ");
+  test_constant_folding_aux("(if (> 3 2) #\\a #\\a)", "#\\97 ");
+  test_constant_folding_aux("(if (> 3 2) #t #t)", "#t ");
+  test_constant_folding_aux("(if (> 3 2) #f #f)", "#f ");
+  test_constant_folding_aux("(if (> 3 2) () ())", "() ");
+  test_constant_folding_aux("(if (> 3 2) \"foo\" \"foo\")", "\"foo\" ");  
   }
 
 void run_all_conv_tests()
@@ -940,4 +973,5 @@ void run_all_conv_tests()
   test_alpha_conversion();
   test_alpha_naming();
   test_constant_propagation();
+  test_constant_folding();
   }
