@@ -28,6 +28,7 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_map_free(ctxt, ctxt->macro_map);
   schemerlicht_syntax_errors_clear(ctxt);
   schemerlicht_compile_errors_clear(ctxt);
+  schemerlicht_runtime_errors_clear(ctxt);
   schemerlicht_vector_destroy(ctxt, &ctxt->stack);
   schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->raw_heap, schemerlicht_object);
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->raw_heap, schemerlicht_object);
@@ -40,6 +41,7 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_vector_destroy(ctxt, &ctxt->raw_heap);
   schemerlicht_vector_destroy(ctxt, &ctxt->syntax_error_reports);  
   schemerlicht_vector_destroy(ctxt, &ctxt->compile_error_reports);
+  schemerlicht_vector_destroy(ctxt, &ctxt->runtime_error_reports);
   for (int i = 0; i < SCHEMERLICHT_MAX_POOL; ++i)
     schemerlicht_pool_allocator_destroy(ctxt, &ctxt->pool[i]);
   schemerlicht_string* sit = schemerlicht_vector_begin(&ctxt->overrides, schemerlicht_string);
@@ -72,6 +74,7 @@ static void context_free(schemerlicht_context* ctxt)
     context_free(*cit);
     }
   schemerlicht_vector_destroy(ctxt, &ctxt->environments);
+  schemerlicht_string_destroy(ctxt, &ctxt->module_path);
   schemerlicht_free(ctxt, ctxt, sizeof(schemerlicht_context));
   }
 
@@ -108,12 +111,14 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_vector_init(ctxt, &ctxt->globals, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &ctxt->syntax_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->compile_error_reports, schemerlicht_error_report);
+  schemerlicht_vector_init(ctxt, &ctxt->runtime_error_reports, schemerlicht_error_report);
   schemerlicht_vector_init(ctxt, &ctxt->overrides, schemerlicht_string);
   schemerlicht_vector_init(ctxt, &ctxt->externals, schemerlicht_external_function);
   ctxt->externals_map = schemerlicht_map_new(ctxt, 0, 4);
   schemerlicht_environment_init(ctxt);  
   schemerlicht_vector_init(ctxt, &ctxt->lambdas, schemerlicht_function*);
   schemerlicht_vector_init(ctxt, &ctxt->environments, schemerlicht_context*);
+  schemerlicht_string_init(ctxt, &ctxt->module_path, "");
   }
 
 schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)

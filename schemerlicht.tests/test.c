@@ -5,6 +5,7 @@
 #include "dump_tests.h"
 #include "environment_tests.h"
 #include "map_tests.h"
+#include "module_tests.h"
 #include "parser_tests.h"
 #include "pool_tests.h"
 #include "reader_tests.h"
@@ -29,6 +30,7 @@ int main(int argc, const char* argv[])
   run_all_dump_tests();
   run_all_environment_tests();
   run_all_map_tests();
+  run_all_module_tests();
   run_all_parser_tests();
   run_all_pool_tests();
   run_all_reader_tests();

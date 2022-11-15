@@ -1863,7 +1863,7 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
       return make_variable(ctxt, token_it, token_it_end);
       }
       default:
-        schemerlicht_throw_parser(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED, (*token_it)->line_nr, (*token_it)->column_nr);
+        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
     }
     default:

@@ -26,6 +26,7 @@ limits.h
 macro.h
 map.h
 memory.h
+modules.h
 object.h
 parser.h
 preprocess.h
@@ -75,6 +76,7 @@ lambdatolet.c
 macro.c
 map.c
 memory.c
+modules.c
 object.c
 parser.c
 preprocess.c

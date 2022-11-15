@@ -200,7 +200,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     }
     default:
     {
-    schemerlicht_runerror(ctxt, "Too many parameters for foreign-call");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "Too many parameters for foreign-call");
     break;
     }
     }

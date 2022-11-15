@@ -47,8 +47,10 @@ struct schemerlicht_context
   schemerlicht_memsize gc_heap_pos_threshold;
   int number_of_syntax_errors;
   int number_of_compile_errors;
+  int number_of_runtime_errors;
   schemerlicht_vector syntax_error_reports;
   schemerlicht_vector compile_error_reports;
+  schemerlicht_vector runtime_error_reports;
   struct schemerlicht_longjmp* error_jmp;  // current error recover point
   schemerlicht_vector environment; // linked chain of environment maps
   schemerlicht_map* quote_to_index;
@@ -62,6 +64,7 @@ struct schemerlicht_context
   schemerlicht_vector lambdas;
   schemerlicht_vector environments; // pointers to other context instantiations that can be used by eval
   schemerlicht_map* macro_map;
+  schemerlicht_string module_path;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

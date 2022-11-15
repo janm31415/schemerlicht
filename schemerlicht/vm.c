@@ -500,8 +500,8 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         schemerlicht_string stackstr = schemerlicht_show_stack(ctxt, 0, 9);
         printf("%s\n", stackstr.string_ptr);
         schemerlicht_string_destroy(ctxt, &stackstr);
-
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to call a non-procedure");
+        pc = pc_end;
         }
       break;
       }
@@ -771,8 +771,9 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         break;
         }
         default:
-        {
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+        {        
+        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to call a non-procedure");
+        pc = pc_end;
         }
         }
       break;

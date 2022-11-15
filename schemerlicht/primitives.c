@@ -12,6 +12,7 @@
 #include "callcc.h"
 #include "r5rs.h"
 #include "inputoutput.h"
+#include "modules.h"
 
 #include <time.h>
 #include <math.h>
@@ -5235,7 +5236,7 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
           }
         else
           {
-          schemerlicht_runerror(ctxt, "non list object as argument to append");
+          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "non list object as argument to append");
           break;
           }
         }
@@ -6543,7 +6544,7 @@ void schemerlicht_primitive_list_ref(schemerlicht_context* ctxt, int a, int b, i
     if ((l->type != schemerlicht_object_type_pair && l->type != schemerlicht_object_type_nil) || pos->type != schemerlicht_object_type_fixnum)
       {
       ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "list-ref: expects a list and fixnum as arguments");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-ref: expects a list and fixnum as arguments");
       }
     else
       {
@@ -6551,7 +6552,7 @@ void schemerlicht_primitive_list_ref(schemerlicht_context* ctxt, int a, int b, i
       if (idx < 0)
         {
         ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_runerror(ctxt, "list-ref: position is negative");
+        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-ref: position is negative");
         }
       else
         {
@@ -6579,9 +6580,9 @@ void schemerlicht_primitive_list_ref(schemerlicht_context* ctxt, int a, int b, i
             {
             ret.type = schemerlicht_object_type_undefined;
             if (l->type == schemerlicht_object_type_pair)
-              schemerlicht_runerror(ctxt, "list-ref: position is out of bounds");
+              schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-ref: position is out of bounds");
             else
-              schemerlicht_runerror(ctxt, "list-ref: not a valid list");
+              schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-ref: not a valid list");
             }
           else
             {
@@ -6597,7 +6598,7 @@ void schemerlicht_primitive_list_ref(schemerlicht_context* ctxt, int a, int b, i
             else
               {
               ret.type = schemerlicht_object_type_undefined;
-              schemerlicht_runerror(ctxt, "list-ref: not a valid list");
+              schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-ref: not a valid list");
               }
             }
           }
@@ -6627,7 +6628,7 @@ void schemerlicht_primitive_list_tail(schemerlicht_context* ctxt, int a, int b, 
     if ((l->type != schemerlicht_object_type_pair && l->type != schemerlicht_object_type_nil) || pos->type != schemerlicht_object_type_fixnum)
       {
       ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "list-tail: expects a list and fixnum as arguments");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-tail: expects a list and fixnum as arguments");
       }
     else
       {
@@ -6635,7 +6636,7 @@ void schemerlicht_primitive_list_tail(schemerlicht_context* ctxt, int a, int b, 
       if (idx < 0)
         {
         ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_runerror(ctxt, "list-tail: position is negative");
+        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-tail: position is negative");
         }
       else
         {
@@ -6655,9 +6656,9 @@ void schemerlicht_primitive_list_tail(schemerlicht_context* ctxt, int a, int b, 
             {
             ret.type = schemerlicht_object_type_undefined;
             if (l->type == schemerlicht_object_type_pair)
-              schemerlicht_runerror(ctxt, "list-tail: position is out of bounds");
+              schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-tail: position is out of bounds");
             else
-              schemerlicht_runerror(ctxt, "list-tail: not a valid list");
+              schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list-tail: not a valid list");
             }
           else
             {
@@ -6682,7 +6683,7 @@ void schemerlicht_primitive_reverse(schemerlicht_context* ctxt, int a, int b, in
     {
     schemerlicht_object ret;
     ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_runerror(ctxt, "reverse: expects a list as argument");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "reverse: expects a list as argument");
     schemerlicht_set_object(ra, &ret);
     }
   else
@@ -6692,7 +6693,7 @@ void schemerlicht_primitive_reverse(schemerlicht_context* ctxt, int a, int b, in
       {
       schemerlicht_object ret;
       ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "reverse: expects a list as argument");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "reverse: expects a list as argument");
       schemerlicht_set_object(ra, &ret);
       }
     else
@@ -6709,7 +6710,7 @@ void schemerlicht_primitive_reverse(schemerlicht_context* ctxt, int a, int b, in
           {
           schemerlicht_object ret;
           ret.type = schemerlicht_object_type_undefined;
-          schemerlicht_runerror(ctxt, "reverse: not a valid list");
+          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "reverse: not a valid list");
           schemerlicht_set_object(ra, &ret);
           schemerlicht_vector_destroy(ctxt, &v);
           return;
@@ -6994,7 +6995,7 @@ void schemerlicht_primitive_string_list(schemerlicht_context* ctxt, int a, int b
       }
     else
       {
-      schemerlicht_runerror(ctxt, "vector->list: argument was not a vector");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "vector->list: argument was not a vector");
       ret.type = schemerlicht_object_type_undefined;
       }
     }
@@ -7013,7 +7014,7 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
     {
     schemerlicht_object ret;
     ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_runerror(ctxt, "list->string: expects a list as argument");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->string: expects a list as argument");
     schemerlicht_set_object(ra, &ret);
     }
   else
@@ -7023,7 +7024,7 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
       {
       schemerlicht_object ret;
       ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "list->string: expects a list as argument");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->string: expects a list as argument");
       schemerlicht_set_object(ra, &ret);
       }
     else
@@ -7039,7 +7040,7 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
           {
           schemerlicht_object ret;
           ret.type = schemerlicht_object_type_undefined;
-          schemerlicht_runerror(ctxt, "list->string: list should contain characters only");
+          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->string: list should contain characters only");
           schemerlicht_set_object(ra, &ret);
           return;
           }
@@ -7049,7 +7050,7 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
           {
           schemerlicht_object ret;
           ret.type = schemerlicht_object_type_undefined;
-          schemerlicht_runerror(ctxt, "list->string: not a valid list");
+          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->string: not a valid list");
           schemerlicht_set_object(ra, &ret);
           return;
           }
@@ -7110,7 +7111,7 @@ void schemerlicht_primitive_vector_list(schemerlicht_context* ctxt, int a, int b
       }
     else
       {
-      schemerlicht_runerror(ctxt, "vector->list: argument was not a vector");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "vector->list: argument was not a vector");
       ret.type = schemerlicht_object_type_undefined;
       }
     }
@@ -7129,7 +7130,7 @@ void schemerlicht_primitive_list_vector(schemerlicht_context* ctxt, int a, int b
     {
     schemerlicht_object ret;
     ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_runerror(ctxt, "list->vector: expects a list as argument");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->vector: expects a list as argument");
     schemerlicht_set_object(ra, &ret);
     }
   else
@@ -7139,7 +7140,7 @@ void schemerlicht_primitive_list_vector(schemerlicht_context* ctxt, int a, int b
       {
       schemerlicht_object ret;
       ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "list->vector: expects a list as argument");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->vector: expects a list as argument");
       schemerlicht_set_object(ra, &ret);
       }
     else
@@ -7156,7 +7157,7 @@ void schemerlicht_primitive_list_vector(schemerlicht_context* ctxt, int a, int b
           {
           schemerlicht_object ret;
           ret.type = schemerlicht_object_type_undefined;
-          schemerlicht_runerror(ctxt, "list->vector: not a valid list");
+          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "list->vector: not a valid list");
           schemerlicht_set_object(ra, &ret);
           schemerlicht_vector_destroy(ctxt, &v);
           return;
@@ -7317,37 +7318,37 @@ void schemerlicht_primitive_make_port(schemerlicht_context* ctxt, int a, int b, 
         case 0:
           if (ri->type != schemerlicht_object_type_true && ri->type != schemerlicht_object_type_false)
             {
-            schemerlicht_runerror(ctxt, "first argument of %make-port should be #t or #f.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "first argument of %make-port should be #t or #f.");
             }
           break;
         case 1:
           if (ri->type != schemerlicht_object_type_string)
             {
-            schemerlicht_runerror(ctxt, "second argument of %make-port should be a string indicating the port name.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "second argument of %make-port should be a string indicating the port name.");
             }
           break;
         case 2:
           if (ri->type != schemerlicht_object_type_fixnum)
             {
-            schemerlicht_runerror(ctxt, "third argument of %make-port should be a fixnum representing the file descriptor.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "third argument of %make-port should be a fixnum representing the file descriptor.");
             }
           break;
         case 3:
           if (ri->type != schemerlicht_object_type_string)
             {
-            schemerlicht_runerror(ctxt, "fourth argument of %make-port should be a string representing the port buffer.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "fourth argument of %make-port should be a string representing the port buffer.");
             }
           break;
         case 4:
           if (ri->type != schemerlicht_object_type_fixnum)
             {
-            schemerlicht_runerror(ctxt, "fifth argument of %make-port should be an index pointing to the next position in the buffer.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "fifth argument of %make-port should be an index pointing to the next position in the buffer.");
             }
           break;
         case 5:
           if (ri->type != schemerlicht_object_type_fixnum)
             {
-            schemerlicht_runerror(ctxt, "sixth argument of %make-port should be an index representing the size of the buffer.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "sixth argument of %make-port should be an index representing the size of the buffer.");
             }
           schemerlicht_object* bytes_read = schemerlicht_vector_at(&v.value.v, 6, schemerlicht_object);
           bytes_read->type = schemerlicht_object_type_fixnum;
@@ -7431,7 +7432,7 @@ void schemerlicht_primitive_write_char(schemerlicht_context* ctxt, int a, int b,
       }
     else
       {
-      schemerlicht_runerror(ctxt, "%write-char expects a character and a port as arguments.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%write-char expects a character and a port as arguments.");
       }
     }
   ra->type = schemerlicht_object_type_void;
@@ -7460,7 +7461,7 @@ void schemerlicht_primitive_flush_output_port(schemerlicht_context* ctxt, int a,
       }
     else
       {
-      schemerlicht_runerror(ctxt, "%flush-output-port expects and output port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%flush-output-port expects and output port as argument.");
       }
     }
   ra->type = schemerlicht_object_type_void;
@@ -7518,13 +7519,13 @@ void schemerlicht_primitive_read_char(schemerlicht_context* ctxt, int a, int b, 
     else
       {
       ra->type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "%read-char expects a port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read-char expects a port as argument.");
       }
     }
   else
     {
     ra->type = schemerlicht_object_type_undefined;
-    schemerlicht_runerror(ctxt, "%read-char expects a port as argument.");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read-char expects a port as argument.");
     }
   }
 
@@ -7553,13 +7554,13 @@ void schemerlicht_primitive_peek_char(schemerlicht_context* ctxt, int a, int b, 
     else
       {
       ra->type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "%peek-char expects a port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%peek-char expects a port as argument.");
       }
     }
   else
     {
     ra->type = schemerlicht_object_type_undefined;
-    schemerlicht_runerror(ctxt, "%peek-char expects a port as argument.");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%peek-char expects a port as argument.");
     }
   }
 
@@ -7627,7 +7628,7 @@ void schemerlicht_primitive_open_input_file(schemerlicht_context* ctxt, int a, i
     if (fn->type != schemerlicht_object_type_string)
       {
       ra->type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "open-input-file expects a string as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "open-input-file expects a string as argument.");
       }
     else
       {
@@ -7684,7 +7685,7 @@ void schemerlicht_primitive_open_output_file(schemerlicht_context* ctxt, int a, 
     if (fn->type != schemerlicht_object_type_string)
       {
       ra->type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "open-input-file expects a string as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "open-input-file expects a string as argument.");
       }
     else
       {
@@ -7828,13 +7829,13 @@ void schemerlicht_primitive_is_char_ready(schemerlicht_context* ctxt, int a, int
     else
       {
       ra->type = schemerlicht_object_type_undefined;
-      schemerlicht_runerror(ctxt, "%char-ready expects an input port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%char-ready expects an input port as argument.");
       }
     }
   else
     {
     ra->type = schemerlicht_object_type_undefined;
-    schemerlicht_runerror(ctxt, "%char-ready expects an input port as argument.");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%char-ready expects an input port as argument.");
     }
   }
 
@@ -7848,7 +7849,7 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_WRITE);
   if (b < 2)
     {
-    schemerlicht_runerror(ctxt, "%write expects an object and an output port as argument.");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%write expects an object and an output port as argument.");
     ra->type = schemerlicht_object_type_undefined;
     }
   else
@@ -7906,7 +7907,7 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
       }
     else
       {
-      schemerlicht_runerror(ctxt, "%write expects an object and an output port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%write expects an object and an output port as argument.");
       ra->type = schemerlicht_object_type_undefined;
       }
     }
@@ -7922,7 +7923,7 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_DISPLAY);
   if (b < 2)
     {
-    schemerlicht_runerror(ctxt, "%display expects an object and an output port as argument.");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%display expects an object and an output port as argument.");
     ra->type = schemerlicht_object_type_undefined;
     }
   else
@@ -7980,7 +7981,7 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
       }
     else
       {
-      schemerlicht_runerror(ctxt, "%display expects an object and an output port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%display expects an object and an output port as argument.");
       ra->type = schemerlicht_object_type_undefined;
       }
     }
@@ -8024,7 +8025,7 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_READ);
   if (b < 1)
     {
-    schemerlicht_runerror(ctxt, "%read expects an input port as argument.");
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read expects an input port as argument.");
     ra->type = schemerlicht_object_type_undefined;
     }
   else
@@ -8051,7 +8052,7 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
       }
     else
       {
-      schemerlicht_runerror(ctxt, "%read expects an input port as argument.");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read expects an input port as argument.");
       ra->type = schemerlicht_object_type_undefined;
       }
     }
@@ -8346,6 +8347,7 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
   schemerlicht_compile_callcc(new_ctxt);
   schemerlicht_compile_r5rs(new_ctxt);
   schemerlicht_compile_input_output(new_ctxt);
+  schemerlicht_compile_modules(new_ctxt, ctxt->module_path.string_ptr);
   schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
   ra->value.ptr = cast(void*, new_ctxt);
   }

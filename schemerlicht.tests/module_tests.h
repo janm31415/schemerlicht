@@ -1,0 +1,6 @@
+#ifndef SCHEMERLICHT_MODULE_TESTS_H
+#define SCHEMERLICHT_MODULE_TESTS_H
+
+void run_all_module_tests();
+
+#endif //SCHEMERLICHT_MODULE_TESTS_H

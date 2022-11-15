@@ -135,6 +135,16 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
     schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
     printf("%s\n", it->message.string_ptr);
     }
+  if (ctxt->number_of_syntax_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_runtime_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->runtime_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
 
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
@@ -205,6 +215,16 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   if (ctxt->number_of_compile_errors > 0)
     {
     schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_syntax_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_runtime_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->runtime_error_reports, schemerlicht_error_report);
     printf("%s\n", it->message.string_ptr);
     }
 
@@ -3048,6 +3068,35 @@ static void test_macros()
   test_compile_aux("8", "(defmacro eight2 () `8) (eight2)");
   }
 
+static void test_calcc_extended()
+  {
+  test_compile_aux_r5rs("1", "(values 1)");
+  test_compile_aux_r5rs("((multiple . values) 1 2)", "(values 1 2)");
+  test_compile_aux_r5rs("((multiple . values) 1 2 3)", "(values 1 2 3)");
+  test_compile_aux_r5rs("3", "(call-with-values (lambda () (values 1 2)) +)");
+  test_compile_aux_r5rs("5", "(call-with-values (lambda () (values 4 5)) (lambda (a b) b))");
+  test_compile_aux_r5rs("-1", "(call-with-values * -)");
+  test_compile_aux_r5rs("(2 1)", "(define lst '()) (define before (lambda () (set! lst (cons 1 lst)))) (define thunk (lambda () (set! lst (cons 2 lst))))  (define after (lambda () (set! lst (cons 3 lst)))) (dynamic-wind before thunk after)");
+  test_compile_aux_r5rs("(3 2 1)", "(define lst '()) (define before (lambda () (set! lst (cons 1 lst)))) (define thunk (lambda () (set! lst (cons 2 lst))))  (define after (lambda () (set! lst (cons 3 lst)))) (dynamic-wind before thunk after) lst");
+  const char* script = "(let ((path '())\n"
+"     (c #f))\n"
+" (let ((add (lambda (s)\n"
+"             (set! path (cons s path)))))\n"
+"   (dynamic-wind\n"
+"     (lambda () (add 'connect))\n"
+"     (lambda ()\n"
+"       (add (call-with-current-continuation\n"
+"             (lambda (c0)\n"
+"               (set! c c0)\n"
+"               'talk1))))\n"
+"     (lambda () (add 'disconnect)))\n"
+"   (if (< (length path) 4)\n"
+"       (c 'talk2)\n"
+"       (reverse path))))\n";
+
+  test_compile_aux_r5rs("(connect talk1 disconnect connect talk2 disconnect)", script);
+  }
+
 void run_all_compiler_tests()
   {
   for (int i = 0; i < 2; ++i)
@@ -3157,5 +3206,6 @@ void run_all_compiler_tests()
     test_eval();
     test_load();
     test_macros();
+    test_calcc_extended();
     }
   }

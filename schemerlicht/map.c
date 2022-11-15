@@ -32,7 +32,7 @@ static void schemerlicht_create_node_vector(schemerlicht_context* ctxt, schemerl
   {
   schemerlicht_memsize size = twoto(log_node_size);
   if (log_node_size > schemerlicht_max_bits)
-    schemerlicht_runerror(ctxt, "map overflow");
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_MEMORY);
   if (log_node_size == 0)
     {
     map->node = ctxt->global->dummy_node;
@@ -460,7 +460,7 @@ schemerlicht_object* schemerlicht_map_insert(schemerlicht_context* ctxt, schemer
   else
     {
     if (key->type == schemerlicht_object_type_undefined)
-      schemerlicht_runerror(ctxt, "table index is nil");
+      schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT);
     return new_key(ctxt, map, key);
     }
   }

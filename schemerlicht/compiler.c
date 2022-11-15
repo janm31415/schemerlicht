@@ -197,7 +197,7 @@ static void compile_if(schemerlicht_context* ctxt, schemerlicht_function* fun, s
   {
   schemerlicht_assert(e->type == schemerlicht_type_if);
   if (e->expr.i.arguments.vector_size != 3)
-    schemerlicht_throw_compiler(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED, e->expr.i.line_nr, e->expr.i.column_nr, &e->expr.i.filename);
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
   schemerlicht_expression* expr_test = schemerlicht_vector_at(&e->expr.i.arguments, 0, schemerlicht_expression);
   schemerlicht_expression* expr_then_branch = schemerlicht_vector_at(&e->expr.i.arguments, 1, schemerlicht_expression);
   schemerlicht_expression* expr_else_branch = schemerlicht_vector_at(&e->expr.i.arguments, 2, schemerlicht_expression);
