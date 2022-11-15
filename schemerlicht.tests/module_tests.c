@@ -8,15 +8,15 @@
 #include "schemerlicht/r5rs.h"
 #include "schemerlicht/inputoutput.h"
 #include "schemerlicht/modules.h"
+#include "schemerlicht/modulesconf.h"
 
 void run_all_module_tests()
   {
   schemerlicht_context* ctxt = schemerlicht_open(2048);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
-  schemerlicht_compile_input_output(ctxt);
-  
-  //schemerlicht_compile_modules(ctxt, "");
+  schemerlicht_compile_input_output(ctxt);  
+  schemerlicht_compile_modules(ctxt, SCHEMERLICHT_MODULES_PATH);
 
   schemerlicht_close(ctxt);
   }

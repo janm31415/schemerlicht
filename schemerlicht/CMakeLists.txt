@@ -27,6 +27,7 @@ macro.h
 map.h
 memory.h
 modules.h
+modulesconf.h
 object.h
 parser.h
 preprocess.h
