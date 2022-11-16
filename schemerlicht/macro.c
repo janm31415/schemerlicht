@@ -118,6 +118,10 @@ static void add_to_macro_map(schemerlicht_context* ctxt, schemerlicht_string* ma
     // then clean key
     schemerlicht_string_destroy(ctxt, &key.value.s);
     }
+  else
+    {
+    ++ctxt->number_of_macros;
+    }
   value->type = schemerlicht_object_type_fixnum;
   value->value.fx = cast(schemerlicht_fixnum, number_of_arguments);
   if (variable_arity)
@@ -481,12 +485,20 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_program pr;
       schemerlicht_vector_init(ctxt, &pr.expressions, schemerlicht_expression);
       schemerlicht_vector_push_back(ctxt, &pr.expressions, *e, schemerlicht_expression);
+      schemerlicht_map* macro_map_store = ctxt->macro_map;
+      schemerlicht_memsize number_of_macros_store = ctxt->number_of_macros;
+      ctxt->number_of_macros = 0;
+      ctxt->macro_map = schemerlicht_map_new(ctxt, 0, 1); // remove all macros, as the macros now exist in the environment
       schemerlicht_preprocess(ctxt, &pr);
       schemerlicht_expression* expr = schemerlicht_vector_at(&pr.expressions, 0, schemerlicht_expression);
       schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
       schemerlicht_object* res = schemerlicht_run(ctxt, func);
       schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
       schemerlicht_function_free(ctxt, func);
+      schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
+      schemerlicht_map_free(ctxt, ctxt->macro_map);
+      ctxt->macro_map = macro_map_store; // restore original macro map
+      ctxt->number_of_macros = number_of_macros_store;
 
       schemerlicht_stream str;
       schemerlicht_memsize len = s.string_length;
@@ -545,6 +557,8 @@ static void schemerlicht_macro_expander_visitor_free(schemerlicht_context* ctxt,
 
 static int expand_existing_macros(schemerlicht_context* ctxt, schemerlicht_program* prog)
   {
+  if (ctxt->number_of_macros == 0)
+    return 0;
   schemerlicht_macro_expander_visitor* v = schemerlicht_macro_expander_visitor_new(ctxt);
   schemerlicht_visit_program(ctxt, v->visitor, prog);
   int macros_expanded = v->macros_expanded;
@@ -572,8 +586,8 @@ void schemerlicht_expand_macros(schemerlicht_context* ctxt, schemerlicht_program
       schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
       schemerlicht_object* res = schemerlicht_run(ctxt, func);
       schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
-      macros_expanded = expand_existing_macros(ctxt, program);
-    }
+      }
+    macros_expanded = expand_existing_macros(ctxt, program);
     schemerlicht_program_destroy(ctxt, &macro_program);
-  }
+    }
   }

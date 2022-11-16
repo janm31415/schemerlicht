@@ -414,6 +414,12 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       const int b = SCHEMERLICHT_GETARG_B(i);
       const int c = SCHEMERLICHT_GETARG_C(i);
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+      if (target->type == schemerlicht_object_type_unassigned)
+        {
+        //this should be a global defined function, but at the time of calling, the function wasn't created yet.
+        //let's see whether its global position has been updated.
+        target = schemerlicht_vector_at(&ctxt->globals, target->value.fx, schemerlicht_object);
+        }
       if (target->type == schemerlicht_object_type_primitive)
         {
         schemerlicht_fixnum function_id = target->value.fx;

@@ -64,6 +64,7 @@ struct schemerlicht_context
   schemerlicht_vector lambdas;
   schemerlicht_vector environments; // pointers to other context instantiations that can be used by eval
   schemerlicht_map* macro_map;
+  schemerlicht_memsize number_of_macros;
   schemerlicht_string module_path;
   };
 

@@ -14,6 +14,7 @@
 #include "inputoutput.h"
 #include "modules.h"
 #include "environment.h"
+#include "dump.h"
 
 #include <time.h>
 #include <math.h>
@@ -8092,10 +8093,20 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         schemerlicht_stream_rewind(&str);
         schemerlicht_vector tokens = tokenize(ctxt, &str);
         schemerlicht_stream_close(ctxt, &str);
+        schemerlicht_vector stack_store = ctxt->stack;
+        schemerlicht_vector new_stack;
+        schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);        
+        ctxt->stack = new_stack;
+
         schemerlicht_program prog = make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
         if (prog.expressions.vector_size > 0)
           {
+#if 0
+          schemerlicht_string dmp = schemerlicht_dump(ctxt, &prog);
+          printf("%s\n\n", dmp.string_ptr);
+          schemerlicht_string_destroy(ctxt, &dmp);
+#endif
           schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
           schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
           destroy_tokens_vector(ctxt, &tokens);
@@ -8104,16 +8115,10 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
           schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
           printf("%s", stck.string_ptr);
           schemerlicht_string_destroy(ctxt, &stck);
-#endif
-          schemerlicht_vector stack_store = ctxt->stack;
-          schemerlicht_vector new_stack;
-          schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
-          ctxt->stack = new_stack;
+#endif          
           schemerlicht_object* res = schemerlicht_run(ctxt, func);
-          //schemerlicht_set_object(ra, res);
-          ra->type = schemerlicht_object_type_undefined;
-          schemerlicht_vector_destroy(ctxt, &new_stack);
-          ctxt->stack = stack_store;
+          schemerlicht_set_object(ra, res);
+          //ra->type = schemerlicht_object_type_undefined;          
           schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
 #if 0
           stck = schemerlicht_show_stack(ctxt, 0, 9);
@@ -8135,6 +8140,8 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
           schemerlicht_program_destroy(ctxt, &prog);
           ra->type = schemerlicht_object_type_undefined;
           }
+        schemerlicht_vector_destroy(ctxt, &new_stack);
+        ctxt->stack = stack_store;
         }
       else
         ra->type = schemerlicht_object_type_undefined;

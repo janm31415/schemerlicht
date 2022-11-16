@@ -106,6 +106,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   ctxt->quote_to_index_size = 0;
   ctxt->string_to_symbol = schemerlicht_map_new(ctxt, 0, 8);
   ctxt->macro_map = schemerlicht_map_new(ctxt, 0, 4);
+  ctxt->number_of_macros = 0;
   ctxt->number_of_runtime_errors = 0;
   ctxt->number_of_compile_errors = 0;
   ctxt->number_of_syntax_errors = 0;

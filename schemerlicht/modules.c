@@ -7,6 +7,7 @@
 #include "preprocess.h"
 #include "syscalls.h"
 #include "string.h"
+#include "dump.h"
 
 
 void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module_path)
@@ -103,12 +104,16 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
     "            )\n"
     "   )\n"
     ")\n"
-    "(define-module srfi-6 (srfi srfi6))";
-    //"(load-module '(packages))\n";
+    "(load-module '(packages))\n";
 
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_preprocess(ctxt, &prog);
+#if 0
+  schemerlicht_string dmp = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n\n", dmp.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dmp);
+#endif
   schemerlicht_function* modules = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
   schemerlicht_run(ctxt, modules);
   destroy_tokens_vector(ctxt, &tokens);
