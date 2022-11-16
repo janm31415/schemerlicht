@@ -138,7 +138,7 @@ void schemerlicht_runtime_error(schemerlicht_context* ctxt, int errorcode, int l
     schemerlicht_string_append(ctxt, &message, msg);
     }
   schemerlicht_string_destroy(ctxt, msg);
-  ++ctxt->number_of_compile_errors;
+  ++ctxt->number_of_runtime_errors;
   schemerlicht_error_report report;
   report.column_number = column_nr;
   report.line_number = line_nr;
@@ -151,7 +151,7 @@ void schemerlicht_runtime_error_cstr(schemerlicht_context* ctxt, int errorcode, 
   {
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, msg);
-  schemerlicht_compile_error(ctxt, errorcode, line_nr, column_nr, &s);
+  schemerlicht_runtime_error(ctxt, errorcode, line_nr, column_nr, &s);
   }
 
 void schemerlicht_syntax_errors_clear(schemerlicht_context* ctxt)

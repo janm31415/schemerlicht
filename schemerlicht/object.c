@@ -13,11 +13,12 @@ int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_true:
     case schemerlicht_object_type_false:
-    case schemerlicht_object_type_nil:
+    case schemerlicht_object_type_nil:    
     case schemerlicht_object_type_void:
     case schemerlicht_object_type_eof:
     case schemerlicht_object_type_blocking:
       return 1;
+    case schemerlicht_object_type_unassigned:
     case schemerlicht_object_type_primitive:
     case schemerlicht_object_type_primitive_object:
     case schemerlicht_object_type_fixnum:
@@ -77,10 +78,11 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
       case schemerlicht_object_type_true:
       case schemerlicht_object_type_false:
       case schemerlicht_object_type_nil:
-      case schemerlicht_object_type_void:
+      case schemerlicht_object_type_void:      
       case schemerlicht_object_type_eof:
       case schemerlicht_object_type_blocking:
         break;
+      case schemerlicht_object_type_unassigned:
       case schemerlicht_object_type_primitive:
       case schemerlicht_object_type_primitive_object:
       case schemerlicht_object_type_fixnum:
@@ -159,10 +161,11 @@ int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_ob
     case schemerlicht_object_type_true:
     case schemerlicht_object_type_false:
     case schemerlicht_object_type_nil:
-    case schemerlicht_object_type_void:
+    case schemerlicht_object_type_void:    
     case schemerlicht_object_type_eof:
     case schemerlicht_object_type_blocking:
       return 1;
+    case schemerlicht_object_type_unassigned:
     case schemerlicht_object_type_primitive:
     case schemerlicht_object_type_primitive_object:
     case schemerlicht_object_type_fixnum:
@@ -491,6 +494,9 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         case schemerlicht_object_type_eof:
           schemerlicht_string_append_cstr(ctxt, &s, "#eof");
           break;
+        case schemerlicht_object_type_unassigned:
+          schemerlicht_string_append_cstr(ctxt, &s, "#unassigned");
+          break;
         case schemerlicht_object_type_void:
           schemerlicht_string_append_cstr(ctxt, &s, "#<void>");
           break;
@@ -662,6 +668,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       case schemerlicht_object_type_false:
       case schemerlicht_object_type_nil:
       case schemerlicht_object_type_void:
+      case schemerlicht_object_type_unassigned:
       case schemerlicht_object_type_lambda:
       case schemerlicht_object_type_environment:
       case schemerlicht_object_type_primitive:

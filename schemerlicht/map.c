@@ -295,7 +295,7 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
   {
   switch (key->type)
     {
-    case schemerlicht_object_type_void:
+    case schemerlicht_object_type_void:    
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_blocking:
     case schemerlicht_object_type_true:
@@ -306,6 +306,7 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
     case schemerlicht_object_type_primitive:
     case schemerlicht_object_type_primitive_object:
     case schemerlicht_object_type_fixnum:
+    case schemerlicht_object_type_unassigned:
       return schemerlicht_hash_fixnum(m, key->value.fx);
     case schemerlicht_object_type_char:
       return schemerlicht_hash_fixnum(m, cast(schemerlicht_fixnum, key->value.ch));

@@ -13,6 +13,7 @@
 #include "r5rs.h"
 #include "inputoutput.h"
 #include "modules.h"
+#include "environment.h"
 
 #include <time.h>
 #include <math.h>
@@ -5532,7 +5533,7 @@ void schemerlicht_primitive_is_integer(schemerlicht_context* ctxt, int a, int b,
       case schemerlicht_object_type_flonum:
       {
       schemerlicht_fixnum fx = cast(schemerlicht_fixnum, arg->value.fl);
-        if (arg->value.fl == cast(schemerlicht_flonum, fx))
+      if (arg->value.fl == cast(schemerlicht_flonum, fx))
         obj.type = schemerlicht_object_type_true;
       break;
       }
@@ -8090,16 +8091,50 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         fclose(f);
         schemerlicht_stream_rewind(&str);
         schemerlicht_vector tokens = tokenize(ctxt, &str);
-        schemerlicht_stream_close(ctxt, &str);        
+        schemerlicht_stream_close(ctxt, &str);
         schemerlicht_program prog = make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
-        schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
-        schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
-        destroy_tokens_vector(ctxt, &tokens);
-        schemerlicht_program_destroy(ctxt, &prog);
-        schemerlicht_object* res = schemerlicht_run(ctxt, func);
-        schemerlicht_set_object(ra, res);
-        schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+        if (prog.expressions.vector_size > 0)
+          {
+          schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
+          schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
+          destroy_tokens_vector(ctxt, &tokens);
+          schemerlicht_program_destroy(ctxt, &prog);
+#if 0
+          schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
+          printf("%s", stck.string_ptr);
+          schemerlicht_string_destroy(ctxt, &stck);
+#endif
+          schemerlicht_vector stack_store = ctxt->stack;
+          schemerlicht_vector new_stack;
+          schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
+          ctxt->stack = new_stack;
+          schemerlicht_object* res = schemerlicht_run(ctxt, func);
+          //schemerlicht_set_object(ra, res);
+          ra->type = schemerlicht_object_type_undefined;
+          schemerlicht_vector_destroy(ctxt, &new_stack);
+          ctxt->stack = stack_store;
+          schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+#if 0
+          stck = schemerlicht_show_stack(ctxt, 0, 9);
+          printf("%s", stck.string_ptr);
+          schemerlicht_string_destroy(ctxt, &stck);
+#endif
+#if 0
+          schemerlicht_string env = schemerlicht_show_environment(ctxt);
+          printf("%s", env.string_ptr);
+          schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
+          printf("%s", stck.string_ptr);
+          schemerlicht_string_destroy(ctxt, &env);
+          schemerlicht_string_destroy(ctxt, &stck);
+#endif
+          }
+        else
+          {
+          destroy_tokens_vector(ctxt, &tokens);
+          schemerlicht_program_destroy(ctxt, &prog);
+          ra->type = schemerlicht_object_type_undefined;
+          }
         }
       else
         ra->type = schemerlicht_object_type_undefined;
@@ -8208,7 +8243,7 @@ void schemerlicht_primitive_getenv(schemerlicht_context* ctxt, int a, int b, int
       const char* env = schemerlicht_getenv(str->value.s.string_ptr);
       if (env)
         {
-        schemerlicht_object s = make_schemerlicht_object_string(ctxt, env);        
+        schemerlicht_object s = make_schemerlicht_object_string(ctxt, env);
         schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
         schemerlicht_set_object(heap_obj, &s);
         ++ctxt->heap_pos;

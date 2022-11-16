@@ -3046,8 +3046,8 @@ static void test_eval()
   test_compile_aux("#((1 2 3) #(3.000000 40.000000) 3 \"abc\" 5 6 7)", "(eval '(vector (list 1 2 3) (vector 3.0 40.0) 3 \"abc\" 5 6 7))");
 
   test_compile_aux("21", "(define e (null-environment)) (eval '(define x (* 7 3)) e)");
-  test_compile_aux("#undefined", "(define e (null-environment)) (eval '(define x (* 7 3)) e) x");
-  test_compile_aux("#undefined", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x)");
+  test_compile_aux("#unassigned", "(define e (null-environment)) (eval '(define x (* 7 3)) e) x");
+  test_compile_aux("#unassigned", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x)");
   test_compile_aux("21", "(define e (null-environment)) (eval '(define x (* 7 3)) e) (eval 'x e)");
   test_compile_aux("21", "(define e (interaction-environment)) (eval '(define x (* 7 3)) e) x");
   test_compile_aux("21", "(eval '(define x (* 7 3))) x");

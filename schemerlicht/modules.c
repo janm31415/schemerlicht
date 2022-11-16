@@ -30,6 +30,7 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
     }
   char* script = "(define *modules* '())\n"
     "(define *loaded-modules* '())\n"
+    "(define error (lambda (reason . args) (display \"Error: \"))); (display reason) (for-each (lambda (arg) (display " ") (write arg)) args) (newline) (%flush-output-port) ))\n"
     "(define (module-name->strings ls res)\n"
     "  (if (null? ls)\n"
     "      res\n"
@@ -102,7 +103,8 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
     "            )\n"
     "   )\n"
     ")\n"
-    "(load-module '(packages))\n";
+    "(define-module srfi-6 (srfi srfi6))";
+    //"(load-module '(packages))\n";
 
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);

@@ -257,17 +257,17 @@ static void compile_variable(schemerlicht_context* ctxt, schemerlicht_function* 
     /*
     This variable was not found in the environment. However: it is possible that this variable will be defined by a load at runtime.
     Therefore we now allocate a global position for this variable. It might be filled in later by load.
-    */
-    //schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN, e->expr.var.line_nr, e->expr.var.column_nr, e->expr.var.name.string_ptr);
+    */    
     schemerlicht_environment_entry entry;
     entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
     entry.position = ctxt->globals.vector_size;
     schemerlicht_object obj;
-    obj.type = schemerlicht_object_type_undefined;
+    obj.type = schemerlicht_object_type_unassigned;
+    obj.value.fx = entry.position;
     schemerlicht_vector_push_back(ctxt, &ctxt->globals, obj, schemerlicht_object);
     schemerlicht_string s;
     schemerlicht_string_copy(ctxt, &s, &e->expr.var.name);
-    schemerlicht_environment_add(ctxt, &s, entry);
+    schemerlicht_environment_add_to_base(ctxt, &s, entry);
     make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADGLOBAL, fun->freereg, cast(int, entry.position));
     }
   else

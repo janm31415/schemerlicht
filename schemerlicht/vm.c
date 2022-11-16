@@ -6,6 +6,7 @@
 #include "gc.h"
 #include "inlines.h"
 #include "foreign.h"
+#include "environment.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -704,6 +705,12 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
       const int b = SCHEMERLICHT_GETARG_B(i);
       const int c = SCHEMERLICHT_GETARG_C(i);
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
+      if (target->type == schemerlicht_object_type_unassigned)
+        {
+        //this should be a global defined function, but at the time of calling, the function wasn't created yet.
+        //let's see whether its global position has been updated.
+        target = schemerlicht_vector_at(&ctxt->globals, target->value.fx, schemerlicht_object);
+        }
       switch (target->type)
         {
         case schemerlicht_object_type_primitive:
@@ -771,7 +778,15 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         break;
         }
         default:
-        {        
+        {     
+#if 1
+        schemerlicht_string env = schemerlicht_show_environment(ctxt);
+        printf("%s", env.string_ptr);
+        schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
+        printf("%s", stck.string_ptr);
+        schemerlicht_string_destroy(ctxt, &env);
+        schemerlicht_string_destroy(ctxt, &stck);
+#endif
         schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to call a non-procedure");
         pc = pc_end;
         }
@@ -903,6 +918,12 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
     schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, stack_item, 0);
     schemerlicht_string_append(ctxt, &s, &tmp);
     schemerlicht_string_destroy(ctxt, &tmp);
+    if (stack_item->type == schemerlicht_object_type_closure)
+      {
+      schemerlicht_object* lam = schemerlicht_vector_at(&stack_item->value.v, 0, schemerlicht_object);
+      schemerlicht_function* fun = cast(schemerlicht_function*, lam->value.ptr);
+      schemerlicht_string_append(ctxt, &s, &fun->function_definition);
+      }
     schemerlicht_string_push_back(ctxt, &s, '\n');
     }
   return s;

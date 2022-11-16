@@ -27,6 +27,7 @@
 #define schemerlicht_object_type_promise 18
 #define schemerlicht_object_type_eof 19
 #define schemerlicht_object_type_environment 20
+#define schemerlicht_object_type_unassigned 21 // used for globals that were not defined yet (possibly definition via load e.g.)
 
 
 typedef union
