@@ -143,11 +143,12 @@ static void test_srfi28(schemerlicht_context* ctxt)
 static void test_csv(schemerlicht_context* ctxt)
   {
   test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(import 'csv) (define lst '((1 2 3 4) (5 6 7 8)))");
-  test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")"); // 0 comes from close-output-port if all went well
+  test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
   test_compile_aux(ctxt, "((\"1\" \"2\" \"3\" \"4\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\")) r"); 
   test_compile_aux(ctxt, "((\"1\" \"2\" \"3\" \"4\") (\"5\" \"6\" \"7\" \"8\"))", "r");
-  //test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv-map string->number r)");
-  //test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv->numbers r)");
+  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(map (lambda (lst) (map string->number lst)) r)");
+  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv-map string->number r)");
+  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv->numbers r)");
   test_compile_aux(ctxt, "((\"Jan\" #\\K Symb \"\"Quoted string\"\") (5 6 7 8))", "(set! lst '((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8)))");    
   test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
   test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\"Quoted string\"\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\"))");

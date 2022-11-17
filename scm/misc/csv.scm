@@ -62,8 +62,8 @@
   (preview-csv path 4611686018427387903))
 
 (define (csv-map proc csvlst)
-  (map (curry map proc) csvlst))
-
+  (map (lambda (lst) (map proc lst)) csvlst))
+  
 (define (csv->numbers csvlst)
   (csv-map string->number csvlst))
 
