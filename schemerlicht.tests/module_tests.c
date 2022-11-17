@@ -16,6 +16,52 @@
 #include "schemerlicht/dump.h"
 #include "test_assert.h"
 
+#include <time.h>
+
+static void test_compile_aux_w_dump(schemerlicht_context* ctxt, const char* expected_value, const char* script)
+  {
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_preprocess(ctxt, &prog);
+#if 1
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_string debug_str;
+  schemerlicht_string_init(ctxt, &debug_str, "");
+  schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debug_str, func);
+  printf("%s\n", debug_str.string_ptr);
+  schemerlicht_string_destroy(ctxt, &debug_str);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
+
+  if (ctxt->number_of_compile_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->compile_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_syntax_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->syntax_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_runtime_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->runtime_error_reports, schemerlicht_error_report);
+    printf("%s\n", it->message.string_ptr);
+    }
+
+  TEST_EQ_STRING(expected_value, s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+
+  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  }
+
 static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_value, const char* script)
   {  
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
@@ -32,17 +78,17 @@ static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_va
 
   if (ctxt->number_of_compile_errors > 0)
     {
-    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->compile_error_reports, schemerlicht_error_report);
     printf("%s\n", it->message.string_ptr);
     }
   if (ctxt->number_of_syntax_errors > 0)
     {
-    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
+    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->syntax_error_reports, schemerlicht_error_report);
     printf("%s\n", it->message.string_ptr);
     }
   if (ctxt->number_of_runtime_errors > 0)
     {
-    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->runtime_error_reports, schemerlicht_error_report);
+    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->runtime_error_reports, schemerlicht_error_report);
     printf("%s\n", it->message.string_ptr);
     }
 
@@ -94,17 +140,35 @@ static void test_srfi28(schemerlicht_context* ctxt)
   test_compile_aux(ctxt, "\"Error, list is too short: (one \"two\" 3)\n\"", "(format \"Error, list is too short: ~s~%\" '(one \"two\" 3))");
   }
 
+static void test_csv(schemerlicht_context* ctxt)
+  {
+  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(import 'csv) (define lst '((1 2 3 4) (5 6 7 8)))");
+  test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")"); // 0 comes from close-output-port if all went well
+  test_compile_aux(ctxt, "((\"1\" \"2\" \"3\" \"4\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\")) r"); 
+  test_compile_aux(ctxt, "((\"1\" \"2\" \"3\" \"4\") (\"5\" \"6\" \"7\" \"8\"))", "r");
+  //test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv-map string->number r)");
+  //test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv->numbers r)");
+  test_compile_aux(ctxt, "((\"Jan\" #\\K Symb \"\"Quoted string\"\") (5 6 7 8))", "(set! lst '((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8)))");    
+  test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
+  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\"Quoted string\"\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\"))");
+  test_compile_aux(ctxt, "4", "(length (list-ref r 0))");
+  test_compile_aux(ctxt, "4", "(length (list-ref r 1))");
+  }
 
 void run_all_module_tests()
   {
-  schemerlicht_context* ctxt = schemerlicht_open(2048);  
+  int c0 = clock();
+  schemerlicht_context* ctxt = schemerlicht_open(2048*16);    
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);  
   schemerlicht_compile_modules(ctxt, SCHEMERLICHT_MODULES_PATH);
+  int c1 = clock();
+  printf("Startup time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
 
   test_srfi6(ctxt);
   test_srfi28(ctxt);
+  test_csv(ctxt);
 
   schemerlicht_close(ctxt);
   }

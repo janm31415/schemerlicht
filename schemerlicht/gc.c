@@ -1,6 +1,7 @@
 #include "gc.h"
 #include "context.h"
 #include "environment.h"
+#include "error.h"
 
 #include <time.h>
 
@@ -51,6 +52,8 @@ static int is_value_object(schemerlicht_object* obj)
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_string:
     case schemerlicht_object_type_closure:
+    case schemerlicht_object_type_port:
+    case schemerlicht_object_type_promise:
     case schemerlicht_object_type_symbol:
     case schemerlicht_object_type_pair:
       return 0;
@@ -67,6 +70,8 @@ static void mark_object_pointer(schemerlicht_object* obj)
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
+    case schemerlicht_object_type_port:
+    case schemerlicht_object_type_promise:
     case schemerlicht_object_type_pair:
     {
       schemerlicht_object* first_arg = cast(schemerlicht_object*, obj->value.v.vector_ptr);
@@ -95,6 +100,8 @@ static void unmark_object_pointer(schemerlicht_object* obj)
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
+    case schemerlicht_object_type_port:
+    case schemerlicht_object_type_promise:
     case schemerlicht_object_type_pair:
     {
     schemerlicht_object* first_arg = cast(schemerlicht_object*, obj->value.v.vector_ptr);
@@ -117,6 +124,8 @@ static int is_marked(schemerlicht_object* obj)
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
+    case schemerlicht_object_type_port:
+    case schemerlicht_object_type_promise:
     case schemerlicht_object_type_pair:
     {
     schemerlicht_object* first_arg = cast(schemerlicht_object*, obj->value.v.vector_ptr);
@@ -179,7 +188,13 @@ static void sweep_environment(schemerlicht_context* ctxt, gc_state* state)
         ++(state->gc_heap_pos);
         }
       else
+        {
+        if (obj->type == schemerlicht_object_type_unassigned)
+          {
+          printf("debug");
+          }
         entry.position = collect_object(ctxt, obj, state);
+        }
       schemerlicht_assert(entry.position != schemerlicht_mem_invalid_size);
       schemerlicht_environment_update(ctxt, &name, entry);
       }
@@ -198,6 +213,8 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
       case schemerlicht_object_type_vector:
       case schemerlicht_object_type_pair:
       case schemerlicht_object_type_closure:
+      case schemerlicht_object_type_port:
+      case schemerlicht_object_type_promise:
       {
       schemerlicht_object* it = schemerlicht_vector_begin(&obj->value.v, schemerlicht_object);
       schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
@@ -243,4 +260,8 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   ctxt->heap_pos = state.gc_heap_pos;
   int c1 = clock();
   ctxt->time_spent_gc += c1 - c0;
+  if (schemerlicht_need_to_perform_gc(ctxt))
+    {
+    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_MEMORY);
+    }
   }

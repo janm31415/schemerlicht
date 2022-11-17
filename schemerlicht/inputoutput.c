@@ -14,7 +14,7 @@ void schemerlicht_compile_input_output(schemerlicht_context* ctxt)
   "    (call-with-values (lambda() (proc in))\n"
   "      (lambda results\n"
   "      (close-output-port in)\n"
-  "        (apply values results)))))\n"  
+  "        (apply values results)))))\n"
   "  (define(call-with-input-file fname proc)\n"
   "          (let((in(open-input-file fname)))\n"
   "            (call-with-values(lambda() (proc in))\n"

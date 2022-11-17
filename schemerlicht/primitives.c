@@ -3375,6 +3375,7 @@ void schemerlicht_primitive_cdr(schemerlicht_context* ctxt, int a, int b, int c)
     schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     if (v->type != schemerlicht_object_type_pair)
       {
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, "cdr on an object that is not a pair");
       ret.type = schemerlicht_object_type_undefined;
       }
     else
@@ -3404,6 +3405,7 @@ void schemerlicht_primitive_car(schemerlicht_context* ctxt, int a, int b, int c)
     schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     if (v->type != schemerlicht_object_type_pair)
       {
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, "car on an object that is not a pair");
       ret.type = schemerlicht_object_type_undefined;
       }
     else
@@ -3438,6 +3440,11 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   memcpy(heap_obj->value.v.vector_ptr, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + a + c + 1, b * sizeof(schemerlicht_object));
+  schemerlicht_object* lambda = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+  if (lambda->type != schemerlicht_object_type_lambda)
+    {
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "closure without a lambda as first argument");
+    }
 #if 0
   for (int j = 0; j < b; ++j)
     {
@@ -5195,6 +5202,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       }
     else
       {
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to use apply with non-procedure.");
       schemerlicht_object ret;
       ret.type = schemerlicht_object_type_undefined;
       schemerlicht_set_object(ra, &ret);

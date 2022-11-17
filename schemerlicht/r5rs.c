@@ -200,10 +200,12 @@ void schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
     "          args)\n"
     "         (%write-char #\\newline standard-output-port) (%flush-output-port standard-output-port)\n"
     "         (halt #undefined)\n"
-    "))\n";
+    "))\n"
+    "(define (curry func . args)\n"
+    "    (lambda x (apply func (append args x))))\n";
 
 
-    schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_preprocess_internal_libs(ctxt, &prog);
   schemerlicht_function* r5rs = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));

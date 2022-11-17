@@ -804,8 +804,14 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
             schemerlicht_string_append(ctxt, &error_message, &key->value.s);
             }
           }
+        else
+          {
+          schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, target, 0);
+          schemerlicht_string_append_cstr(ctxt, &error_message, ": ");
+          schemerlicht_string_append(ctxt, &error_message, &tmp);
+          schemerlicht_string_destroy(ctxt, &tmp);
+          }
         schemerlicht_runtime_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, &error_message);
-        schemerlicht_string_destroy(ctxt, &error_message);
         pc = pc_end;
         }
         }
@@ -936,12 +942,14 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
     schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, stack_item, 0);
     schemerlicht_string_append(ctxt, &s, &tmp);
     schemerlicht_string_destroy(ctxt, &tmp);
+#ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
     if (stack_item->type == schemerlicht_object_type_closure)
       {
       schemerlicht_object* lam = schemerlicht_vector_at(&stack_item->value.v, 0, schemerlicht_object);
       schemerlicht_function* fun = cast(schemerlicht_function*, lam->value.ptr);
       schemerlicht_string_append(ctxt, &s, &fun->function_definition);
       }
+#endif
     schemerlicht_string_push_back(ctxt, &s, '\n');
     }
   return s;

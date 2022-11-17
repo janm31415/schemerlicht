@@ -112,7 +112,7 @@ static void replace_escape_chars(schemerlicht_string* str)
         case 'r': *s = '\r'; ++escapes; memmove(t, t + 1, str->string_length - escapes - char_index); break;
         case 't': *s = '\t'; ++escapes; memmove(t, t + 1, str->string_length - escapes - char_index); break;
         default:
-          ++s; ++char_index; break;
+          *s = *t; ++escapes; memmove(t, t + 1, str->string_length - escapes - char_index); break;
         }
       }
     else

@@ -2991,7 +2991,7 @@ static void test_read()
 
 static void test_write()
   {
-  test_compile_aux("\"50#\\ 3.141590\"FOO\"\n\"FOO\\\"BAR\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+  test_compile_aux("\"50#\\ 3.141590\"FOO\"\n\"FOO\"BAR\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
     "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
     "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
     "(define ostr (open-output-string))\n"
@@ -3100,6 +3100,22 @@ static void test_calcc_extended()
 static void test_error()
   {
   test_compile_aux_r5rs("#undefined", "(error \"test_error\") (+ 5 7)");
+  }
+
+static void test_curry()
+  {
+  test_compile_aux_r5rs("<closure>", "(curry list 1 2)");
+  test_compile_aux_r5rs("(1 2 3)", "((curry list 1 2) 3)");
+  test_compile_aux_r5rs("<closure>", "(define pair_with_one (curry cons 1))");
+  test_compile_aux_r5rs("(1 . 2)", "(define pair_with_one (curry cons 1))(pair_with_one 2)");
+  test_compile_aux_r5rs("(1)", "(define pair_with_one (curry cons 1))(pair_with_one '())");
+  test_compile_aux_r5rs("(1 2 . 3)", "(define pair_with_one (curry cons 1))(pair_with_one (cons 2 3))");
+  test_compile_aux_r5rs("<lambda>", "(define lam (lambda (x y z) (list x y z)))");
+  test_compile_aux_r5rs("(1 2 3)", "(define lam (lambda (x y z) (list x y z)))(lam 1 2 3)");
+  test_compile_aux_r5rs("<closure>", "(define lam (lambda (x y z) (list x y z)))(define foo (curry lam 1))");
+  test_compile_aux_r5rs("(1 2 3)", "(define lam (lambda (x y z) (list x y z)))(define foo (curry lam 1))(foo 2 3)");
+  test_compile_aux_r5rs("<closure>", "(define lam (lambda (x y z) (list x y z)))(define foo (curry lam 1))(define bar (curry lam 1 2))");
+  test_compile_aux_r5rs("(1 2 4)", "(define lam (lambda (x y z) (list x y z)))(define foo (curry lam 1))(define bar (curry lam 1 2))(bar 4)");
   }
 
 void run_all_compiler_tests()
@@ -3213,5 +3229,6 @@ void run_all_compiler_tests()
     test_macros();
     test_calcc_extended();
     test_error();
+    test_curry();
     }
   }

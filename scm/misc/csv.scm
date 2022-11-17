@@ -111,7 +111,7 @@
     (let loop ([ls-local ls])
       (cond [(null? ls-local)
              (close-output-port p)]
-            [else
-             (write-string (delimit-list (car ls-local)) p)
+            [else             
+             (%display (delimit-list (car ls-local)) p)
              (newline p)
              (loop (cdr ls-local))]))))
