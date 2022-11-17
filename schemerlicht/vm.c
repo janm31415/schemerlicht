@@ -793,7 +793,19 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         schemerlicht_string_destroy(ctxt, &env);
         schemerlicht_string_destroy(ctxt, &stck);
 #endif
-        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to call a non-procedure");
+        schemerlicht_string error_message;
+        schemerlicht_string_init(ctxt, &error_message, "attempt to call a non-procedure");
+        if (target->type == schemerlicht_object_type_unassigned)
+          {
+          schemerlicht_object* key = schemerlicht_environment_find_key_given_position(ctxt, target->value.fx);
+          if (key != NULL)
+            {
+            schemerlicht_string_append_cstr(ctxt, &error_message, ": ");
+            schemerlicht_string_append(ctxt, &error_message, &key->value.s);
+            }
+          }
+        schemerlicht_runtime_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, &error_message);
+        schemerlicht_string_destroy(ctxt, &error_message);
         pc = pc_end;
         }
         }

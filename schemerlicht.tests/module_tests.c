@@ -88,6 +88,13 @@ static void test_srfi6(schemerlicht_context* ctxt)
 
   }
 
+static void test_srfi28(schemerlicht_context* ctxt)
+  {
+  test_compile_aux(ctxt, "\"Hello, World!\"", "(import 'srfi-28) (format \"Hello, ~a\" \"World!\")");
+  test_compile_aux(ctxt, "\"Error, list is too short: (one \"two\" 3)\n\"", "(format \"Error, list is too short: ~s~%\" '(one \"two\" 3))");
+  }
+
+
 void run_all_module_tests()
   {
   schemerlicht_context* ctxt = schemerlicht_open(2048);  
@@ -97,6 +104,7 @@ void run_all_module_tests()
   schemerlicht_compile_modules(ctxt, SCHEMERLICHT_MODULES_PATH);
 
   test_srfi6(ctxt);
+  test_srfi28(ctxt);
 
   schemerlicht_close(ctxt);
   }

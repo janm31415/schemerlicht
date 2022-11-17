@@ -170,3 +170,21 @@ schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt)
     }
   return s;
   }
+
+schemerlicht_object* schemerlicht_environment_find_key_given_position(schemerlicht_context* ctxt, schemerlicht_fixnum global_position)
+  {
+  schemerlicht_assert(ctxt->environment.vector_size > 0);
+  schemerlicht_map* base_map = *schemerlicht_vector_begin(&ctxt->environment, schemerlicht_map*);
+  schemerlicht_memsize size = node_size(base_map);
+  for (schemerlicht_memsize i = 0; i < size; ++i)
+    {
+    if (base_map->node[i].key.type == schemerlicht_object_type_string)
+      {
+      if ((base_map->node[i].value.type == SCHEMERLICHT_ENV_TYPE_GLOBAL + 1) && (base_map->node[i].value.value.fx == global_position))
+        {
+        return &base_map->node[i].key;
+        }
+      }
+    }
+  return NULL;
+  }
