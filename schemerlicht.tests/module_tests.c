@@ -57,10 +57,35 @@ static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_va
   }
 
 static void test_srfi6(schemerlicht_context* ctxt)
-  {
-  //test_compile_aux(ctxt, "5", "(import 'srfi-6) 5");
-  test_compile_aux(ctxt, "<port>: \"input-string\"", "(import 'srfi-6) (define p (open-input-string \"21 34\"))");
-  //test_compile_aux(ctxt, "<port>: \"input-string\"", "(load \"C:/_Dev/schemerlicht/schemerlicht/scm/srfi/srfi6.scm\") (define p (open-input-string \"21 34\"))");
+  {  
+  test_compile_aux(ctxt, "<port>: \"input-string\"", "(import 'srfi-6) (define p (open-input-string \"21 34\"))");  
+  test_compile_aux(ctxt, "#t", "(input-port? p)");
+  test_compile_aux(ctxt, "21", "(read p)");
+  test_compile_aux(ctxt, "34", "(read p)");
+  test_compile_aux(ctxt, "#t", "(eof-object? (peek-char p))");
+
+  test_compile_aux(ctxt, "<port>: \"input-string\"", "(define p2 (open-input-string \"(a . (b . (c . ()))) 34\"))");
+  test_compile_aux(ctxt, "#t", "(input-port? p2)");
+  test_compile_aux(ctxt, "(a b c)", "(read p2)");
+  test_compile_aux(ctxt, "34", "(read p2)");
+  test_compile_aux(ctxt, "#t", "(eof-object? (peek-char p2))");
+
+  const char* script =
+"(let ([q (open-output-string)]\n"
+"      [x '(a b c)])\n"
+"          (write (car x) q)\n"
+"          (write (cdr x) q)\n"
+"          (get-output-string q))\n";
+
+  test_compile_aux(ctxt, "\"a(b c)\"", script);
+
+  const char* script2 =
+"(let ([os (open-output-string)])\n"
+"          (write \"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\" os)\n"
+"          (get-output-string os))\n";
+
+  test_compile_aux(ctxt, "\"\"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\"\"", script2);
+
   }
 
 void run_all_module_tests()

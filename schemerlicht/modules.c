@@ -30,8 +30,7 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
     schemerlicht_putenv("SCHEMERLICHT_MODULE_PATH", module_path);
     }
   char* script = "(define *modules* '())\n"
-    "(define *loaded-modules* '())\n"
-    "(define error (lambda (reason . args) (display \"Error: \"))); (display reason) (for-each (lambda (arg) (display " ") (write arg)) args) (newline) (%flush-output-port) ))\n"
+    "(define *loaded-modules* '())\n"    
     "(define (module-name->strings ls res)\n"
     "  (if (null? ls)\n"
     "      res\n"

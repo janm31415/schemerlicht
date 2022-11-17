@@ -1814,7 +1814,10 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
       return make_literal(ctxt, token_it, token_it_end);
     case SCHEMERLICHT_T_SYMBOL:
       if (current_token_equals(token_it, token_it_end, "#undefined"))
+        {
+        token_next(ctxt, token_it, token_it_end);
         return make_nop();
+        }
       return make_literal(ctxt, token_it, token_it_end);
     case SCHEMERLICHT_T_QUOTE:
     {

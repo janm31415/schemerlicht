@@ -3097,6 +3097,11 @@ static void test_calcc_extended()
   test_compile_aux_r5rs("(connect talk1 disconnect connect talk2 disconnect)", script);
   }
 
+static void test_error()
+  {
+  test_compile_aux_r5rs("#undefined", "(error \"test_error\") (+ 5 7)");
+  }
+
 void run_all_compiler_tests()
   {
   for (int i = 0; i < 2; ++i)
@@ -3207,5 +3212,6 @@ void run_all_compiler_tests()
     test_load();
     test_macros();
     test_calcc_extended();
+    test_error();
     }
   }

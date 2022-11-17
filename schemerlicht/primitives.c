@@ -7414,11 +7414,13 @@ void schemerlicht_primitive_write_char(schemerlicht_context* ctxt, int a, int b,
         if (required_length > available_length)
           {
           schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-          schemerlicht_string dummy;
-          schemerlicht_string_init_with_size(ctxt, &dummy, 256, 0);
-          schemerlicht_string_append(ctxt, &s->value.s, &dummy);
-          schemerlicht_string_destroy(ctxt, &dummy);
-          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += 256;
+          schemerlicht_string new_string;
+          schemerlicht_string_init_with_size(ctxt, &new_string, 256 + s->value.s.string_length, 0);
+          s->value.s = new_string; // old string is on the heap and will be cleaned up by gc
+          schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+          schemerlicht_set_object(heap_obj, s);
+          ++ctxt->heap_pos;
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx = new_string.string_length;
           }
         }
       schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
@@ -7455,11 +7457,14 @@ void schemerlicht_primitive_flush_output_port(schemerlicht_context* ctxt, int a,
     if (p->type == schemerlicht_object_type_port && schemerlicht_vector_begin(&p->value.v, schemerlicht_object)->type != schemerlicht_object_type_true)
       {
       int fileid = cast(int, schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx);
-      schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
-      schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
-      schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-      schemerlicht_write(fileid, buffer->value.s.string_ptr, current_pos);
-      schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
+      if (fileid >= 0)
+        {
+        schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
+        schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+        schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
+        schemerlicht_write(fileid, buffer->value.s.string_ptr, current_pos);
+        schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
+        }
       }
     else
       {
@@ -7870,14 +7875,16 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
         if (required_length > available_length)
           {
           schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-          schemerlicht_string dummy;
+          schemerlicht_string new_string;
           schemerlicht_memsize size_init = 256;
           if (required_length - available_length > size_init)
             size_init = required_length - available_length;
-          schemerlicht_string_init_with_size(ctxt, &dummy, size_init, 0);
-          schemerlicht_string_append(ctxt, &s->value.s, &dummy);
-          schemerlicht_string_destroy(ctxt, &dummy);
-          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += size_init;
+          schemerlicht_string_init_with_size(ctxt, &new_string, size_init + s->value.s.string_length, 0);
+          s->value.s = new_string; // old string is on the heap and will be cleaned up by gc
+          schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+          schemerlicht_set_object(heap_obj, s);
+          ++ctxt->heap_pos;
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx = new_string.string_length;
           }
         }
       schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
@@ -7944,14 +7951,16 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
         if (required_length > available_length)
           {
           schemerlicht_object* s = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-          schemerlicht_string dummy;
+          schemerlicht_string new_string;
           schemerlicht_memsize size_init = 256;
           if (required_length - available_length > size_init)
             size_init = required_length - available_length;
-          schemerlicht_string_init_with_size(ctxt, &dummy, size_init, 0);
-          schemerlicht_string_append(ctxt, &s->value.s, &dummy);
-          schemerlicht_string_destroy(ctxt, &dummy);
-          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx += size_init;
+          schemerlicht_string_init_with_size(ctxt, &new_string, size_init + s->value.s.string_length, 0);
+          s->value.s = new_string; // old string is on the heap and will be cleaned up by gc
+          schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+          schemerlicht_set_object(heap_obj, s);
+          ++ctxt->heap_pos;
+          schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx = new_string.string_length;
           }
         }
       schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
@@ -8093,46 +8102,25 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         schemerlicht_stream_rewind(&str);
         schemerlicht_vector tokens = tokenize(ctxt, &str);
         schemerlicht_stream_close(ctxt, &str);
+        //make new stack so that old stack is not overwritten.
+        //new stack needs to be created before we run any macros.
         schemerlicht_vector stack_store = ctxt->stack;
         schemerlicht_vector new_stack;
-        schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);        
+        schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
         ctxt->stack = new_stack;
 
         schemerlicht_program prog = make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
         if (prog.expressions.vector_size > 0)
           {
-#if 0
-          schemerlicht_string dmp = schemerlicht_dump(ctxt, &prog);
-          printf("%s\n\n", dmp.string_ptr);
-          schemerlicht_string_destroy(ctxt, &dmp);
-#endif
           schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
           schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
           destroy_tokens_vector(ctxt, &tokens);
           schemerlicht_program_destroy(ctxt, &prog);
-#if 0
-          schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
-          printf("%s", stck.string_ptr);
-          schemerlicht_string_destroy(ctxt, &stck);
-#endif          
           schemerlicht_object* res = schemerlicht_run(ctxt, func);
           schemerlicht_set_object(ra, res);
           //ra->type = schemerlicht_object_type_undefined;          
           schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
-#if 0
-          stck = schemerlicht_show_stack(ctxt, 0, 9);
-          printf("%s", stck.string_ptr);
-          schemerlicht_string_destroy(ctxt, &stck);
-#endif
-#if 0
-          schemerlicht_string env = schemerlicht_show_environment(ctxt);
-          printf("%s", env.string_ptr);
-          schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
-          printf("%s", stck.string_ptr);
-          schemerlicht_string_destroy(ctxt, &env);
-          schemerlicht_string_destroy(ctxt, &stck);
-#endif
           }
         else
           {
@@ -8140,6 +8128,7 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
           schemerlicht_program_destroy(ctxt, &prog);
           ra->type = schemerlicht_object_type_undefined;
           }
+        //restore old stack
         schemerlicht_vector_destroy(ctxt, &new_stack);
         ctxt->stack = stack_store;
         }

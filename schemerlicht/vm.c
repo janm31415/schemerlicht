@@ -785,7 +785,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         }
         default:
         {     
-#if 1
+#if 0
         schemerlicht_string env = schemerlicht_show_environment(ctxt);
         printf("%s", env.string_ptr);
         schemerlicht_string stck = schemerlicht_show_stack(ctxt, 0, 9);
