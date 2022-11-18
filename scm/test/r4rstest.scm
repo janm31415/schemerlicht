@@ -389,7 +389,7 @@
 (test #t equal? 2 2)
 (test #t equal? (make-vector 5 'a) (make-vector 5 'a))
 
-
+#|
 (SECTION 6 3)
 (test '(a b c d e) 'dot '(a . (b . (c . (d . (e . ()))))))
 (define x (list 'a 'b 'c))
@@ -1235,7 +1235,7 @@
 (test #f list-length '(a b . c))
 (test '() map cadr '())
 
-#|
+
 ;;; This tests full conformance of call-with-current-continuation.  It
 ;;; is a separate test because some schemes do not support call/cc
 ;;; other than escape procedures.  I am indebted to
@@ -1305,7 +1305,7 @@
 		 (c #f))
 	  (force p)))
   (report-errs))
-
+#|
 (SECTION 6 10 1)
 (test #t input-port? (current-input-port))
 (test #t output-port? (current-output-port))
@@ -1383,6 +1383,7 @@
   (report-errs))
 
 (report-errs)
+#|
 (let ((have-inexacts?
        (and (string->number "0.0") (inexact? (string->number "0.0"))))
       (have-bignums?

@@ -3284,10 +3284,10 @@ static void test_nested_define()
 
 void run_all_compiler_tests()
   {
-  for (int i = 0; i < 1; ++i)
+  for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
-#if 0
+#if 1
     test_compile_fixnum();
     test_compile_flonum();
     test_compile_bool();
@@ -3396,10 +3396,9 @@ void run_all_compiler_tests()
     test_error();
     test_curry();
 #endif
-    //test_curry_2();
-    //test_long_apply();
-    //test_jaffer_bug_1();
-    
+    test_curry_2();
+    test_long_apply();
+    test_jaffer_bug_1();    
     test_nested_define();
     }
   }
