@@ -140,6 +140,40 @@ static void test_convert_define_7()
   schemerlicht_close(ctxt);
   }
 
+static void test_convert_define_8()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define x 34)(define (foo) (define x 5) x)(foo)x");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( set! x 34 ) ( set! foo ( lambda ( ) ( begin ( letrec ( [ x 5 ] ) ( begin x ) ) ) ) ) ( foo ) x ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_convert_define_9()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define old-+ +) (define + (lambda (x y) (list y x))) (set! + old-+) (+ 6 3)");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
+  TEST_EQ_STRING("( set! old-+ + ) ( set! + ( lambda ( x y ) ( begin ( list y x ) ) ) ) ( set! + old-+ ) ( + 6 3 ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_single_begin_conv()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -962,6 +996,8 @@ void run_all_conv_tests()
   test_convert_define_5();
   test_convert_define_6();
   test_convert_define_7();
+  test_convert_define_8();
+  test_convert_define_9();
   simplify_to_core_conversion_and();
   simplify_to_core_conversion_and_2();
   simplify_to_core_conversion_and_3();

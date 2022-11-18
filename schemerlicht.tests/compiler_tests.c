@@ -3278,8 +3278,28 @@ static void test_nested_define()
     "		  )))))\n"
     "))\n"
   );
-  
+  }
 
+static void test_define_vs_internal_define()
+  {  
+  test_compile_aux("5", 
+    "(define x 34)\n"
+    "(define (foo) (define x 5) x)\n"
+    "(foo)\n"
+    );    
+  test_compile_aux("34",
+    "(define x 34)\n"
+    "(define (foo) (define x 5) x)\n"
+    "(foo)\n"
+    "x"
+  );
+  }
+
+static void test_quasiquote_comparison()
+  {
+  test_compile_aux("((foo 7) . cons)", "`((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))");
+  test_compile_aux("((foo 7) . cons)", "'((foo 7) . cons)");
+  test_compile_aux("#t", "(equal? '((foo 7) . cons) `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons))))");
   }
 
 void run_all_compiler_tests()
@@ -3395,10 +3415,12 @@ void run_all_compiler_tests()
     test_calcc_extended();
     test_error();
     test_curry();
-#endif
     test_curry_2();
     test_long_apply();
-    test_jaffer_bug_1();    
+    test_jaffer_bug_1();
     test_nested_define();
+    test_define_vs_internal_define();
+    test_quasiquote_comparison();
+#endif            
     }
   }

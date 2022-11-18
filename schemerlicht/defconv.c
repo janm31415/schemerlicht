@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "error.h"
 #include "stringvec.h"
+#include "dump.h"
 
 #include <string.h>
 
@@ -41,9 +42,11 @@ typedef struct schemerlicht_define_conversion_visitor
   int internal;
   } schemerlicht_define_conversion_visitor;
 
-static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_expression* expr)
+static schemerlicht_define_conversion_visitor* schemerlicht_define_conversion_visitor_new(schemerlicht_context* ctxt);
+static void schemerlicht_define_conversion_visitor_free(schemerlicht_context* ctxt, schemerlicht_define_conversion_visitor* v);
+
+static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor* vtor, schemerlicht_expression* expr)
   {
-  schemerlicht_assert(expr->type == schemerlicht_type_primitive_call);
   if (expr->expr.prim.arguments.vector_size < 2)
     {
     schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "at least 2 arguments expected");
@@ -63,7 +66,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_express
       f = first_arg->expr.funcall;
     else
       {
-      f.filename = make_null_string();      
+      f.filename = make_null_string();
       schemerlicht_vector_init(ctxt, &f.fun, schemerlicht_expression);
       schemerlicht_parsed_variable v;
       v.filename = make_null_string();
@@ -81,13 +84,13 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_express
       return;
       }
     schemerlicht_parsed_lambda lam;
-    lam.variable_arity = 0;    
+    lam.variable_arity = 0;
     schemerlicht_vector_init(ctxt, &lam.body, schemerlicht_expression);
     schemerlicht_vector_init(ctxt, &lam.variables, schemerlicht_string);
     schemerlicht_vector_init(ctxt, &lam.free_variables, schemerlicht_string);
     schemerlicht_vector_init(ctxt, &lam.assignable_variables, schemerlicht_string);
     lam.filename = make_null_string();
-    if (f.arguments.vector_size >= 2 && schemerlicht_vector_at(&f.arguments, f.arguments.vector_size-2, schemerlicht_expression)->type == schemerlicht_type_literal)
+    if (f.arguments.vector_size >= 2 && schemerlicht_vector_at(&f.arguments, f.arguments.vector_size - 2, schemerlicht_expression)->type == schemerlicht_type_literal)
       {
       // variable arguments
       schemerlicht_expression* lit = schemerlicht_vector_at(&f.arguments, f.arguments.vector_size - 2, schemerlicht_expression);
@@ -139,14 +142,23 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_express
     expr->expr.prim.arguments.vector_size = 0;
     schemerlicht_vector_push_back(ctxt, &expr->expr.prim.arguments, *var, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &expr->expr.prim.arguments, schemerlicht_make_lambda_expression(&lam), schemerlicht_expression);
-    
+
     schemerlicht_string_destroy(ctxt, &f.filename);
     schemerlicht_vector_destroy(ctxt, &f.fun);
-    schemerlicht_vector_destroy(ctxt, &f.arguments);    
-    }  
+    schemerlicht_vector_destroy(ctxt, &f.arguments);
+
+    //printf("ENTER\n");
+    schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(vtor->impl);
+    schemerlicht_define_conversion_visitor* vis2 = schemerlicht_define_conversion_visitor_new(ctxt);
+    vis2->internal = vis->internal+1;
+    schemerlicht_remove_nested_begin(ctxt, expr);
+    schemerlicht_visit_expression(ctxt, vis2->visitor, expr);
+    schemerlicht_define_conversion_visitor_free(ctxt, vis2);
+    //printf("RELEASE\n");
+    }
   }
 
-static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_expression* body) // input body is a begin statement
+static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* body) // input body is a begin statement
   {
   schemerlicht_assert(body->type == schemerlicht_type_begin);
   schemerlicht_vector define_args;
@@ -162,7 +174,7 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
       {
       if (strcmp(it->expr.prim.name.string_ptr, "define") == 0)
         {
-        rewrite_prim_define(ctxt, it);
+        rewrite_prim_define(ctxt, v, it);
         schemerlicht_vector_push_back(ctxt, &define_args, index, schemerlicht_memsize);
         schemerlicht_vector_push_back(ctxt, &define_exprs, *it, schemerlicht_expression);
         }
@@ -195,7 +207,7 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
     for (; eit != eit_end; ++eit)
       {
       schemerlicht_assert(strcmp(eit->expr.prim.name.string_ptr, "define") == 0);
-      if (eit->expr.prim.arguments.vector_size!=2)
+      if (eit->expr.prim.arguments.vector_size != 2)
         {
         schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, eit->expr.prim.line_nr, eit->expr.prim.column_nr, "2 arguments expected");
         continue;
@@ -211,7 +223,7 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
       b.binding_name = arg0->expr.var.name;
       b.binding_expr = *arg1;
       schemerlicht_string_destroy(ctxt, &eit->expr.prim.name);
-      schemerlicht_string_destroy(ctxt, &eit->expr.prim.filename);      
+      schemerlicht_string_destroy(ctxt, &eit->expr.prim.filename);
       schemerlicht_string_destroy(ctxt, &arg0->expr.var.filename);
       schemerlicht_vector_push_back(ctxt, &let.bindings, b, schemerlicht_let_binding);
       schemerlicht_vector_destroy(ctxt, &eit->expr.prim.arguments);
@@ -230,13 +242,21 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_exp
 
 static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
-  schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);  
+  schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
+#if 1
+  schemerlicht_expression* body = schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression);
+  convert_internal_define(ctxt, v, body);
+#endif
   --vis->internal;
   }
 
 static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
-  schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);  
+  schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
+#if 1
+  schemerlicht_expression* body = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);
+  convert_internal_define(ctxt, v, body);
+#endif
   --vis->internal;
   }
 
@@ -244,8 +264,10 @@ static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   {
   schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
   ++vis->internal;
+#if 0
   schemerlicht_expression* body = schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression);
-  convert_internal_define(ctxt, body);
+  convert_internal_define(ctxt, v, body);
+#endif
   UNUSED(ctxt);
   UNUSED(e);
   return 1;
@@ -256,19 +278,70 @@ static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   {
   schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
   ++vis->internal;
+#if 0
   schemerlicht_expression* body = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);
-  convert_internal_define(ctxt, body);
+  convert_internal_define(ctxt, v, body);
+#endif
   UNUSED(ctxt);
   UNUSED(e);
+  return 1;
+  }
+
+static int previsit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* expr)
+  {
+  if (strcmp(expr->expr.prim.name.string_ptr, "define") == 0)
+    {
+    if (expr->expr.prim.arguments.vector_size < 2)
+      {
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "at least 2 arguments expected");
+      return 0;
+      }
+    int alternative_syntax = 0;
+    schemerlicht_expression* first_arg = schemerlicht_vector_at(&expr->expr.prim.arguments, 0, schemerlicht_expression);
+    if (first_arg->type == schemerlicht_type_funcall)
+      alternative_syntax = 1;
+    if (first_arg->type == schemerlicht_type_primitive_call && first_arg->expr.prim.as_object == 0)
+      alternative_syntax = 1;
+    if (alternative_syntax)
+      {
+      schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
+      ++vis->internal;
+      }
+    }
   return 1;
   }
 
 static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
-  if ((vis->internal == 0) && (strcmp(e->expr.prim.name.string_ptr, "define") == 0))
+
+  int cmp_define = strcmp(e->expr.prim.name.string_ptr, "define");
+  if (cmp_define == 0)
+    {   
+    int alternative_syntax = 0;
+    schemerlicht_expression* first_arg = schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression);
+    if (first_arg->type == schemerlicht_type_funcall)
+      alternative_syntax = 1;
+    if (first_arg->type == schemerlicht_type_primitive_call && first_arg->expr.prim.as_object == 0)
+      alternative_syntax = 1;
+    if (alternative_syntax)
+      {      
+      --vis->internal;
+      }
+    }
+
+#if 0
+  if (strcmp(e->expr.prim.name.string_ptr, "define") == 0)
     {
-    rewrite_prim_define(ctxt, e);
+    printf("postvisit_primcall level %d\n", vis->internal);
+    schemerlicht_string s = schemerlicht_dump_expression(ctxt, e);
+    printf(" --> %s\n", s.string_ptr);
+    schemerlicht_string_destroy(ctxt, &s);
+    }
+#endif
+  if (vis->internal == 0 && cmp_define == 0)
+    {
+    rewrite_prim_define(ctxt, v, e);
     if (e->expr.prim.arguments.vector_size != 2)
       {
       schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "");
@@ -337,7 +410,7 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
       schemerlicht_vector_push_back(ctxt, &fun.expr.funcall.fun, var, schemerlicht_expression);
       *e = fun;
       }
-    }  
+    }
   }
 
 static schemerlicht_define_conversion_visitor* schemerlicht_define_conversion_visitor_new(schemerlicht_context* ctxt)
@@ -347,8 +420,9 @@ static schemerlicht_define_conversion_visitor* schemerlicht_define_conversion_vi
   v->visitor->postvisit_lambda = postvisit_lambda;
   v->visitor->postvisit_let = postvisit_let;
   v->visitor->previsit_lambda = previsit_lambda;
-  v->visitor->previsit_let = previsit_let;  
+  v->visitor->previsit_let = previsit_let;
   v->visitor->postvisit_primcall = postvisit_primcall;
+  v->visitor->previsit_primcall = previsit_primcall;
   v->internal = 0;
   return v;
   }
@@ -367,6 +441,5 @@ void schemerlicht_define_conversion(schemerlicht_context* ctxt, schemerlicht_pro
   schemerlicht_remove_nested_begin_expressions(ctxt, program);
   schemerlicht_define_conversion_visitor* v = schemerlicht_define_conversion_visitor_new(ctxt);
   schemerlicht_visit_program(ctxt, v->visitor, program);
-  schemerlicht_assert(v->internal == 0);
   schemerlicht_define_conversion_visitor_free(ctxt, v);
   }

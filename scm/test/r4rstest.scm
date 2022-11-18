@@ -688,7 +688,7 @@
 					 (* f1e-300 (sqrt 2)))))
 	 (test f.25 / f1e-300+1e-300i (* 4 f1e-300+1e-300i))))
 	 |#
-	 
+	 #|
   (test #t = f0.0 f0.0)
   (test #t = f0.0 (- f0.0))
   (test #t = f0.0 (* -5 f0.0))
@@ -1397,6 +1397,9 @@
   (if (and have-inexacts? have-bignums?)
       (test-numeric-predicates)))
 |#
+
+(report-errs)
+
 (newline)
 (display "To fully test continuations, Scheme 4, and DELAY/FORCE do:")
 (newline)

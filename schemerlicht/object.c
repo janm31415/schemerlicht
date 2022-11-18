@@ -111,7 +111,7 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
         break;
       case schemerlicht_object_type_symbol:
       case schemerlicht_object_type_string:
-        if (strcmp(obj1->value.s.string_ptr, obj2->value.s.string_ptr) != 0)
+        if (strcmp(o1->value.s.string_ptr, o2->value.s.string_ptr) != 0)
           {
           schemerlicht_vector_destroy(ctxt, &left_queue);
           schemerlicht_vector_destroy(ctxt, &right_queue);
