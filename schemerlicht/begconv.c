@@ -26,6 +26,7 @@ static void postvisit_begin(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_vector_erase(&b->arguments, &it, schemerlicht_expression);
       schemerlicht_vector_insert(ctxt, &b->arguments, &it, &it2, &it2_end, schemerlicht_expression);
       schemerlicht_vector_destroy(ctxt, &b2.arguments);
+      it_end = schemerlicht_vector_end(&b->arguments, schemerlicht_expression);
       }
     else
       ++it;
