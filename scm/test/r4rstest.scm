@@ -810,7 +810,7 @@
 	      '("1.0" "10.0" "100.0" 
 	    	"0.1" "0.01" "0.001" )))
 	res))
-#|
+
     (define (float-rw-range-test)
       (define success #t)
 	  (do ((cnt -323 (+ 1 cnt)))
@@ -848,9 +848,9 @@
 				     (string->number "2.7182818284590451")))
     (test #t float-rw-range-test)
     ;(test #t float-powers-of-2-test)
-    |#
+    
 	))
-#|
+
 	
 (define (test-bignum)
   (define tb
@@ -1235,7 +1235,7 @@
 (test #f list-length '(a b . c))
 (test '() map cadr '())
 
-
+#|
 ;;; This tests full conformance of call-with-current-continuation.  It
 ;;; is a separate test because some schemes do not support call/cc
 ;;; other than escape procedures.  I am indebted to

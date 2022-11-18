@@ -24,13 +24,13 @@ int main(int argc, const char* argv[])
   InitTestEngine();
   clock_t start_t, end_t;
   start_t = clock();
-  run_all_compiler_tests();
+  //run_all_compiler_tests();
   //run_all_conv_tests();
   //run_all_copy_tests();
   //run_all_dump_tests();
   //run_all_environment_tests();
   //run_all_map_tests();
-  //run_all_module_tests();
+  run_all_module_tests();
   //run_all_parser_tests();
   //run_all_pool_tests();
   //run_all_reader_tests();

@@ -263,7 +263,7 @@ static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   return 1;
   }
 
-static int previsit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_define_conversion_visitor* vis = (schemerlicht_define_conversion_visitor*)(v->impl);
   if ((vis->internal == 0) && (strcmp(e->expr.prim.name.string_ptr, "define") == 0))
@@ -337,8 +337,7 @@ static int previsit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v
       schemerlicht_vector_push_back(ctxt, &fun.expr.funcall.fun, var, schemerlicht_expression);
       *e = fun;
       }
-    }
-  return 1;
+    }  
   }
 
 static schemerlicht_define_conversion_visitor* schemerlicht_define_conversion_visitor_new(schemerlicht_context* ctxt)
@@ -349,7 +348,7 @@ static schemerlicht_define_conversion_visitor* schemerlicht_define_conversion_vi
   v->visitor->postvisit_let = postvisit_let;
   v->visitor->previsit_lambda = previsit_lambda;
   v->visitor->previsit_let = previsit_let;  
-  v->visitor->previsit_primcall = previsit_primcall;
+  v->visitor->postvisit_primcall = postvisit_primcall;
   v->internal = 0;
   return v;
   }
