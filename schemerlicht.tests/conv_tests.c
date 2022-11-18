@@ -123,6 +123,23 @@ static void test_convert_define_6()
   schemerlicht_close(ctxt);
   }
 
+static void test_convert_define_7()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define (a)(let ((var 3))(define b 7.0)(define (fun x) (define (nested y) (+ x y)) (let ((z 3)) (nested z)))))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_define_conversion(ctxt, &prog);
+
+  schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  schemerlicht_visit_program(ctxt, dumper->visitor, &prog);  
+  TEST_EQ_STRING("( set! a ( lambda ( ) ( begin ( let ( [ var 3 ] ) ( begin ( letrec ( [ b 7.000000 ] [ fun ( lambda ( x ) ( begin ( letrec ( [ nested ( lambda ( y ) ( begin ( + x y ) ) ) ] ) ( begin ( let ( [ z 3 ] ) ( begin ( nested z ) ) ) ) ) ) ) ] ) ( begin ) ) ) ) ) ) ) ", dumper->s.string_ptr);
+  schemerlicht_dump_visitor_free(ctxt, dumper);
+
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_single_begin_conv()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
@@ -944,6 +961,7 @@ void run_all_conv_tests()
   test_convert_define_4();
   test_convert_define_5();
   test_convert_define_6();
+  test_convert_define_7();
   simplify_to_core_conversion_and();
   simplify_to_core_conversion_and_2();
   simplify_to_core_conversion_and_3();

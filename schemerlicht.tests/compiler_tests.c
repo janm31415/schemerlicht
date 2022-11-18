@@ -3241,9 +3241,50 @@ static void test_jaffer_bug_1()
     "(test '(3 4 5 6) (lambda x x) 3 4 5 6)", 2048);  
   }
 
+
+
+static void test_nested_define()
+  {  
+  test_compile_aux("<lambda>", "(define (a)(let ((var 3))(define b 7.0)(define (fun x) (define (nested y) (+ x y)) (let ((z 3)) (nested z)))))");
+  test_compile_aux("<lambda>", "(define (a)(let ((var 3))(define b 7.0)(define (fun x) (define (nested y) (+ x y)) (let ((z 3)) (nested z)))(fun 2)))");
+  
+  test_compile_aux("<lambda>", "(define(a)(let((var 3))(define b 7.0)(define(fun x) (define(nested y) (+ x y)) (let((z 3)) (nested z)))))\n");
+    
+  
+  test_compile_aux("<closure>", 
+    "(define(test-inexact-printing)\n"
+    "  (let((f0.0 (string->number \"0.0\"))\n"
+    "    (f0.5 (string->number \"0.5\"))\n"
+    "    (f1.0 (string->number \"1.0\"))\n"
+    "    (f2.0 (string->number \"2.0\")))    \n"
+    "(define log2\n"
+    "(let((l2(log 2)))\n"
+    "  (lambda(x) (/ (log x) l2))))\n"
+    "    (define (float-print-test x)\n"
+    "      (define (testit number)	\n"
+    "	(= number (string->number (number->string number))))\n"
+    "      (let ((eps (float-precision x))\n"
+    "	    (all-ok? #t))\n"
+    "	(do ((j -100 (+ j 1)))\n"
+    "	    ((or (not all-ok?) (> j 100)) all-ok?)\n"
+    "	  (let* ((xx (+ x (* j eps)))\n"
+    "		 (ok? (testit xx)))\n"
+    "	    (cond ((not ok?)\n"
+    "		   (display \"Number readback failure for \")\n"
+    "		   (display `(+ ,x (* ,j ,eps))) (newline)\n"
+    "		   (display xx) (newline)\n"
+    "		   (display (string->number (number->string xx))) (newline)\n"
+    "		   (set! all-ok? #f))\n"
+    "		  )))))\n"
+    "))\n"
+  );
+  
+
+  }
+
 void run_all_compiler_tests()
   {
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < 1; ++i)
     {
     full_preprocessor = i;
 #if 0
@@ -3356,7 +3397,9 @@ void run_all_compiler_tests()
     test_curry();
 #endif
     //test_curry_2();
-    test_long_apply();
+    //test_long_apply();
     //test_jaffer_bug_1();
+    
+    test_nested_define();
     }
   }

@@ -102,3 +102,10 @@ void schemerlicht_remove_nested_begin_expressions(schemerlicht_context* ctxt, sc
   schemerlicht_visit_program(ctxt, v->visitor, program);
   schemerlicht_remove_nested_begin_visitor_free(ctxt, v);
   }
+
+void schemerlicht_remove_nested_begin(schemerlicht_context* ctxt, schemerlicht_expression* expr)
+  {
+  schemerlicht_remove_nested_begin_visitor* v = schemerlicht_remove_nested_begin_visitor_new(ctxt);
+  schemerlicht_visit_expression(ctxt, v->visitor, expr);
+  schemerlicht_remove_nested_begin_visitor_free(ctxt, v);
+  }

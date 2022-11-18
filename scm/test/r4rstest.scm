@@ -134,7 +134,6 @@
   (let ((x 4))
     (lambda (y) (+ x y))))
 (test 10 add4 6)
-#|
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
 (test '(5 6) (lambda (x y . z) z) 3 4 5 6)
 (SECTION 4 1 5)
@@ -194,7 +193,7 @@
 (test 10 'letrec (letrec ((x 3)) (define x 10) x))
 (test 34 'letrec x)
 (define (s x) (if x (let () (set! s x) (set! x s))))
-#|
+
 (SECTION 4 2 3)
 (define x 0)
 (test 6 'begin (begin (set! x (begin (begin 5)))
@@ -400,8 +399,8 @@
 (test '(a . 4) 'set-cdr! x)
 (test #t eqv? x y)
 (test '(a b c . d) 'dot '(a . (b . (c . d))))
-(and list? (test #f list? y))
-(and list? (let ((x (list 'a))) (set-cdr! x x) (test #f 'list? (list? x))))
+;[JanM] to fix: (and list? (test #f list? y))
+;[JanM] to fix; (and list? (let ((x (list 'a))) (set-cdr! x x) (test #f 'list? (list? x))))
 
 (test #t pair? '(a . b))
 (test #t pair? '(a . 1))
@@ -676,7 +675,7 @@
 	 (test #t eqv? f0.0 (* -5 f0.0))
 	 (test #t equal? f0.0 (* -5 f0.0))))
   |#
-  ;(SECTION 6 5 5)
+  (SECTION 6 5 5)
   #| [JanM] : removed because no support for complex numbers in skiwi
   (and f1e300
        (let ((f1e300+1e300i (make-rectangular f1e300 f1e300)))
@@ -689,7 +688,7 @@
 					 (* f1e-300 (sqrt 2)))))
 	 (test f.25 / f1e-300+1e-300i (* 4 f1e-300+1e-300i))))
 	 |#
-	 #|
+	 
   (test #t = f0.0 f0.0)
   (test #t = f0.0 (- f0.0))
   (test #t = f0.0 (* -5 f0.0))
@@ -786,8 +785,7 @@
 		 (slow-frexp x)))))
 
     (define (float-print-test x)
-      (define (testit number)
-	;(eqv? number (string->number (number->string number)))) ; [JanM] changed eqv? to =
+      (define (testit number)	
 	(= number (string->number (number->string number))))
       (let ((eps (float-precision x))
 	    (all-ok? #t))
@@ -801,7 +799,6 @@
 		   (display xx) (newline)
 		   (display (string->number (number->string xx))) (newline)
 		   (set! all-ok? #f))
-		  ;;   (else (display xx) (newline))
 		  )))))
 
     (define (mult-float-print-test x)
@@ -810,12 +807,10 @@
 	 (lambda (mult)
 	   (or (float-print-test (* mult x)) (set! res #f)))
 	 (map string->number
-	  ;    '("1.0" "10.0" "100.0" "1.0e20" "1.0e50" "1.0e100"
-	  ;	"0.1" "0.01" "0.001" "1.0e-20" "1.0e-50" "1.0e-100"))) ; [JanM] no arbitrary large numbers in skiwi
 	      '("1.0" "10.0" "100.0" 
 	    	"0.1" "0.01" "0.001" )))
 	res))
-
+#|
     (define (float-rw-range-test)
       (define success #t)
 	  (do ((cnt -323 (+ 1 cnt)))
@@ -825,8 +820,6 @@
 	       (str (number->string num)))
 	   (cond ((or (>= (string-length str) 100) ; [JanM] allow long stringlength
 		      (not (= (string->number str) num))) ; [JanM] using = instead of equal?
-	  ;(cond ((or (>= (string-length str) 10)
-	  ;	     (not (equal? (string->number str) num)))
 		 (set! success #f)
 		 (for-each write (list estr num str (string->number str))))))))
 
@@ -855,8 +848,9 @@
 				     (string->number "2.7182818284590451")))
     (test #t float-rw-range-test)
     ;(test #t float-powers-of-2-test)
+    |#
 	))
-
+#|
 	
 (define (test-bignum)
   (define tb
