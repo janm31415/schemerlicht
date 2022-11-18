@@ -2592,6 +2592,7 @@ void schemerlicht_primitive_is_null(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_IS_NULL);
   if (b == 0)
     {
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "null? needs an argument");
     schemerlicht_object ret;
     ret.type = schemerlicht_object_type_undefined;
     schemerlicht_set_object(ra, &ret);
@@ -3292,11 +3293,13 @@ void schemerlicht_primitive_cons(schemerlicht_context* ctxt, int a, int b, int c
   schemerlicht_object* v1 = schemerlicht_vector_at(&v.value.v, 1, schemerlicht_object);
   if (b == 0)
     {
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "cons needs two arguments");
     v0->type = schemerlicht_object_type_undefined;
     v1->type = schemerlicht_object_type_undefined;
     }
   else if (b == 1)
     {
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "cons needs two arguments");
     schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     schemerlicht_set_object(v0, arg0);
     v1->type = schemerlicht_object_type_undefined;
@@ -3467,10 +3470,11 @@ void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSUREREF);
-#if 0
+#if 1
   schemerlicht_object ret;
   if (b < 2)
     {
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "closure-ref expects 2 arguments.");
     ret.type = schemerlicht_object_type_undefined;
     }
   else
@@ -3479,12 +3483,14 @@ void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b
     schemerlicht_object* pos = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
     if (v->type != schemerlicht_object_type_closure || pos->type != schemerlicht_object_type_fixnum)
       {
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "closure-ref expects a closure and an index as argument.");
       ret.type = schemerlicht_object_type_undefined;
       }
     else
       {
       if (pos->value.fx < 0 || pos->value.fx >= v->value.v.vector_size) // out of bounds
         {
+        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "closure-ref index is out of bounds.");
         ret.type = schemerlicht_object_type_undefined;
         }
       else
@@ -5085,16 +5091,29 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
   if (b > 1)
     {
     schemerlicht_object* last_arg = schemerlicht_vector_at(&ctxt->stack, a + c + b, schemerlicht_object);
+    if (last_arg->type != schemerlicht_object_type_pair && last_arg->type != schemerlicht_object_type_nil)
+      {
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "last argument of apply should be a list.");
+      ra->type = schemerlicht_object_type_undefined;
+      return;
+      }
     --b;
     while (last_arg->type == schemerlicht_object_type_pair)
       {
+      if (a+c+b >= schemerlicht_maxstack)
+        {
+        schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_MEMORY, -1, -1, "stack overflow in apply.");
+        ra->type = schemerlicht_object_type_undefined;
+        return;
+        }
       schemerlicht_object* v0 = schemerlicht_vector_at(&last_arg->value.v, 0, schemerlicht_object);
       schemerlicht_object* v1 = schemerlicht_vector_at(&last_arg->value.v, 1, schemerlicht_object);
       ++b;
       schemerlicht_object* stack_pos = schemerlicht_vector_at(&ctxt->stack, a + c + b, schemerlicht_object);
       *stack_pos = *v0;
-      last_arg = v1;
+      last_arg = v1;      
       }
+    //schemerlicht_vector_at(&ctxt->stack, a + c + b + 1, schemerlicht_object)->type = schemerlicht_object_type_blocking;
 
     //stack situation so far:
     // a: prim call apply
@@ -5116,17 +5135,12 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_assert(c == 1); // as apply is represented as object, it means that c == 1 because the vm wants to skip the continuation when calling the primitive apply.
       schemerlicht_object* continuation = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object); // save the original closure
       schemerlicht_object original_continuation = *continuation;
+      schemerlicht_vector_push_back(ctxt, &ctxt->gcsave_list, *continuation, schemerlicht_object);
       schemerlicht_object oper = *op;
-      // TODO later: move dummy continuation to the context so that we don't need to recreate it all the time for apply
-      schemerlicht_object dummy_continuation = make_schemerlicht_object_closure(ctxt, 1);
-      schemerlicht_object dummy_lambda;
-      dummy_lambda.type = schemerlicht_object_type_lambda;
-      schemerlicht_function* dummy_fun = schemerlicht_function_new(ctxt);
-      dummy_lambda.value.ptr = dummy_fun;
-      schemerlicht_set_object(schemerlicht_vector_begin(&dummy_continuation.value.v, schemerlicht_object), &dummy_lambda);
+           
 
       //swap place of continuation and operator
-      *op = dummy_continuation;
+      *op = ctxt->empty_continuation;
       *continuation = oper;
 
       // stack state (with guaranteed a == 0):
@@ -5144,6 +5158,8 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
         schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, i + 1, schemerlicht_object);
         *ri = *ri_next;
         }
+      schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object)->type = schemerlicht_object_type_blocking; // Very important! variable arity lambdas should know till where the list goes
+
       schemerlicht_assert(oper.type == schemerlicht_object_type_closure);
       schemerlicht_object* lambda_obj = schemerlicht_vector_at(&oper.value.v, 0, schemerlicht_object);
       schemerlicht_assert(lambda_obj->type == schemerlicht_object_type_lambda);
@@ -5152,9 +5168,12 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
 
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);
-      *continuation = original_continuation;
-      schemerlicht_object_destroy(ctxt, &dummy_continuation);
-      schemerlicht_function_free(ctxt, dummy_fun);
+      *continuation = original_continuation;    
+      schemerlicht_vector_pop_back(&ctxt->gcsave_list);
+
+      //schemerlicht_object* lam = schemerlicht_vector_begin(&continuation->value.v, schemerlicht_object);
+      //schemerlicht_assert(lam->type == schemerlicht_object_type_lambda);
+      //schemerlicht_assert(((schemerlicht_function*)lam->value.ptr)->function_definition.string_length < 1024);
       }
     else if (op->type == schemerlicht_object_type_lambda)
       {
@@ -5162,17 +5181,28 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_assert(c == 1); // as apply is represented as object, it means that c == 1 because the vm wants to skip the continuation when calling the primitive apply.
       schemerlicht_object* continuation = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object); // save the original closure
       schemerlicht_object original_continuation = *continuation;
-      schemerlicht_object oper = *op;
-      // TODO later: move dummy continuation to the context so that we don't need to recreate it all the time for apply
-      schemerlicht_object dummy_continuation = make_schemerlicht_object_closure(ctxt, 1);
-      schemerlicht_object dummy_lambda;
-      dummy_lambda.type = schemerlicht_object_type_lambda;
-      schemerlicht_function* dummy_fun = schemerlicht_function_new(ctxt);
-      dummy_lambda.value.ptr = dummy_fun;
-      schemerlicht_set_object(schemerlicht_vector_begin(&dummy_continuation.value.v, schemerlicht_object), &dummy_lambda);
+      schemerlicht_vector_push_back(ctxt, &ctxt->gcsave_list, *continuation, schemerlicht_object);
+      /*
+      int cnt = 0;
+      int found_block = 0;
+      while (found_block == 0)
+        {
+        schemerlicht_object* stack_item = schemerlicht_vector_at(&ctxt->stack, a + 2 + cnt, schemerlicht_object);
+        if (stack_item->type == schemerlicht_object_type_blocking)
+          {
+          found_block = 1;
+          }
+        else
+          {
+          ++cnt;
+          schemerlicht_vector_push_back(ctxt, &ctxt->gcsave_list, *stack_item, schemerlicht_object);
+          }
+        }
+        */
+      schemerlicht_object oper = *op;      
 
       //swap place of continuation and operator
-      *op = dummy_continuation;
+      *op = ctxt->empty_continuation;
       *continuation = oper;
 
       // stack state (with guaranteed a == 0):
@@ -5190,29 +5220,36 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
         schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, i + 1, schemerlicht_object);
         *ri = *ri_next;
         }
+      schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object)->type = schemerlicht_object_type_blocking; // Very important! variable arity lambdas should know till where the list goes
       schemerlicht_assert(oper.type == schemerlicht_object_type_lambda);
       schemerlicht_function* lambda = cast(schemerlicht_function*, oper.value.ptr);
       schemerlicht_run(ctxt, lambda);
 
-      schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
-      schemerlicht_set_object(ra, &ret);
+      schemerlicht_object* ret = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
+      schemerlicht_set_object(ra, ret);
       *continuation = original_continuation;
-      schemerlicht_object_destroy(ctxt, &dummy_continuation);
-      schemerlicht_function_free(ctxt, dummy_fun);
+      /*
+      for (int i = 0; i < cnt; ++i)
+        {
+        schemerlicht_object* stack_item = schemerlicht_vector_back(&ctxt->gcsave_list, schemerlicht_object);        
+        schemerlicht_set_object(schemerlicht_vector_at(&ctxt->stack, a + 2 + (cnt-i-1), schemerlicht_object), stack_item);
+        schemerlicht_vector_pop_back(&ctxt->gcsave_list);
+        }
+      */
+      schemerlicht_vector_pop_back(&ctxt->gcsave_list);
+      //schemerlicht_object* lam = schemerlicht_vector_begin(&continuation->value.v, schemerlicht_object);
+      //schemerlicht_assert(lam->type == schemerlicht_object_type_lambda);
+      //schemerlicht_assert(((schemerlicht_function*)lam->value.ptr)->function_definition.string_length < 1024);
       }
     else
       {
-      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to use apply with non-procedure.");
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "attempt to use apply with non-procedure.");      
+      ra->type = schemerlicht_object_type_undefined;      
       }
     }
   else
     {
-    schemerlicht_object ret;
-    ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_set_object(ra, &ret);
+    ra->type = schemerlicht_object_type_undefined;
     }
   }
 ////////////////////////////////////////////////////
@@ -5225,6 +5262,7 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_APPEND);
   if (b == 0)
     {
+    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "append needs at least one list argument");
     schemerlicht_object ret;
     ret.type = schemerlicht_object_type_undefined;
     schemerlicht_set_object(ra, &ret);
@@ -5246,7 +5284,7 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
           }
         else
           {
-          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "non list object as argument to append");
+          schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "non list object as argument to append");
           break;
           }
         }

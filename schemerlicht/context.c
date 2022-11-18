@@ -7,6 +7,7 @@
 #include "foreign.h"
 #include "func.h"
 #include "constfold.h"
+#include "vm.h"
 
 static schemerlicht_context* context_new(schemerlicht_context* ctxt)
   {
@@ -19,6 +20,8 @@ static schemerlicht_context* context_new(schemerlicht_context* ctxt)
 
 static void context_free(schemerlicht_context* ctxt)
   {
+  schemerlicht_function_free(ctxt, ctxt->empty_continuation_function);
+  schemerlicht_object_destroy(ctxt, &ctxt->empty_continuation);
   schemerlicht_map_keys_free(ctxt, ctxt->quote_to_index);
   schemerlicht_map_free(ctxt, ctxt->quote_to_index);
   schemerlicht_map_values_free(ctxt, ctxt->string_to_symbol);
@@ -75,11 +78,13 @@ static void context_free(schemerlicht_context* ctxt)
     }
   schemerlicht_vector_destroy(ctxt, &ctxt->environments);
   schemerlicht_string_destroy(ctxt, &ctxt->module_path);
+  schemerlicht_vector_destroy(ctxt, &ctxt->gcsave_list);
   schemerlicht_free(ctxt, ctxt, sizeof(schemerlicht_context));
   }
 
 static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size)
   {
+  schemerlicht_vector_init(ctxt, &ctxt->gcsave_list, schemerlicht_object);
   schemerlicht_assert(ctxt->global != NULL);
   ctxt->error_jmp = NULL;
   ctxt->number_of_syntax_errors = 0;
@@ -123,6 +128,16 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_vector_init(ctxt, &ctxt->lambdas, schemerlicht_function*);
   schemerlicht_vector_init(ctxt, &ctxt->environments, schemerlicht_context*);
   schemerlicht_string_init(ctxt, &ctxt->module_path, "");
+  ctxt->empty_continuation_function = schemerlicht_function_new(ctxt);
+  //schemerlicht_instruction i = 0;
+  //SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_MOVE);
+  //SCHEMERLICHT_SETARG_A(i, 0);
+  //SCHEMERLICHT_SETARG_B(i, 1);
+  //schemerlicht_vector_push_back(ctxt, &ctxt->empty_continuation_function->code, i, schemerlicht_instruction);
+  ctxt->empty_continuation = make_schemerlicht_object_closure(ctxt, 1);
+  schemerlicht_object* empty_lambda = schemerlicht_vector_begin(&ctxt->empty_continuation.value.v, schemerlicht_object);
+  empty_lambda->type = schemerlicht_object_type_lambda;
+  empty_lambda->value.ptr = ctxt->empty_continuation_function;
   }
 
 schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)

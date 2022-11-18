@@ -165,7 +165,7 @@ static void test_compile_aux(const char* expected_value, const char* script)
 
 static void test_compile_aux_w_dump(const char* expected_value, const char* script)
   {
-  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_context* ctxt = schemerlicht_open(256 * 256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   if (full_preprocessor)
@@ -2810,6 +2810,49 @@ static void test_compile_aux_r5rs(const char* expected_value, const char* script
   schemerlicht_close(ctxt);
   }
 
+static void test_compile_aux_r5rs_heap(const char* expected_value, const char* script, schemerlicht_memsize heap)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(heap);
+  schemerlicht_compile_callcc(ctxt);
+  schemerlicht_compile_r5rs(ctxt);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_quasiquote_conversion(ctxt, &prog);
+  schemerlicht_define_conversion(ctxt, &prog);
+  schemerlicht_single_begin_conversion(ctxt, &prog);
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+  schemerlicht_alpha_conversion(ctxt, &prog);
+  schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
+  schemerlicht_quote_conversion(ctxt, &prog, &quotes);
+  schemerlicht_quote_collection_destroy(ctxt, &quotes);
+  schemerlicht_global_define_environment_allocation(ctxt, &prog);
+  schemerlicht_continuation_passing_style(ctxt, &prog);
+  schemerlicht_lambda_to_let_conversion(ctxt, &prog);
+  schemerlicht_assignable_variable_conversion(ctxt, &prog);
+  schemerlicht_free_variable_analysis(ctxt, &prog);
+  schemerlicht_closure_conversion(ctxt, &prog);
+#if 0
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif
+  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+  schemerlicht_object* res = schemerlicht_run(ctxt, func);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
+
+  if (print_gc_time)
+    printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+
+  TEST_EQ_STRING(expected_value, s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  schemerlicht_function_free(ctxt, func);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
 static void test_control_ops()
   {
   test_compile_aux_r5rs("(b e h)", "(map cadr '((a b) (d e) (g h)))");
@@ -3079,20 +3122,20 @@ static void test_calcc_extended()
   test_compile_aux_r5rs("(2 1)", "(define lst '()) (define before (lambda () (set! lst (cons 1 lst)))) (define thunk (lambda () (set! lst (cons 2 lst))))  (define after (lambda () (set! lst (cons 3 lst)))) (dynamic-wind before thunk after)");
   test_compile_aux_r5rs("(3 2 1)", "(define lst '()) (define before (lambda () (set! lst (cons 1 lst)))) (define thunk (lambda () (set! lst (cons 2 lst))))  (define after (lambda () (set! lst (cons 3 lst)))) (dynamic-wind before thunk after) lst");
   const char* script = "(let ((path '())\n"
-"     (c #f))\n"
-" (let ((add (lambda (s)\n"
-"             (set! path (cons s path)))))\n"
-"   (dynamic-wind\n"
-"     (lambda () (add 'connect))\n"
-"     (lambda ()\n"
-"       (add (call-with-current-continuation\n"
-"             (lambda (c0)\n"
-"               (set! c c0)\n"
-"               'talk1))))\n"
-"     (lambda () (add 'disconnect)))\n"
-"   (if (< (length path) 4)\n"
-"       (c 'talk2)\n"
-"       (reverse path))))\n";
+    "     (c #f))\n"
+    " (let ((add (lambda (s)\n"
+    "             (set! path (cons s path)))))\n"
+    "   (dynamic-wind\n"
+    "     (lambda () (add 'connect))\n"
+    "     (lambda ()\n"
+    "       (add (call-with-current-continuation\n"
+    "             (lambda (c0)\n"
+    "               (set! c c0)\n"
+    "               'talk1))))\n"
+    "     (lambda () (add 'disconnect)))\n"
+    "   (if (< (length path) 4)\n"
+    "       (c 'talk2)\n"
+    "       (reverse path))))\n";
 
   test_compile_aux_r5rs("(connect talk1 disconnect connect talk2 disconnect)", script);
   }
@@ -3118,11 +3161,92 @@ static void test_curry()
   test_compile_aux_r5rs("(1 2 4)", "(define lam (lambda (x y z) (list x y z)))(define foo (curry lam 1))(define bar (curry lam 1 2))(bar 4)");
   }
 
+static void test_curry_2()
+  {
+  test_compile_aux_heap("((1 2) (3 4))", "\n"
+    "(define map(lambda(proc lst1 . lsts)\n"
+    "   (if (null? lsts)\n"
+    "      (let loop([lst lst1])\n"
+    "        (if (null? lst)\n"
+    "          '()\n"
+    "          (cons (proc (car lst)) (loop(cdr lst)))\n"
+    "          ))\n"
+    "      (let loop ([lsts(cons lst1 lsts)])\n"
+    "        (let ([hds(let loop2([lsts lsts])\n"
+    "          (if (null? lsts)\n"
+    "            '()\n"
+    "            (let([x(car lsts)])\n"
+    "              (and (not (null? x))\n"
+    "                (let([r(loop2(cdr lsts))])\n"
+    "                  (and r(cons(car x) r))\n"
+    "                  )))))])\n"
+    "          (if hds"
+    "          (cons(apply proc hds)\n"
+    "            (loop(let loop3([lsts lsts])\n"
+    "              (if (null? lsts)\n"
+    "                '()\n"
+    "                (cons(cdr(car lsts)) (loop3(cdr lsts)))\n"
+    "                ))))\n"
+    "            '()\n"
+    "            ))))))\n"
+    "(define (curry func . args) (lambda x (apply func (append args x))))\n"
+    "(define (csv-map proc csvlst) (map (curry map proc) csvlst))\n"
+    //"(define (csv-map proc csvlst) (map (lambda (lst) (map proc lst)) csvlst))\n"
+    "(define r '((\"1\" \"2\") (\"3\" \"4\")))\n"
+    "(csv-map string->number r)", 256*256);
+  }
+
+static void test_long_apply()
+  {
+  //test_compile_aux("210", "(apply + (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))");
+  //test_compile_aux("410", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (apply + 200 lst)");
+  //test_compile_aux("210", "(define (oper lst) (apply + lst))  ( oper (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))");
+  //test_compile_aux_r5rs("(1.000000 1.414214 1.732051 2.000000 2.236068 2.449490 2.645751 2.828427 3.000000 3.162278 3.316625 3.464102 3.605551 3.741657 3.872983 4.000000 4.123106 4.242641 4.358899 4.472136)", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (map sqrt lst)");
+  test_compile_aux_r5rs_heap("(1 4 9 16 25 36 49 64 81 100 121 144 169 196 225 256 289 324 361 400)", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (map * lst lst)", 2048);
+  
+  
+  //test_compile_aux_r5rs("11.958261", "(define (rms nums) (sqrt (/ (apply + (map * nums nums))(length nums)))) (rms (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))");
+  //TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("(define dm (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))"));
+  //TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("dm"));
+  //TEST_EQ("11.9791", run("(rms dm)"));
+  //TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("dm"));
+  //TEST_EQ("(0 1 2 3 4)", run("(iota 5)"));
+  //TEST_EQ("2000", run("(define dm (iota 2000)) (length dm)"));
+  //TEST_EQ("1999000", run("(apply + dm)"));
+  //TEST_EQ("2000", run("(length dm)"));
+
+  }
+
+static void test_jaffer_bug_1()
+  {
+  test_compile_aux("(3)", "(apply (lambda x x) (list 3))", 2048);  
+  test_compile_aux("(3 4)", "(apply (lambda x x) (list 3 4))", 2048);
+  test_compile_aux("(3 4 5 6)", "(apply (lambda x x) (list 3 4 5 6))", 2048);
+  
+  test_compile_aux_r5rs_heap("#t", 
+  "(define test\n"
+    "  (lambda (expect fun . args)\n"
+    "    (write (cons fun args))\n"
+    "    (display \"  ==> \")\n"
+    "    ((lambda (res)\n"
+    "      (write res)\n"
+    "      (newline)\n"
+    "      (cond ((not (equal? expect res))\n"
+    "	     (display \" BUT EXPECTED \")\n"
+    "	     (write expect)\n"
+    "	     (newline)\n"
+    "	     #f)\n"
+    "	    (else #t)))\n"
+    "     (if (procedure? fun) (apply fun args) (car args)))))\n"
+    "(test '(3 4 5 6) (lambda x x) 3 4 5 6)", 2048);  
+  }
+
 void run_all_compiler_tests()
   {
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
+#if 0
     test_compile_fixnum();
     test_compile_flonum();
     test_compile_bool();
@@ -3230,5 +3354,9 @@ void run_all_compiler_tests()
     test_calcc_extended();
     test_error();
     test_curry();
+#endif
+    //test_curry_2();
+    test_long_apply();
+    //test_jaffer_bug_1();
     }
   }

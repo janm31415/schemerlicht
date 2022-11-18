@@ -170,6 +170,17 @@ static void sweep_stack(schemerlicht_context* ctxt, gc_state* state)
     }
   }
 
+static void sweep_gcsave_list(schemerlicht_context* ctxt, gc_state* state)
+  {
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->gcsave_list, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->gcsave_list, schemerlicht_object);
+  for (; it != it_end; ++it)
+    {
+    if (is_value_object(it) == 0)
+      collect_object(ctxt, it, state);
+    }
+  }
+
 static void sweep_environment(schemerlicht_context* ctxt, gc_state* state)
   {
   const schemerlicht_memsize sz = schemerlicht_environment_base_size(ctxt);
@@ -181,7 +192,7 @@ static void sweep_environment(schemerlicht_context* ctxt, gc_state* state)
       {
       schemerlicht_assert(entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL);
       schemerlicht_object* obj = ctxt->heap + entry.position;
-      if (is_value_object(obj))
+      if (is_value_object(obj) && obj->type != schemerlicht_object_type_blocking)
         {
         entry.position = state->gc_heap_pos;
         state->target_heap[entry.position] = *obj;
@@ -240,6 +251,7 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   state.heap_size = get_heap_size(ctxt);
   sweep_environment(ctxt, &state);
   sweep_stack(ctxt, &state);
+  sweep_gcsave_list(ctxt, &state);
   scan_target_space(ctxt, &state);
   for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
     {

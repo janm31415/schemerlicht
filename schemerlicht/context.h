@@ -7,6 +7,7 @@
 #include "reader.h"
 #include "pool.h"
 #include "vector.h"
+#include "func.h"
 
 #include <setjmp.h>
 
@@ -66,6 +67,9 @@ struct schemerlicht_context
   schemerlicht_map* macro_map;
   schemerlicht_memsize number_of_macros;
   schemerlicht_string module_path;
+  schemerlicht_function* empty_continuation_function;
+  schemerlicht_object empty_continuation;
+  schemerlicht_vector gcsave_list;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
