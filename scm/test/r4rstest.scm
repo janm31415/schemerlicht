@@ -722,7 +722,6 @@
 
   (test (atan 1) atan 1 1)
   
-  #|
   (set! write-test-obj (list f.25 f-3.25)) ;.25 inexact errors less likely.
   (set! load-test-obj (list 'define 'foo (list 'quote write-test-obj)))
   
@@ -1178,7 +1177,7 @@
 (test #t string-ci>=? "9" "0")
 (test #t string-ci>=? "A" "A")
 (test #t string-ci>=? "A" "a")
-
+#|
 (SECTION 6 8)
 (test #t vector? '#(0 (2 2 2 2) "Anna"))
 (test #t vector? '#())
