@@ -5637,11 +5637,8 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
   schemerlicht_assert(ra->type == schemerlicht_object_type_primitive || ra->type == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_APPEND);
   if (b == 0)
-    {
-    schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, -1, -1, "append needs at least one list argument");
-    schemerlicht_object ret;
-    ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_set_object(ra, &ret);
+    {    
+    ra->type = schemerlicht_object_type_nil;
     }
   else
     {
