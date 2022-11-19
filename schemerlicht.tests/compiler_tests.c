@@ -2287,12 +2287,12 @@ static void test_min_max()
   test_compile_aux("2.000000", "(max 1.0 2.0)");
   test_compile_aux("7.200000", "(max 1.0 2.0 -0.4 7.2 2.3 7.1 -11.0)");
   test_compile_aux("2.000000", "(max 1 2.0)");
-  test_compile_aux("2", "(max 1.0 2)");
+  test_compile_aux("2.000000", "(max 1.0 2)");
   test_compile_aux("2", "(max 1 2)");
   test_compile_aux("7", "(max 1 2 7 -3 -11 6 3)");
   test_compile_aux("1.000000", "(min 1.0 2.0)");
   test_compile_aux("-11.000000", "(min 1.0 2.0 -0.4 7.2 2.3 7.1 -11.0)");
-  test_compile_aux("1", "(min 1 2.0)");
+  test_compile_aux("1.000000", "(min 1 2.0)");
   test_compile_aux("1.000000", "(min 1.0 2)");
   test_compile_aux("1", "(min 1 2)");
   test_compile_aux("-11", "(min 1 2 7 -3 -11 6 3)");

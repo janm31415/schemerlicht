@@ -626,7 +626,7 @@
 (test 0 gcd)
 (test 288 lcm 32 -36)
 (test 1 lcm)
-#|
+
 (SECTION 6 5 5)
 ;;; Implementations which don't allow division by 0 can have fragile
 ;;; string->number.
@@ -688,7 +688,7 @@
 					 (* f1e-300 (sqrt 2)))))
 	 (test f.25 / f1e-300+1e-300i (* 4 f1e-300+1e-300i))))
 	 |#
-	 #|
+	 
   (test #t = f0.0 f0.0)
   (test #t = f0.0 (- f0.0))
   (test #t = f0.0 (* -5 f0.0))
@@ -717,12 +717,12 @@
   (test f1.0 expt -25  f0.0)
   (test f1.0 expt f-3.25 f0.0)
   ;(test f1.0 expt f-3.25 0)
-  (test 1 expt f-3.25 0) ; [JanM] returns fixnum instead of flonum
+  (test f1.0 expt f-3.25 0)
   ;;(test f0.0 expt f0.0 f-3.25)
 
   (test (atan 1) atan 1 1)
   
-  
+  #|
   (set! write-test-obj (list f.25 f-3.25)) ;.25 inexact errors less likely.
   (set! load-test-obj (list 'define 'foo (list 'quote write-test-obj)))
   
