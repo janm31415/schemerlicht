@@ -3221,9 +3221,9 @@ static void test_long_apply()
 
 static void test_jaffer_bug_1()
   {
-  test_compile_aux("(3)", "(apply (lambda x x) (list 3))", 2048);  
-  test_compile_aux("(3 4)", "(apply (lambda x x) (list 3 4))", 2048);
-  test_compile_aux("(3 4 5 6)", "(apply (lambda x x) (list 3 4 5 6))", 2048);
+  test_compile_aux("(3)", "(apply (lambda x x) (list 3))");  
+  test_compile_aux("(3 4)", "(apply (lambda x x) (list 3 4))");
+  test_compile_aux("(3 4 5 6)", "(apply (lambda x x) (list 3 4 5 6))");
   
   test_compile_aux_r5rs_heap("#t", 
   "(define test\n"
