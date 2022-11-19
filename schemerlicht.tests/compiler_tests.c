@@ -3328,6 +3328,14 @@ static void test_quasiquote_comparison()
   test_compile_aux("#t", "(equal? '((foo 7) . cons) `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons))))");
   }
 
+static void test_string_list()
+  {
+  test_compile_aux("(#\\1 #\\\\ #\\\")", "(string->list \"1\\\\\\\"\")");
+  test_compile_aux("\"1\\\\\\\"\"", "(list->string '(#\\1 #\\\\ #\\\"))");
+  test_compile_aux("\"1\\\\\\\"\"", "(define test (lambda (fun . args) (apply fun args))) ( test list->string '(#\\1 #\\\\ #\\\"))");
+  test_compile_aux("\"1\\\"\"", "\"1\\\\\\\"\"");
+  }
+
 void run_all_compiler_tests()
   {   
   for (int i = 0; i < 2; ++i)
@@ -3449,6 +3457,7 @@ void run_all_compiler_tests()
     test_nested_define();
     test_define_vs_internal_define();
     test_quasiquote_comparison();
+    test_string_list();
 #endif            
     }
   }

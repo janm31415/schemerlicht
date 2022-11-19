@@ -4269,7 +4269,7 @@ void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int
       char* ch = schemerlicht_string_at(&v.value.s, j);
       *ch = arg->value.ch;
       }
-    }
+    }  
   schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
@@ -7558,7 +7558,15 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
           schemerlicht_set_object(ra, &ret);
           return;
           }
-        schemerlicht_string_push_back(ctxt, &heap_obj->value.s, v0->value.ch);
+        switch (v0->value.ch)
+          {
+          case '"':
+          case '\\':
+            schemerlicht_string_push_back(ctxt, &heap_obj->value.s, '\\');
+          default:
+            schemerlicht_string_push_back(ctxt, &heap_obj->value.s, v0->value.ch);
+            break;
+          }
         l = v1;
         if (l->type != schemerlicht_object_type_nil && l->type != schemerlicht_object_type_pair)
           {

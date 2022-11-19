@@ -1304,7 +1304,7 @@
 		 (c #f))
 	  (force p)))
   (report-errs))
-#|
+
 (SECTION 6 10 1)
 (test #t input-port? (current-input-port))
 (test #t output-port? (current-output-port))
@@ -1369,7 +1369,7 @@
   (SECTION 6 7)
   (test '(#\P #\space #\l) string->list "P l")
   (test '() string->list "")
-  (test "1\\\"" list->string '(#\1 #\\ #\"))
+  (test "1\\\\\\\"" list->string '(#\1 #\\ #\")) ;[JanM] c style escape chars
   (test "" list->string '())
   (SECTION 6 8)
   (test '(dah dah didah) vector->list '#(dah dah didah))
@@ -1404,5 +1404,5 @@
 (newline)
 (display "(test-cont) (test-sc4) (test-delay)")
 (newline)
-;(test-cont) (test-sc4) (test-delay)
+(test-cont) (test-sc4) (test-delay)
 "last item in file"

@@ -91,7 +91,7 @@ token schemerlicht_make_token_cstr(schemerlicht_context* ctxt, int type, int lin
   return t;
   }
 
-static void replace_escape_chars(schemerlicht_string* str)
+void schemerlicht_replace_escape_chars(schemerlicht_string* str)
   {
   if (str->string_length == 0)
     return;
@@ -115,11 +115,8 @@ static void replace_escape_chars(schemerlicht_string* str)
           *s = *t; ++escapes; memmove(t, t + 1, str->string_length - escapes - char_index); break;
         }
       }
-    else
-      {
-      ++s;
-      ++char_index;
-      }
+    ++s;
+    ++char_index;
     }
   }
 
@@ -426,7 +423,7 @@ int schemerlicht_read_token_polymorph(token* tok, schemerlicht_context* ctxt, sc
           {
           schemerlicht_string_push_back(ctxt, &tmp, s);
           }
-        replace_escape_chars(&tmp);
+        schemerlicht_replace_escape_chars(&tmp);
         *tok = schemerlicht_make_token(ctxt, SCHEMERLICHT_T_STRING, temp_line_nr, temp_column_nr, &tmp);
         schemerlicht_string_destroy(ctxt, &tmp);
         return 1;

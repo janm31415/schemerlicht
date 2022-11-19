@@ -6,6 +6,8 @@
 #include "stream.h"
 #include "vector.h"
 
+void schemerlicht_replace_escape_chars(schemerlicht_string* str);
+
 SCHEMERLICHT_API schemerlicht_flonum schemerlicht_to_flonum(const char* value);
 SCHEMERLICHT_API schemerlicht_fixnum schemerlicht_to_fixnum(const char* value);
 SCHEMERLICHT_API int schemerlicht_is_number(int* is_real, int* is_scientific, const char* value);
