@@ -389,7 +389,7 @@
 (test #t equal? 2 2)
 (test #t equal? (make-vector 5 'a) (make-vector 5 'a))
 
-#|
+
 (SECTION 6 3)
 (test '(a b c d e) 'dot '(a . (b . (c . (d . (e . ()))))))
 (define x (list 'a 'b 'c))
@@ -522,7 +522,7 @@
 (test 1 expt 0 0)
 (test 0 expt 0 1)
 ;(test 0 expt 0 256)
-(test 0.0 expt 0 256) ; [JanM] flonum is returned instead of fixnum
+(test 0 expt 0 256) ; [JanM] flonum is returned instead of fixnum
 ;;(test 0 expt 0 -255)
 ;(test 1 expt -1 256) ; [JanM] exp is out of bounds in skiwi
 (test -1 expt -1 255)
@@ -586,12 +586,12 @@
 ;(test -3 / 6 -2)
 ;(test -3 / -6 2)
 ;(test 3 / -6 -2)
-(test 1.0 / 1)
-(test -1.0 / -1)
-(test 2.0 / 6 3)
-(test -3.0 / 6 -2)
-(test -3.0 / -6 2)
-(test 3.0 / -6 -2)
+(test 1 / 1)
+(test -1 / -1)
+(test 2 / 6 3)
+(test -3 / 6 -2)
+(test -3 / -6 2)
+(test 3 / -6 -2)
 (test -1 - 3 4)
 (test -3 - 3)
 (test 7 abs -7)
@@ -626,7 +626,7 @@
 (test 0 gcd)
 (test 288 lcm 32 -36)
 (test 1 lcm)
-
+#|
 (SECTION 6 5 5)
 ;;; Implementations which don't allow division by 0 can have fragile
 ;;; string->number.
