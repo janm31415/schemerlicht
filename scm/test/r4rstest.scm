@@ -1234,7 +1234,7 @@
 (test #f list-length '(a b . c))
 (test '() map cadr '())
 
-#|
+
 ;;; This tests full conformance of call-with-current-continuation.  It
 ;;; is a separate test because some schemes do not support call/cc
 ;;; other than escape procedures.  I am indebted to
