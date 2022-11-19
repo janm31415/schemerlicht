@@ -5673,6 +5673,13 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
         last_list_obj = schemerlicht_vector_at(&last_list_obj->value.v, 1, schemerlicht_object);
         last_list_obj->type = schemerlicht_object_type_nil;
         current_list = v1;
+        if (i == (b - 1)) // last object to append does not need to be a list
+          {
+          if (v1->type != schemerlicht_object_type_pair)
+            {
+            schemerlicht_set_object(last_list_obj, v1);
+            }
+          }
         }
       }
     schemerlicht_set_object(ra, heap_obj);

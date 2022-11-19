@@ -681,6 +681,7 @@ static void test_geq()
   test_compile_aux("#f", "(>= (+ 13.0 1) 16) ");
   test_compile_aux("#t", "(>= (+ 13.0 3) 16) ");
   test_compile_aux("#t", "(>= (+ 13.0 13) 16)");
+  test_compile_aux("#f", "(>= 1 3 2)");
   }
 
 static void test_compare_incorrect_argument()
@@ -2488,6 +2489,7 @@ static void test_foreign()
 
 static void test_r5rs_funs()
   {
+  test_compile_aux("(a b c . d)", "(append '(a b) '(c . d))");  
   test_compile_aux("(1 2 3 4)", "(append (list 1 2) (list 3 4))");
   test_compile_aux("(1 2 3 4)", "(append '(1 2) '(3 4))");
   test_compile_aux("(1 2 3 4 5 6 7 8)", "(append '(1 2) '(3 4) '(5 6) '(7 8))");
@@ -2495,7 +2497,7 @@ static void test_r5rs_funs()
   test_compile_aux("(1 2 3 4 5 6 . cons)", "(append '(1 2) '(3 4) '(5 6) 'cons)");
   test_compile_aux("()", "(append '())");
   test_compile_aux("()", "(append '() '() '())");
-  test_compile_aux("(1 2 3)", "(append '(1 2 3))");
+  test_compile_aux("(1 2 3)", "(append '(1 2 3))");  
 
   test_compile_aux("#t", "(exact? 3)");
   test_compile_aux("#f", "(exact? 3.14)");
@@ -3303,7 +3305,7 @@ static void test_quasiquote_comparison()
   }
 
 void run_all_compiler_tests()
-  {
+  {  
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
