@@ -1177,7 +1177,7 @@
 (test #t string-ci>=? "9" "0")
 (test #t string-ci>=? "A" "A")
 (test #t string-ci>=? "A" "a")
-#|
+
 (SECTION 6 8)
 (test #t vector? '#(0 (2 2 2 2) "Anna"))
 (test #t vector? '#())
@@ -1234,7 +1234,7 @@
 (test #f list-length '(a b . c))
 (test '() map cadr '())
 
-
+#|
 ;;; This tests full conformance of call-with-current-continuation.  It
 ;;; is a separate test because some schemes do not support call/cc
 ;;; other than escape procedures.  I am indebted to

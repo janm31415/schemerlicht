@@ -5348,7 +5348,7 @@ void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c)
         {
         schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
         switch (arg->type)
-          {        
+          {
           case schemerlicht_object_type_fixnum:
           {
           if (arg->value.fx > ret.value.fx)
@@ -5376,7 +5376,7 @@ void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c)
         }
       break;
       }
-      }      
+      }
     schemerlicht_set_object(ra, &ret);
     }
   }
@@ -5562,8 +5562,32 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
     schemerlicht_object* op = schemerlicht_vector_at(&ctxt->stack, a + c + 1, schemerlicht_object);
     if (op->type == schemerlicht_object_type_primitive || op->type == schemerlicht_object_type_primitive_object)
       {
-      schemerlicht_call_primitive(ctxt, op->value.fx, a + c + 1, b - 1, 0);
-      schemerlicht_set_object(ra, op);
+      if (op->value.fx == SCHEMERLICHT_APPLY)
+        {
+        //stack situation so far:
+        // a == 0, c == 1
+        // a: prim call apply
+        // a + c: continuation
+        // a + c + 1: operator arg == apply
+        // a + c + 2: first arg for op
+        // a + c + 3: second arg for op
+        // ...
+        // a + c + b: last arg
+        // move down 
+        for (int i = 0; i < b - 1; ++i)
+          {
+          schemerlicht_object* ri = schemerlicht_vector_at(&ctxt->stack, a + c + i + 1, schemerlicht_object);
+          schemerlicht_object* ri_next = schemerlicht_vector_at(&ctxt->stack, a + c + i + 2, schemerlicht_object);
+          *ri = *ri_next;
+          }
+        schemerlicht_vector_at(&ctxt->stack, a + c + b, schemerlicht_object)->type = schemerlicht_object_type_blocking; // Very important! variable arity lambdas should know till where the list goes
+        schemerlicht_call_primitive(ctxt, SCHEMERLICHT_APPLY, 0, b - 1, 1);       
+        }
+      else
+        {
+        schemerlicht_call_primitive(ctxt, op->value.fx, a + c + 1, b - 1, 0);
+        schemerlicht_set_object(ra, op);
+        }
       }
     else if (op->type == schemerlicht_object_type_closure)
       {

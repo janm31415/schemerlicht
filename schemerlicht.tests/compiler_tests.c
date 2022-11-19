@@ -3243,7 +3243,31 @@ static void test_jaffer_bug_1()
     "(test '(3 4 5 6) (lambda x x) 3 4 5 6)", 2048);  
   }
 
+static void test_jaffer_bug_2()
+  {  
+  test_compile_aux("7", "(define test (lambda (fun . args) (apply fun args))) (test apply + (list 3 4))");   
+  test_compile_aux_r5rs("#t",
+    "(define test\n"
+    "  (lambda (expect fun . args)\n"
+    "    (write (cons fun args))\n"
+    "    (display \"  ==> \")\n"
+    "    ((lambda (res)\n"
+    "      (write res)\n"
+    "      (newline)\n"
+    "      (cond ((not (equal? expect res))\n"
+    "	     (display \" BUT EXPECTED \")\n"
+    "	     (write expect)\n"
+    "	     (newline)\n"
+    "	     #f)\n"
+    "	    (else #t)))\n"
+    "     (if (procedure? fun) (apply fun args) (car args)))))\n"
+    "(test 7 apply + (list 3 4))");
+  }
 
+static void test_jaffer_bug_3()
+  {
+  test_compile_aux("7", "(define test (lambda (fun . args) (apply fun args))) (test apply (lambda (a b) (+ a b)) (list 3 4))");  
+  }
 
 static void test_nested_define()
   {  
@@ -3305,7 +3329,7 @@ static void test_quasiquote_comparison()
   }
 
 void run_all_compiler_tests()
-  {  
+  {   
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3420,6 +3444,8 @@ void run_all_compiler_tests()
     test_curry_2();
     test_long_apply();
     test_jaffer_bug_1();
+    test_jaffer_bug_2();
+    test_jaffer_bug_3();
     test_nested_define();
     test_define_vs_internal_define();
     test_quasiquote_comparison();

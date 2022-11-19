@@ -257,18 +257,26 @@ static void compile_variable(schemerlicht_context* ctxt, schemerlicht_function* 
     /*
     This variable was not found in the environment. However: it is possible that this variable will be defined by a load at runtime.
     Therefore we now allocate a global position for this variable. It might be filled in later by load.
-    */    
-    schemerlicht_environment_entry entry;
-    entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
-    entry.position = ctxt->globals.vector_size;
-    schemerlicht_object obj;
-    obj.type = schemerlicht_object_type_unassigned;
-    obj.value.fx = entry.position;
-    schemerlicht_vector_push_back(ctxt, &ctxt->globals, obj, schemerlicht_object);
-    schemerlicht_string s;
-    schemerlicht_string_copy(ctxt, &s, &e->expr.var.name);
-    schemerlicht_environment_add_to_base(ctxt, &s, entry);
-    make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADGLOBAL, fun->freereg, cast(int, entry.position));
+    Other possibility is that the variable is "apply", as this is a special case primitive.
+    */
+    if (strcmp(e->expr.var.name.string_ptr, "apply") == 0)
+      {
+      make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETPRIMOBJ, fun->freereg, cast(int, SCHEMERLICHT_APPLY));
+      }
+    else
+      {
+      schemerlicht_environment_entry entry;
+      entry.type = SCHEMERLICHT_ENV_TYPE_GLOBAL;
+      entry.position = ctxt->globals.vector_size;
+      schemerlicht_object obj;
+      obj.type = schemerlicht_object_type_unassigned;
+      obj.value.fx = entry.position;
+      schemerlicht_vector_push_back(ctxt, &ctxt->globals, obj, schemerlicht_object);
+      schemerlicht_string s;
+      schemerlicht_string_copy(ctxt, &s, &e->expr.var.name);
+      schemerlicht_environment_add_to_base(ctxt, &s, entry);
+      make_code_abx(ctxt, fun, SCHEMERLICHT_OPCODE_LOADGLOBAL, fun->freereg, cast(int, entry.position));
+      }
     }
   else
     {
@@ -361,7 +369,7 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
 #endif
     }
 #if 0 // SCHEMERLICHT_OPCODE_MOVETOP already sets blocking
-  make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, nr_args+1, schemerlicht_object_type_blocking); // for variable arity function calls we need to know where the arguments stop
+  make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, nr_args + 1, schemerlicht_object_type_blocking); // for variable arity function calls we need to know where the arguments stop
 #endif
   make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 0);
   }
@@ -384,7 +392,7 @@ static void compile_lambda(schemerlicht_context* ctxt, schemerlicht_function* fu
     }
   if (e->expr.lambda.variable_arity)
     {
-    make_code_ab(ctxt, new_fun, SCHEMERLICHT_OPCODE_LIST_STACK, e->expr.lambda.variables.vector_size-1, 0);
+    make_code_ab(ctxt, new_fun, SCHEMERLICHT_OPCODE_LIST_STACK, e->expr.lambda.variables.vector_size - 1, 0);
     }
   new_fun->freereg = e->expr.lambda.variables.vector_size;
   schemerlicht_expression* body_expr = schemerlicht_vector_at(&e->expr.lambda.body, 0, schemerlicht_expression);
