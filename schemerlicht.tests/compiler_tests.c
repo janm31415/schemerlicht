@@ -3027,8 +3027,18 @@ static void test_read()
     "(define res (%read rf))"
     "(close-input-port rf)"
     "res");
-  test_compile_aux("#eof", "(define rf (open-input-file \"data/read_test.txt\"))"
+  test_compile_aux("\"foo\"", "(define rf (open-input-file \"data/read_test.txt\"))"
     "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("(quote bar)", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
+    "(define res (%read rf))"
+    "(close-input-port rf)"
+    "res");
+  test_compile_aux("#eof", "(define rf (open-input-file \"data/read_test.txt\"))"
+    "(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)(%read rf)"
     "(define res (%read rf))"
     "(close-input-port rf)"
     "res");

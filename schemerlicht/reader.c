@@ -642,6 +642,9 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
       const char* to = c.value.str.string_ptr + c.value.str.string_length - 1;
       res.type = schemerlicht_object_type_string;
       schemerlicht_string_init_ranged(ctxt, &res.value.s, from, to);
+      schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+      schemerlicht_set_object(heap_obj, &res);
+      ++ctxt->heap_pos;
       break;
       }
       case schemerlicht_ct_symbol:
