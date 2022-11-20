@@ -4269,7 +4269,7 @@ void schemerlicht_primitive_string(schemerlicht_context* ctxt, int a, int b, int
       char* ch = schemerlicht_string_at(&v.value.s, j);
       *ch = arg->value.ch;
       }
-    }  
+    }
   schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
@@ -5581,7 +5581,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
           *ri = *ri_next;
           }
         schemerlicht_vector_at(&ctxt->stack, a + c + b, schemerlicht_object)->type = schemerlicht_object_type_blocking; // Very important! variable arity lambdas should know till where the list goes
-        schemerlicht_call_primitive(ctxt, SCHEMERLICHT_APPLY, 0, b - 1, 1);       
+        schemerlicht_call_primitive(ctxt, SCHEMERLICHT_APPLY, 0, b - 1, 1);
         }
       else
         {
@@ -7558,15 +7558,9 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
           schemerlicht_set_object(ra, &ret);
           return;
           }
-        switch (v0->value.ch)
-          {
-          case '"':
-          case '\\':
-            schemerlicht_string_push_back(ctxt, &heap_obj->value.s, '\\');
-          default:
-            schemerlicht_string_push_back(ctxt, &heap_obj->value.s, v0->value.ch);
-            break;
-          }
+        if (schemerlicht_char_needs_escape(v0->value.ch))
+          schemerlicht_string_push_back(ctxt, &heap_obj->value.s, '\\');
+        schemerlicht_string_push_back(ctxt, &heap_obj->value.s, v0->value.ch);
         l = v1;
         if (l->type != schemerlicht_object_type_nil && l->type != schemerlicht_object_type_pair)
           {
@@ -8577,16 +8571,16 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
         {
         schemerlicht_object obj = schemerlicht_cell_to_object(ctxt, &cell);
         schemerlicht_set_object(ra, &obj);
-        }
+      }
       schemerlicht_string_destroy(ctxt, &buff);
       schemerlicht_destroy_cell(ctxt, &cell);
-      }
+    }
     else
       {
       schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read expects an input port as argument.");
       ra->type = schemerlicht_object_type_undefined;
       }
-    }
+  }
   }
 
 ////////////////////////////////////////////////////
@@ -9528,7 +9522,7 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
-    }
+  }
 #endif
   }
 

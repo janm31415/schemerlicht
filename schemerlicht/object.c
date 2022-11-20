@@ -13,7 +13,7 @@ int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_true:
     case schemerlicht_object_type_false:
-    case schemerlicht_object_type_nil:    
+    case schemerlicht_object_type_nil:
     case schemerlicht_object_type_void:
     case schemerlicht_object_type_eof:
     case schemerlicht_object_type_blocking:
@@ -78,7 +78,7 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
       case schemerlicht_object_type_true:
       case schemerlicht_object_type_false:
       case schemerlicht_object_type_nil:
-      case schemerlicht_object_type_void:      
+      case schemerlicht_object_type_void:
       case schemerlicht_object_type_eof:
       case schemerlicht_object_type_blocking:
         break;
@@ -161,7 +161,7 @@ int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_ob
     case schemerlicht_object_type_true:
     case schemerlicht_object_type_false:
     case schemerlicht_object_type_nil:
-    case schemerlicht_object_type_void:    
+    case schemerlicht_object_type_void:
     case schemerlicht_object_type_eof:
     case schemerlicht_object_type_blocking:
       return 1;
@@ -522,12 +522,21 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         break;
         }
         case schemerlicht_object_type_string:
-          if (!display)
-            schemerlicht_string_append_cstr(ctxt, &s, "\"");
+        {
+        if (!display)
+          {
+          schemerlicht_string_append_cstr(ctxt, &s, "\"");
+          schemerlicht_string tmp = schemerlicht_string_add_escape_chars(ctxt, &current_task.obj->value.s);
+          schemerlicht_string_append(ctxt, &s, &tmp);
+          schemerlicht_string_destroy(ctxt, &tmp);
+          schemerlicht_string_push_back(ctxt, &s, '"');
+          }
+        else
+          {
           schemerlicht_string_append(ctxt, &s, &current_task.obj->value.s);
-          if (!display)
-            schemerlicht_string_push_back(ctxt, &s, '"');
-          break;
+          }
+        break;
+        }
         case schemerlicht_object_type_symbol:
           schemerlicht_string_append(ctxt, &s, &current_task.obj->value.s);
           break;
@@ -663,7 +672,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       case schemerlicht_object_type_undefined:
       case schemerlicht_object_type_char:
       case schemerlicht_object_type_fixnum:
-      case schemerlicht_object_type_flonum:      
+      case schemerlicht_object_type_flonum:
       case schemerlicht_object_type_true:
       case schemerlicht_object_type_false:
       case schemerlicht_object_type_nil:
@@ -676,62 +685,62 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       case schemerlicht_object_type_blocking:
       case schemerlicht_object_type_eof:
       {
-        schemerlicht_set_object(&res, &obj);
-        break;
+      schemerlicht_set_object(&res, &obj);
+      break;
       }
       case schemerlicht_object_type_symbol:
       {
+      schemerlicht_object key;
+      key.type = schemerlicht_object_type_string;
+      key.value.s = obj.value.s;
+      schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &key);
+      if (symbol != NULL)
+        {
+        schemerlicht_set_object(&res, symbol);
+        }
+      else
+        {
         schemerlicht_object key;
         key.type = schemerlicht_object_type_string;
-        key.value.s = obj.value.s;
-        schemerlicht_object* symbol = schemerlicht_map_get(ctxt, ctxt->string_to_symbol, &key);
-        if (symbol != NULL)
-          {
-          schemerlicht_set_object(&res, symbol);
-          }
-        else
-          {
-          schemerlicht_object key;
-          key.type = schemerlicht_object_type_string;
-          schemerlicht_string_copy(ctxt, &key.value.s, &obj.value.s);
-          schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
-          new_symbol->type = schemerlicht_object_type_symbol;
-          schemerlicht_string_copy(ctxt, &new_symbol->value.s, &obj.value.s);
-          schemerlicht_set_object(&res, new_symbol);
-          }
-        break;
+        schemerlicht_string_copy(ctxt, &key.value.s, &obj.value.s);
+        schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
+        new_symbol->type = schemerlicht_object_type_symbol;
+        schemerlicht_string_copy(ctxt, &new_symbol->value.s, &obj.value.s);
+        schemerlicht_set_object(&res, new_symbol);
+        }
+      break;
       }
       case schemerlicht_object_type_string:
       {
-        res.type = schemerlicht_object_type_string;
-        schemerlicht_string_copy(ctxt, &res.value.s, &obj.value.s);
-        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-        schemerlicht_set_object(heap_obj, &res);
-        ++ctxt->heap_pos;
-        break;
+      res.type = schemerlicht_object_type_string;
+      schemerlicht_string_copy(ctxt, &res.value.s, &obj.value.s);
+      schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+      schemerlicht_set_object(heap_obj, &res);
+      ++ctxt->heap_pos;
+      break;
       }
-      case schemerlicht_object_type_closure:        
+      case schemerlicht_object_type_closure:
       case schemerlicht_object_type_vector:
       case schemerlicht_object_type_pair:
       case schemerlicht_object_type_port:
-      case schemerlicht_object_type_promise:        
+      case schemerlicht_object_type_promise:
       {
-        res = make_schemerlicht_object_vector(ctxt, obj.value.v.vector_size);
-        res.type = obj.type;
-        res.value.v.vector_size = 0; // we set the size to 0, so that we can push back without memory consequences
-        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-        schemerlicht_set_object(heap_obj, &res);
-        ++ctxt->heap_pos;
-        schemerlicht_object* it = schemerlicht_vector_begin(&obj.value.v, schemerlicht_object);
-        schemerlicht_object* it_end = schemerlicht_vector_end(&obj.value.v, schemerlicht_object);
-        schemerlicht_object* rit = it_end - 1;
-        schemerlicht_object* rit_end = it - 1;
-        for (; rit != rit_end; --rit)
-          {
-          schemerlicht_vector_push_back(ctxt, &todo, *rit, schemerlicht_object);
-          }
-        parents_to_add = obj.value.v.vector_size;
-        break;
+      res = make_schemerlicht_object_vector(ctxt, obj.value.v.vector_size);
+      res.type = obj.type;
+      res.value.v.vector_size = 0; // we set the size to 0, so that we can push back without memory consequences
+      schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+      schemerlicht_set_object(heap_obj, &res);
+      ++ctxt->heap_pos;
+      schemerlicht_object* it = schemerlicht_vector_begin(&obj.value.v, schemerlicht_object);
+      schemerlicht_object* it_end = schemerlicht_vector_end(&obj.value.v, schemerlicht_object);
+      schemerlicht_object* rit = it_end - 1;
+      schemerlicht_object* rit_end = it - 1;
+      for (; rit != rit_end; --rit)
+        {
+        schemerlicht_vector_push_back(ctxt, &todo, *rit, schemerlicht_object);
+        }
+      parents_to_add = obj.value.v.vector_size;
+      break;
       }
       }
     if (last_result)
@@ -754,6 +763,6 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
     }
 
   schemerlicht_vector_destroy(ctxt, &parent);
-  schemerlicht_vector_destroy(ctxt, &todo);  
+  schemerlicht_vector_destroy(ctxt, &todo);
   return result;
   }

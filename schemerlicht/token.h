@@ -7,6 +7,8 @@
 #include "vector.h"
 
 void schemerlicht_replace_escape_chars(schemerlicht_string* str);
+schemerlicht_string schemerlicht_string_add_escape_chars(schemerlicht_context* ctxt, schemerlicht_string* str);
+int schemerlicht_char_needs_escape(const char ch);
 
 SCHEMERLICHT_API schemerlicht_flonum schemerlicht_to_flonum(const char* value);
 SCHEMERLICHT_API schemerlicht_fixnum schemerlicht_to_fixnum(const char* value);

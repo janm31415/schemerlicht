@@ -1417,8 +1417,8 @@ static void test_strings()
   test_compile_aux("1", "(let([n 1])(string-set! (make-string n) (sub1 n) (fixnum->char 34)) n) ");
   test_compile_aux("1", "(let([n 1]) (let([v(make-string 1)]) (string-set! v(sub1 n) (fixnum->char n)) (char->fixnum(string-ref v(sub1 n))))) ");
   test_compile_aux("(\"b\" . \"A\")", "(let([v0(make-string 1)]) (string-set! v0 0 #\\a) (let([v1(make-string 1)]) (string-set! v1 0 #\\A) (string-set! (if (string? v0) v0 v1) (sub1(string-length(if (string? v0) v0 v1))) (fixnum->char (add1 (char->fixnum (string-ref (if (string? v0) v0 v1)(sub1(string-length(if (string? v0) v0 v1)))))))) (cons v0 v1))) ");
-  test_compile_aux("\"\"\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\") s) ");
-  test_compile_aux("\"\\\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\\) s) ");
+  test_compile_aux("\"\\\"\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\") s) ");
+  test_compile_aux("\"\\\\\"", "(let([s(make-string 1)]) (string-set! s 0 #\\\\) s) ");
   }
 
 static void test_quotes()
@@ -3045,8 +3045,8 @@ static void test_read()
   }
 
 static void test_write()
-  {
-  test_compile_aux("\"50#\\ 3.141590\"FOO\"\n\"FOO\"BAR\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+  {  
+  test_compile_aux("\"50#\\\\ 3.141590\\\"FOO\\\"\n\\\"FOO\\\\\\\"BAR\\\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
     "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
     "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
     "(define ostr (open-output-string))\n"
@@ -3341,9 +3341,29 @@ static void test_quasiquote_comparison()
 static void test_string_list()
   {
   test_compile_aux("(#\\1 #\\\\ #\\\")", "(string->list \"1\\\\\\\"\")");
-  test_compile_aux("\"1\\\\\\\"\"", "(list->string '(#\\1 #\\\\ #\\\"))");
-  test_compile_aux("\"1\\\\\\\"\"", "(define test (lambda (fun . args) (apply fun args))) ( test list->string '(#\\1 #\\\\ #\\\"))");
-  test_compile_aux("\"1\\\"\"", "\"1\\\\\\\"\"");
+  test_compile_aux("\"1\\\\\\\\\\\\\\\"\"", "(list->string '(#\\1 #\\\\ #\\\"))");
+  test_compile_aux("\"1\\\\\\\\\\\\\\\"\"", "(define test (lambda (fun . args) (apply fun args))) ( test list->string '(#\\1 #\\\\ #\\\"))");
+  test_compile_aux("\"1\\\\\\\"\"", "\"1\\\\\\\"\"");
+  }
+
+static void test_compare_quote()
+  {
+  test_compile_aux("#t", "(equal? '(#t #f a () 9739 -3 . #((test) \"te \" \\\" st\" \"\" test #() b c)) '(#t #f a () 9739 -3 . #((test) \"te \" \\\" st\" \"\" test #() b c)))");
+  test_compile_aux("#t", "(eq? '(#t #f a () 9739 -3 . #((test) \"te \" \\\" st\" \"\" test #() b c)) '(#t #f a () 9739 -3 . #((test) \"te \" \\\" st\" \"\" test #() b c)))");
+  test_compile_aux("#t", "(eqv? '(#t #f a () 9739 -3 . #((test) \"te \" \\\" st\" \"\" test #() b c)) '(#t #f a () 9739 -3 . #((test) \"te \" \\\" st\" \"\" test #() b c)))");
+
+  test_compile_aux("#t", 
+    "(define wf (open-output-file \"write_test_obj.txt\"))\n"
+    "(define write-test-obj\n"
+    "'(#t #f a () 9739 -3 . #((test) \"te \\\" \\\" st\" \"\" test #() b c)))\n"
+    "(%write write-test-obj wf)\n"
+    "(%flush-output-port wf)\n"
+    "(close-output-port wf)\n"
+    "(define rf (open-input-file \"write_test_obj.txt\"))\n"
+    "(define line (%read rf))\n"
+    "(close-input-port rf)\n"
+    "(equal? write-test-obj line)\n"
+  );
   }
 
 void run_all_compiler_tests()
@@ -3468,6 +3488,7 @@ void run_all_compiler_tests()
     test_define_vs_internal_define();
     test_quasiquote_comparison();
     test_string_list();
+    test_compare_quote();
 #endif            
     }
   }

@@ -120,6 +120,34 @@ void schemerlicht_replace_escape_chars(schemerlicht_string* str)
     }
   }
 
+int schemerlicht_char_needs_escape(const char ch)
+  {
+  switch (ch)
+    {
+    case '"':
+    case '\\':
+      return 1;
+    default:
+      return 0;
+    }
+  }
+
+schemerlicht_string schemerlicht_string_add_escape_chars(schemerlicht_context* ctxt, schemerlicht_string* str)
+  {
+  schemerlicht_string tgt;
+  schemerlicht_string_init_with_size(ctxt, &tgt, str->string_length, 0);
+  tgt.string_length = 0;
+  char* it = schemerlicht_string_begin(str);
+  const char* it_end = schemerlicht_string_end(str);
+  for (; it != it_end; ++it)
+    {
+    if (schemerlicht_char_needs_escape(*it))
+      schemerlicht_string_push_back(ctxt, &tgt, '\\');
+    schemerlicht_string_push_back(ctxt, &tgt, *it);
+    }
+  return tgt;
+  }
+
 static int treat_buffer_token(schemerlicht_context* ctxt, schemerlicht_string* buff, token* tok, int line_nr, int column_nr, int* is_a_symbol)
   {
   int result = 0;
