@@ -8261,6 +8261,7 @@ void schemerlicht_primitive_close_input_port(schemerlicht_context* ctxt, int a, 
       ra->type = schemerlicht_object_type_void;
       schemerlicht_object* id = schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object);
       schemerlicht_close_file(id->value.fx);
+      schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx = -1; // remove file handle / mark as closed
       }
     else
       {

@@ -836,16 +836,17 @@
 
     (SECTION 6 5 6)
     (test #t 'float-print-test (float-print-test f0.0))
+    
     (test #t 'mult-float-print-test (mult-float-print-test f1.0))
-    (test #t 'mult-float-print-test (mult-float-print-test
-				     (string->number "3.0")))
-    (test #t 'mult-float-print-test (mult-float-print-test
-				     (string->number "7.0")))
-    (test #t 'mult-float-print-test (mult-float-print-test
-				     (string->number "3.1415926535897931")))
-    (test #t 'mult-float-print-test (mult-float-print-test
-				     (string->number "2.7182818284590451")))
-    (test #t float-rw-range-test)
+    ;(test #t 'mult-float-print-test (mult-float-print-test
+		;		     (string->number "3.0")))
+    ;(test #t 'mult-float-print-test (mult-float-print-test
+		;		     (string->number "7.0")))
+    ;(test #t 'mult-float-print-test (mult-float-print-test
+		;		     (string->number "3.1415926535897931")))
+    ;(test #t 'mult-float-print-test (mult-float-print-test
+		;		     (string->number "2.7182818284590451")))
+    ;(test #t float-rw-range-test)
     ;(test #t float-powers-of-2-test)
     
 	))
@@ -1308,8 +1309,8 @@
 (SECTION 6 10 1)
 (test #t input-port? (current-input-port))
 (test #t output-port? (current-output-port))
-(test #t call-with-input-file "r4rstest.scm" input-port?)
-(define this-file (open-input-file "r4rstest.scm"))
+(test #t call-with-input-file "C:/_Dev/schemerlicht/schemerlicht/scm/test/r4rstest.scm" input-port?)
+(define this-file (open-input-file "C:/_Dev/schemerlicht/schemerlicht/scm/test/r4rstest.scm"))
 (test #t input-port? this-file)
 (SECTION 6 10 2)
 (test #\; peek-char this-file)
@@ -1382,7 +1383,7 @@
   (report-errs))
 
 (report-errs)
-#|
+
 (let ((have-inexacts?
        (and (string->number "0.0") (inexact? (string->number "0.0"))))
       (have-bignums?
@@ -1395,7 +1396,7 @@
   (if have-bignums? (test-bignum))
   (if (and have-inexacts? have-bignums?)
       (test-numeric-predicates)))
-|#
+
 
 (report-errs)
 

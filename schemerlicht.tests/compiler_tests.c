@@ -3366,6 +3366,38 @@ static void test_compare_quote()
   );
   }
 
+static void test_multi_float_print()
+  {
+  test_compile_aux_r5rs("(1.000000 10.000000 100.000000 0.100000 0.010000 0.001000)", "(map string->number '(\"1.0\" \"10.0\" \"100.0\" \"0.1\" \"0.01\" \"0.001\" ))");
+  test_compile_aux_r5rs_heap("#t", 
+    "    (define (float-print-test x)\n"
+    "      (define (testit number)	\n"
+    "	(= number (string->number (number->string number))))\n"
+    "      (let ((eps 0.000001)\n"
+    "	    (all-ok? #t))\n"
+    "	(do ((j -100 (+ j 1)))\n"
+    "	    ((or (not all-ok?) (> j 100)) all-ok?)\n"
+    "	  (let* ((xx (+ x (* j eps)))\n"
+    "		 (ok? (testit xx)))\n"
+    "	    (cond ((not ok?)\n"
+    "		   (display \"Number readback failure for \")\n"
+    "		   (display `(+ ,x (* ,j ,eps))) (newline)\n"
+    "		   (display xx) (newline)\n"
+    "		   (display (string->number (number->string xx))) (newline)\n"
+    "		   (set! all-ok? #f))\n"
+    "		  )))))\n"
+    "(define (mult-float-print-test x)\n"
+    "      (let ((res #t))\n"
+    "	(for-each\n"
+    "	 (lambda (mult)\n"
+    "	   (or (float-print-test (* mult x)) (set! res #f)))\n"
+    "	 (map string->number\n"
+    "	      '(\"1.0\" \"10.0\" \"100.0\" \n"
+    "	    	\"0.1\" \"0.01\" \"0.001\" )))\n"
+    "	res))\n"
+    "(mult-float-print-test 0.0)", 2048*16);
+  }
+
 void run_all_compiler_tests()
   {   
   for (int i = 0; i < 2; ++i)
@@ -3489,6 +3521,7 @@ void run_all_compiler_tests()
     test_quasiquote_comparison();
     test_string_list();
     test_compare_quote();
+    test_multi_float_print();
 #endif            
     }
   }
