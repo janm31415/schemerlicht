@@ -136,14 +136,14 @@ static void test_srfi6(schemerlicht_context* ctxt)
     "          (write \"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\" os)\n"
     "          (get-output-string os))\n";
 
-  test_compile_aux(ctxt, "\"\"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\"\"", script2);
+  test_compile_aux(ctxt, "\"\\\"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\\\"\"", script2);
 
   }
 
 static void test_srfi28(schemerlicht_context* ctxt)
   {
   test_compile_aux(ctxt, "\"Hello, World!\"", "(import 'srfi-28) (format \"Hello, ~a\" \"World!\")");
-  test_compile_aux(ctxt, "\"Error, list is too short: (one \"two\" 3)\n\"", "(format \"Error, list is too short: ~s~%\" '(one \"two\" 3))");
+  test_compile_aux(ctxt, "\"Error, list is too short: (one \\\"two\\\" 3)\n\"", "(format \"Error, list is too short: ~s~%\" '(one \"two\" 3))");
   }
 
 static void test_csv(schemerlicht_context* ctxt)
@@ -155,9 +155,9 @@ static void test_csv(schemerlicht_context* ctxt)
   test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(map (lambda (lst) (map string->number lst)) r)");
   test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv-map string->number r)");
   test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv->numbers r)");
-  test_compile_aux(ctxt, "((\"Jan\" #\\K Symb \"\"Quoted string\"\") (5 6 7 8))", "(set! lst '((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8)))");
+  test_compile_aux(ctxt, "((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8))", "(set! lst '((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8)))");
   test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
-  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\"Quoted string\"\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\"))");
+  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\\\\\\\"Quoted string\\\\\\\"\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\"))");
   test_compile_aux(ctxt, "4", "(length (list-ref r 0))");
   test_compile_aux(ctxt, "4", "(length (list-ref r 1))");
   }
@@ -178,9 +178,9 @@ void run_all_module_tests()
   int c1 = clock();
   printf("Startup time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
 
-  //test_srfi6(ctxt);
-  //test_srfi28(ctxt);
-  //test_csv(ctxt);
+  test_srfi6(ctxt);
+  test_srfi28(ctxt);
+  test_csv(ctxt);
   test_jaffer(ctxt);
 
   schemerlicht_close(ctxt);

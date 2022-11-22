@@ -5600,7 +5600,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_assert(c == 1); // as apply is represented as object, it means that c == 1 because the vm wants to skip the continuation when calling the primitive apply.
       schemerlicht_object* continuation = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object); // save the original closure
       schemerlicht_object original_continuation = *continuation;
-      //schemerlicht_vector_push_back(ctxt, &ctxt->gcsave_list, *continuation, schemerlicht_object);
+      schemerlicht_vector_push_back(ctxt, &ctxt->gc_save_list, *continuation, schemerlicht_object);
       schemerlicht_object oper = *op;
 
 
@@ -5634,7 +5634,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);
       *continuation = original_continuation;
-      //schemerlicht_vector_pop_back(&ctxt->gcsave_list);
+      schemerlicht_vector_pop_back(&ctxt->gc_save_list);
 
       //schemerlicht_object* lam = schemerlicht_vector_begin(&continuation->value.v, schemerlicht_object);
       //schemerlicht_assert(lam->type == schemerlicht_object_type_lambda);
@@ -5646,7 +5646,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_assert(c == 1); // as apply is represented as object, it means that c == 1 because the vm wants to skip the continuation when calling the primitive apply.
       schemerlicht_object* continuation = schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object); // save the original closure
       schemerlicht_object original_continuation = *continuation;
-      //schemerlicht_vector_push_back(ctxt, &ctxt->gcsave_list, *continuation, schemerlicht_object);
+      schemerlicht_vector_push_back(ctxt, &ctxt->gc_save_list, *continuation, schemerlicht_object);
       /*
       int cnt = 0;
       int found_block = 0;
@@ -5701,7 +5701,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
         schemerlicht_vector_pop_back(&ctxt->gcsave_list);
         }
       */
-      //schemerlicht_vector_pop_back(&ctxt->gcsave_list);
+      schemerlicht_vector_pop_back(&ctxt->gc_save_list);
       //schemerlicht_object* lam = schemerlicht_vector_begin(&continuation->value.v, schemerlicht_object);
       //schemerlicht_assert(lam->type == schemerlicht_object_type_lambda);
       //schemerlicht_assert(((schemerlicht_function*)lam->value.ptr)->function_definition.string_length < 1024);

@@ -70,7 +70,7 @@ struct schemerlicht_context
   schemerlicht_string module_path;
   schemerlicht_function* empty_continuation_function;
   schemerlicht_object empty_continuation;
-  schemerlicht_vector gcsave_list;
+  schemerlicht_vector gc_save_list;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

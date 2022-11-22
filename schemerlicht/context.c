@@ -20,6 +20,7 @@ static schemerlicht_context* context_new(schemerlicht_context* ctxt)
 
 static void context_free(schemerlicht_context* ctxt)
   {
+  schemerlicht_vector_destroy(ctxt, &ctxt->gc_save_list);
   schemerlicht_function_free(ctxt, ctxt->empty_continuation_function);
   schemerlicht_object_destroy(ctxt, &ctxt->empty_continuation);
   schemerlicht_map_keys_free(ctxt, ctxt->quote_to_index);
@@ -78,17 +79,16 @@ static void context_free(schemerlicht_context* ctxt)
     }
   schemerlicht_vector_destroy(ctxt, &ctxt->environments);
   schemerlicht_string_destroy(ctxt, &ctxt->module_path);
-  schemerlicht_vector_destroy(ctxt, &ctxt->gcsave_list);
   schemerlicht_free(ctxt, ctxt, sizeof(schemerlicht_context));
   }
 
 static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size)
   {
-  schemerlicht_vector_init(ctxt, &ctxt->gcsave_list, schemerlicht_object);
   schemerlicht_assert(ctxt->global != NULL);
   ctxt->error_jmp = NULL;
   ctxt->number_of_syntax_errors = 0;
   ctxt->number_of_compile_errors = 0;
+  schemerlicht_vector_init(ctxt, &ctxt->gc_save_list, schemerlicht_object);
   schemerlicht_vector_init_with_size(ctxt, &ctxt->stack_raw, schemerlicht_maxstack, schemerlicht_object);
   schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack_raw, schemerlicht_object);
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack_raw, schemerlicht_object);
