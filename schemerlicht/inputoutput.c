@@ -42,7 +42,7 @@ void schemerlicht_compile_input_output(schemerlicht_context* ctxt)
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_preprocess_internal_libs(ctxt, &prog);
   schemerlicht_function* inputoutput = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, inputoutput, 1);
+  schemerlicht_run(ctxt, inputoutput);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, inputoutput, schemerlicht_function*);

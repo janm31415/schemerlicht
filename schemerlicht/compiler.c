@@ -63,10 +63,10 @@ static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemer
     new_id->type = schemerlicht_object_type_fixnum;
     new_id->value.fx = fun->constants.vector_size;
     schemerlicht_vector_push_back(ctxt, &fun->constants, *k, schemerlicht_object);
-    if (k->type == schemerlicht_object_type_symbol)
-      {
-      printf("add to symbols list\n");
-      }
+    //if (k->type == schemerlicht_object_type_symbol)
+    //  {
+    //  printf("add to symbols list\n");
+    //  }
     //if (k->type == schemerlicht_object_type_string || k->type == schemerlicht_object_type_lambda)
     //  {
     //  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
