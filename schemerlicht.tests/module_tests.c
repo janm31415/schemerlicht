@@ -170,7 +170,7 @@ static void test_jaffer(schemerlicht_context* ctxt)
 void run_all_module_tests()
   {
   int c0 = clock();
-  schemerlicht_context* ctxt = schemerlicht_open(2048 * 32);
+  schemerlicht_context* ctxt = schemerlicht_open(2048*2);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);

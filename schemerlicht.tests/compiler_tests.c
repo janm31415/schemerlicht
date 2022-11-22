@@ -2840,7 +2840,14 @@ static void test_compile_aux_r5rs_heap(const char* expected_value, const char* s
   schemerlicht_string_destroy(ctxt, &dumped);
 #endif
   schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
+#if 0
+  schemerlicht_string debug_string;
+  schemerlicht_string_init(ctxt, &debug_string, "");
+  schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debug_string, func);
+  schemerlicht_string_destroy(ctxt, &debug_string);
+#else
   schemerlicht_object* res = schemerlicht_run(ctxt, func);
+#endif
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   if (print_gc_time)
@@ -3212,10 +3219,12 @@ static void test_long_apply()
   {
   //test_compile_aux("210", "(apply + (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))");
   //test_compile_aux("410", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (apply + 200 lst)");
-  //test_compile_aux("210", "(define (oper lst) (apply + lst))  ( oper (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))");
-  //test_compile_aux_r5rs("(1.000000 1.414214 1.732051 2.000000 2.236068 2.449490 2.645751 2.828427 3.000000 3.162278 3.316625 3.464102 3.605551 3.741657 3.872983 4.000000 4.123106 4.242641 4.358899 4.472136)", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (map sqrt lst)");
-  test_compile_aux_r5rs_heap("(1 4 9 16 25 36 49 64 81 100 121 144 169 196 225 256 289 324 361 400)", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (map * lst lst)", 2048);
   
+  //test_compile_aux_heap("210", "(define (oper lst) (apply + lst))  ( oper (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) ( oper (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))", 90);
+  
+  //test_compile_aux_r5rs("(1.000000 1.414214 1.732051 2.000000 2.236068 2.449490 2.645751 2.828427 3.000000 3.162278 3.316625 3.464102 3.605551 3.741657 3.872983 4.000000 4.123106 4.242641 4.358899 4.472136)", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (map sqrt lst)");  
+  //test_compile_aux("987", "(define fib (lambda (n) (cond [(< n 2) 1]  [else (+ (fib (- n 2)) (fib(- n 1)))]))) (fib 15)");
+  test_compile_aux_r5rs_heap("(1 4 9 16 25 36 49 64 81 100 121 144 169 196 225 256 289 324 361 400)", "(define lst (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)) (map * lst lst)", 200);  
   
   //test_compile_aux_r5rs("11.958261", "(define (rms nums) (sqrt (/ (apply + (map * nums nums))(length nums)))) (rms (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))");
   //TEST_EQ("(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)", run("(define dm (list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20))"));
@@ -3226,7 +3235,6 @@ static void test_long_apply()
   //TEST_EQ("2000", run("(define dm (iota 2000)) (length dm)"));
   //TEST_EQ("1999000", run("(apply + dm)"));
   //TEST_EQ("2000", run("(length dm)"));
-
   }
 
 static void test_jaffer_bug_1()
@@ -3399,7 +3407,9 @@ static void test_multi_float_print()
   }
 
 void run_all_compiler_tests()
-  {   
+  { 
+  //test_long_apply();
+  //return;
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;

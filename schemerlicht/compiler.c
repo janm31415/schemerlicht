@@ -63,6 +63,16 @@ static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemer
     new_id->type = schemerlicht_object_type_fixnum;
     new_id->value.fx = fun->constants.vector_size;
     schemerlicht_vector_push_back(ctxt, &fun->constants, *k, schemerlicht_object);
+    if (k->type == schemerlicht_object_type_symbol)
+      {
+      printf("add to symbols list\n");
+      }
+    //if (k->type == schemerlicht_object_type_string || k->type == schemerlicht_object_type_lambda)
+    //  {
+    //  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+    //  schemerlicht_set_object(heap_obj, k);
+    //  ++ctxt->heap_pos;
+    //  }
     return cast(int, new_id->value.fx);
     }
   }
@@ -368,9 +378,10 @@ static void compile_funcall(schemerlicht_context* ctxt, schemerlicht_function* f
     make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_MOVETOP, fun->freereg, nr_args);
 #endif
     }
-#if 0 // SCHEMERLICHT_OPCODE_MOVETOP already sets blocking
-  make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, nr_args + 1, schemerlicht_object_type_blocking); // for variable arity function calls we need to know where the arguments stop
-#endif
+  else
+    {
+    make_code_ab(ctxt, fun, SCHEMERLICHT_OPCODE_SETTYPE, nr_args+1, schemerlicht_object_type_blocking);
+    }
   make_code_abc(ctxt, fun, SCHEMERLICHT_OPCODE_CALL, 0, nr_args, 0);
   }
 

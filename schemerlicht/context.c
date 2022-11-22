@@ -24,9 +24,6 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_object_destroy(ctxt, &ctxt->empty_continuation);
   schemerlicht_map_keys_free(ctxt, ctxt->quote_to_index);
   schemerlicht_map_free(ctxt, ctxt->quote_to_index);
-  schemerlicht_map_values_free(ctxt, ctxt->string_to_symbol);
-  schemerlicht_map_keys_free(ctxt, ctxt->string_to_symbol);
-  schemerlicht_map_free(ctxt, ctxt->string_to_symbol);
   schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
   schemerlicht_map_free(ctxt, ctxt->macro_map);
   schemerlicht_syntax_errors_clear(ctxt);
@@ -40,6 +37,9 @@ static void context_free(schemerlicht_context* ctxt)
     if (it->type != schemerlicht_object_type_symbol) // symbols are unique and stored in the string to symbol map
       schemerlicht_object_destroy(ctxt, it);
     }
+  schemerlicht_map_values_free(ctxt, ctxt->string_to_symbol);
+  schemerlicht_map_keys_free(ctxt, ctxt->string_to_symbol);
+  schemerlicht_map_free(ctxt, ctxt->string_to_symbol);
   schemerlicht_vector_destroy(ctxt, &ctxt->globals); // we don't destroy the objects in the globals list, as they point to constants or heap objects
   schemerlicht_vector_destroy(ctxt, &ctxt->raw_heap);
   schemerlicht_vector_destroy(ctxt, &ctxt->syntax_error_reports);  

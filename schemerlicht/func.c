@@ -30,7 +30,8 @@ void schemerlicht_function_free(schemerlicht_context* ctxt, schemerlicht_functio
   schemerlicht_object* it_end = schemerlicht_vector_end(&f->constants, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    schemerlicht_object_destroy(ctxt, it);
+    if (it->type != schemerlicht_object_type_symbol)
+      schemerlicht_object_destroy(ctxt, it);
     }
   schemerlicht_map_free(ctxt, f->constants_map);
   schemerlicht_vector_destroy(ctxt, &f->constants);

@@ -4488,7 +4488,8 @@ void schemerlicht_primitive_reclaim(schemerlicht_context* ctxt, int a, int b, in
   ret.type = schemerlicht_object_type_void;
   UNUSED(b);
   UNUSED(c);
-  schemerlicht_check_garbage_collection(ctxt);
+  //schemerlicht_check_garbage_collection(ctxt);
+  schemerlicht_assert(0);
   schemerlicht_set_object(ra, &ret);
   }
 
@@ -4504,7 +4505,8 @@ void schemerlicht_primitive_reclaim_garbage(schemerlicht_context* ctxt, int a, i
   ret.type = schemerlicht_object_type_void;
   UNUSED(b);
   UNUSED(c);
-  schemerlicht_collect_garbage(ctxt);
+  //schemerlicht_collect_garbage(ctxt);
+  schemerlicht_assert(0);
   schemerlicht_set_object(ra, &ret);
   }
 ////////////////////////////////////////////////////
@@ -5546,6 +5548,9 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object* v1 = schemerlicht_vector_at(&last_arg->value.v, 1, schemerlicht_object);
       ++b;
       schemerlicht_object* stack_pos = schemerlicht_vector_at(&ctxt->stack, a + c + b, schemerlicht_object);
+      //intptr_t address = (intptr_t)stack_pos->value.v.vector_ptr;
+      //printf("overriding: %x\n", address);
+
       *stack_pos = *v0;
       last_arg = v1;
       }
@@ -8902,10 +8907,6 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
   {
-#if 0
-  void* fun_ptr = g_prim_arr[prim_id];
-  ((void (*)(schemerlicht_context*, int, int, int))fun_ptr)(ctxt, a, b, c);
-#else
   switch (prim_id)
     {
     case SCHEMERLICHT_ADD1:
@@ -9524,7 +9525,6 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
   }
-#endif
   }
 
 static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, int value)
@@ -9536,9 +9536,6 @@ static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const ch
 
 schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   {
-#if 0
-  init_primitive_ptrs(&g_prim_arr[0], ctxt);
-#endif
   schemerlicht_map* m = schemerlicht_map_new(ctxt, 0, 8);
   map_insert(ctxt, m, "add1", SCHEMERLICHT_ADD1);
   map_insert(ctxt, m, "sub1", SCHEMERLICHT_SUB1);
