@@ -4488,7 +4488,7 @@ void schemerlicht_primitive_reclaim(schemerlicht_context* ctxt, int a, int b, in
   ret.type = schemerlicht_object_type_void;
   UNUSED(b);
   UNUSED(c);
-  //schemerlicht_check_garbage_collection(ctxt);
+  schemerlicht_check_garbage_collection(ctxt);
   schemerlicht_assert(0);
   schemerlicht_set_object(ra, &ret);
   }
@@ -4505,7 +4505,7 @@ void schemerlicht_primitive_reclaim_garbage(schemerlicht_context* ctxt, int a, i
   ret.type = schemerlicht_object_type_void;
   UNUSED(b);
   UNUSED(c);
-  //schemerlicht_collect_garbage(ctxt);
+  schemerlicht_collect_garbage(ctxt);
   schemerlicht_assert(0);
   schemerlicht_set_object(ra, &ret);
   }
@@ -5538,7 +5538,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
     --b;
     while (last_arg->type == schemerlicht_object_type_pair)
       {
-      if (a + c + b >= schemerlicht_maxstack)
+      if (a + c + b >= ctxt->stack.vector_size)
         {
         schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_MEMORY, -1, -1, "stack overflow in apply.");
         ra->type = schemerlicht_object_type_undefined;
@@ -8622,12 +8622,17 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         schemerlicht_stream_rewind(&str);
         schemerlicht_vector tokens = tokenize(ctxt, &str);
         schemerlicht_stream_close(ctxt, &str);
+        
         //make new stack so that old stack is not overwritten.
         //new stack needs to be created before we run any macros.
-        schemerlicht_vector stack_store = ctxt->stack;
-        schemerlicht_vector new_stack;
-        schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
-        ctxt->stack = new_stack;
+        void* store_stack_pointer = ctxt->stack.vector_ptr;
+        ctxt->stack.vector_ptr = cast(void*, ra);
+        ctxt->stack.vector_size -= a;
+                
+        //schemerlicht_vector stack_store = ctxt->stack;
+        //schemerlicht_vector new_stack;
+        //schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
+        //ctxt->stack = new_stack;
 
         schemerlicht_program prog = make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
@@ -8649,8 +8654,10 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
           ra->type = schemerlicht_object_type_undefined;
           }
         //restore old stack
-        schemerlicht_vector_destroy(ctxt, &new_stack);
-        ctxt->stack = stack_store;
+        //schemerlicht_vector_destroy(ctxt, &new_stack);
+        //ctxt->stack = stack_store;
+        ctxt->stack.vector_ptr = store_stack_pointer;
+        ctxt->stack.vector_size += a;
         }
       else
         ra->type = schemerlicht_object_type_undefined;

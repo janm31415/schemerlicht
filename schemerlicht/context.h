@@ -40,6 +40,7 @@ typedef struct schemerlicht_global_context
 struct schemerlicht_context 
   {
   schemerlicht_global_context* global;
+  schemerlicht_vector stack_raw;
   schemerlicht_vector stack;
   schemerlicht_vector globals;
   schemerlicht_vector raw_heap;

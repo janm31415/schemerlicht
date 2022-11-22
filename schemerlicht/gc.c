@@ -39,10 +39,32 @@ int schemerlicht_need_to_perform_gc(schemerlicht_context* ctxt)
   return ctxt->heap_pos > ctxt->gc_heap_pos_threshold;
   }
 
-void schemerlicht_check_garbage_collection(schemerlicht_context* ctxt, schemerlicht_function* fun)
+void schemerlicht_check_garbage_collection(schemerlicht_context* ctxt)
   {
   if (schemerlicht_need_to_perform_gc(ctxt))
-    schemerlicht_collect_garbage(ctxt, fun);
+    schemerlicht_collect_garbage(ctxt);
+  }
+
+static int is_marked(schemerlicht_object* obj)
+  {
+  schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
+  switch (obj->type)
+    {
+    case schemerlicht_object_type_vector:
+    case schemerlicht_object_type_closure:
+    case schemerlicht_object_type_port:
+    case schemerlicht_object_type_promise:
+    case schemerlicht_object_type_pair:
+    {
+    schemerlicht_object* first_arg = cast(schemerlicht_object*, obj->value.v.vector_ptr);
+    return (first_arg->type & schemerlicht_int_gcmark_bit);
+    }
+    case schemerlicht_object_type_string:
+      //case schemerlicht_object_type_symbol:
+      return obj->value.s.string_ptr[obj->value.s.string_length]; // abuse invariable: strings end with 0 character
+    default:
+      return 0;
+    }
   }
 
 static int is_value_object(schemerlicht_object* obj)
@@ -118,28 +140,6 @@ static void unmark_object_pointer(schemerlicht_object* obj)
   schemerlicht_assert(is_value_object(obj) == 0);
   }
 
-static int is_marked(schemerlicht_object* obj)
-  {
-  schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type)
-    {
-    case schemerlicht_object_type_vector:
-    case schemerlicht_object_type_closure:
-    case schemerlicht_object_type_port:
-    case schemerlicht_object_type_promise:
-    case schemerlicht_object_type_pair:
-    {
-    schemerlicht_object* first_arg = cast(schemerlicht_object*, obj->value.v.vector_ptr);
-    return (first_arg->type & schemerlicht_int_gcmark_bit);
-    }
-    case schemerlicht_object_type_string:
-      //case schemerlicht_object_type_symbol:
-      return obj->value.s.string_ptr[obj->value.s.string_length]; // abuse invariable: strings end with 0 character
-    default:
-      return 0;
-    }
-  }
-
 // returns position in the new heap of the object
 static schemerlicht_memsize collect_object(schemerlicht_context* ctxt, schemerlicht_object* obj, gc_state* state)
   {
@@ -172,6 +172,16 @@ static void sweep_globals(schemerlicht_context* ctxt, gc_state* state)
 
 static void sweep_stack(schemerlicht_context* ctxt, gc_state* state)
   {
+  if (ctxt->stack.vector_size != ctxt->stack_raw.vector_size)
+    {
+    schemerlicht_memsize raw_stack_buffer_size = ctxt->stack_raw.vector_size - ctxt->stack.vector_size;
+    schemerlicht_object* sit = schemerlicht_vector_begin(&ctxt->stack_raw, schemerlicht_object);
+    for (schemerlicht_memsize j = 0; j < raw_stack_buffer_size; ++j, ++sit)
+      {
+      if (is_marked(sit) == 0 && is_value_object(sit) == 0)
+        collect_object(ctxt, sit, state);
+      }
+    }
   schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object);
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack, schemerlicht_object);
   for (; it != it_end; ++it)
@@ -232,7 +242,7 @@ static void scan_target_space(schemerlicht_context* ctxt, gc_state* state)
     }
   }
 
-void schemerlicht_collect_garbage(schemerlicht_context* ctxt, schemerlicht_function* fun)
+void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   {
   int c0 = clock();
   schemerlicht_assert(ctxt->heap_pos < ctxt->raw_heap.vector_size / 2);

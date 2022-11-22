@@ -481,7 +481,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
           fun = lambda;
           }
 
-        schemerlicht_check_garbage_collection(ctxt, fun);
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else if (target->type == schemerlicht_object_type_closure)
         {
@@ -496,7 +496,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = lambda;
         printf("now starting GC\n");
-        schemerlicht_check_garbage_collection(ctxt, fun);
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else if (target->type == schemerlicht_object_type_lambda)
         {
@@ -510,7 +510,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = lambda;
         printf("now starting GC\n");
-        schemerlicht_check_garbage_collection(ctxt, fun);
+        schemerlicht_check_garbage_collection(ctxt);
         }
       else
         {
@@ -595,7 +595,7 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
       stack_to_block->type = schemerlicht_object_type_blocking;
       pc = pc_end;
-      schemerlicht_check_garbage_collection(ctxt, fun);
+      schemerlicht_check_garbage_collection(ctxt);
       break;
       }
       default:
@@ -785,7 +785,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
           pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
           fun = lambda;
           }
-        schemerlicht_check_garbage_collection(ctxt, fun);
+        schemerlicht_check_garbage_collection(ctxt);
         break;
         }
         case schemerlicht_object_type_closure:
@@ -799,7 +799,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = lambda;
-        schemerlicht_check_garbage_collection(ctxt, fun);
+        schemerlicht_check_garbage_collection(ctxt);
         break;
         }
         case schemerlicht_object_type_lambda:
@@ -809,7 +809,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
         pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
         fun = lambda;
-        schemerlicht_check_garbage_collection(ctxt, fun);
+        schemerlicht_check_garbage_collection(ctxt);
         break;
         }
         default:
@@ -918,7 +918,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
       stack_to_block->type = schemerlicht_object_type_blocking;
       pc = pc_end;
-      schemerlicht_check_garbage_collection(ctxt, fun);
+      schemerlicht_check_garbage_collection(ctxt);
       break;
       }
       default:

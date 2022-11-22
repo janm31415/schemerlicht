@@ -70,7 +70,6 @@ enum schemerlicht_opcode_mode { schemerlicht_iABC, schemerlicht_iABx, schemerlic
 /*
 ** R(x) - register
 ** Kst(x) - constant (in constant table)
-** RK(x) == if x < schemerlicht_maxstack then R(x) else Kst(x-schemerlicht_maxstack)
 */
 
 typedef enum 

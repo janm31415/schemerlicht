@@ -29,7 +29,7 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_syntax_errors_clear(ctxt);
   schemerlicht_compile_errors_clear(ctxt);
   schemerlicht_runtime_errors_clear(ctxt);
-  schemerlicht_vector_destroy(ctxt, &ctxt->stack);
+  schemerlicht_vector_destroy(ctxt, &ctxt->stack_raw);
   schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->raw_heap, schemerlicht_object);
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->raw_heap, schemerlicht_object);
   for (; it != it_end; ++it)
@@ -89,9 +89,10 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   ctxt->error_jmp = NULL;
   ctxt->number_of_syntax_errors = 0;
   ctxt->number_of_compile_errors = 0;
-  schemerlicht_vector_init_with_size(ctxt, &ctxt->stack, schemerlicht_maxstack, schemerlicht_object);
-  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object);
-  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack, schemerlicht_object);
+  schemerlicht_vector_init_with_size(ctxt, &ctxt->stack_raw, schemerlicht_maxstack, schemerlicht_object);
+  schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack_raw, schemerlicht_object);
+  schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack_raw, schemerlicht_object);
+  ctxt->stack = ctxt->stack_raw;
   for (; it != it_end; ++it)
     {
     it->type = schemerlicht_object_type_blocking;
