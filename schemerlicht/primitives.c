@@ -8639,7 +8639,6 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
 
         schemerlicht_program prog = make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
-        printf("preprocess done\n");
 #if 0
         schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
         printf("%s\n", dumped.string_ptr);
@@ -8649,7 +8648,6 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
           {
           schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
           schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
-          printf("compile done\n");
           if (ctxt->number_of_compile_errors > 0)
             {
             schemerlicht_error_report* cit = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
