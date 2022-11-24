@@ -256,6 +256,8 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   sweep_stack(ctxt, &state);
   sweep_gc_save_list(ctxt, &state);
   scan_target_space(&state);
+  if (is_marked(&ctxt->empty_continuation)==0)
+    mark_object_pointer(&ctxt->empty_continuation);
   for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
     {
     schemerlicht_object* obj = state.source_heap + i;

@@ -8,8 +8,7 @@ schemerlicht_function* schemerlicht_function_new(schemerlicht_context* ctxt)
   fun->constants_map = schemerlicht_map_new(ctxt, 0, 8);
   schemerlicht_vector_init(ctxt, &fun->constants, schemerlicht_object);
   schemerlicht_vector_init(ctxt, &fun->code, schemerlicht_instruction);
-  schemerlicht_vector_init(ctxt, &fun->lambdas, schemerlicht_function*);
-  fun->freereg = 0;
+  schemerlicht_vector_init(ctxt, &fun->lambdas, schemerlicht_function*);  
   fun->number_of_constants = 0;
 #ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
   schemerlicht_string_init(ctxt, &fun->function_definition, "");
