@@ -818,7 +818,7 @@
 	       (num (string->number estr))
 	       (str (number->string num)))
 	   (cond ((or (>= (string-length str) 100) ; [JanM] allow long stringlength
-		      (not (= (string->number str) num))) ; [JanM] using = instead of equal?
+		      (not (equal? (string->number str) num))) ; [JanM] using = instead of equal?
 		 (set! success #f)
 		 (for-each write (list estr num str (string->number str))))))))
 
@@ -838,16 +838,16 @@
     (test #t 'float-print-test (float-print-test f0.0))
     
     (test #t 'mult-float-print-test (mult-float-print-test f1.0))
-    ;(test #t 'mult-float-print-test (mult-float-print-test
-		;		     (string->number "3.0")))
-    ;(test #t 'mult-float-print-test (mult-float-print-test
-		;		     (string->number "7.0")))
-    ;(test #t 'mult-float-print-test (mult-float-print-test
-		;		     (string->number "3.1415926535897931")))
-    ;(test #t 'mult-float-print-test (mult-float-print-test
-		;		     (string->number "2.7182818284590451")))
-    ;(test #t float-rw-range-test)
-    ;(test #t float-powers-of-2-test)
+    (test #t 'mult-float-print-test (mult-float-print-test
+				     (string->number "3.0")))
+    (test #t 'mult-float-print-test (mult-float-print-test
+				     (string->number "7.0")))
+    (test #t 'mult-float-print-test (mult-float-print-test
+				     (string->number "3.1415926535897931")))
+    (test #t 'mult-float-print-test (mult-float-print-test
+				     (string->number "2.7182818284590451")))
+    (test #t float-rw-range-test)
+    (test #t float-powers-of-2-test)
     
 	))
 

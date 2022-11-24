@@ -2642,7 +2642,7 @@ static void test_r5rs_funs()
   test_compile_aux("#t", "(flonum? (exact->inexact 3))");
   test_compile_aux("#t", "(inexact? (exact->inexact 3))");
 
-  test_compile_aux("\"3.1415984351384360629\"", "(number->string 3.1415984351384361)");
+  test_compile_aux("\"3.14159843513843606289e+00\"", "(number->string 3.1415984351384361)");
   test_compile_aux("\"25\"", "(number->string 25)");
   test_compile_aux("\"31\"", "(number->string 25 8)");
   test_compile_aux("\"1a\"", "(number->string 26 16)");
@@ -3406,8 +3406,23 @@ static void test_multi_float_print()
     "(mult-float-print-test 0.0)", 2048*16);
   }
 
+static void test_float_rw_range()
+  {
+  test_compile_aux("\"1.e-323\"", "(let* ((x -323) (estr (string-append \"1.e\" (number->string x)))) estr )");
+  test_compile_aux("0.000000", "(let* ((x -323) (estr (string-append \"1.e\" (number->string x))) (num (string->number estr))) num )");
+  test_compile_aux("\"9.88131291682493088353e-324\"", "(let* ((x -323) (estr (string-append \"1.e\" (number->string x))) (num (string->number estr)) (str (number->string num))) str )");
+  test_compile_aux("#t", "(let* ((x -323) (estr (string-append \"1.e\" (number->string x))) (num (string->number estr)) (str (number->string num))) (= (string->number str) num) )");
+
+  test_compile_aux("\"1.e19\"", "(let* ((x 19) (estr (string-append \"1.e\" (number->string x)))) estr )");
+  test_compile_aux("10000000000000000000.000000", "(let* ((x 19) (estr (string-append \"1.e\" (number->string x))) (num (string->number estr))) num )");
+  test_compile_aux("\"1.00000000000000000000e+19\"", "(let* ((x 19) (estr (string-append \"1.e\" (number->string x))) (num (string->number estr)) (str (number->string num))) str )");
+  test_compile_aux("#t", "(let* ((x 19) (estr (string-append \"1.e\" (number->string x))) (num (string->number estr)) (str (number->string num))) (= (string->number str) num) )");
+  }
+
 void run_all_compiler_tests()
   { 
+  
+  
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3530,6 +3545,7 @@ void run_all_compiler_tests()
     test_string_list();
     test_compare_quote();
     test_multi_float_print();
+    test_float_rw_range();
 #endif            
     }
   }
