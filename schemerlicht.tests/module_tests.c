@@ -170,7 +170,7 @@ static void test_jaffer(schemerlicht_context* ctxt)
 void run_all_module_tests()
   {
   int c0 = clock();
-  schemerlicht_context* ctxt = schemerlicht_open(2048*2);
+  schemerlicht_context* ctxt = schemerlicht_open(2048*32);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);
@@ -178,9 +178,9 @@ void run_all_module_tests()
   int c1 = clock();
   printf("Startup time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
 
-  test_srfi6(ctxt);
-  test_srfi28(ctxt);
-  test_csv(ctxt);
+  //test_srfi6(ctxt);
+  //test_srfi28(ctxt);
+  //test_csv(ctxt);
   test_jaffer(ctxt);
 
   schemerlicht_close(ctxt);

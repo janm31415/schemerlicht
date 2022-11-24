@@ -26,5 +26,6 @@ typedef unsigned char schemerlicht_byte;
 #endif
 
 //#define SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
+//#define SCHEMERLICHT_MAKE_NEW_STACK_DURING_LOAD
 
 #endif //SCHEMERLICHT_H

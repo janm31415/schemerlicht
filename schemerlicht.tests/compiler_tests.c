@@ -3408,8 +3408,6 @@ static void test_multi_float_print()
 
 void run_all_compiler_tests()
   { 
-  //test_long_apply();
-  //return;
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3419,7 +3417,7 @@ void run_all_compiler_tests()
     test_compile_bool();
     test_compile_nil();
     test_compile_char();
-    test_compile_string();
+    test_compile_string();    
     test_single_argument_primitives();
     test_add_fixnums();
     test_add_flonums();
@@ -3445,13 +3443,13 @@ void run_all_compiler_tests()
     test_is_boolean();
     test_is_char();
     test_fx_arithmetic();
-    test_if();
+    test_if();    
     test_and();
     test_or();
     test_let();
     test_let_star();
     test_compile_errors();
-    test_define();
+    test_define();    
     test_fixnum_char_flonum_conversions();
     test_bitwise_ops();
     test_vector();

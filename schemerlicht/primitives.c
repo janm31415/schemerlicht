@@ -8577,16 +8577,16 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
         {
         schemerlicht_object obj = schemerlicht_cell_to_object(ctxt, &cell);
         schemerlicht_set_object(ra, &obj);
-      }
+        }
       schemerlicht_string_destroy(ctxt, &buff);
       schemerlicht_destroy_cell(ctxt, &cell);
-    }
+      }
     else
       {
       schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read expects an input port as argument.");
       ra->type = schemerlicht_object_type_undefined;
       }
-  }
+    }
   }
 
 ////////////////////////////////////////////////////
@@ -8622,30 +8622,62 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         schemerlicht_stream_rewind(&str);
         schemerlicht_vector tokens = tokenize(ctxt, &str);
         schemerlicht_stream_close(ctxt, &str);
-        
+
         //make new stack so that old stack is not overwritten.
         //new stack needs to be created before we run any macros.
+
+#ifdef SCHEMERLICHT_MAKE_NEW_STACK_DURING_LOAD
+        schemerlicht_vector stack_store = ctxt->stack;
+        schemerlicht_vector new_stack;
+        schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
+        ctxt->stack = new_stack;
+#else
         void* store_stack_pointer = ctxt->stack.vector_ptr;
         ctxt->stack.vector_ptr = cast(void*, ra);
         ctxt->stack.vector_size -= a;
-                
-        //schemerlicht_vector stack_store = ctxt->stack;
-        //schemerlicht_vector new_stack;
-        //schemerlicht_vector_init_with_size(ctxt, &new_stack, schemerlicht_maxstack, schemerlicht_object);
-        //ctxt->stack = new_stack;
+#endif           
 
         schemerlicht_program prog = make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
+        printf("preprocess done\n");
+#if 0
+        schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+        printf("%s\n", dumped.string_ptr);
+        schemerlicht_string_destroy(ctxt, &dumped);
+#endif
         if (prog.expressions.vector_size > 0)
           {
           schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
           schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
+          printf("compile done\n");
+          if (ctxt->number_of_compile_errors > 0)
+            {
+            schemerlicht_error_report* cit = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+            schemerlicht_error_report* cit_end = schemerlicht_vector_end(&ctxt->compile_error_reports, schemerlicht_error_report);
+            for (; cit != cit_end; ++cit)
+              printf("%s\n", cit->message.string_ptr);
+            }
+          if (ctxt->number_of_syntax_errors > 0)
+            {
+            schemerlicht_error_report* cit = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
+            schemerlicht_error_report* cit_end = schemerlicht_vector_end(&ctxt->syntax_error_reports, schemerlicht_error_report);
+            for (; cit != cit_end; ++cit)
+              printf("%s\n", cit->message.string_ptr);
+            }
           destroy_tokens_vector(ctxt, &tokens);
           schemerlicht_program_destroy(ctxt, &prog);
-          schemerlicht_object* res = schemerlicht_run(ctxt, func);
-          schemerlicht_set_object(ra, res);
-          //ra->type = schemerlicht_object_type_undefined;          
-          schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+          if (ctxt->number_of_compile_errors == 0 && ctxt->number_of_syntax_errors == 0)
+            {
+            schemerlicht_object* res = schemerlicht_run(ctxt, func);
+            schemerlicht_set_object(ra, res);
+            //ra->type = schemerlicht_object_type_undefined;          
+            schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+            }
+          else
+            {
+            schemerlicht_function_free(ctxt, func);
+            ra->type = schemerlicht_object_type_undefined;
+            }
           }
         else
           {
@@ -8654,10 +8686,13 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
           ra->type = schemerlicht_object_type_undefined;
           }
         //restore old stack
-        //schemerlicht_vector_destroy(ctxt, &new_stack);
-        //ctxt->stack = stack_store;
+#ifdef SCHEMERLICHT_MAKE_NEW_STACK_DURING_LOAD
+        schemerlicht_vector_destroy(ctxt, &new_stack);
+        ctxt->stack = stack_store;
+#else
         ctxt->stack.vector_ptr = store_stack_pointer;
         ctxt->stack.vector_size += a;
+#endif
         }
       else
         ra->type = schemerlicht_object_type_undefined;
@@ -9531,7 +9566,7 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
-  }
+    }
   }
 
 static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, int value)
