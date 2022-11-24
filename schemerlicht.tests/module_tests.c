@@ -150,14 +150,14 @@ static void test_csv(schemerlicht_context* ctxt)
   {
   test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(import 'csv) (define lst '((1 2 3 4) (5 6 7 8)))");
   test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
-  test_compile_aux(ctxt, "((\"1\" \"2\" \"3\" \"4\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\")) r");
-  test_compile_aux(ctxt, "((\"1\" \"2\" \"3\" \"4\") (\"5\" \"6\" \"7\" \"8\"))", "r");
-  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(map (lambda (lst) (map string->number lst)) r)");
-  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv-map string->number r)");
-  test_compile_aux(ctxt, "((1 2 3 4) (5 6 7 8))", "(csv->numbers r)");
+  test_compile_aux(ctxt, "((\"1.00000000000000000e+00\" \"2.00000000000000000e+00\" \"3.00000000000000000e+00\" \"4.00000000000000000e+00\") (\"5.00000000000000000e+00\" \"6.00000000000000000e+00\" \"7.00000000000000000e+00\" \"8.00000000000000000e+00\"))", "(define r (read-csv \"out.csv\")) r");
+  test_compile_aux(ctxt, "((\"1.00000000000000000e+00\" \"2.00000000000000000e+00\" \"3.00000000000000000e+00\" \"4.00000000000000000e+00\") (\"5.00000000000000000e+00\" \"6.00000000000000000e+00\" \"7.00000000000000000e+00\" \"8.00000000000000000e+00\"))", "r");
+  test_compile_aux(ctxt, "((1.000000 2.000000 3.000000 4.000000) (5.000000 6.000000 7.000000 8.000000))", "(map (lambda (lst) (map string->number lst)) r)");
+  test_compile_aux(ctxt, "((1.000000 2.000000 3.000000 4.000000) (5.000000 6.000000 7.000000 8.000000))", "(csv-map string->number r)");
+  test_compile_aux(ctxt, "((1.000000 2.000000 3.000000 4.000000) (5.000000 6.000000 7.000000 8.000000))", "(csv->numbers r)");
   test_compile_aux(ctxt, "((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8))", "(set! lst '((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8)))");
   test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
-  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\\\\\\\"Quoted string\\\\\\\"\") (\"5\" \"6\" \"7\" \"8\"))", "(define r (read-csv \"out.csv\"))");
+  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\\\\\\\"Quoted string\\\\\\\"\") (\"5.00000000000000000e+00\" \"6.00000000000000000e+00\" \"7.00000000000000000e+00\" \"8.00000000000000000e+00\"))", "(define r (read-csv \"out.csv\"))");
   test_compile_aux(ctxt, "4", "(length (list-ref r 0))");
   test_compile_aux(ctxt, "4", "(length (list-ref r 1))");
   }
@@ -170,7 +170,7 @@ static void test_jaffer(schemerlicht_context* ctxt)
 void run_all_module_tests()
   {
   int c0 = clock();
-  schemerlicht_context* ctxt = schemerlicht_open(2048*32);
+  schemerlicht_context* ctxt = schemerlicht_open(2048*4);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);
@@ -178,9 +178,9 @@ void run_all_module_tests()
   int c1 = clock();
   printf("Startup time: %lldms\n", (int64_t)(c1 - c0) * (int64_t)1000 / (int64_t)CLOCKS_PER_SEC);
 
-  //test_srfi6(ctxt);
-  //test_srfi28(ctxt);
-  //test_csv(ctxt);
+  test_srfi6(ctxt);
+  test_srfi28(ctxt);
+  test_csv(ctxt);
   test_jaffer(ctxt);
 
   schemerlicht_close(ctxt);

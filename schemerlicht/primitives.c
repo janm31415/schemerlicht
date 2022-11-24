@@ -6886,7 +6886,7 @@ void schemerlicht_primitive_number_string(schemerlicht_context* ctxt, int a, int
         else if (isfinite(arg->value.fl))
           {
           char buffer[256];
-          sprintf(buffer, "%.20e", arg->value.fl);
+          sprintf(buffer, "%.17e", arg->value.fl);
           obj.type = schemerlicht_object_type_string;
           schemerlicht_string_init(ctxt, &obj.value.s, buffer);
           }
