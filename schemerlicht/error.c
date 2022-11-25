@@ -189,3 +189,28 @@ void schemerlicht_runtime_errors_clear(schemerlicht_context* ctxt)
   ctxt->runtime_error_reports.vector_size = 0;
   ctxt->number_of_runtime_errors = 0;
   }
+
+void schemerlicht_print_any_error(schemerlicht_context* ctxt)
+  {
+  if (ctxt->number_of_compile_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
+    schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->compile_error_reports, schemerlicht_error_report);
+    for (; it != it_end; ++it)
+      printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_syntax_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
+    schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->syntax_error_reports, schemerlicht_error_report);
+    for (; it != it_end; ++it)
+      printf("%s\n", it->message.string_ptr);
+    }
+  if (ctxt->number_of_runtime_errors > 0)
+    {
+    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->runtime_error_reports, schemerlicht_error_report);
+    schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->runtime_error_reports, schemerlicht_error_report);
+    for (; it != it_end; ++it)
+      printf("%s\n", it->message.string_ptr);
+    }
+  }

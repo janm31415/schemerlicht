@@ -493,6 +493,7 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_expression* expr = schemerlicht_vector_at(&pr.expressions, 0, schemerlicht_expression);
       schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
       schemerlicht_object* res = schemerlicht_run(ctxt, func);
+      schemerlicht_print_any_error(ctxt);
       schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
       schemerlicht_function_free(ctxt, func);
       schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
@@ -583,11 +584,13 @@ void schemerlicht_expand_macros(schemerlicht_context* ctxt, schemerlicht_program
 
       schemerlicht_preprocess(ctxt, &macro_program);
       schemerlicht_expression* expr = schemerlicht_vector_at(&macro_program.expressions, 0, schemerlicht_expression);
-      schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
+      schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);      
       schemerlicht_object* res = schemerlicht_run(ctxt, func);
+      schemerlicht_print_any_error(ctxt);
       schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
       }
     macros_expanded = expand_existing_macros(ctxt, program);
+    schemerlicht_print_any_error(ctxt);
     schemerlicht_program_destroy(ctxt, &macro_program);
     }
   }
