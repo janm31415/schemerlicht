@@ -151,9 +151,9 @@ static void test_mbe(schemerlicht_context* ctxt)
   //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #t)");
   //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #f)");
   //test_compile_aux(ctxt, "#f", "(and2 #t #t #t #f)");
-  test_compile_aux(ctxt, "#t", "(import 'slib)");
-  test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
-  //test_compile_aux(ctxt, "#t", "(require 'prime)");
+  //test_compile_aux(ctxt, "#t", "(import 'slib)");
+  //test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
+  //test_compile_aux(ctxt, "#t", "(require 'srfi-1)");
   }
 
 static void test_jaffer(schemerlicht_context* ctxt)

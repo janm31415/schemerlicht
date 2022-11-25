@@ -8646,8 +8646,6 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
 #endif
         if (prog.expressions.vector_size > 0)
           {
-          //schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
-          //schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
           schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
           schemerlicht_print_any_error(ctxt);
           destroy_tokens_vector(ctxt, &tokens);
