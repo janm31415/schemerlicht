@@ -1088,11 +1088,6 @@ static void test_begin()
   test_compile_aux("(1 . 2)", "(let ([t (begin 13 (cons 1 2))])(cons 1 t)t)");
   }
 
-static void test_halt()
-  {
-  test_compile_aux("15", "(begin (halt 15) 7 9)");
-  }
-
 static void test_letrec()
   {
   test_compile_aux("12", "(letrec () 12)");
@@ -3132,7 +3127,7 @@ static void test_calcc_extended()
 
 static void test_error()
   {
-  test_compile_aux_r5rs("#undefined", "(error \"test_error\") (+ 5 7)");
+  test_compile_aux_r5rs("12", "(error \"test_error\") (+ 5 7)");
   }
 
 static void test_curry()
@@ -3443,14 +3438,13 @@ void run_all_compiler_tests()
     test_bitwise_ops();
     test_vector();
     test_pair();
-    test_begin();
-    test_halt();
+    test_begin();        
     test_letrec();
     test_lambdas();
     test_tailcall();
     test_closures();
     test_set();
-    test_letrec2();
+    test_letrec2();    
     test_inner_define();
     test_global_define();
     test_list();
@@ -3458,7 +3452,7 @@ void run_all_compiler_tests()
     test_fibonacci();
     test_vectors();
     test_strings();
-    test_quotes();
+    test_quotes();    
     test_length();
     test_set_car_cdr();
     test_when_unless();
@@ -3471,7 +3465,7 @@ void run_all_compiler_tests()
     test_compile_cc();
     test_compile_cc_2();
     //test_ack_performance();
-    //test_fib_performance();
+    //test_fib_performance();    
     test_lambda_variable_arity_not_using_rest_arg();
     test_lambda_variable_arity_while_using_rest_arg();
     test_lambda_long_list();
@@ -3488,7 +3482,7 @@ void run_all_compiler_tests()
     test_is_list();
     test_min_max();
     test_override();
-    test_apply();
+    test_apply();    
     test_foreign_1();
     test_foreign();
     test_r5rs_funs();
@@ -3505,7 +3499,7 @@ void run_all_compiler_tests()
     test_eval();
     test_load();
     test_macros();
-    test_calcc_extended();
+    test_calcc_extended();    
     test_error();
     test_curry();
     test_curry_2();
@@ -3520,7 +3514,7 @@ void run_all_compiler_tests()
     test_compare_quote();
     test_multi_float_print();
     test_float_rw_range();
-    test_multiple_lines();
+    test_multiple_lines();    
 #endif            
     }
   }
