@@ -1514,18 +1514,22 @@ void schemerlicht_continuation_passing_style(schemerlicht_context* ctxt, schemer
   if (program->expressions.vector_size == 0)
     return;
   schemerlicht_expression* e = schemerlicht_vector_at(&program->expressions, 0, schemerlicht_expression);
-  /*
   if (e->type == schemerlicht_type_begin)
     {
     schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.beg.arguments, schemerlicht_expression);
     schemerlicht_expression* it_end = schemerlicht_vector_end(&e->expr.beg.arguments, schemerlicht_expression);
     for (; it != it_end; ++it)
+      {
       cps_start(ctxt, it);
+      }
+    schemerlicht_vector new_expressions = e->expr.beg.arguments;
+    schemerlicht_string_destroy(ctxt, &e->expr.beg.filename);
+    schemerlicht_vector_destroy(ctxt, &program->expressions);
+    program->expressions = new_expressions;
     }
   else
     {
     cps_start(ctxt, e);
-    }
-  */
-  cps_start(ctxt, e);
+    }  
+  //cps_start(ctxt, e);
   }

@@ -23,11 +23,11 @@ void schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);  
-  schemerlicht_function* callccfunc = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, callccfunc);
+  schemerlicht_vector callcc = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_run_program(ctxt, &callcc);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, callccfunc, schemerlicht_function*);
+  schemerlicht_compiled_program_register(ctxt, &callcc);
   char* dynamic_wind_script = "(define %dynamic-winds '())\n"
   "  (define dynamic-wind (lambda (before thunk after)\n"
   "    (before)\n"
@@ -61,9 +61,9 @@ void schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   tokens = schemerlicht_script2tokens(ctxt, dynamic_wind_script);
   prog = make_program(ctxt, &tokens);
   schemerlicht_preprocess_internal_libs(ctxt, &prog);
-  schemerlicht_function* dynamic_wind = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, dynamic_wind);
+  schemerlicht_vector dynamic_wind = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_run_program(ctxt, &dynamic_wind);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, dynamic_wind, schemerlicht_function*);
+  schemerlicht_compiled_program_register(ctxt, &dynamic_wind);
   }

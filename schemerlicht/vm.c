@@ -983,3 +983,14 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
     }
   return s;
   }
+
+schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, const schemerlicht_vector* functions)
+  {
+  const schemerlicht_function** it = schemerlicht_vector_begin(functions, schemerlicht_function*);
+  const schemerlicht_function** it_end = schemerlicht_vector_end(functions, schemerlicht_function*);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_run(ctxt, *it);
+    }
+  return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  }

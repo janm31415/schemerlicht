@@ -5,6 +5,7 @@
 #include "limits.h"
 #include "object.h"
 #include "func.h"
+#include "parser.h"
 
 /*===========================================================================
 * 
@@ -119,6 +120,7 @@ typedef enum
 
 schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerlicht_string* s, const schemerlicht_function* fun);
 schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerlicht_function* fun);
+schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, const schemerlicht_vector* functions);
 
 schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schemerlicht_function* fun);
 

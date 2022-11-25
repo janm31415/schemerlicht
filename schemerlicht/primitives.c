@@ -8646,34 +8646,22 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
 #endif
         if (prog.expressions.vector_size > 0)
           {
-          schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
-          schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
-          if (ctxt->number_of_compile_errors > 0)
-            {
-            schemerlicht_error_report* cit = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
-            schemerlicht_error_report* cit_end = schemerlicht_vector_end(&ctxt->compile_error_reports, schemerlicht_error_report);
-            for (; cit != cit_end; ++cit)
-              printf("%s\n", cit->message.string_ptr);
-            }
-          if (ctxt->number_of_syntax_errors > 0)
-            {
-            schemerlicht_error_report* cit = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
-            schemerlicht_error_report* cit_end = schemerlicht_vector_end(&ctxt->syntax_error_reports, schemerlicht_error_report);
-            for (; cit != cit_end; ++cit)
-              printf("%s\n", cit->message.string_ptr);
-            }
+          //schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
+          //schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
+          schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
+          schemerlicht_print_any_error(ctxt);
           destroy_tokens_vector(ctxt, &tokens);
           schemerlicht_program_destroy(ctxt, &prog);
           if (ctxt->number_of_compile_errors == 0 && ctxt->number_of_syntax_errors == 0)
             {
-            schemerlicht_object* res = schemerlicht_run(ctxt, func);
+            schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
             schemerlicht_set_object(ra, res);
             //ra->type = schemerlicht_object_type_undefined;          
-            schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+            schemerlicht_compiled_program_register(ctxt, &compiled_program);
             }
           else
             {
-            schemerlicht_function_free(ctxt, func);
+            schemerlicht_compiled_program_destroy(ctxt, &compiled_program);
             ra->type = schemerlicht_object_type_undefined;
             }
           }
@@ -8736,11 +8724,10 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
     schemerlicht_stream_close(eval_ctxt, &str);
     schemerlicht_program prog = make_program(eval_ctxt, &tokens);
     schemerlicht_preprocess(eval_ctxt, &prog);
-    schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
-    schemerlicht_function* func = schemerlicht_compile_expression(eval_ctxt, expr);
-    schemerlicht_object* res = schemerlicht_run(eval_ctxt, func);
+    schemerlicht_vector compiled_program = schemerlicht_compile_program(eval_ctxt, &prog);
+    schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
     schemerlicht_object res_copy = schemerlicht_object_deep_copy(ctxt, res);
-    schemerlicht_function_free(eval_ctxt, func);
+    schemerlicht_compiled_program_destroy(eval_ctxt, &compiled_program);    
     destroy_tokens_vector(eval_ctxt, &tokens);
     schemerlicht_program_destroy(eval_ctxt, &prog);
     schemerlicht_string_destroy(ctxt, &s);

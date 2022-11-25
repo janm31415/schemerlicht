@@ -113,9 +113,9 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
   printf("%s\n\n", dmp.string_ptr);
   schemerlicht_string_destroy(ctxt, &dmp);
 #endif
-  schemerlicht_function* modules = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, modules);
+  schemerlicht_vector modules = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_run_program(ctxt, &modules);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, modules, schemerlicht_function*);
+  schemerlicht_compiled_program_register(ctxt, &modules);
   }

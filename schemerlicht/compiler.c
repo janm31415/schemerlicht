@@ -733,3 +733,37 @@ schemerlicht_function* schemerlicht_compile_expression(schemerlicht_context* ctx
   compile_expression_iterative(ctxt, fun, e);
   return fun;
   }
+
+schemerlicht_vector schemerlicht_compile_program(schemerlicht_context* ctxt, schemerlicht_program* prog)
+  {
+  schemerlicht_vector compiled;
+  schemerlicht_vector_init(ctxt, &compiled, schemerlicht_function*);
+  schemerlicht_expression* it = schemerlicht_vector_begin(&prog->expressions, schemerlicht_expression);
+  schemerlicht_expression* it_end = schemerlicht_vector_end(&prog->expressions, schemerlicht_expression);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_function* fun = schemerlicht_compile_expression(ctxt, it);
+    schemerlicht_vector_push_back(ctxt, &compiled, fun, schemerlicht_function*);
+    }
+  return compiled;
+  }
+
+void schemerlicht_compiled_program_destroy(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program)
+  {
+  schemerlicht_function** it = schemerlicht_vector_begin(compiled_program, schemerlicht_function*);
+  schemerlicht_function** it_end = schemerlicht_vector_end(compiled_program, schemerlicht_function*);
+  for (; it != it_end; ++it)
+    {
+    schemerlicht_function_free(ctxt, *it);
+    }
+  schemerlicht_vector_destroy(ctxt, compiled_program);
+  }
+
+void schemerlicht_compiled_program_register(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program)
+  {
+  schemerlicht_function** it = schemerlicht_vector_begin(compiled_program, schemerlicht_function*);
+  schemerlicht_function** it_end = schemerlicht_vector_end(compiled_program, schemerlicht_function*);
+  schemerlicht_function** where_it = schemerlicht_vector_end(&ctxt->lambdas, schemerlicht_function*);
+  schemerlicht_vector_insert(ctxt, &ctxt->lambdas, &where_it, &it, &it_end, schemerlicht_function*);
+  schemerlicht_vector_destroy(ctxt, compiled_program);
+  }

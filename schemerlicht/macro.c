@@ -489,13 +489,12 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_memsize number_of_macros_store = ctxt->number_of_macros;
       ctxt->number_of_macros = 0;
       ctxt->macro_map = schemerlicht_map_new(ctxt, 0, 1); // remove all macros, as the macros now exist in the environment
-      schemerlicht_preprocess(ctxt, &pr);
-      schemerlicht_expression* expr = schemerlicht_vector_at(&pr.expressions, 0, schemerlicht_expression);
-      schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);
-      schemerlicht_object* res = schemerlicht_run(ctxt, func);
+      schemerlicht_preprocess(ctxt, &pr);      
+      schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &pr);
+      schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
       schemerlicht_print_any_error(ctxt);
-      schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
-      schemerlicht_function_free(ctxt, func);
+      schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);      
+      schemerlicht_compiled_program_destroy(ctxt, &compiled_program);
       schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
       schemerlicht_map_free(ctxt, ctxt->macro_map);
       ctxt->macro_map = macro_map_store; // restore original macro map
@@ -583,11 +582,10 @@ void schemerlicht_expand_macros(schemerlicht_context* ctxt, schemerlicht_program
 #endif
 
       schemerlicht_preprocess(ctxt, &macro_program);
-      schemerlicht_expression* expr = schemerlicht_vector_at(&macro_program.expressions, 0, schemerlicht_expression);
-      schemerlicht_function* func = schemerlicht_compile_expression(ctxt, expr);      
-      schemerlicht_object* res = schemerlicht_run(ctxt, func);
+      schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &macro_program);
+      schemerlicht_run_program(ctxt, &compiled_program);
       schemerlicht_print_any_error(ctxt);
-      schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+      schemerlicht_compiled_program_register(ctxt, &compiled_program);
       }
     macros_expanded = expand_existing_macros(ctxt, program);
     schemerlicht_print_any_error(ctxt);

@@ -72,37 +72,17 @@ static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_va
   printf("%s\n", dumped.string_ptr);
   schemerlicht_string_destroy(ctxt, &dumped);
 #endif
-  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_object* res = schemerlicht_run(ctxt, func);
+  schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
-  if (ctxt->number_of_compile_errors > 0)
-    {
-    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
-    schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->compile_error_reports, schemerlicht_error_report);
-    for (; it != it_end; ++it)
-      printf("%s\n", it->message.string_ptr);
-    }
-  if (ctxt->number_of_syntax_errors > 0)
-    {
-    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
-    schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->syntax_error_reports, schemerlicht_error_report);
-    for (; it != it_end; ++it)
-      printf("%s\n", it->message.string_ptr);
-    }
-  if (ctxt->number_of_runtime_errors > 0)
-    {
-    schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->runtime_error_reports, schemerlicht_error_report);
-    schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->runtime_error_reports, schemerlicht_error_report);
-    for (; it != it_end; ++it)
-      printf("%s\n", it->message.string_ptr);
-    }
+  schemerlicht_print_any_error(ctxt);
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
   schemerlicht_string_destroy(ctxt, &s);
 
-  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
+  schemerlicht_compiled_program_register(ctxt, &compiled_program);
 
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
@@ -162,6 +142,20 @@ static void test_csv(schemerlicht_context* ctxt)
   test_compile_aux(ctxt, "4", "(length (list-ref r 1))");
   }
 
+static void test_mbe(schemerlicht_context* ctxt)
+  {
+  //test_compile_aux(ctxt, "#t", "(import 'mbe)");
+  //test_compile_aux(ctxt, "#undefined", "(define-syntax and2 (syntax-rules() ((and2) #t) ((and2 test) test) ((and2 test1 test2 ...) (if test1(and2 test2 ...) #f))))");
+  //test_compile_aux(ctxt, "#t", "(and2 #t #t #t #t)");
+  //test_compile_aux(ctxt, "#f", "(and2 #f #t #t #t)");
+  //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #t)");
+  //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #f)");
+  //test_compile_aux(ctxt, "#f", "(and2 #t #t #t #f)");
+  test_compile_aux(ctxt, "#t", "(import 'slib)");
+  test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
+  //test_compile_aux(ctxt, "#t", "(require 'prime)");
+  }
+
 static void test_jaffer(schemerlicht_context* ctxt)
   {
   test_compile_aux(ctxt, "#t", "(import 'test-r4rs)");
@@ -170,7 +164,7 @@ static void test_jaffer(schemerlicht_context* ctxt)
 void run_all_module_tests()
   {
   int c0 = clock();
-  schemerlicht_context* ctxt = schemerlicht_open(2048*4);
+  schemerlicht_context* ctxt = schemerlicht_open(2048*2);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);
@@ -181,6 +175,7 @@ void run_all_module_tests()
   test_srfi6(ctxt);
   test_srfi28(ctxt);
   test_csv(ctxt);
+  //test_mbe(ctxt);
   test_jaffer(ctxt);
 
   schemerlicht_close(ctxt);

@@ -208,9 +208,9 @@ void schemerlicht_compile_r5rs(schemerlicht_context* ctxt)
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_preprocess_internal_libs(ctxt, &prog);
-  schemerlicht_function* r5rs = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_run(ctxt, r5rs);
+  schemerlicht_vector r5rs = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_run_program(ctxt, &r5rs);
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
-  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, r5rs, schemerlicht_function*);
+  schemerlicht_compiled_program_register(ctxt, &r5rs);
   }
