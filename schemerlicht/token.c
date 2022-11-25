@@ -205,6 +205,10 @@ static int treat_buffer_token(schemerlicht_context* ctxt, schemerlicht_string* b
 
 int schemerlicht_read_token_polymorph(token* tok, schemerlicht_context* ctxt, schemerlicht_string* buff, void* str, schemerlicht_read_token_state* state, schemerlicht_get_char_fun get_char, schemerlicht_next_char_fun next_char, schemerlicht_get_position_fun get_position)
   {
+  tok->value.string_ptr = 0;
+  tok->value.string_capacity = 0;
+  tok->value.string_length = 0;
+  tok->type = SCHEMERLICHT_T_BAD;
   schemerlicht_assert(buff->string_length == 0);
 
   int is_a_symbol = 0;

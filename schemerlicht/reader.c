@@ -356,7 +356,7 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, token* fir
     {
     tok = *first_token;
     }
-  else if (first_token == NULL && !schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position))
+  else if (first_token == NULL && schemerlicht_read_token_polymorph(&tok, ctxt, buff, stream, &state, get_char, next_char, get_position)==0)
     {
     return make_invalid_cell();
     }
