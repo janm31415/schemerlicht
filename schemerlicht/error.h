@@ -35,6 +35,7 @@ typedef struct schemerlicht_error_report
 void schemerlicht_syntax_errors_clear(schemerlicht_context* ctxt);
 void schemerlicht_compile_errors_clear(schemerlicht_context* ctxt);
 void schemerlicht_runtime_errors_clear(schemerlicht_context* ctxt);
+int schemerlicht_context_is_error_free(schemerlicht_context* ctxt);
 
 void schemerlicht_print_any_error(schemerlicht_context* ctxt);
 

@@ -214,3 +214,14 @@ void schemerlicht_print_any_error(schemerlicht_context* ctxt)
       printf("%s\n", it->message.string_ptr);
     }
   }
+
+int schemerlicht_context_is_error_free(schemerlicht_context* ctxt)
+  {
+  if (ctxt->number_of_compile_errors > 0)
+    return 0;
+  if (ctxt->number_of_syntax_errors > 0)
+    return 0;
+  if (ctxt->number_of_runtime_errors > 0)
+    return 0;
+  return 1;
+  }
