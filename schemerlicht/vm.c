@@ -961,6 +961,8 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
   char buffer[256];
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, "SCHEMERLICHT STACK:\n");
+  if (stack_end >= schemerlicht_maxstack)
+    stack_end = schemerlicht_maxstack-1;
   for (int i = stack_start; i <= stack_end; ++i)
     {
     sprintf(buffer, "%d", i);
