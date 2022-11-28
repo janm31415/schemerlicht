@@ -612,6 +612,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
   const schemerlicht_instruction* pc_end = schemerlicht_vector_end(&(fun)->code, schemerlicht_instruction);
   while (pc < pc_end)
     {
+    if (ctxt->number_of_runtime_errors > 0)
+      break;
     const schemerlicht_instruction i = *pc++;
     const int opcode = SCHEMERLICHT_GET_OPCODE(i);
     switch (opcode)

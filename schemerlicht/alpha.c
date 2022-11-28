@@ -110,6 +110,36 @@ static int previsit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   return 1;
   }
 
+static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
+  {
+  schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
+  schemerlicht_string alpha_name;
+  if (find_variable(&alpha_name, ctxt, vis, &e->expr.prim.name))
+    {
+    schemerlicht_expression var = schemerlicht_init_variable(ctxt);
+    schemerlicht_string_copy(ctxt, &var.expr.var.name, &alpha_name);
+    schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
+    var.expr.var.filename = e->expr.prim.filename;
+    var.expr.var.line_nr = e->expr.prim.line_nr;
+    var.expr.var.column_nr = e->expr.prim.column_nr;
+    if (e->expr.prim.as_object)
+      {
+      schemerlicht_vector_destroy(ctxt, &e->expr.prim.arguments);
+      *e = var;
+      }
+    else
+      {
+      schemerlicht_expression fun = schemerlicht_init_funcall(ctxt);
+      schemerlicht_vector_destroy(ctxt, &fun.expr.funcall.arguments);
+      fun.expr.funcall.arguments = e->expr.prim.arguments;
+      fun.expr.funcall.line_nr = e->expr.prim.line_nr;
+      fun.expr.funcall.column_nr = e->expr.prim.column_nr;
+      schemerlicht_vector_push_back(ctxt, &fun.expr.funcall.fun, var, schemerlicht_expression);
+      *e = fun;
+      }
+    }  
+  }
+
 static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
@@ -161,6 +191,7 @@ static schemerlicht_alpha_conversion_visitor* schemerlicht_alpha_conversion_visi
   v->visitor->postvisit_lambda = postvisit_lambda;
   v->visitor->postvisit_let_bindings = postvisit_let_bindings;
   v->visitor->postvisit_let = postvisit_let;
+  v->visitor->postvisit_primcall = postvisit_primcall;
   return v;
   }
 

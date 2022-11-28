@@ -134,7 +134,11 @@ static void convert_and(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
     schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
     schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
     *e = expr;
-    schemerlicht_visit_expression(ctxt, v, e);
+    schemerlicht_visitor_entry entry;
+    entry.binding = NULL;
+    entry.expr = e;
+    entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+    schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
     }
   }
 
@@ -181,7 +185,12 @@ static void convert_or(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
     schemerlicht_string_destroy(ctxt, &e->expr.prim.name);
     schemerlicht_string_destroy(ctxt, &e->expr.prim.filename);
     *e = l;
-    schemerlicht_visit_expression(ctxt, v, e);
+
+    schemerlicht_visitor_entry entry;
+    entry.binding = NULL;
+    entry.expr = e;
+    entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+    schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
     }
   }
 
@@ -624,17 +633,39 @@ static void postvisit_expression(schemerlicht_context* ctxt, schemerlicht_visito
         }
       break;
     case schemerlicht_type_cond:
+    {
       convert_cond(ctxt, v, e);
-      schemerlicht_visit_expression(ctxt, v, e);
+
+      schemerlicht_visitor_entry entry;
+      entry.binding = NULL;
+      entry.expr = e;
+      entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+      schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
+
       break;
+    }
     case schemerlicht_type_case:
+    {
       convert_case(ctxt, v, e);
-      schemerlicht_visit_expression(ctxt, v, e);
+
+      schemerlicht_visitor_entry entry;
+      entry.binding = NULL;
+      entry.expr = e;
+      entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+      schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
       break;
+    }
     case schemerlicht_type_do:
+    {
       convert_do(ctxt, v, e);
-      schemerlicht_visit_expression(ctxt, v, e);
+
+      schemerlicht_visitor_entry entry;
+      entry.binding = NULL;
+      entry.expr = e;
+      entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+      schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
       break;
+    }
     }
   }
 

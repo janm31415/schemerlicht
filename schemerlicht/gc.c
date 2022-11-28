@@ -48,7 +48,7 @@ void schemerlicht_check_garbage_collection(schemerlicht_context* ctxt)
 static int is_marked(schemerlicht_object* obj)
   {
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type)
+  switch (obj->type & (~schemerlicht_int_gcmark_bit))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -70,7 +70,7 @@ static int is_marked(schemerlicht_object* obj)
 static int is_value_object(schemerlicht_object* obj)
   {
   schemerlicht_assert(!is_marked(obj));
-  switch (obj->type)
+  switch (obj->type & (~schemerlicht_int_gcmark_bit))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_string:
@@ -89,7 +89,7 @@ static void mark_object_pointer(schemerlicht_object* obj)
   {
   schemerlicht_assert(is_value_object(obj) == 0);
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type)
+  switch (obj->type & (~schemerlicht_int_gcmark_bit))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -118,7 +118,7 @@ static void mark_object_pointer(schemerlicht_object* obj)
 static void unmark_object_pointer(schemerlicht_object* obj)
   {  
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type)
+  switch (obj->type&(~schemerlicht_int_gcmark_bit))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -212,7 +212,7 @@ static void scan_target_space(gc_state* state)
     schemerlicht_object* obj = state->target_heap + i;
     if (obj->type == schemerlicht_object_type_blocking)
       break;
-    switch (obj->type)
+    switch (obj->type & (~schemerlicht_int_gcmark_bit))
       {
       case schemerlicht_object_type_vector:
       case schemerlicht_object_type_pair:

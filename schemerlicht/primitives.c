@@ -8607,6 +8607,10 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
     if (fn->type == schemerlicht_object_type_string)
       {
       FILE* f = fopen(fn->value.s.string_ptr, "r");
+      if (!f)
+        {
+
+        }
       if (f)
         {
         schemerlicht_stream str;

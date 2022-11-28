@@ -151,9 +151,15 @@ static void test_mbe(schemerlicht_context* ctxt)
   //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #t)");
   //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #f)");
   //test_compile_aux(ctxt, "#f", "(and2 #t #t #t #f)");
-  //test_compile_aux(ctxt, "#t", "(import 'slib)");
-  //test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
+  test_compile_aux(ctxt, "#t", "(import 'slib)");
+  test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
   //test_compile_aux(ctxt, "#t", "(require 'srfi-1)");
+  }
+
+static void test_srfi1(schemerlicht_context* ctxt)
+  {
+  test_compile_aux(ctxt, "#t", "(import 'srfi-1)");
+  test_compile_aux(ctxt, "(0 1 2 3 4)", "(iota 5)");
   }
 
 static void test_jaffer(schemerlicht_context* ctxt)
@@ -164,7 +170,7 @@ static void test_jaffer(schemerlicht_context* ctxt)
 void run_all_module_tests()
   {
   int c0 = clock();
-  schemerlicht_context* ctxt = schemerlicht_open(2048*2);
+  schemerlicht_context* ctxt = schemerlicht_open(1024*1024*32);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);
@@ -177,6 +183,7 @@ void run_all_module_tests()
   test_csv(ctxt);
   //test_mbe(ctxt);
   test_jaffer(ctxt);
+  test_srfi1(ctxt);
 
   schemerlicht_close(ctxt);
   }

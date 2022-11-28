@@ -4855,6 +4855,14 @@ to /* and */ in c/c++
       }
     };
 
+  struct iota_test : public compile_fixture {
+    void test()
+      {
+      run("(define (my-iota n) (do ((n n (- n 1)) (list '() (cons (- n 1) list))) ((zero? n) list)))");
+      TEST_EQ("(0 1 2 3 4)", run("(my-iota 5)"));
+      }
+    };
+
   }
   
 COMPILER_END
@@ -4862,6 +4870,10 @@ COMPILER_END
 void run_all_compile_tests()
   {
   using namespace COMPILER;
+
+  iota_test().test();
+  return;
+
   for (int i = 0; i < 1; ++i)
     {
     g_ops = compiler_options();

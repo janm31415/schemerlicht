@@ -121,6 +121,16 @@ namespace
     //std::cout << to_string(prog) << "\n";
     }
 
+  void simplify_to_core_conversion_do()
+    {
+    auto tokens = tokenize("(define (my-iota n) (do ((n n (- n 1)) (list '() (cons (- n 1) list))) ((zero? n) list)))");
+    std::reverse(tokens.begin(), tokens.end());
+    auto prog = make_program(tokens);
+    simplify_to_core_forms(prog);
+    TEST_ASSERT(to_string(prog) == "( define ( my-iota n ) ( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( n list ) ( begin ( if ( zero? n ) ( begin list ) ( begin ( loop ( - n 1 ) ( cons ( - n 1 ) list ) ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) ( loop n ( quote () ) ) ) ) ) ");
+    //std::cout << to_string(prog) << "\n";
+    }
+
 
   void convert_define()
     {
@@ -886,7 +896,7 @@ namespace
     assignable_variable_conversion(prog, ops);
     free_variable_analysis(prog, env);
     closure_conversion(prog, ops);
-    std::cout << to_string(prog);
+    //std::cout << to_string(prog);
     }
   }
 
@@ -901,6 +911,7 @@ void run_all_conversion_tests()
   simplify_to_core_conversion_or();
   simplify_to_core_conversion_letrec();
   simplify_to_core_conversion_cond();
+  simplify_to_core_conversion_do();
   convert_define();
   single_begin_conv();
   dump_conversion();

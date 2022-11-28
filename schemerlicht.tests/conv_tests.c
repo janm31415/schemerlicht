@@ -18,6 +18,7 @@
 #include "schemerlicht/alpha.h"
 #include "schemerlicht/constprop.h"
 #include "schemerlicht/constfold.h"
+#include "schemerlicht/preprocess.h"
 #include "test_assert.h"
 #include "token_tests.h"
 
@@ -432,6 +433,24 @@ static void simplify_to_core_conversion_do()
   schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
 
   TEST_EQ_STRING("( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( vec i ) ( begin ( if ( = i 5 ) ( begin vec ) ( begin ( vector-set! vec i i ) ( loop vec ( + i 1 ) ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) ( loop ( make-vector 5 ) 0 ) ) ) ", s.string_ptr);
+
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void simplify_to_core_conversion_do_2()
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(define (my-iota n) (do ((n n (- n 1)) (list '() (cons (- n 1) list))) ((zero? n) list)))");
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+
+  schemerlicht_simplify_to_core_forms(ctxt, &prog);
+
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+
+  TEST_EQ_STRING("( define ( my-iota n ) ( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( n list ) ( begin ( if ( zero? n ) ( begin list ) ( begin ( loop ( - n 1 ) ( cons ( - n 1 ) list ) ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) ( loop n ( quote () ) ) ) ) ) ", s.string_ptr);
 
   schemerlicht_string_destroy(ctxt, &s);
   destroy_tokens_vector(ctxt, &tokens);
@@ -979,6 +998,27 @@ static void test_constant_folding()
   test_constant_folding_aux("(/ (* 3 (- (+ 23 9) 20.0) 1.5) 2)", "27.000000 ");
   }
 
+static void test_full_conversion_aux(const char* script, const char* expected)
+  {
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_preprocess(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  TEST_EQ_STRING(expected, res.string_ptr);
+  schemerlicht_string_destroy(ctxt, &res);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_full_conversion()
+  {
+  test_full_conversion_aux("(define (my-iota n) (do ((n n (- n 1)) (list '() (cons (- n 1) list))) ((zero? n) list)))", "( let ( [ #%k0 ( set! #%q0 () ) ] ) ( begin ( halt #%k0 ) ) ) ( let ( [ #%k1 ( lambda ( #%self1 #%k2 %n_0 ) ( begin ( let ( [ #%%loop_1 #undefined ] ) ( begin ( let ( [ %loop_1 ( vector #%%loop_1 ) ] ) ( let ( [ %#%t0_4 ( closure ( lambda ( #%self0 #%k9 %n_2 %list_3 ) ( begin ( if ( zero? %n_2 ) ( begin ( #%k9 %list_3 ) ) ( begin ( let ( [ #%k10 ( vector-ref ( closure-ref #%self0 1 ) 0 ) ] ) ( begin ( #%k10 #%k9 ( - %n_2 1 ) ( cons ( - %n_2 1 ) %list_3 ) ) ) ) ) ) ) ) %loop_1 ) ] ) ( begin ( let ( [ #%k7 ( vector-set! %loop_1 0 %#%t0_4 ) ] ) ( begin ( let ( [ #%k3 ( vector-ref %loop_1 0 ) ] ) ( begin ( #%k3 #%k2 %n_0 #%q0 ) ) ) ) ) ) ) ) ) ) ) ) ] ) ( begin ( let ( [ #%k0 ( set! my-iota #%k1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ");
+
+  //test_full_conversion_aux("(define(filter-and-fix predicate-fn update-fn list) (let loop((list list)) (cond((null? list) '()) ((predicate-fn (car list)) (cons(update-fn(car list)) (loop(cdr list)))) (else (loop(cdr list))))))", "");
+  }
+
 void run_all_conv_tests()
   {
   test_single_begin_conv();
@@ -1005,6 +1045,7 @@ void run_all_conv_tests()
   simplify_to_core_conversion_cond();
   simplify_to_core_conversion_cond_2();
   simplify_to_core_conversion_do();
+  simplify_to_core_conversion_do_2();
   simplify_to_core_conversion_when();
   simplify_to_core_conversion_unless();
   simplify_to_core_conversion_delay();
@@ -1029,4 +1070,5 @@ void run_all_conv_tests()
   test_alpha_naming();
   test_constant_propagation();
   test_constant_folding();
+  test_full_conversion();
   }

@@ -380,6 +380,7 @@ schemerlicht_object* schemerlicht_map_get(schemerlicht_context* ctxt, schemerlic
   switch (key->type)
     {
     case schemerlicht_object_type_string:
+    case schemerlicht_object_type_symbol:
       return schemerlicht_map_get_string(map, key->value.s.string_ptr);
     case schemerlicht_object_type_fixnum:
     {

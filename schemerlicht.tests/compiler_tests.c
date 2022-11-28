@@ -2764,6 +2764,7 @@ static void test_compile_aux_r5rs(const char* expected_value, const char* script
 #endif
   schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
   schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
+  schemerlicht_print_any_error(ctxt);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
   if (print_gc_time)
@@ -3390,8 +3391,20 @@ static void test_multiple_lines()
   test_compile_aux("3", "1 2 3");
   }
 
+static void test_car_bug()
+  {
+  test_compile_aux("(0 1 2 3 4)", "(define lst list) (define (my-iota n) (do ((n n (- n 1)) (lst '() (cons (- n 1) lst))) ((zero? n) lst)))\n"    
+    "(my-iota 5)"
+  );
+
+  test_compile_aux("(0 1 2 3 4)", "(define (my-iota n) (do ((n n (- n 1)) (list '() (cons (- n 1) list))) ((zero? n) list)))\n"
+    "(my-iota 5)"
+  );
+      
+  }
+
 void run_all_compiler_tests()
-  { 
+  {   
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3515,6 +3528,7 @@ void run_all_compiler_tests()
     test_multi_float_print();
     test_float_rw_range();
     test_multiple_lines();    
+    test_car_bug();
 #endif            
     }
   }
