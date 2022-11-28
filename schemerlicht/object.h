@@ -46,6 +46,9 @@ typedef struct schemerlicht_object
   int type;
   } schemerlicht_object;
 
+#define schemerlicht_object_get_type(obj) \
+  (obj->type & ~schemerlicht_int_gcmark_bit)
+
 #define schemerlicht_set_object(obj1, obj2) \
   { \
   *(obj1) = *(obj2); \

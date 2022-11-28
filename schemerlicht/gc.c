@@ -69,7 +69,6 @@ static int is_marked(schemerlicht_object* obj)
 
 static int is_value_object(schemerlicht_object* obj)
   {
-  schemerlicht_assert(!is_marked(obj));
   switch (obj->type & (~schemerlicht_int_gcmark_bit))
     {
     case schemerlicht_object_type_vector:
@@ -116,9 +115,9 @@ static void mark_object_pointer(schemerlicht_object* obj)
   }
 
 static void unmark_object_pointer(schemerlicht_object* obj)
-  {  
+  {
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type&(~schemerlicht_int_gcmark_bit))
+  switch (obj->type & (~schemerlicht_int_gcmark_bit))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -140,22 +139,16 @@ static void unmark_object_pointer(schemerlicht_object* obj)
   schemerlicht_assert(is_value_object(obj) == 0);
   }
 
-// returns position in the new heap of the object
-static schemerlicht_memsize collect_object(schemerlicht_object* obj, gc_state* state)
+static void collect_object(schemerlicht_object* obj, gc_state* state)
   {
-  schemerlicht_assert(is_value_object(obj) == 0);
-  if (is_marked(obj))
+  if (is_value_object(obj) == 0)
     {
-    return schemerlicht_mem_invalid_size;
-    }
-  else
-    {
-    mark_object_pointer(obj);
-    schemerlicht_memsize ret = state->gc_heap_pos;
-    ++(state->gc_heap_pos);
-    //schemerlicht_assert(state->gc_heap_pos < state->heap_size/2);
-    state->target_heap[ret] = *obj;
-    return ret;
+    if (is_marked(obj) == 0)
+      {
+      mark_object_pointer(obj);
+      state->target_heap[state->gc_heap_pos] = *obj;
+      ++(state->gc_heap_pos);
+      }
     }
   }
 
@@ -165,8 +158,8 @@ static void sweep_globals(schemerlicht_context* ctxt, gc_state* state)
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->globals, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    if (is_marked(it) == 0 && is_value_object(it) == 0)
-      collect_object(it, state);
+    //if (is_marked(it) == 0 && is_value_object(it) == 0)
+    collect_object(it, state);
     }
   }
 
@@ -178,8 +171,8 @@ static void sweep_stack(schemerlicht_context* ctxt, gc_state* state)
     schemerlicht_object* sit = schemerlicht_vector_begin(&ctxt->stack_raw, schemerlicht_object);
     for (schemerlicht_memsize j = 0; j < raw_stack_buffer_size; ++j, ++sit)
       {
-      if (is_marked(sit) == 0 && is_value_object(sit) == 0)
-        collect_object(sit, state);
+      //if (is_marked(sit) == 0 && is_value_object(sit) == 0)
+      collect_object(sit, state);
       }
     }
   schemerlicht_object* it = schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object);
@@ -188,8 +181,8 @@ static void sweep_stack(schemerlicht_context* ctxt, gc_state* state)
     {
     if (it->type == schemerlicht_object_type_blocking)
       break;
-    if (is_marked(it) == 0 && is_value_object(it) == 0)
-      collect_object(it, state);
+    //if (is_marked(it) == 0 && is_value_object(it) == 0)
+    collect_object(it, state);
     }
   }
 
@@ -200,8 +193,8 @@ static void sweep_gc_save_list(schemerlicht_context* ctxt, gc_state* state)
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->gc_save_list, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    if (is_marked(it) == 0 && is_value_object(it) == 0)
-      collect_object(it, state);
+    //if (is_marked(it) == 0 && is_value_object(it) == 0)
+    collect_object(it, state);
     }
   }
 
@@ -224,6 +217,8 @@ static void scan_target_space(gc_state* state)
       schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
       for (; it != it_end; ++it)
         {
+        collect_object(it, state);
+        /*
         if (it->type & schemerlicht_int_gcmark_bit)
           {
           it->type &= ~schemerlicht_int_gcmark_bit; //temporarily unmark
@@ -236,6 +231,7 @@ static void scan_target_space(gc_state* state)
           if (is_marked(it) == 0 && is_value_object(it) == 0)
             collect_object(it, state);
           }
+        */
         }
       break;
       }
@@ -255,9 +251,8 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   sweep_globals(ctxt, &state);
   sweep_stack(ctxt, &state);
   sweep_gc_save_list(ctxt, &state);
-  scan_target_space(&state);
-  if (is_marked(&ctxt->empty_continuation)==0)
-    mark_object_pointer(&ctxt->empty_continuation);
+  scan_target_space(&state);  
+  mark_object_pointer(&ctxt->empty_continuation);
   for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
     {
     schemerlicht_object* obj = state.source_heap + i;
@@ -266,24 +261,24 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
       unmark_object_pointer(obj);
     if (obj->type == schemerlicht_object_type_blocking)
       break;
-    if (obj->type == schemerlicht_object_type_symbol) // symbols are a special case because they are unique
-      {
-      obj->type = schemerlicht_object_type_blocking;
-      continue;
-      }
-    if (obj->type == schemerlicht_object_type_lambda) // lambdas are in the lambdas vector
-      {
-      obj->type = schemerlicht_object_type_blocking;
-      continue;
-      }
     if (marked == 0)
       {
       schemerlicht_object_destroy(ctxt, obj);
       }
     obj->type = schemerlicht_object_type_blocking;
     }
+  //for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
+  //  {
+  //  schemerlicht_object* obj = state.source_heap + i;
+  //  obj->type = schemerlicht_object_type_blocking;
+  //  }
   ctxt->heap = state.target_heap;
   ctxt->heap_pos = state.gc_heap_pos;
+  //for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
+  //  {
+  //  schemerlicht_object* obj = state.target_heap + i;
+  //  obj->type &= ~schemerlicht_int_gcmark_bit;
+  //  }
   unmark_object_pointer(&ctxt->empty_continuation);
   int c1 = clock();
   ctxt->time_spent_gc += c1 - c0;
