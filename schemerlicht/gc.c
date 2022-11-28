@@ -48,7 +48,7 @@ void schemerlicht_check_garbage_collection(schemerlicht_context* ctxt)
 static int is_marked(schemerlicht_object* obj)
   {
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type & (~schemerlicht_int_gcmark_bit))
+  switch (schemerlicht_object_get_type(obj))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -69,7 +69,7 @@ static int is_marked(schemerlicht_object* obj)
 
 static int is_value_object(schemerlicht_object* obj)
   {
-  switch (obj->type & (~schemerlicht_int_gcmark_bit))
+  switch (schemerlicht_object_get_type(obj))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_string:
@@ -88,7 +88,7 @@ static void mark_object_pointer(schemerlicht_object* obj)
   {
   schemerlicht_assert(is_value_object(obj) == 0);
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type & (~schemerlicht_int_gcmark_bit))
+  switch (schemerlicht_object_get_type(obj))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -117,7 +117,7 @@ static void mark_object_pointer(schemerlicht_object* obj)
 static void unmark_object_pointer(schemerlicht_object* obj)
   {
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
-  switch (obj->type & (~schemerlicht_int_gcmark_bit))
+  switch (schemerlicht_object_get_type(obj))
     {
     case schemerlicht_object_type_vector:
     case schemerlicht_object_type_closure:
@@ -158,7 +158,6 @@ static void sweep_globals(schemerlicht_context* ctxt, gc_state* state)
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->globals, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    //if (is_marked(it) == 0 && is_value_object(it) == 0)
     collect_object(it, state);
     }
   }
@@ -171,7 +170,6 @@ static void sweep_stack(schemerlicht_context* ctxt, gc_state* state)
     schemerlicht_object* sit = schemerlicht_vector_begin(&ctxt->stack_raw, schemerlicht_object);
     for (schemerlicht_memsize j = 0; j < raw_stack_buffer_size; ++j, ++sit)
       {
-      //if (is_marked(sit) == 0 && is_value_object(sit) == 0)
       collect_object(sit, state);
       }
     }
@@ -179,9 +177,8 @@ static void sweep_stack(schemerlicht_context* ctxt, gc_state* state)
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->stack, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    if (it->type == schemerlicht_object_type_blocking)
+    if (schemerlicht_object_get_type(it) == schemerlicht_object_type_blocking)
       break;
-    //if (is_marked(it) == 0 && is_value_object(it) == 0)
     collect_object(it, state);
     }
   }
@@ -193,7 +190,6 @@ static void sweep_gc_save_list(schemerlicht_context* ctxt, gc_state* state)
   schemerlicht_object* it_end = schemerlicht_vector_end(&ctxt->gc_save_list, schemerlicht_object);
   for (; it != it_end; ++it)
     {
-    //if (is_marked(it) == 0 && is_value_object(it) == 0)
     collect_object(it, state);
     }
   }
@@ -203,9 +199,9 @@ static void scan_target_space(gc_state* state)
   for (schemerlicht_memsize i = 0; i < state->heap_size; ++i)
     {
     schemerlicht_object* obj = state->target_heap + i;
-    if (obj->type == schemerlicht_object_type_blocking)
+    if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_blocking)
       break;
-    switch (obj->type & (~schemerlicht_int_gcmark_bit))
+    switch (schemerlicht_object_get_type(obj))
       {
       case schemerlicht_object_type_vector:
       case schemerlicht_object_type_pair:
@@ -217,21 +213,7 @@ static void scan_target_space(gc_state* state)
       schemerlicht_object* it_end = schemerlicht_vector_end(&obj->value.v, schemerlicht_object);
       for (; it != it_end; ++it)
         {
-        collect_object(it, state);
-        /*
-        if (it->type & schemerlicht_int_gcmark_bit)
-          {
-          it->type &= ~schemerlicht_int_gcmark_bit; //temporarily unmark
-          if (is_marked(it) == 0 && is_value_object(it) == 0)
-            collect_object(it, state);
-          it->type |= schemerlicht_int_gcmark_bit; //undo unmark
-          }
-        else
-          {
-          if (is_marked(it) == 0 && is_value_object(it) == 0)
-            collect_object(it, state);
-          }
-        */
+        collect_object(it, state);        
         }
       break;
       }
@@ -259,7 +241,7 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
     int marked = is_marked(obj);
     if (marked)
       unmark_object_pointer(obj);
-    if (obj->type == schemerlicht_object_type_blocking)
+    if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_blocking)
       break;
     if (marked == 0)
       {

@@ -6,9 +6,9 @@
 
 int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
-  if (obj1->type != obj2->type)
+  if (schemerlicht_object_get_type(obj1) != schemerlicht_object_get_type(obj2))
     return 0;
-  switch (obj1->type)
+  switch (schemerlicht_object_get_type(obj1))
     {
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_true:
@@ -46,7 +46,7 @@ int schemerlicht_objects_eqv(const schemerlicht_object* obj1, const schemerlicht
 
 static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
-  schemerlicht_assert(obj1->type == obj2->type);
+  schemerlicht_assert(schemerlicht_object_get_type(obj1) == schemerlicht_object_get_type(obj2));
   schemerlicht_assert(obj1->value.v.vector_size == obj2->value.v.vector_size);
   schemerlicht_vector left_queue, right_queue;
   schemerlicht_vector_init(ctxt, &left_queue, schemerlicht_object);
@@ -66,13 +66,13 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
     schemerlicht_object* o2 = schemerlicht_vector_back(&right_queue, schemerlicht_object);
     schemerlicht_vector_pop_back(&left_queue);
     schemerlicht_vector_pop_back(&right_queue);
-    if (o1->type != o2->type)
+    if (schemerlicht_object_get_type(o1) != schemerlicht_object_get_type(o2))
       {
       schemerlicht_vector_destroy(ctxt, &left_queue);
       schemerlicht_vector_destroy(ctxt, &right_queue);
       return 0;
       }
-    switch (o1->type)
+    switch (schemerlicht_object_get_type(o1))
       {
       case schemerlicht_object_type_undefined:
       case schemerlicht_object_type_true:
@@ -153,9 +153,9 @@ static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, cons
 
 int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
-  if (obj1->type != obj2->type)
+  if (schemerlicht_object_get_type(obj1) != schemerlicht_object_get_type(obj2))
     return 0;
-  switch (obj1->type)
+  switch (schemerlicht_object_get_type(obj1))
     {
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_true:
@@ -360,7 +360,7 @@ schemerlicht_object make_schemerlicht_object_vector(schemerlicht_context* ctxt, 
 
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
-  switch (obj->type)
+  switch (schemerlicht_object_get_type(obj))
     {
     case schemerlicht_object_type_string:
     {
@@ -468,7 +468,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
       }
     else
       {
-      switch (current_task.obj->type)
+      switch (schemerlicht_object_get_type(current_task.obj))
         {
         case schemerlicht_object_type_undefined:
           schemerlicht_string_append_cstr(ctxt, &s, "#undefined");
@@ -616,12 +616,12 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           schemerlicht_runtime_task task = make_text_task(")");
           schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
           }
-        if (second->type != schemerlicht_object_type_nil)
+        if (schemerlicht_object_get_type(second) != schemerlicht_object_type_nil)
           {
           schemerlicht_runtime_task task = make_object_task(second);
           task.second_item_of_pair = 1;
           schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
-          if (second->type != schemerlicht_object_type_pair)
+          if (schemerlicht_object_get_type(second) != schemerlicht_object_type_pair)
             {
             task = make_text_task(" . ");
             schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
