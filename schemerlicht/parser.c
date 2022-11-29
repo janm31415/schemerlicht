@@ -1696,9 +1696,9 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
 static enum schemerlicht_expression_type find_current_expression_type(schemerlicht_context* ctxt, token** token_it)
   {
   schemerlicht_object* obj = schemerlicht_map_get_string(ctxt->global->expression_map, (*token_it)->value.string_ptr);
-  if (obj == NULL || obj->type == schemerlicht_object_type_undefined)
+  if (obj == NULL || schemerlicht_object_get_type(obj) == schemerlicht_object_type_undefined)
     return schemerlicht_et_funcall_or_variable;
-  schemerlicht_assert(obj->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(schemerlicht_object_get_type(obj) == schemerlicht_object_type_fixnum);
   return obj->value.fx;
   }
 

@@ -196,7 +196,7 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
     }
   quote_object = schemerlicht_map_get(ctxt, ctxt->quote_to_index, &key);
   schemerlicht_assert(quote_object != NULL);
-  schemerlicht_assert(quote_object->type == schemerlicht_object_type_fixnum);
+  schemerlicht_assert(schemerlicht_object_get_type(quote_object) == schemerlicht_object_type_fixnum);
   schemerlicht_expression var = schemerlicht_init_variable(ctxt);
   schemerlicht_string_init(ctxt, &var.expr.var.name, "#%q");
   sprintf(buffer, "%lld", quote_object->value.fx);

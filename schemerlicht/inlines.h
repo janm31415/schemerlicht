@@ -6,7 +6,7 @@
     { \
     const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (aa) + (cc) + 1, schemerlicht_object); \
     const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa) + (cc) + 2, schemerlicht_object); \
-    if (arg1->type == schemerlicht_object_type_fixnum && arg2->type == schemerlicht_object_type_fixnum) \
+    if (schemerlicht_object_get_type(arg1) == schemerlicht_object_type_fixnum && schemerlicht_object_get_type(arg2) == schemerlicht_object_type_fixnum) \
       { \
       switch (function_id) \
       { \
@@ -85,7 +85,7 @@
           } \
       } \
       } \
-    else if (arg1->type == schemerlicht_object_type_flonum && arg2->type == schemerlicht_object_type_flonum) \
+    else if (schemerlicht_object_get_type(arg1) == schemerlicht_object_type_flonum && schemerlicht_object_get_type(arg2) == schemerlicht_object_type_flonum) \
       { \
       switch (function_id) \
       { \

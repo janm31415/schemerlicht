@@ -147,6 +147,7 @@ static void collect_object(schemerlicht_object* obj, gc_state* state)
       {
       mark_object_pointer(obj);
       state->target_heap[state->gc_heap_pos] = *obj;
+      state->target_heap[state->gc_heap_pos].type &= ~schemerlicht_int_gcmark_bit;
       ++(state->gc_heap_pos);
       }
     }

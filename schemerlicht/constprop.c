@@ -23,7 +23,7 @@ static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
     key.type = schemerlicht_object_type_string;
     key.value.s = it->binding_name;
     schemerlicht_object* value = schemerlicht_map_insert(ctxt, vis->is_unmutable, &key);
-    if (value->type == schemerlicht_object_type_undefined)
+    if (schemerlicht_object_get_type(value) == schemerlicht_object_type_undefined)
       {
       value->type = schemerlicht_object_type_fixnum;
       value->value.fx = 1;
@@ -56,7 +56,7 @@ static void visit_variable(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   key.type = schemerlicht_object_type_string;
   key.value.s = e->expr.var.name;
   schemerlicht_object* value = schemerlicht_map_insert(ctxt, vis->is_unmutable, &key);
-  if (value->type == schemerlicht_object_type_undefined)
+  if (schemerlicht_object_get_type(value) == schemerlicht_object_type_undefined)
     {
     value->type = schemerlicht_object_type_fixnum;
     value->value.fx = 0; // We get here if the variable was unknown so far. That means it could have been defined previously and might be mutable

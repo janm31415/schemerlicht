@@ -50,7 +50,7 @@ static void make_code_abc(schemerlicht_context* ctxt, schemerlicht_function* fun
 static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* k)
   {
   const schemerlicht_object* idx = schemerlicht_map_get(ctxt, fun->constants_map, k);
-  if (idx != NULL && idx->type == schemerlicht_object_type_fixnum)
+  if (idx != NULL && schemerlicht_object_get_type(idx) == schemerlicht_object_type_fixnum)
     {
     schemerlicht_object_destroy(ctxt, k); // the key should be destroyed as the object was already added to the constants map
     return cast(int, idx->value.fx);
@@ -61,16 +61,6 @@ static int get_k(schemerlicht_context* ctxt, schemerlicht_function* fun, schemer
     new_id->type = schemerlicht_object_type_fixnum;
     new_id->value.fx = fun->constants.vector_size;
     schemerlicht_vector_push_back(ctxt, &fun->constants, *k, schemerlicht_object);
-    //if (k->type == schemerlicht_object_type_symbol)
-    //  {
-    //  printf("add to symbols list\n");
-    //  }
-    //if (k->type == schemerlicht_object_type_string || k->type == schemerlicht_object_type_lambda)
-    //  {
-    //  schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-    //  schemerlicht_set_object(heap_obj, k);
-    //  ++ctxt->heap_pos;
-    //  }
     return cast(int, new_id->value.fx);
     }
   }
@@ -317,7 +307,7 @@ static void compile_prim_iterative(schemerlicht_context* ctxt, compiler_expressi
       {
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
-    schemerlicht_assert(prim->type == schemerlicht_object_type_primitive);
+    schemerlicht_assert(schemerlicht_object_get_type(prim) == schemerlicht_object_type_primitive);
     const schemerlicht_memsize nr_prim_args = state->expr->expr.prim.arguments.vector_size;
     schemerlicht_vector_push_back(ctxt, &helper->expressions_to_treat, init_compiler_expression_state(state->expr, state->fun, state->freereg, compiler_state_step_1), compiler_expression_state);
 
@@ -340,7 +330,7 @@ static void compile_prim_iterative_step_1(schemerlicht_context* ctxt, compiler_e
     {
     schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
     }
-  schemerlicht_assert(prim->type == schemerlicht_object_type_primitive);
+  schemerlicht_assert(schemerlicht_object_get_type(prim) == schemerlicht_object_type_primitive);
   const schemerlicht_memsize nr_prim_args = state->expr->expr.prim.arguments.vector_size;
   if (strcmp(state->expr->expr.prim.name.string_ptr, "halt") == 0)
     {
@@ -548,7 +538,7 @@ static void compile_foreign_iterative(schemerlicht_context* ctxt, compiler_expre
     }
   else
     {
-    schemerlicht_assert(pos->type == schemerlicht_object_type_fixnum);
+    schemerlicht_assert(schemerlicht_object_get_type(pos) == schemerlicht_object_type_fixnum);
     const schemerlicht_memsize position = cast(schemerlicht_memsize, pos->value.fx);
     //schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
     const schemerlicht_memsize nr_args = state->expr->expr.foreign.arguments.vector_size;

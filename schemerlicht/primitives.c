@@ -5649,7 +5649,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       while (found_block == 0)
         {
         schemerlicht_object* stack_item = schemerlicht_vector_at(&ctxt->stack, a + 2 + cnt, schemerlicht_object);
-        if (stack_item->type == schemerlicht_object_type_blocking)
+        if (schemerlicht_object_get_type(stack_item) == schemerlicht_object_type_blocking)
           {
           found_block = 1;
           }
@@ -5699,7 +5699,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       */
       schemerlicht_vector_pop_back(&ctxt->gc_save_list);
       //schemerlicht_object* lam = schemerlicht_vector_begin(&continuation->value.v, schemerlicht_object);
-      //schemerlicht_assert(lam->type == schemerlicht_object_type_lambda);
+      //schemerlicht_assert(schemerlicht_object_get_type(lam) == schemerlicht_object_type_lambda);
       //schemerlicht_assert(((schemerlicht_function*)lam->value.ptr)->function_definition.string_length < 1024);
       }
     else
