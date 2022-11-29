@@ -11,6 +11,7 @@
 
 #include <setjmp.h>
 
+#define SCHEMERLICHT_USE_POOL
 #define SCHEMERLICHT_MAX_POOL 8
 
 #define SCHEMERLICHT_STRING_PORT_ID -2
@@ -60,7 +61,9 @@ struct schemerlicht_context
   schemerlicht_memsize quote_to_index_size;
   schemerlicht_vector overrides; // stringvec with names of primitives that were overridden
   uint64_t time_spent_gc;
+#ifdef SCHEMERLICHT_USE_POOL
   schemerlicht_pool_allocator pool[SCHEMERLICHT_MAX_POOL];
+#endif
   schemerlicht_vector externals;
   schemerlicht_map* externals_map;
   schemerlicht_vector lambdas;

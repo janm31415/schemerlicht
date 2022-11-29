@@ -166,7 +166,7 @@ static void resize(schemerlicht_context* ctxt, schemerlicht_map* t, schemerlicht
     /* re-insert elements from vanishing slice */
     for (i = nasize; i < oldasize; ++i)
       {
-      if (t->array[i].type != schemerlicht_object_type_undefined)
+      if ((t->array[i].type & ~schemerlicht_int_gcmark_bit) != schemerlicht_object_type_undefined)
         {
         schemerlicht_object* obj = schemerlicht_map_insert_indexed(ctxt, t, i + 1);
         schemerlicht_set_object(obj, &t->array[i]);
@@ -215,9 +215,9 @@ void schemerlicht_map_keys_free(schemerlicht_context* ctxt, schemerlicht_map* ma
   schemerlicht_memsize size = node_size(map);
   for (schemerlicht_memsize i = 0; i < size; ++i)
     {
-    if (map->node[i].key.type == schemerlicht_object_type_string)
+    if ((map->node[i].key.type & ~schemerlicht_int_gcmark_bit) == schemerlicht_object_type_string)
       schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
-    if (map->node[i].key.type == schemerlicht_object_type_symbol)
+    if ((map->node[i].key.type & ~schemerlicht_int_gcmark_bit) == schemerlicht_object_type_symbol)
       schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
     }
   }
@@ -227,23 +227,15 @@ void schemerlicht_map_values_free(schemerlicht_context* ctxt, schemerlicht_map* 
   schemerlicht_memsize size = node_size(map);
   for (schemerlicht_memsize i = 0; i < size; ++i)
     {
-    if (map->node[i].value.type == schemerlicht_object_type_string)
+    if ((map->node[i].value.type & ~schemerlicht_int_gcmark_bit) == schemerlicht_object_type_string)
       schemerlicht_string_destroy(ctxt, &(map->node[i].value.value.s));
-    if (map->node[i].value.type == schemerlicht_object_type_symbol)
+    if ((map->node[i].value.type & ~schemerlicht_int_gcmark_bit) == schemerlicht_object_type_symbol)
       schemerlicht_string_destroy(ctxt, &(map->node[i].value.value.s));
     }
   }
 
 void schemerlicht_map_free(schemerlicht_context* ctxt, schemerlicht_map* map)
   {
-  //schemerlicht_memsize size = node_size(map);
-  //for (schemerlicht_memsize i = 0; i < size; ++i)
-  //  {
-  //  if (map->node[i].key.type == schemerlicht_object_type_string)
-  //    schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
-  //  if (map->node[i].key.type == schemerlicht_object_type_symbol)
-  //    schemerlicht_string_destroy(ctxt, &(map->node[i].key.value.s));
-  //  }
   schemerlicht_freevector(ctxt, map->node, node_size(map), schemerlicht_map_node);
   schemerlicht_freevector(ctxt, map->array, map->array_size, schemerlicht_object);
   schemerlicht_delete(ctxt, map);
@@ -295,7 +287,7 @@ static schemerlicht_map_node* schemerlicht_main_position(const schemerlicht_map*
   {
   switch (schemerlicht_object_get_type(key))
     {
-    case schemerlicht_object_type_void:    
+    case schemerlicht_object_type_void:
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_blocking:
     case schemerlicht_object_type_true:
@@ -367,7 +359,7 @@ schemerlicht_object* schemerlicht_map_get_string(schemerlicht_map* map, const ch
   schemerlicht_map_node* n = schemerlicht_hash_string(map, str);
   do
     {
-    if ((schemerlicht_object_get_type(get_key(n)) == schemerlicht_object_type_string) && (strcmp(get_key(n)->value.s.string_ptr, str)==0))
+    if ((schemerlicht_object_get_type(get_key(n)) == schemerlicht_object_type_string) && (strcmp(get_key(n)->value.s.string_ptr, str) == 0))
       return get_value(n);
     else
       n = n->next;
@@ -477,5 +469,5 @@ schemerlicht_object* schemerlicht_map_insert_string(schemerlicht_context* ctxt, 
     schemerlicht_object key = make_schemerlicht_object_string(ctxt, str);
     schemerlicht_object* obj = new_key(ctxt, map, &key);
     return obj;
-    }  
+    }
   }

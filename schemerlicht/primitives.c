@@ -4394,7 +4394,7 @@ void schemerlicht_primitive_length(schemerlicht_context* ctxt, int a, int b, int
           break;
           }
         }
-      if (ret.type == schemerlicht_object_type_fixnum)
+      if (schemerlicht_object_get_type(&ret) == schemerlicht_object_type_fixnum)
         ret.value.fx = length;
       }
     }
@@ -5538,7 +5538,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
     --b;
     while (schemerlicht_object_get_type(last_arg) == schemerlicht_object_type_pair)
       {
-      if (a + c + b >= ctxt->stack.vector_size)
+      if (a + c + b + 1 >= ctxt->stack.vector_size)
         {
         schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_MEMORY, -1, -1, "stack overflow in apply.");
         ra->type = schemerlicht_object_type_undefined;
@@ -5727,10 +5727,8 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
     }
   else
     {
-    schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-    ++ctxt->heap_pos;
-    heap_obj->type = schemerlicht_object_type_nil;
-    schemerlicht_object* last_list_obj = heap_obj;
+    schemerlicht_object* last_list_obj = ra;
+    last_list_obj->type = schemerlicht_object_type_nil;
     for (int i = 0; i < b; ++i)
       {
       schemerlicht_object* current_list = schemerlicht_vector_at(&ctxt->stack, a + c + 1 + i, schemerlicht_object);
@@ -5751,6 +5749,9 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
         schemerlicht_object* v0 = schemerlicht_vector_at(&current_list->value.v, 0, schemerlicht_object);
         schemerlicht_object* v1 = schemerlicht_vector_at(&current_list->value.v, 1, schemerlicht_object);
         *last_list_obj = make_schemerlicht_object_pair(ctxt);
+        schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+        ++ctxt->heap_pos;
+        schemerlicht_set_object(heap_obj, last_list_obj);
         *schemerlicht_vector_at(&last_list_obj->value.v, 0, schemerlicht_object) = *v0;
         last_list_obj = schemerlicht_vector_at(&last_list_obj->value.v, 1, schemerlicht_object);
         last_list_obj->type = schemerlicht_object_type_nil;
@@ -5764,7 +5765,6 @@ void schemerlicht_primitive_append(schemerlicht_context* ctxt, int a, int b, int
           }
         }
       }
-    schemerlicht_set_object(ra, heap_obj);
     }
   }
 

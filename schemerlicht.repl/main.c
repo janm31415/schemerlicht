@@ -216,7 +216,7 @@ int main(int argc, char** argv)
 
   char command_buffer[COMMAND_BUFFER_LENGTH];
 
-  schemerlicht_context* ctxt = schemerlicht_open(1024 * 1024 * 32);
+  schemerlicht_context* ctxt = schemerlicht_open(1024 * 1024 * 4);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);

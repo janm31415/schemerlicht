@@ -113,7 +113,7 @@ static void add_to_macro_map(schemerlicht_context* ctxt, schemerlicht_string* ma
   key.type = schemerlicht_object_type_string;
   schemerlicht_string_copy(ctxt, &key.value.s, macro_name);
   schemerlicht_object* value = schemerlicht_map_insert(ctxt, ctxt->macro_map, &key);
-  if (value->type != schemerlicht_object_type_undefined) // if macro already exists in map
+  if (schemerlicht_object_get_type(value) != schemerlicht_object_type_undefined) // if macro already exists in map
     {
     // then clean key
     schemerlicht_string_destroy(ctxt, &key.value.s);

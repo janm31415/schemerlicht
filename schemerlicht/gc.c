@@ -86,7 +86,6 @@ static int is_value_object(schemerlicht_object* obj)
 
 static void mark_object_pointer(schemerlicht_object* obj)
   {
-  schemerlicht_assert(is_value_object(obj) == 0);
   schemerlicht_assert(MINSIZEVECTOR > 0); // this asserts that each vector has at least one object
   switch (schemerlicht_object_get_type(obj))
     {
@@ -110,7 +109,7 @@ static void mark_object_pointer(schemerlicht_object* obj)
       obj->value.s.string_ptr[obj->value.s.string_length] = 1; // abuse invariable: strings end with 0 character
       break;
     default:
-      schemerlicht_assert(0);
+      break;
     }
   }
 
@@ -134,9 +133,8 @@ static void unmark_object_pointer(schemerlicht_object* obj)
       obj->value.s.string_ptr[obj->value.s.string_length] = 0; // abuse invariable: strings end with 0 character
       break;
     default:
-      schemerlicht_assert(0);
-    }
-  schemerlicht_assert(is_value_object(obj) == 0);
+      break;
+    }  
   }
 
 static void collect_object(schemerlicht_object* obj, gc_state* state)
@@ -247,14 +245,20 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
     if (marked == 0)
       {
       schemerlicht_object_destroy(ctxt, obj);
+      obj->type = schemerlicht_object_type_undefined;
       }
     obj->type = schemerlicht_object_type_blocking;
     }
-  //for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
-  //  {
-  //  schemerlicht_object* obj = state.source_heap + i;
-  //  obj->type = schemerlicht_object_type_blocking;
-  //  }
+  /*
+  for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
+    {
+    schemerlicht_object* obj = state.source_heap + i;
+    unmark_object_pointer(obj);
+    if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_blocking)
+      break;
+    obj->type = schemerlicht_object_type_blocking;
+    }
+  */
   ctxt->heap = state.target_heap;
   ctxt->heap_pos = state.gc_heap_pos;
   //for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
