@@ -40,6 +40,7 @@ r5rs.h
 reader.h
 schemerlicht.h
 simplifyconv.h
+stackreduce.h
 stream.h
 string.h
 stringvec.h
@@ -89,6 +90,7 @@ quotecollect.c
 r5rs.c
 reader.c
 simplifyconv.c
+stackreduce.c
 stream.c
 string.c
 stringvec.c

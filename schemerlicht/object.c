@@ -46,6 +46,15 @@ int schemerlicht_objects_eqv(const schemerlicht_object* obj1, const schemerlicht
 
 static int schemerlicht_objects_equal_recursive(schemerlicht_context* ctxt, const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
+#if 0
+  schemerlicht_string s1, s2;
+  s1 = schemerlicht_object_to_string(ctxt, obj1, 0);
+  s2 = schemerlicht_object_to_string(ctxt, obj2, 0);
+  printf("%s\n", s1.string_ptr);
+  printf("%s\n", s2.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s1);
+  schemerlicht_string_destroy(ctxt, &s2);
+#endif
   schemerlicht_assert(schemerlicht_object_get_type(obj1) == schemerlicht_object_get_type(obj2));
   schemerlicht_assert(obj1->value.v.vector_size == obj2->value.v.vector_size);
   schemerlicht_vector left_queue, right_queue;
@@ -597,13 +606,68 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         {
         if (!display)
           schemerlicht_string_append_cstr(ctxt, &s, "#\\");
+        int v = (int)current_task.obj->value.ch;
+        int done = 0;
+        if (display)
+          {
+          switch (v)
+            {
+            case 9:
+              schemerlicht_string_append_cstr(ctxt, &s, "\t");
+              done = 1;
+              break;
+            case 10:
+              schemerlicht_string_append_cstr(ctxt, &s, "\n");
+              done = 1;
+              break;
+            case 13:
+              schemerlicht_string_append_cstr(ctxt, &s, "\r");
+              done = 1;
+              break;
+            }
+          }
+        else
+          {
+          switch (v)
+            {
+            case 8:
+              schemerlicht_string_append_cstr(ctxt, &s, "backspace");
+              done = 1;
+              break;
+            case 9:
+              schemerlicht_string_append_cstr(ctxt, &s, "tab");
+              done = 1;
+              break;
+            case 10:
+              schemerlicht_string_append_cstr(ctxt, &s, "newline");
+              done = 1;
+              break;
+            case 11:
+              schemerlicht_string_append_cstr(ctxt, &s, "vtab");
+              done = 1;
+              break;
+            case 12:
+              schemerlicht_string_append_cstr(ctxt, &s, "page");
+              done = 1;
+              break;
+            case 13:
+              schemerlicht_string_append_cstr(ctxt, &s, "return");
+              done = 1;
+              break;
+            case 32:
+              schemerlicht_string_append_cstr(ctxt, &s, "space");
+              done = 1;
+              break;
+            }
+          }
+        if (done)
+          break;
         if (current_task.obj->value.ch > 31 && current_task.obj->value.ch < 127)
           {
           schemerlicht_string_push_back(ctxt, &s, current_task.obj->value.ch);
           }
         else
           {
-          int v = (int)current_task.obj->value.ch;
           char str[4];
           sprintf(str, "%d", v);
           str[3] = 0;

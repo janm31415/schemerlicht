@@ -28,6 +28,7 @@
 #include "schemerlicht/r5rs.h"
 #include "schemerlicht/macro.h"
 #include "schemerlicht/preprocess.h"
+#include "schemerlicht/stackreduce.h"
 
 #include <time.h>
 
@@ -114,6 +115,7 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
     schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);
     schemerlicht_quote_conversion(ctxt, &prog, &quotes);
     schemerlicht_quote_collection_destroy(ctxt, &quotes);
+    schemerlicht_stack_reduce_conversion(ctxt, &prog);
     schemerlicht_global_define_environment_allocation(ctxt, &prog);
     schemerlicht_continuation_passing_style(ctxt, &prog);
     schemerlicht_lambda_to_let_conversion(ctxt, &prog);
@@ -318,12 +320,12 @@ static void test_compile_char()
   test_compile_aux("#\\005", "#\\005");
   test_compile_aux("#\\006", "#\\006");
   test_compile_aux("#\\007", "#\\007");
-  test_compile_aux("#\\008", "#\\008");
-  test_compile_aux("#\\009", "#\\009");
-  test_compile_aux("#\\010", "#\\010");
-  test_compile_aux("#\\011", "#\\011");
-  test_compile_aux("#\\012", "#\\012");
-  test_compile_aux("#\\013", "#\\013");
+  test_compile_aux("#\\backspace", "#\\008");
+  test_compile_aux("#\\tab", "#\\009");
+  test_compile_aux("#\\newline", "#\\010");
+  test_compile_aux("#\\vtab", "#\\011");
+  test_compile_aux("#\\page", "#\\012");
+  test_compile_aux("#\\return", "#\\013");
   test_compile_aux("#\\014", "#\\014");
   test_compile_aux("#\\015", "#\\015");
   test_compile_aux("#\\016", "#\\016");
@@ -337,14 +339,14 @@ static void test_compile_char()
 
   test_compile_aux("#\\000", "#\\nul");
   test_compile_aux("#\\000", "#\\null");
-  test_compile_aux("#\\008", "#\\backspace");
-  test_compile_aux("#\\009", "#\\tab");
-  test_compile_aux("#\\010", "#\\newline");
-  test_compile_aux("#\\010", "#\\linefeed");
-  test_compile_aux("#\\011", "#\\vtab");
-  test_compile_aux("#\\012", "#\\page");
-  test_compile_aux("#\\013", "#\\return");
-  test_compile_aux("#\\ ", "#\\space");
+  test_compile_aux("#\\backspace", "#\\backspace");
+  test_compile_aux("#\\tab", "#\\tab");
+  test_compile_aux("#\\newline", "#\\newline");
+  test_compile_aux("#\\newline", "#\\linefeed");
+  test_compile_aux("#\\vtab", "#\\vtab");
+  test_compile_aux("#\\page", "#\\page");
+  test_compile_aux("#\\return", "#\\return");
+  test_compile_aux("#\\space", "#\\space");
   test_compile_aux("#\\127", "#\\rubout");
   }
 
@@ -2014,7 +2016,7 @@ static void test_case()
   test_compile_aux("5", "(let ([x #\\a]) (case x [(#\\newline) (char->fixnum x)] [else 5]))");
   test_compile_aux("10", "(let ([x #\\newline]) (case x [(#\\newline) (char->fixnum x)] [else 5]))");
   test_compile_aux("#t", "(let ([x #\\newline]) (eqv? x #\\newline))");
-  test_compile_aux("(#\\010)", "(let ([x #\\newline]) (memv x '(#\\newline)))");
+  test_compile_aux("(#\\newline)", "(let ([x #\\newline]) (memv x '(#\\newline)))");
   }
 
 static void test_named_let()
@@ -2455,7 +2457,8 @@ static void test_foreign()
 
 static void test_r5rs_funs()
   {
-  test_compile_aux("(a b c . d)", "(append '(a b) '(c . d))");  
+  
+  test_compile_aux("(a b c . d)", "(append '(a b) '(c . d))"); 
   test_compile_aux("(1 2 3 4)", "(append (list 1 2) (list 3 4))");
   test_compile_aux("(1 2 3 4)", "(append '(1 2) '(3 4))");
   test_compile_aux("(1 2 3 4 5 6 7 8)", "(append '(1 2) '(3 4) '(5 6) '(7 8))");
@@ -2464,7 +2467,7 @@ static void test_r5rs_funs()
   test_compile_aux("()", "(append '())");
   test_compile_aux("()", "(append '() '() '())");
   test_compile_aux("(1 2 3)", "(append '(1 2 3))");  
-
+  
   test_compile_aux("#t", "(exact? 3)");
   test_compile_aux("#f", "(exact? 3.14)");
   test_compile_aux("#f", "(inexact? 3)");
@@ -3020,7 +3023,7 @@ static void test_read()
 
 static void test_write()
   {  
-  test_compile_aux("\"50#\\\\ 3.141590\\\"FOO\\\"\n\\\"FOO\\\\\\\"BAR\\\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+  test_compile_aux("\"50#\\\\space3.141590\\\"FOO\\\"\n\\\"FOO\\\\\\\"BAR\\\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
     "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
     "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
     "(define ostr (open-output-string))\n"
@@ -3401,10 +3404,61 @@ static void test_car_bug()
     "(my-iota 5)"
   );
       
+  test_compile_aux("100", "(define (my-iota n) (do ((n n (- n 1)) (list '() (cons (- n 1) list))) ((zero? n) list)))\n"
+    "(length (my-iota 100)) (length (my-iota 100)) (length (my-iota 100)) (length (my-iota 100)) (length (my-iota 100)) (length (my-iota 100))"
+  );
+  }
+
+static void test_long_symbol()
+  {
+  test_compile_aux_heap("(#\\space #\\space #\\space #\\_ #\\space #\\space #\\space #\\_ #\\space #\\space #\\space #\\_ #\\newline #\\space #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\. #\\\\ #\\space #\\newline #\\/ #\\space #\\\\ #\\space #\\space #\\space #\\\\ #\\_ #\\space #\\. #\\space #\\space #\\/ #\\. #\\\\ #\\newline #\\\\ #\\space #\\space #\\space #\\\\ #\\space #\\/ #\\. #\\space #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\/ #\\. #\\space #\\_ #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\\\ #\\newline #\\\\ #\\space #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\space #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\space #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\\\ #\\newline #\\\\ #\\space #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\space #\\_ #\\/ #\\space #\\space #\\space #\\/ #\\newline #\\/ #\\space #\\\\ #\\space #\\/ #\\. #\\\\ #\\space #\\/ #\\. #\\\\ #\\_ #\\/ #\\space #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\space #\\\\ #\\space #\\/ #\\. #\\space #\\_ #\\space #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\space #\\_ #\\/ #\\space #\\\\ #\\space #\\space #\\space #\\\\ #\\newline #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\/ #\\space #\\space #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\space #\\_ #\\/ #\\space #\\space #\\space #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\\\ #\\newline #\\\\ #\\_ #\\space #\\space #\\\\ #\\space #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\space #\\. #\\\\ #\\newline #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\/ #\\space #\\space #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\space #\\space #\\\\ #\\space #\\/ #\\. #\\\\ #\\space #\\space #\\. #\\\\ #\\newline #\\\\ #\\space #\\/ #\\. #\\\\ #\\_ #\\space #\\. #\\space #\\space #\\/ #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\space #\\space #\\space #\\. #\\space #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\space #\\\\ #\\newline #\\\\ #\\space #\\/ #\\. #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\space #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\space #\\space #\\/ #\\space #\\space #\\_ #\\/ #\\space #\\\\ #\\newline #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\space #\\_ #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\\\ #\\_ #\\space #\\space #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\space #\\space #\\_ #\\/ #\\. #\\\\ #\\_ #\\space #\\space #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\space #\\_ #\\space #\\. #\\space #\\_ #\\space #\\space #\\\\ #\\newline #\\\\ #\\space #\\/ #\\space #\\\\ #\\_ #\\/ #\\. #\\space #\\_ #\\space #\\space #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\space #\\_ #\\space #\\space #\\\\ #\\space #\\space #\\space #\\\\ #\\_ #\\/ #\\space #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\space #\\. #\\\\ #\\_ #\\/ #\\space #\\space #\\_ #\\/ #\\newline #\\/ #\\space #\\\\ #\\space #\\space #\\. #\\space #\\_ #\\/ #\\space #\\space #\\space #\\/ #\\space #\\\\ #\\newline #\\\\ #\\space #\\/ #\\. #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\space #\\_ #\\/ #\\. #\\space #\\space #\\space #\\space #\\\\ #\\newline #\\\\ #\\space #\\space #\\space #\\space #\\space #\\space #\\. #\\space #\\space #\\/ #\\. #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\space #\\space #\\space #\\/ #\\space #\\\\ #\\_ #\\/ #\\. #\\space #\\space #\\/ #\\newline #\\/ #\\space #\\space #\\space #\\/ #\\space #\\space #\\_ #\\space #\\space #\\\\ #\\space #\\/ #\\space #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\/ #\\newline #\\/ #\\space #\\\\ #\\_ #\\/ #\\space #\\space #\\_ #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\\\ #\\newline #\\\\ #\\space #\\space #\\space #\\space #\\_ #\\/ #\\. #\\space #\\space #\\/ #\\. #\\space #\\_ #\\/ #\\newline #\\/ #\\space #\\\\ #\\space #\\/ #\\. #\\space #\\space #\\/ #\\space #\\\\ #\\_ #\\space #\\. #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\. #\\space #\\_ #\\/ #\\. #\\\\ #\\_ #\\/ #\\. #\\\\ #\\space #\\/ #\\newline #\\/ #\\space #\\space #\\_ #\\space #\\. #\\\\ #\\_ #\\space #\\. #\\space #\\_ #\\space #\\. #\\\\ #\\newline #\\\\ #\\_ #\\/ #\\space #\\\\ #\\space #\\/ #\\space #\\\\ #\\_ #\\/ #\\space #\\\\ #\\_ #\\/ #\\newline)"
+    , "(define long-symbol '\n"
+    "  (#\\  #\\  #\\  #\\_ #\\  #\\  #\\  #\\_ #\\  #\\  #\\  #\\_ #\\newline\n"
+    "   #\\  #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\. #\\\\ #\\  #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\  #\\  #\\  #\\\\ #\\_ #\\  #\\. #\\  #\\  #\\/ #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\  #\\  #\\\\ #\\  #\\/ #\\. #\\  #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\/ #\\. #\\  #\\_ #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\  #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\  #\\_ #\\/ #\\  #\\  #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\  #\\/ #\\. #\\\\ #\\  #\\/ #\\. #\\\\ #\\_ #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\  #\\\\ #\\  #\\/ #\\. #\\  #\\_ #\\  #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\  #\\_ #\\/ #\\  #\\\\ #\\  #\\  #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\/ #\\  #\\  #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\_ #\\/ #\\  #\\  #\\  #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\  #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\/ #\\  #\\  #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\  #\\  #\\\\ #\\  #\\/ #\\. #\\\\ #\\  #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\/ #\\. #\\\\ #\\_ #\\  #\\. #\\  #\\  #\\/ #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\  #\\  #\\. #\\  #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\/ #\\. #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\  #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\  #\\  #\\/ #\\  #\\  #\\_ #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\_ #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\_ #\\  #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\  #\\  #\\_ #\\/ #\\. #\\\\ #\\_ #\\  #\\  #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\  #\\_ #\\  #\\. #\\  #\\_ #\\  #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\/ #\\  #\\\\ #\\_ #\\/ #\\. #\\  #\\_ #\\  #\\  #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\_ #\\  #\\  #\\\\ #\\  #\\  #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\  #\\. #\\\\ #\\_ #\\/ #\\  #\\  #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\  #\\  #\\. #\\  #\\_ #\\/ #\\  #\\  #\\  #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\/ #\\. #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\  #\\_ #\\/ #\\. #\\  #\\  #\\  #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\  #\\  #\\  #\\  #\\  #\\. #\\  #\\  #\\/ #\\. #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\  #\\  #\\  #\\/ #\\  #\\\\ #\\_ #\\/ #\\. #\\  #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\  #\\/ #\\  #\\  #\\_ #\\  #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\. #\\\\ #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\  #\\_ #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\  #\\  #\\  #\\  #\\_ #\\/ #\\. #\\  #\\  #\\/ #\\. #\\  #\\_ #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\\\ #\\  #\\/ #\\. #\\  #\\  #\\/ #\\  #\\\\ #\\_ #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\. #\\  #\\_ #\\/ #\\. #\\\\ #\\_ #\\/ #\\. #\\\\ #\\  #\\/ #\\newline\n"
+    "   #\\/ #\\  #\\  #\\_ #\\  #\\. #\\\\ #\\_ #\\  #\\. #\\  #\\_ #\\  #\\. #\\\\ #\\newline\n"
+    "   #\\\\ #\\_ #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\newline))\n", 10000);
   }
 
 void run_all_compiler_tests()
-  {   
+  { 
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3429,7 +3483,7 @@ void run_all_compiler_tests()
     test_less();
     test_leq();
     test_greater();
-    test_geq();
+    test_geq();    
     test_compare_incorrect_argument();
     test_arithmetic();
     test_is_fixnum();
@@ -3452,7 +3506,7 @@ void run_all_compiler_tests()
     test_vector();
     test_pair();
     test_begin();        
-    test_letrec();
+    test_letrec();    
     test_lambdas();
     test_tailcall();
     test_closures();
@@ -3460,7 +3514,7 @@ void run_all_compiler_tests()
     test_letrec2();    
     test_inner_define();
     test_global_define();
-    test_list();
+    test_list();    
     test_scheme();
     test_fibonacci();
     test_vectors();
@@ -3476,7 +3530,7 @@ void run_all_compiler_tests()
     test_cond();
     test_newton();
     test_compile_cc();
-    test_compile_cc_2();
+    test_compile_cc_2();    
     //test_ack_performance();
     //test_fib_performance();    
     test_lambda_variable_arity_not_using_rest_arg();
@@ -3489,7 +3543,7 @@ void run_all_compiler_tests()
     test_case();
     test_named_let();
     test_list_ops();
-    test_symbol_ops();
+    test_symbol_ops();    
     test_string_ops();
     test_current_seconds();
     test_is_list();
@@ -3497,16 +3551,16 @@ void run_all_compiler_tests()
     test_override();
     test_apply();    
     test_foreign_1();
-    test_foreign();
-    test_r5rs_funs();
-    test_chars();
+    test_foreign();    
+    test_r5rs_funs();    
+    test_chars();    
     test_list_conversions();
     test_control_ops();
-    test_quasiquote();
+    test_quasiquote();    
     test_port();
     test_read();
     test_write();
-    test_display();
+    test_display();    
     if (i == 0)
       test_getenv(); // only run once, as the environment will be modified
     test_eval();
@@ -3528,7 +3582,8 @@ void run_all_compiler_tests()
     test_multi_float_print();
     test_float_rw_range();
     test_multiple_lines();    
-    test_car_bug();
+    test_car_bug();    
+    test_long_symbol();
 #endif            
     }
   }

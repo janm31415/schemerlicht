@@ -245,7 +245,6 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
     if (marked == 0)
       {
       schemerlicht_object_destroy(ctxt, obj);
-      obj->type = schemerlicht_object_type_undefined;
       }
     obj->type = schemerlicht_object_type_blocking;
     }

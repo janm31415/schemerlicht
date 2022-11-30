@@ -426,6 +426,13 @@ static schemerlicht_expression make_quote(schemerlicht_context* ctxt, token** to
   if (!token_next(ctxt, token_it, token_it_end))
     return schemerlicht_make_quote_expression(&q);
   q.arg = schemerlicht_read_quote(ctxt, token_it, token_it_end, 0);
+#if 0
+  schemerlicht_string stmp;
+  schemerlicht_string_init(ctxt, &stmp, "");
+  schemerlicht_dump_cell_to_string(ctxt, &q.arg, &stmp);
+  printf("%s\n", stmp.string_ptr);
+  schemerlicht_string_destroy(ctxt, &stmp);
+#endif
   return schemerlicht_make_quote_expression(&q);
   }
 

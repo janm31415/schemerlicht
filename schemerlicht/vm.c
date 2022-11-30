@@ -621,6 +621,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
       }
     const schemerlicht_instruction i = *pc++;
     const int opcode = SCHEMERLICHT_GET_OPCODE(i);
+    schemerlicht_assert((opcode == SCHEMERLICHT_OPCODE_JMP) || (SCHEMERLICHT_GETARG_A(i)< schemerlicht_maxstack));
     switch (opcode)
       {
       case SCHEMERLICHT_OPCODE_MOVE:

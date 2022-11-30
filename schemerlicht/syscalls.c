@@ -35,7 +35,7 @@ int schemerlicht_read(int fd, void* buffer, unsigned int buffer_size)
 int schemerlicht_open_output_file(const char* filename)
   {
 #ifdef _WIN32
-  return _open(filename, _O_CREAT | O_WRONLY | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
+  return _open(filename, _O_CREAT | O_WRONLY | O_TRUNC, _S_IREAD | _S_IWRITE);
 #elif defined(__APPLE__)
   return open(filename, O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
 #else // unix
@@ -46,7 +46,7 @@ int schemerlicht_open_output_file(const char* filename)
 int schemerlicht_open_input_file(const char* filename)
   {
 #ifdef _WIN32
-  return _open(filename, _O_RDONLY | O_BINARY, _S_IREAD | _S_IWRITE);
+  return _open(filename, _O_RDONLY, _S_IREAD | _S_IWRITE);
 #elif defined(__APPLE__)
   return open(filename, O_RDONLY, S_IREAD | S_IWRITE);
 #else // unix
