@@ -31,7 +31,7 @@ void schemerlicht_preprocess(schemerlicht_context* ctxt, schemerlicht_program* p
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, prog);
   schemerlicht_quote_conversion(ctxt, prog, &quotes);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
-  schemerlicht_stack_reduce_conversion(ctxt, prog);
+  schemerlicht_stack_reduce_conversion(ctxt, prog, schemerlicht_maxstack*8/10);
   schemerlicht_global_define_environment_allocation(ctxt, prog);
   schemerlicht_continuation_passing_style(ctxt, prog);
   schemerlicht_lambda_to_let_conversion(ctxt, prog);

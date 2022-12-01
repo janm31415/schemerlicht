@@ -3,12 +3,11 @@
 #include "context.h"
 #include "vector.h"
 
-#define max_vars_on_stack_allowed 200
-
 typedef struct schemerlicht_stack_reduce_visitor
   {
   schemerlicht_visitor* visitor;
   schemerlicht_vector estimated_vars_on_the_stack;
+  int max_vars_on_stack_allowed;
   } schemerlicht_stack_reduce_visitor;
 
 static void postvisit_let_binding(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_let_binding* e)
@@ -53,7 +52,7 @@ static int previsit_expression(schemerlicht_context* ctxt, schemerlicht_visitor*
     schemerlicht_stack_reduce_visitor* vis = (schemerlicht_stack_reduce_visitor*)(v->impl);
     int* vars = schemerlicht_vector_back(&vis->estimated_vars_on_the_stack, int);
     *vars += e->expr.prim.arguments.vector_size;
-    if (e->expr.prim.as_object == 0 && (*vars > max_vars_on_stack_allowed)) // if the stack is too full
+    if (e->expr.prim.as_object == 0 && (*vars > vis->max_vars_on_stack_allowed)) // if the stack is too full
       { // then change the prim call to a fun call with the prim as object. cps will make sure the stack is cleared.
       schemerlicht_expression funcall = schemerlicht_init_funcall(ctxt);
       e->expr.prim.as_object = 1;
@@ -115,6 +114,7 @@ static void postvisit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* 
 static schemerlicht_stack_reduce_visitor* schemerlicht_stack_reduce_visitor_new(schemerlicht_context* ctxt)
   {
   schemerlicht_stack_reduce_visitor* v = schemerlicht_new(ctxt, schemerlicht_stack_reduce_visitor);
+  v->max_vars_on_stack_allowed = schemerlicht_maxstack*8/10;
   schemerlicht_vector_init(ctxt, &v->estimated_vars_on_the_stack, int);
   schemerlicht_vector_push_back(ctxt, &v->estimated_vars_on_the_stack, 0, int);
   v->visitor = schemerlicht_visitor_new(ctxt, v);
@@ -141,9 +141,10 @@ static void schemerlicht_stack_reduce_visitor_free(schemerlicht_context* ctxt, s
     }
   }
 
-void schemerlicht_stack_reduce_conversion(schemerlicht_context* ctxt, schemerlicht_program* program)
+void schemerlicht_stack_reduce_conversion(schemerlicht_context* ctxt, schemerlicht_program* program, int max_vars_on_stack_allowed)
   {
   schemerlicht_stack_reduce_visitor* v = schemerlicht_stack_reduce_visitor_new(ctxt);
+  v->max_vars_on_stack_allowed = max_vars_on_stack_allowed;
   schemerlicht_visit_program(ctxt, v->visitor, program);
   schemerlicht_stack_reduce_visitor_free(ctxt, v);
   }
