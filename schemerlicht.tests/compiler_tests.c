@@ -3457,8 +3457,16 @@ static void test_long_symbol()
     "   #\\\\ #\\_ #\\/ #\\  #\\\\ #\\  #\\/ #\\  #\\\\ #\\_ #\\/ #\\  #\\\\ #\\_ #\\/ #\\newline))\n", 10000);
   }
 
+static void test_unquote_bug()
+  {
+  test_compile_aux("(55)", "(define (qt a) `(,a)  ) (qt 55)");
+  test_compile_aux("((55))", "(define(qt a) `(, (let((x `(, a))) x)))(qt 55)");
+  }
+
 void run_all_compiler_tests()
   { 
+  test_unquote_bug();
+  return;
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3584,6 +3592,7 @@ void run_all_compiler_tests()
     test_multiple_lines();    
     test_car_bug();    
     test_long_symbol();
+    test_unquote_bug();
 #endif            
     }
   }
