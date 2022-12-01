@@ -147,12 +147,24 @@ static void test_mbe(schemerlicht_context* ctxt)
   test_compile_aux(ctxt, "#t", "(import 'mbe)");
   test_compile_aux(ctxt, "#undefined", "(define-syntax and2 (syntax-rules() ((and2) #t) ((and2 test) test) ((and2 test1 test2 ...) (if test1(and2 test2 ...) #f))))");
   test_compile_aux(ctxt, "#t", "(and2 #t #t #t #t)");
-  //test_compile_aux(ctxt, "#f", "(and2 #f #t #t #t)");
-  //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #t)");
-  //test_compile_aux(ctxt, "#f", "(and2 #t #f #t #f)");
-  //test_compile_aux(ctxt, "#f", "(and2 #t #t #t #f)");
-  //test_compile_aux(ctxt, "#t", "(import 'slib)");
-  //test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
+  test_compile_aux(ctxt, "#f", "(and2 #f #t #t #t)");
+  test_compile_aux(ctxt, "#f", "(and2 #t #f #t #t)");
+  test_compile_aux(ctxt, "#f", "(and2 #t #f #t #f)");
+  test_compile_aux(ctxt, "#f", "(and2 #t #t #t #f)");
+  //test_compile_aux(ctxt, "#undefined", "(define-syntax or2 (syntax-rules() ((or2) #f) ((or2 test) test) ((or2 test1 test2 ...) (let ((t test1)) (if t t (or2 test2 ...)))  )))");
+  test_compile_aux(ctxt, "#undefined", "(define-syntax or2 (syntax-rules() ((or2) #f) ((or2 test) test) ((or2 test1 test2 ...) (if test1 #t (or2 test2 ...)))))");
+  test_compile_aux(ctxt, "#t", "(or2 #t #t #t #t)");
+  test_compile_aux(ctxt, "#t", "(or2 #f #t #t #t)");
+  test_compile_aux(ctxt, "#t", "(or2 #t #f #t #t)");
+  test_compile_aux(ctxt, "#t", "(or2 #t #f #t #f)");
+  test_compile_aux(ctxt, "#t", "(or2 #t #t #t #f)");
+  test_compile_aux(ctxt, "#f", "(or2 #f #f #f #f)");
+  }
+
+static void test_slib(schemerlicht_context* ctxt)
+  {
+  test_compile_aux(ctxt, "#t", "(import 'slib)");
+  test_compile_aux(ctxt, "#t", "(require 'new-catalog)");
   //test_compile_aux(ctxt, "#t", "(require 'srfi-1)");
   }
 
@@ -170,7 +182,7 @@ static void test_jaffer(schemerlicht_context* ctxt)
 void run_all_module_tests()
   {
   int c0 = clock();
-  schemerlicht_context* ctxt = schemerlicht_open(1024*1024*32);
+  schemerlicht_context* ctxt = schemerlicht_open(1024 * 1024 * 32);
   schemerlicht_compile_callcc(ctxt);
   schemerlicht_compile_r5rs(ctxt);
   schemerlicht_compile_input_output(ctxt);
@@ -181,9 +193,10 @@ void run_all_module_tests()
   test_srfi6(ctxt);
   test_srfi28(ctxt);
   test_csv(ctxt);
-  //test_mbe(ctxt);
+  test_mbe(ctxt);
   test_jaffer(ctxt);
   test_srfi1(ctxt);
+  test_slib(ctxt);
 
   schemerlicht_close(ctxt);
   }

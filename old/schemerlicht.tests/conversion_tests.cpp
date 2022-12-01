@@ -849,7 +849,16 @@ namespace
     prog = make_program(tokens);
     quasiquote_conversion(prog);
     TEST_EQ("( cons ( quote a ) ( cons ( cons ( quote quasiquote ) ( cons ( cons ( quote b ) ( cons ( cons ( quote unquote ) ( cons ( quote (+ 1 2) ) ( quote () ) ) ) ( cons ( cons ( quote unquote ) ( cons ( cons ( quote foo ) ( cons ( + 1 3 ) ( quote (d) ) ) ) ( quote () ) ) ) ( quote (e) ) ) ) ) ( quote () ) ) ) ( quote (f) ) ) ) ", to_string(prog));
-    }
+ 
+    script = "(define(qt a) `(, (let((x `(, a))) x)))";
+    tokens = tokenize(script);
+    std::reverse(tokens.begin(), tokens.end());
+    prog = make_program(tokens);
+    quasiquote_conversion(prog);
+    //std::cout << to_string(prog);
+    TEST_EQ("( define ( qt a ) ( cons ( let ( [ x ( cons a ( quote () ) ) ] ) ( begin x ) ) ( quote () ) ) ) ", to_string(prog));
+
+   }
 
   void test_inner_define_conversion()
     {

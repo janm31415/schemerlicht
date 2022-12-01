@@ -3465,8 +3465,6 @@ static void test_unquote_bug()
 
 void run_all_compiler_tests()
   { 
-  test_unquote_bug();
-  return;
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;

@@ -651,6 +651,7 @@ static void test_quasiquote_conversion()
   test_quasiquote("`( `(,(+ 1 2 ,(+ 3 4) ) ) )", "( cons ( cons ( quote quasiquote ) ( cons ( cons ( cons ( quote unquote ) ( cons ( cons ( quote + ) ( cons ( quote 1 ) ( cons ( quote 2 ) ( cons ( + 3 4 ) ( quote () ) ) ) ) ) ( quote () ) ) ) ( quote () ) ) ( quote () ) ) ) ( quote () ) ) ");
   test_quasiquote("`(,(+ 1 2 7) )", "( cons ( + 1 2 7 ) ( quote () ) ) ");
   test_quasiquote("`(a `(b ,(+ 1 2) ,(foo ,(+ 1 3) d) e) f)", "( cons ( quote a ) ( cons ( cons ( quote quasiquote ) ( cons ( cons ( quote b ) ( cons ( cons ( quote unquote ) ( cons ( quote (+ 1 2) ) ( quote () ) ) ) ( cons ( cons ( quote unquote ) ( cons ( cons ( quote foo ) ( cons ( + 1 3 ) ( quote (d) ) ) ) ( quote () ) ) ) ( quote (e) ) ) ) ) ( quote () ) ) ) ( quote (f) ) ) ) ");  
+  test_quasiquote("(define(qt a) `(, (let((x `(, a))) x)))", "( define ( qt a ) ( cons ( let ( [ x ( cons a ( quote () ) ) ] ) ( begin x ) ) ( quote () ) ) ) ");
   }
 
 static void test_lambda_to_let_conversion()

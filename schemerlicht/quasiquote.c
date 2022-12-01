@@ -489,6 +489,11 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   if (e->expr.quote.qt == schemerlicht_qt_backquote)
     {
     convert(ctxt, e);
+    schemerlicht_visitor_entry entry;
+    entry.binding = NULL;
+    entry.expr = e;
+    entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+    schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
     }
   }
 
