@@ -32,12 +32,12 @@ enum schemerlicht_opcode_mode { schemerlicht_iABC, schemerlicht_iABx, schemerlic
 /*
 ** size and position of opcode arguments.
 */
-#define SCHEMERLICHT_SIZE_C 9
-#define SCHEMERLICHT_SIZE_B 9
+#define SCHEMERLICHT_SIZE_C 8
+#define SCHEMERLICHT_SIZE_B 10
 #define SCHEMERLICHT_SIZE_Bx (SCHEMERLICHT_SIZE_C + SCHEMERLICHT_SIZE_B)
-#define SCHEMERLICHT_SIZE_A 8
+#define SCHEMERLICHT_SIZE_A 10
 
-#define SCHEMERLICHT_SIZE_OPCODE 6
+#define SCHEMERLICHT_SIZE_OPCODE 4
 
 #define SCHEMERLICHT_POS_C SCHEMERLICHT_SIZE_OPCODE
 #define SCHEMERLICHT_POS_B (SCHEMERLICHT_POS_C + SCHEMERLICHT_SIZE_C)

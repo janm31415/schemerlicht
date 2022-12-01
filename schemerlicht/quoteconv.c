@@ -209,6 +209,11 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   schemerlicht_string_destroy(ctxt, &e->expr.quote.filename);
 
   *e = var;
+  //schemerlicht_visitor_entry entry;
+  //entry.binding = NULL;
+  //entry.expr = e;
+  //entry.type = SCHEMERLICHT_VISITOR_EXPRESSION_PRE;
+  //schemerlicht_vector_push_back(ctxt, &(v->v), entry, schemerlicht_visitor_entry);
   }
 
 static schemerlicht_quote_conversion_visitor* schemerlicht_quote_conversion_visitor_new(schemerlicht_context* ctxt)
