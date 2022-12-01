@@ -1370,7 +1370,7 @@
   (SECTION 6 7)
   (test '(#\P #\space #\l) string->list "P l")
   (test '() string->list "")
-  (test "1\\\\\\\"" list->string '(#\1 #\\ #\")) ;[JanM] c style escape chars
+  (test "1\\\"" list->string '(#\1 #\\ #\"))
   (test "" list->string '())
   (SECTION 6 8)
   (test '(dah dah didah) vector->list '#(dah dah didah))

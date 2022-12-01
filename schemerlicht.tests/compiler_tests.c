@@ -3319,8 +3319,8 @@ static void test_quasiquote_comparison()
 static void test_string_list()
   {
   test_compile_aux("(#\\1 #\\\\ #\\\")", "(string->list \"1\\\\\\\"\")");
-  test_compile_aux("\"1\\\\\\\\\\\\\\\"\"", "(list->string '(#\\1 #\\\\ #\\\"))");
-  test_compile_aux("\"1\\\\\\\\\\\\\\\"\"", "(define test (lambda (fun . args) (apply fun args))) ( test list->string '(#\\1 #\\\\ #\\\"))");
+  test_compile_aux("\"1\\\\\\\"\"", "(list->string '(#\\1 #\\\\ #\\\"))");
+  test_compile_aux("\"1\\\\\\\"\"", "(define test (lambda (fun . args) (apply fun args))) ( test list->string '(#\\1 #\\\\ #\\\"))");
   test_compile_aux("\"1\\\\\\\"\"", "\"1\\\\\\\"\"");
   }
 

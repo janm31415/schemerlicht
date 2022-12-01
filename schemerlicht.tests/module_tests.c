@@ -137,7 +137,7 @@ static void test_csv(schemerlicht_context* ctxt)
   test_compile_aux(ctxt, "((1.000000 2.000000 3.000000 4.000000) (5.000000 6.000000 7.000000 8.000000))", "(csv->numbers r)");
   test_compile_aux(ctxt, "((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8))", "(set! lst '((\"Jan\" #\\K Symb \"\\\"Quoted string\\\"\") (5 6 7 8)))");
   test_compile_aux(ctxt, "#<void>", "(write-csv lst \"out.csv\")");
-  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\\\\\\\"Quoted string\\\\\\\"\") (\"5.00000000000000000e+00\" \"6.00000000000000000e+00\" \"7.00000000000000000e+00\" \"8.00000000000000000e+00\"))", "(define r (read-csv \"out.csv\"))");
+  test_compile_aux(ctxt, "((\"Jan\" \"K\" \"Symb\" \"\\\"Quoted string\\\"\") (\"5.00000000000000000e+00\" \"6.00000000000000000e+00\" \"7.00000000000000000e+00\" \"8.00000000000000000e+00\"))", "(define r (read-csv \"out.csv\"))");
   test_compile_aux(ctxt, "4", "(length (list-ref r 0))");
   test_compile_aux(ctxt, "4", "(length (list-ref r 1))");
   }

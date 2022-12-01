@@ -7559,8 +7559,8 @@ void schemerlicht_primitive_list_string(schemerlicht_context* ctxt, int a, int b
           schemerlicht_set_object(ra, &ret);
           return;
           }
-        if (schemerlicht_char_needs_escape(v0->value.ch))
-          schemerlicht_string_push_back(ctxt, &heap_obj->value.s, '\\');
+        //if (schemerlicht_char_needs_escape(v0->value.ch))
+        //  schemerlicht_string_push_back(ctxt, &heap_obj->value.s, '\\');
         schemerlicht_string_push_back(ctxt, &heap_obj->value.s, v0->value.ch);
         l = v1;
         if (schemerlicht_object_get_type(l) != schemerlicht_object_type_nil && schemerlicht_object_get_type(l) != schemerlicht_object_type_pair)
@@ -8565,7 +8565,7 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
       schemerlicht_cell cell = schemerlicht_read_datum(ctxt, NULL, &buff, cast(void*, p), &_port_get_char, &_port_next_char, &_port_get_position);
 #if 0
       schemerlicht_dump_cell_to_string(ctxt, &cell, &buff);
-      printf("%s\n", buff.string_ptr);
+      printf("%s\n-------\n", buff.string_ptr);
 #endif
       if (cell.type == schemerlicht_ct_invalid_cell)
         ra->type = schemerlicht_object_type_eof;
