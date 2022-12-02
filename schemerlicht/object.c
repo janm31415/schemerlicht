@@ -784,7 +784,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       last_result = *schemerlicht_vector_back(&parent, schemerlicht_object*);
       schemerlicht_vector_pop_back(&parent);
       }
-    switch (obj.type)
+    switch (schemerlicht_object_get_type(&obj))
       {
       case schemerlicht_object_type_undefined:
       case schemerlicht_object_type_char:
@@ -801,6 +801,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       case schemerlicht_object_type_primitive_object:
       case schemerlicht_object_type_blocking:
       case schemerlicht_object_type_eof:
+      default:
       {
       schemerlicht_set_object(&res, &obj);
       break;
@@ -843,7 +844,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       case schemerlicht_object_type_promise:
       {
       res = make_schemerlicht_object_vector(ctxt, obj.value.v.vector_size);
-      res.type = obj.type;
+      res.type = schemerlicht_object_get_type(&obj);
       res.value.v.vector_size = 0; // we set the size to 0, so that we can push back without memory consequences
       schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
       schemerlicht_set_object(heap_obj, &res);

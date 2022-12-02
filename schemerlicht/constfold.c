@@ -155,7 +155,7 @@ static int prepare_primitive_call(schemerlicht_context* ctxt, schemerlicht_expre
 
 static void replace_expression_by_result(schemerlicht_context* ctxt, schemerlicht_expression* e, schemerlicht_object* res)
   {
-  switch (res->type)
+  switch (schemerlicht_object_get_type(res))
     {
     case schemerlicht_object_type_fixnum:
       schemerlicht_expression_destroy(ctxt, e);

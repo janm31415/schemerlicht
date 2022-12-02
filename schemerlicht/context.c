@@ -143,6 +143,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_object* empty_lambda = schemerlicht_vector_begin(&ctxt->empty_continuation.value.v, schemerlicht_object);
   empty_lambda->type = schemerlicht_object_type_lambda;
   empty_lambda->value.ptr = ctxt->empty_continuation_function;
+  ctxt->callcc_fun = NULL;
   }
 
 schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)

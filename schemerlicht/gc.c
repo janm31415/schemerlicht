@@ -139,6 +139,11 @@ static void unmark_object_pointer(schemerlicht_object* obj)
 
 static void collect_object(schemerlicht_object* obj, gc_state* state)
   {
+  //int obj_type = schemerlicht_object_get_type(obj);
+  //if (obj_type > schemerlicht_object_type_unassigned || obj_type < 0)
+  //  {
+  //  printf("Invalid type\n");
+  //  }
   if (is_value_object(obj) == 0)
     {
     if (is_marked(obj) == 0)

@@ -25,6 +25,9 @@ void schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   schemerlicht_global_define_environment_allocation(ctxt, &prog);  
   schemerlicht_vector callcc = schemerlicht_compile_program(ctxt, &prog);
   schemerlicht_run_program(ctxt, &callcc);
+  schemerlicht_assert(schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object)->type == schemerlicht_object_type_lambda);
+  schemerlicht_function* call_cc_fun = cast(schemerlicht_function*, schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object)->value.ptr);
+  ctxt->callcc_fun = call_cc_fun;
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_compiled_program_register(ctxt, &callcc);

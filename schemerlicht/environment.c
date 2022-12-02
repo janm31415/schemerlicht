@@ -117,7 +117,7 @@ int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, sche
   {
   schemerlicht_map** parent_map = schemerlicht_vector_at(&ctxt->environment, 0, schemerlicht_map*);
   schemerlicht_assert(pos < cast(schemerlicht_memsize, node_size((*parent_map))));
-  if ((*parent_map)->node[pos].key.type == schemerlicht_object_type_string) // valid node
+  if (schemerlicht_object_get_type(&(*parent_map)->node[pos].key) == schemerlicht_object_type_string) // valid node
     {
     entry->type = (*parent_map)->node[pos].value.type - 1;
     entry->position = (*parent_map)->node[pos].value.value.fx;
@@ -139,7 +139,7 @@ schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt)
     schemerlicht_memsize size = node_size(m);
     for (schemerlicht_memsize i = 0; i < size; ++i)
       {
-      if (m->node[i].key.type == schemerlicht_object_type_string)
+      if (schemerlicht_object_get_type(&m->node[i].key) == schemerlicht_object_type_string)
         {
         schemerlicht_string_append(ctxt, &s, &m->node[i].key.value.s);
         schemerlicht_string_append_cstr(ctxt, &s, ": ");
@@ -178,7 +178,7 @@ schemerlicht_object* schemerlicht_environment_find_key_given_position(schemerlic
   schemerlicht_memsize size = node_size(base_map);
   for (schemerlicht_memsize i = 0; i < size; ++i)
     {
-    if (base_map->node[i].key.type == schemerlicht_object_type_string)
+    if (schemerlicht_object_get_type(&base_map->node[i].key) == schemerlicht_object_type_string)
       {
       if ((base_map->node[i].value.type == SCHEMERLICHT_ENV_TYPE_GLOBAL + 1) && (base_map->node[i].value.value.fx == global_position))
         {

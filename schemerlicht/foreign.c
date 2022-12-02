@@ -40,7 +40,7 @@ void schemerlicht_register_external_function(schemerlicht_context* ctxt, schemer
 static void* get_argument_pointer(schemerlicht_context* ctxt, int stack_offset)
   {
   schemerlicht_object* obj = schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object);
-  switch (obj->type)
+  switch (schemerlicht_object_get_type(obj))
     {
     case schemerlicht_object_type_undefined:
     case schemerlicht_object_type_true:

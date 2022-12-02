@@ -471,8 +471,9 @@ static void compile_lambda_iterative_step_1(schemerlicht_context* ctxt, compiler
   schemerlicht_environment_pop_child(ctxt);
 
 #ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
+  schemerlicht_expression* body_expr = schemerlicht_vector_at(&state->expr->expr.lambda.body, 0, schemerlicht_expression);
   schemerlicht_string tmp = schemerlicht_dump_expression(ctxt, body_expr);
-  schemerlicht_string_append(ctxt, &new_fun->function_definition, &tmp);
+  schemerlicht_string_append(ctxt, &state->aux.lambda->function_definition, &tmp);
   schemerlicht_string_destroy(ctxt, &tmp);
 #endif
 

@@ -614,14 +614,14 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
     {
     if (ctxt->number_of_runtime_errors > 0)
       break;
-    if (ctxt->heap_pos >= ctxt->raw_heap.vector_size/2)
+    if (ctxt->heap_pos >= ctxt->raw_heap.vector_size / 2)
       {
       printf("ERROR!!! HEAP FULL");
       break;
       }
     const schemerlicht_instruction i = *pc++;
     const int opcode = SCHEMERLICHT_GET_OPCODE(i);
-    schemerlicht_assert((opcode == SCHEMERLICHT_OPCODE_JMP) || (SCHEMERLICHT_GETARG_A(i)< schemerlicht_maxstack));
+    schemerlicht_assert((opcode == SCHEMERLICHT_OPCODE_JMP) || (SCHEMERLICHT_GETARG_A(i) < schemerlicht_maxstack));
     switch (opcode)
       {
       case SCHEMERLICHT_OPCODE_MOVE:
@@ -647,7 +647,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
       schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
       blocking->type = schemerlicht_object_type_blocking;
 #if 0 // just a check to see whether this is conceptually correct
-      for (int j = b+2; j < ctxt->stack.vector_size; ++j)
+      for (int j = b + 2; j < ctxt->stack.vector_size; ++j)
         {
         schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
         blocking->type = schemerlicht_object_type_blocking;
@@ -821,7 +821,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         break;
         }
         default:
-        {     
+        {
 #if 0
         schemerlicht_string env = schemerlicht_show_environment(ctxt);
         printf("%s", env.string_ptr);
@@ -928,13 +928,13 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
       pc = pc_end;
       schemerlicht_check_garbage_collection(ctxt);
       break;
-      }
+        }
       default:
         schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
-    }
+      }
   return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
-  }
+    }
 
 
 schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schemerlicht_function* fun)
@@ -970,7 +970,7 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, "SCHEMERLICHT STACK:\n");
   if (stack_end >= schemerlicht_maxstack)
-    stack_end = schemerlicht_maxstack-1;
+    stack_end = schemerlicht_maxstack - 1;
   for (int i = stack_start; i <= stack_end; ++i)
     {
     sprintf(buffer, "%d", i);
@@ -992,7 +992,7 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
     schemerlicht_string_push_back(ctxt, &s, '\n');
     }
   return s;
-  }
+      }
 
 schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, const schemerlicht_vector* functions)
   {

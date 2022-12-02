@@ -8234,6 +8234,10 @@ void schemerlicht_primitive_open_output_file(schemerlicht_context* ctxt, int a, 
       sz->type = schemerlicht_object_type_fixnum;
       sz->value.fx = 4096;
 
+      schemerlicht_object* unused = schemerlicht_vector_at(&v.value.v, 6, schemerlicht_object);
+      unused->type = schemerlicht_object_type_fixnum;
+      unused->value.fx = 0;
+
       heap_obj = &ctxt->heap[ctxt->heap_pos];
       schemerlicht_set_object(heap_obj, &v);
       ++ctxt->heap_pos;
