@@ -166,6 +166,9 @@ static void test_slib(schemerlicht_context* ctxt)
   test_compile_aux(ctxt, "#t", "(import 'slib)");
   test_compile_aux(ctxt, "#f", "(require 'new-catalog)");
   test_compile_aux(ctxt, "<lambda>", "(require 'factor)");
+  test_compile_aux(ctxt, "#t", "(prime? 13)");
+  test_compile_aux(ctxt, "#f", "(prime? 14)");
+  test_compile_aux(ctxt, "(2 3 37)", "(factor 222)");
   }
 
 static void test_srfi1(schemerlicht_context* ctxt)
