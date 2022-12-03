@@ -355,4 +355,8 @@ void schemerlicht_destroy_parsed_lambda(schemerlicht_context* ctxt, schemerlicht
 void schemerlicht_destroy_parsed_funcall(schemerlicht_context* ctxt, schemerlicht_parsed_funcall* p);
 void schemerlicht_destroy_parsed_set(schemerlicht_context* ctxt, schemerlicht_parsed_set* p);
 
+schemerlicht_fixnum schemerlicht_hex_to_fixnum(schemerlicht_context* ctxt, schemerlicht_string* s);
+schemerlicht_fixnum schemerlicht_binary_to_fixnum(schemerlicht_context* ctxt, schemerlicht_string* s);
+schemerlicht_fixnum schemerlicht_octal_to_fixnum(schemerlicht_context* ctxt, schemerlicht_string* s);
+
 #endif // SCHEMERLICHT_PARSER_H

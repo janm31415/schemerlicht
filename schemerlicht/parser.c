@@ -1680,17 +1680,56 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
       else if (s.string_length >= 2 && (*schemerlicht_string_at(&s, 0) == '#') && (*schemerlicht_string_at(&s, 1) == 'x'))
         {
         //hexadecimal
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+        schemerlicht_string hex;
+        schemerlicht_string_init_ranged(ctxt, &hex, s.string_ptr+2, s.string_ptr+s.string_length);        
+        schemerlicht_expression expr;
+        expr.type = schemerlicht_type_literal;
+        expr.expr.lit.type = schemerlicht_type_fixnum;
+        schemerlicht_parsed_fixnum fx;
+        fx.line_nr = ln;
+        fx.column_nr = cn;
+        fx.filename = make_lit_filename(ctxt);
+        fx.value = schemerlicht_hex_to_fixnum(ctxt, &hex);
+        expr.expr.lit.lit.fx = fx;
+        token_next(ctxt, token_it, token_it_end);
+        schemerlicht_string_destroy(ctxt, &hex);
+        return expr;
         }
       else if (s.string_length >= 2 && (*schemerlicht_string_at(&s, 0) == '#') && (*schemerlicht_string_at(&s, 1) == 'b'))
         {
         //binary
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+        schemerlicht_string binary;
+        schemerlicht_string_init_ranged(ctxt, &binary, s.string_ptr + 2, s.string_ptr + s.string_length);
+        schemerlicht_expression expr;
+        expr.type = schemerlicht_type_literal;
+        expr.expr.lit.type = schemerlicht_type_fixnum;
+        schemerlicht_parsed_fixnum fx;
+        fx.line_nr = ln;
+        fx.column_nr = cn;
+        fx.filename = make_lit_filename(ctxt);
+        fx.value = schemerlicht_binary_to_fixnum(ctxt, &binary);
+        expr.expr.lit.lit.fx = fx;
+        token_next(ctxt, token_it, token_it_end);
+        schemerlicht_string_destroy(ctxt, &binary);
+        return expr;
         }
       else if (s.string_length >= 2 && (*schemerlicht_string_at(&s, 0) == '#') && (*schemerlicht_string_at(&s, 1) == 'o'))
         {
         //octal
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+        schemerlicht_string octal;
+        schemerlicht_string_init_ranged(ctxt, &octal, s.string_ptr + 2, s.string_ptr + s.string_length);
+        schemerlicht_expression expr;
+        expr.type = schemerlicht_type_literal;
+        expr.expr.lit.type = schemerlicht_type_fixnum;
+        schemerlicht_parsed_fixnum fx;
+        fx.line_nr = ln;
+        fx.column_nr = cn;
+        fx.filename = make_lit_filename(ctxt);
+        fx.value = schemerlicht_octal_to_fixnum(ctxt, &octal);
+        expr.expr.lit.lit.fx = fx;
+        token_next(ctxt, token_it, token_it_end);
+        schemerlicht_string_destroy(ctxt, &octal);
+        return expr;
         }
       }
     }
@@ -2505,4 +2544,77 @@ schemerlicht_expression schemerlicht_make_set_expression(schemerlicht_parsed_set
   expr.type = schemerlicht_type_set;
   expr.expr.set = *l;
   return expr;
+  }
+
+schemerlicht_fixnum schemerlicht_hex_to_fixnum(schemerlicht_context* ctxt, schemerlicht_string* s)
+  {
+  schemerlicht_fixnum fx = 0;
+  if (s->string_length==0)
+    return fx;
+  int i = cast(int, s->string_length-1);
+  int j = 0;
+  for (; i >= 0; --i)
+    {
+    int v = s->string_ptr[i] >= 'A' ? (s->string_ptr[i] >= 'a' ? (cast(int,s->string_ptr[i]) - 87) : (cast(int,s->string_ptr[i]) - 55)) : (cast(int,s->string_ptr[i]) - 48);
+    if (v > 15 || v < 0)
+      {
+      schemerlicht_string msg;
+      schemerlicht_string_init(ctxt, &msg, "invalid hex number: #x");
+      schemerlicht_string_append(ctxt, &msg, s);
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, &msg);
+      return fx;
+      }
+    fx |= (cast(schemerlicht_fixnum, v) << (4 * j));
+    ++j;
+    }
+  return fx;
+  }
+
+schemerlicht_fixnum schemerlicht_binary_to_fixnum(schemerlicht_context* ctxt, schemerlicht_string* s)
+  {
+  schemerlicht_fixnum fx = 0;
+  if (s->string_length == 0)
+    return fx;
+  int i = cast(int, s->string_length - 1);
+  int j = 0;
+  for (; i >= 0; --i)
+    {
+    int v = cast(int, s->string_ptr[i])-48;
+    if (v != 0 && v != 1)
+      {
+      schemerlicht_string msg;
+      schemerlicht_string_init(ctxt, &msg, "invalid binary number: #b");
+      schemerlicht_string_append(ctxt, &msg, s);
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, &msg);
+      return fx;
+      }
+    fx |= (cast(schemerlicht_fixnum, v) << j);
+    ++j;
+    }
+  return fx;
+  }
+
+
+schemerlicht_fixnum schemerlicht_octal_to_fixnum(schemerlicht_context* ctxt, schemerlicht_string* s)
+  {
+  schemerlicht_fixnum fx = 0;
+  if (s->string_length == 0)
+    return fx;
+  int i = cast(int, s->string_length - 1);
+  int j = 0;
+  for (; i >= 0; --i)
+    {
+    int v = cast(int, s->string_ptr[i]) - 48;
+    if (v < 0 || v > 7)
+      {
+      schemerlicht_string msg;
+      schemerlicht_string_init(ctxt, &msg, "invalid octal number: #o");
+      schemerlicht_string_append(ctxt, &msg, s);
+      schemerlicht_syntax_error(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, &msg);
+      return fx;
+      }
+    fx |= (cast(schemerlicht_fixnum, v) << (3*j));
+    ++j;
+    }
+  return fx;
   }

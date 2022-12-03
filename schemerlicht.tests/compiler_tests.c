@@ -3463,6 +3463,33 @@ static void test_unquote_bug()
   test_compile_aux("((55))", "(define(qt a) `(, (let((x `(, a))) x)))(qt 55)");
   }
 
+static void test_hex()
+  {
+  test_compile_aux("255", "#xff");
+  test_compile_aux("255", "#xFF");
+  test_compile_aux("255", "#xFf");
+  test_compile_aux("255", "#xfF");
+  test_compile_aux("243", "#xf3");
+  test_compile_aux("11229389", "#xab58cd");
+  test_compile_aux("0", "#xg");
+  }
+
+static void test_bin()
+  {
+  test_compile_aux("18", "#b10010");
+  test_compile_aux("1", "#b0000000001");
+  test_compile_aux("127", "#b1111111");
+  test_compile_aux("0", "#b333");
+  }
+
+static void test_octal()
+  {
+  test_compile_aux("4104", "#o10010");
+  test_compile_aux("59", "#o73");
+  test_compile_aux("0", "#o9");
+  test_compile_aux("0", "#o8");
+  }
+
 void run_all_compiler_tests()
   { 
   for (int i = 0; i < 2; ++i)
@@ -3591,6 +3618,9 @@ void run_all_compiler_tests()
     test_car_bug();    
     test_long_symbol();
     test_unquote_bug();
+    test_hex();
+    test_bin();
+    test_octal();
 #endif            
     }
   }

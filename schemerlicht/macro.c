@@ -490,10 +490,18 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       ctxt->number_of_macros = 0;
       ctxt->macro_map = schemerlicht_map_new(ctxt, 0, 1); // remove all macros, as the macros now exist in the environment
       schemerlicht_preprocess(ctxt, &pr);      
+#if 0
+      schemerlicht_string dumped = schemerlicht_dump(ctxt, &pr);
+      printf("%s\n", dumped.string_ptr);
+      schemerlicht_string_destroy(ctxt, &dumped);
+#endif
       schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &pr);
       schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
       schemerlicht_print_any_error(ctxt);
       schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);      
+#if 0
+      printf("%s\n", s.string_ptr);     
+#endif
       schemerlicht_compiled_program_destroy(ctxt, &compiled_program);
       schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
       schemerlicht_map_free(ctxt, ctxt->macro_map);
@@ -509,6 +517,11 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_stream_close(ctxt, &str);
       schemerlicht_string_destroy(ctxt, &s);
       schemerlicht_program result = make_program(ctxt, &tokens);
+#if 0
+      schemerlicht_string dumped2 = schemerlicht_dump(ctxt, &result);
+      printf("%s\n", dumped2.string_ptr);
+      schemerlicht_string_destroy(ctxt, &dumped2);
+#endif
       destroy_tokens_vector(ctxt, &tokens);
       schemerlicht_program_destroy(ctxt, &pr);
 

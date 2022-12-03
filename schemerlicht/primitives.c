@@ -8717,6 +8717,15 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
         eval_ctxt = cast(schemerlicht_context*, e->value.ptr);
         }
       }
+    int stack_offset = 2;
+    void* store_stack_pointer = ctxt->stack.vector_ptr;
+    if (eval_ctxt == ctxt)
+      {      
+      while (schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object)->type != schemerlicht_object_type_blocking)
+        ++stack_offset;
+      cast(schemerlicht_object*, ctxt->stack.vector_ptr) += stack_offset;
+      ctxt->stack.vector_size -= stack_offset;
+      }
     schemerlicht_stream str;
     schemerlicht_memsize len = s.string_length;
     schemerlicht_stream_init(eval_ctxt, &str, len);
@@ -8734,6 +8743,11 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
     schemerlicht_program_destroy(eval_ctxt, &prog);
     schemerlicht_string_destroy(ctxt, &s);
     schemerlicht_set_object(ra, &res_copy);
+    if (eval_ctxt == ctxt)
+      {
+      ctxt->stack.vector_ptr = store_stack_pointer;
+      ctxt->stack.vector_size += stack_offset;
+      }
     }
   }
 
