@@ -18,7 +18,7 @@
 
 static schemerlicht_cell expression_to_cell(schemerlicht_context* ctxt, schemerlicht_expression* expr)
   {
-  schemerlicht_string s = schemerlicht_dump_expression(ctxt, expr);
+  schemerlicht_string s = schemerlicht_dump_expression(ctxt, expr, 0);
   schemerlicht_stream str;
   schemerlicht_memsize len = s.string_length;
   schemerlicht_stream_init(ctxt, &str, len);
@@ -464,7 +464,7 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
         }
       else
         {
-        if (e->expr.funcall.arguments.vector_size < number_of_arguments)
+        if (e->expr.funcall.arguments.vector_size+1 < number_of_arguments)
           {
           schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
           return 0;

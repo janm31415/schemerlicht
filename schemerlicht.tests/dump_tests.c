@@ -12,6 +12,8 @@ static void dump_fixnum()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -31,6 +33,8 @@ static void dump_begin()
   schemerlicht_program prog = make_program(ctxt, &tokens);
   
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   
@@ -50,6 +54,8 @@ static void dump_primcall()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -70,6 +76,8 @@ static void dump_if()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -89,6 +97,8 @@ static void dump_variable()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -108,6 +118,8 @@ static void dump_set()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -127,6 +139,8 @@ static void dump_lambda()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -146,6 +160,8 @@ static void dump_lambda_nested_begins()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -165,6 +181,8 @@ static void dump_let()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -184,6 +202,8 @@ static void dump_let_2()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -203,6 +223,8 @@ static void dump_let_3()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -222,6 +244,8 @@ static void dump_let_4()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -241,6 +265,8 @@ static void dump_foreign()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -260,6 +286,8 @@ static void dump_quote()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -279,6 +307,8 @@ static void dump_quasiquote()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -298,6 +328,8 @@ static void dump_quasiquote_2()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -317,6 +349,8 @@ static void dump_quasiquote_3()
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
 
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
 
@@ -336,7 +370,7 @@ static void test_dump(const char* script, const char* expected)
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, s.string_ptr);
   schemerlicht_string_destroy(ctxt, &s);
 

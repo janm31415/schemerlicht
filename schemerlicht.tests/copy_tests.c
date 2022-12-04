@@ -13,9 +13,9 @@ void test_copy(const char* script)
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog1 = make_program(ctxt, &tokens);
-  schemerlicht_string s1 = schemerlicht_dump(ctxt, &prog1);
+  schemerlicht_string s1 = schemerlicht_dump(ctxt, &prog1, 1);
   schemerlicht_program prog2 = schemerlicht_program_copy(ctxt, &prog1);
-  schemerlicht_string s2 = schemerlicht_dump(ctxt, &prog2);
+  schemerlicht_string s2 = schemerlicht_dump(ctxt, &prog2, 1);
 
   TEST_EQ_STRING(s1.string_ptr, s2.string_ptr);
 

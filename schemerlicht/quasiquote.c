@@ -151,7 +151,7 @@ static int has_splicing(schemerlicht_context* ctxt, schemerlicht_cell* in)
 
 static schemerlicht_cell expression_to_cell(schemerlicht_context* ctxt, schemerlicht_expression* e)
   {
-  schemerlicht_string s = schemerlicht_dump_expression(ctxt, e);
+  schemerlicht_string s = schemerlicht_dump_expression(ctxt, e, 0);
   schemerlicht_stream str;
   schemerlicht_stream_init(ctxt, &str, s.string_capacity);
   schemerlicht_stream_write_str(ctxt, &str, s.string_ptr);

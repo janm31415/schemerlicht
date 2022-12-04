@@ -180,7 +180,7 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
     schemerlicht_closure_conversion(ctxt, &prog);
     }
 #if 1
-  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog, 0);
   printf("%s\n", dumped.string_ptr);
   schemerlicht_string_destroy(ctxt, &dumped);
 #endif

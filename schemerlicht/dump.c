@@ -232,7 +232,9 @@ static int previsit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
 static int previsit_let_binding(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_let_binding* b)
   {
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
-  schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+  //schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+  schemerlicht_string_push_back(ctxt, &(d->s), d->binding_left_bracket);
+  schemerlicht_string_push_back(ctxt, &(d->s), ' ');
   schemerlicht_string_append(ctxt, &(d->s), &b->binding_name);
   schemerlicht_string_push_back(ctxt, &(d->s), ' ');
   return 1;
@@ -241,7 +243,9 @@ static void postvisit_let_binding(schemerlicht_context* ctxt, schemerlicht_visit
   {
   UNUSED(b);
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
-  schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+  //schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+  schemerlicht_string_push_back(ctxt, &(d->s), d->binding_right_bracket);
+  schemerlicht_string_push_back(ctxt, &(d->s), ' ');
   }
 static void postvisit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
@@ -267,7 +271,9 @@ static int previsit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   for (schemerlicht_memsize j = 0; j < e->expr.cas.datum_args.vector_size; ++j)
     {
     schemerlicht_cell* c = schemerlicht_vector_at(&e->expr.cas.datum_args, j, schemerlicht_cell);
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_left_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     schemerlicht_dump_cell_to_string(ctxt, c, &(d->s));
     schemerlicht_string_append_cstr(ctxt, &(d->s), " ");
     schemerlicht_vector* then_body = schemerlicht_vector_at(&e->expr.cas.then_bodies, j, schemerlicht_vector);
@@ -277,14 +283,20 @@ static int previsit_case(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
       {
       schemerlicht_visit_expression(ctxt, v, it);
       }
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_right_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     }
   if (e->expr.cas.else_body.vector_size > 0)
     {
     schemerlicht_expression* else_body = schemerlicht_vector_at(&e->expr.cas.else_body, 0, schemerlicht_expression);
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "[ else ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "[ else ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_left_bracket);
+    schemerlicht_string_append_cstr(ctxt, &(d->s), " else ");
     schemerlicht_visit_expression(ctxt, v, else_body);
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_right_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     }
 
   schemerlicht_string_append_cstr(ctxt, &(d->s), ") ");
@@ -306,7 +318,9 @@ static int previsit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   //int* proc_it_end = schemerlicht_vector_end(&e->expr.cond.is_proc, int);
   for (; vit != vit_end; ++vit, ++proc_it)
     {
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_left_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     schemerlicht_expression* it = schemerlicht_vector_begin(vit, schemerlicht_expression);
     schemerlicht_expression* it_end = schemerlicht_vector_end(vit, schemerlicht_expression);
     if (*proc_it)
@@ -326,7 +340,9 @@ static int previsit_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
         schemerlicht_visit_expression(ctxt, v, it);
         }
       }
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_right_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     }
   schemerlicht_string_append_cstr(ctxt, &(d->s), ") ");
   return 0;
@@ -345,7 +361,9 @@ static int previsit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
   schemerlicht_vector* vit_end = schemerlicht_vector_end(&e->expr.d.bindings, schemerlicht_vector);
   for (; vit != vit_end; ++vit)
     {
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "[ ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_left_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     schemerlicht_expression* it = schemerlicht_vector_begin(vit, schemerlicht_expression);
     schemerlicht_expression* it_end = schemerlicht_vector_end(vit, schemerlicht_expression);
     
@@ -354,7 +372,9 @@ static int previsit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, sche
       schemerlicht_visit_expression(ctxt, v, it);
       }
       
-    schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    //schemerlicht_string_append_cstr(ctxt, &(d->s), "] ");
+    schemerlicht_string_push_back(ctxt, &(d->s), d->binding_right_bracket);
+    schemerlicht_string_push_back(ctxt, &(d->s), ' ');
     }
   schemerlicht_string_append_cstr(ctxt, &(d->s), ") ( ");
   schemerlicht_expression* it = schemerlicht_vector_begin(&e->expr.d.test, schemerlicht_expression);
@@ -383,6 +403,8 @@ static void postvisit_do(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
 schemerlicht_dump_visitor* schemerlicht_dump_visitor_new(schemerlicht_context* ctxt)
   {
   schemerlicht_dump_visitor* v = schemerlicht_new(ctxt, schemerlicht_dump_visitor);
+  v->binding_left_bracket = '(';
+  v->binding_right_bracket = ')';
   v->visitor = schemerlicht_visitor_new(ctxt, v);
   schemerlicht_string_init(ctxt, &(v->s), "");
   v->visitor->visit_fixnum = visit_fixnum;
@@ -434,9 +456,14 @@ void schemerlicht_dump_visitor_free(schemerlicht_context* ctxt, schemerlicht_dum
     }
   }
 
-schemerlicht_string schemerlicht_dump(schemerlicht_context* ctxt, schemerlicht_program* prog)
+schemerlicht_string schemerlicht_dump(schemerlicht_context* ctxt, schemerlicht_program* prog, int square_brackets)
   {
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  if (square_brackets)
+    {
+    dumper->binding_left_bracket = '[';
+    dumper->binding_right_bracket = ']';
+    }
   schemerlicht_visit_program(ctxt, dumper->visitor, prog);
   schemerlicht_string s;
   schemerlicht_string_copy(ctxt, &s, &dumper->s);
@@ -444,9 +471,14 @@ schemerlicht_string schemerlicht_dump(schemerlicht_context* ctxt, schemerlicht_p
   return s;
   }
 
-schemerlicht_string schemerlicht_dump_expression(schemerlicht_context* ctxt, schemerlicht_expression* e)
+schemerlicht_string schemerlicht_dump_expression(schemerlicht_context* ctxt, schemerlicht_expression* e, int square_brackets)
   {
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  if (square_brackets)
+    {
+    dumper->binding_left_bracket = '[';
+    dumper->binding_right_bracket = ']';
+    }
   schemerlicht_visit_expression(ctxt, dumper->visitor, e);
   schemerlicht_string s;
   schemerlicht_string_copy(ctxt, &s, &dumper->s);

@@ -30,6 +30,8 @@ static void test_convert_define()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! x 5 ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -47,6 +49,8 @@ static void test_convert_define_2()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( let ( [ x 5 ] ) ( begin ( letrec ( [ foo ( lambda ( y ) ( begin ( bar x y ) ) ) ] [ bar ( lambda ( a b ) ( begin ( + ( * a b ) a ) ) ) ] ) ( begin ( foo ( + x 3 ) ) ) ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -64,6 +68,8 @@ static void test_convert_define_3()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! y 5 ) ( let ( [ z y ] ) ( begin ( + z 1 ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -81,6 +87,8 @@ static void test_convert_define_4()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! foo ( lambda ( x ) ( begin ( * x x ) ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -98,6 +106,8 @@ static void test_convert_define_5()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! f ( lambda ( . x ) ( begin ( apply + x ) ) ) ) ( f 1 2 3 4 5 ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -115,6 +125,8 @@ static void test_convert_define_6()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! + ( lambda ( x ) ( begin ( * x x ) ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -132,6 +144,8 @@ static void test_convert_define_7()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);  
   TEST_EQ_STRING("( set! a ( lambda ( ) ( begin ( let ( [ var 3 ] ) ( begin ( letrec ( [ b 7.000000 ] [ fun ( lambda ( x ) ( begin ( letrec ( [ nested ( lambda ( y ) ( begin ( + x y ) ) ) ] ) ( begin ( let ( [ z 3 ] ) ( begin ( nested z ) ) ) ) ) ) ) ] ) ( begin ) ) ) ) ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -149,6 +163,8 @@ static void test_convert_define_8()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! x 34 ) ( set! foo ( lambda ( ) ( begin ( letrec ( [ x 5 ] ) ( begin x ) ) ) ) ) ( foo ) x ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -166,6 +182,8 @@ static void test_convert_define_9()
   schemerlicht_define_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( set! old-+ + ) ( set! + ( lambda ( x y ) ( begin ( list y x ) ) ) ) ( set! + old-+ ) ( + 6 3 ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -183,6 +201,8 @@ static void test_single_begin_conv()
   schemerlicht_single_begin_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( begin ( define x 5 ) ( define y 6 ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -200,6 +220,8 @@ static void test_single_begin_conv_2()
   schemerlicht_single_begin_conversion(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( begin ( define x 5 ) ( define y 6 ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -217,6 +239,8 @@ static void simplify_to_core_conversion_and()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("#t ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -234,6 +258,8 @@ static void simplify_to_core_conversion_and_2()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("3 ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -251,6 +277,8 @@ static void simplify_to_core_conversion_and_3()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( if 3 4 #f ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -268,6 +296,8 @@ static void simplify_to_core_conversion_or()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("#f ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -285,6 +315,8 @@ static void simplify_to_core_conversion_or_2()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("3 ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -302,6 +334,8 @@ static void simplify_to_core_conversion_or_3()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( let ( [ #%x 3 ] ) ( begin ( if #%x #%x 4 ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -319,6 +353,8 @@ static void simplify_to_core_conversion_letrec()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( let ( [ f #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( ) ( begin 5 ) ) ] ) ( begin ( set! f #%t0 ) ) ) ( - 20 ( f ) ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -336,6 +372,8 @@ static void simplify_to_core_conversion_let_star()
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( let ( [ x ( + 1 2 ) ] ) ( begin ( let ( [ y ( + 3 4 ) ] ) ( begin ( + x y ) ) ) ) ) ", dumper->s.string_ptr);
   schemerlicht_dump_visitor_free(ctxt, dumper);
@@ -352,6 +390,8 @@ static void simplify_to_core_conversion_named_let()
   schemerlicht_program prog = make_program(ctxt, &tokens);  
 
   schemerlicht_dump_visitor* dumper = schemerlicht_dump_visitor_new(ctxt);
+  dumper->binding_left_bracket = '[';
+  dumper->binding_right_bracket = ']';
   schemerlicht_visit_program(ctxt, dumper->visitor, &prog);
   TEST_EQ_STRING("( define ( number->list n ) ( let loop ( [ n n ] [ acc ( quote () ) ] ) ( begin ( if ( < n 10 ) ( cons n acc ) ( loop ( quotient n 10 ) ( cons ( remainder n 10 ) acc ) ) ) ) ) ) ", dumper->s.string_ptr);
 
@@ -376,7 +416,7 @@ static void simplify_to_core_conversion_case()
   
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( let ( [ case-var ( + 7 5 ) ] ) ( begin ( if ( memv case-var ( quote (1 2 3) ) ) ( begin ( quote small ) ) ( if ( memv case-var ( quote (10 11 12) ) ) ( begin ( quote big ) ) ( begin #undefined ) ) ) ) ) ", s.string_ptr);
 
@@ -394,7 +434,7 @@ static void simplify_to_core_conversion_cond()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( let ( [ cond-var #f ] ) ( begin ( if cond-var cond-var ( let ( [ cond-var #f ] ) ( begin ( if cond-var ( begin 12 ) ( let ( [ cond-var 12 ] ) ( begin ( if cond-var ( begin 13 ) #undefined ) ) ) ) ) ) ) ) ) ", s.string_ptr);
 
@@ -412,7 +452,7 @@ static void simplify_to_core_conversion_cond_2()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( let ( [ cond-var ( cons 1 2 ) ] ) ( begin ( if cond-var ( ( lambda ( x ) ( begin ( cdr x ) ) ) cond-var ) #undefined ) ) ) ", s.string_ptr);
 
@@ -430,7 +470,7 @@ static void simplify_to_core_conversion_do()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( vec i ) ( begin ( if ( = i 5 ) ( begin vec ) ( begin ( vector-set! vec i i ) ( loop vec ( + i 1 ) ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) ( loop ( make-vector 5 ) 0 ) ) ) ", s.string_ptr);
 
@@ -448,7 +488,7 @@ static void simplify_to_core_conversion_do_2()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( define ( my-iota n ) ( let ( [ loop #undefined ] ) ( begin ( let ( [ #%t0 ( lambda ( n list ) ( begin ( if ( zero? n ) ( begin list ) ( begin ( loop ( - n 1 ) ( cons ( - n 1 ) list ) ) ) ) ) ) ] ) ( begin ( set! loop #%t0 ) ) ) ( loop n ( quote () ) ) ) ) ) ", s.string_ptr);
 
@@ -466,7 +506,7 @@ static void simplify_to_core_conversion_when()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( if ( < x 2 ) ( begin ( + 1 2 ) ( * 3 4 ) ) #undefined ) ", s.string_ptr);
 
@@ -484,7 +524,7 @@ static void simplify_to_core_conversion_unless()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( if ( not ( < x 2 ) ) ( begin ( + 1 2 ) ( * 3 4 ) ) #undefined ) ", s.string_ptr);
 
@@ -502,7 +542,7 @@ static void simplify_to_core_conversion_delay()
 
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
 
-  schemerlicht_string s = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string s = schemerlicht_dump(ctxt, &prog, 1);
 
   TEST_EQ_STRING("( set! p ( make-promise ( lambda ( ) ( begin ( * 3 4 ) ) ) ) ) ", s.string_ptr);
 
@@ -543,7 +583,7 @@ static void cps(const char* script, const char* expected)
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   schemerlicht_tail_call_analysis(ctxt, &prog);
@@ -563,7 +603,7 @@ static void test_cps_2()
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_continuation_passing_style(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);    
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);    
   TEST_EQ_STRING("( let ( [ #%k1 ( lambda ( #%k2 x ) ( begin ( #%k2 ( * x x ) ) ) ) ] ) ( begin ( let ( [ #%k0 ( set! square #%k1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) ( let ( [ #%k4 square ] ) ( begin ( #%k4 ( lambda ( #%k1 ) ( begin ( let ( [ #%k0 ( + #%k1 1 ) ] ) ( begin ( halt #%k0 ) ) ) ) ) 5 ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   schemerlicht_tail_call_analysis(ctxt, &prog);
@@ -610,7 +650,7 @@ static void test_quasiquote(const char* script, const char* expected)
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_quasiquote_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -660,7 +700,7 @@ static void test_lambda_to_let_conversion()
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "((lambda (x y) (+ x y)) 1 2)");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( let ( [ x 1 ] [ y 2 ] ) ( begin ( + x y ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -674,7 +714,7 @@ static void test_find_assignable_variables()
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let([x 12]) (let([y(let([x #f]) (set! x 14))])  x))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_find_assignable_variables(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   schemerlicht_vector vars = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression)->expr.let.assignable_variables;
   TEST_EQ_INT(1, vars.vector_size);
   schemerlicht_string s = *schemerlicht_vector_at(&vars, 0, schemerlicht_string);
@@ -691,7 +731,7 @@ static void test_assignable_variable_conversion()
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let([x 12]) (let([y(let([z #f]) (set! z 14))])  z))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( let ( [ x 12 ] ) ( begin ( let ( [ y ( let ( [ #%z #f ] ) ( begin ( let ( [ z ( vector #%z ) ] ) ( begin ( vector-set! z 0 14 ) ) ) ) ) ] ) ( begin ( vector-ref z 0 ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -705,7 +745,7 @@ static void test_assignable_variable_conversion_2()
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([f (lambda (c) (cons (lambda (v) (set! c v)) (lambda () c)))]) (let ([p (f 0)]) ( (car p) 12) ((cdr p))))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( let ( [ f ( lambda ( #%c ) ( begin ( let ( [ c ( vector #%c ) ] ) ( begin ( cons ( lambda ( v ) ( begin ( vector-set! c 0 v ) ) ) ( lambda ( ) ( begin ( vector-ref c 0 ) ) ) ) ) ) ) ) ] ) ( begin ( let ( [ p ( f 0 ) ] ) ( begin ( ( car p ) 12 ) ( ( cdr p ) ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -719,7 +759,7 @@ static void test_assignable_variable_conversion_3()
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(let ([x 3]) (set! x 5))");
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( let ( [ #%x 3 ] ) ( begin ( let ( [ x ( vector #%x ) ] ) ( begin ( vector-set! x 0 5 ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -738,7 +778,7 @@ static void test_assignable_variable_conversion_4()
   schemerlicht_global_define_environment_allocation(ctxt, &prog);
   schemerlicht_lambda_to_let_conversion(ctxt, &prog);
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( let ( [ x 5 ] ) ( begin ( let ( [ #%foo #undefined ] [ #%bar #undefined ] ) ( begin ( let ( [ foo ( vector #%foo ) ] [ bar ( vector #%bar ) ] ) ( begin ( let ( [ #%t0 ( lambda ( y ) ( begin ( ( vector-ref bar 0 ) x y ) ) ) ] [ #%t1 ( lambda ( a b ) ( begin ( + ( * a b ) a ) ) ) ] ) ( begin ( vector-set! foo 0 #%t0 ) ( vector-set! bar 0 #%t1 ) ) ) ( ( vector-ref foo 0 ) ( + x 3 ) ) ) ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -803,7 +843,7 @@ static void test_closure_conversion_1()
   schemerlicht_single_begin_conversion(ctxt, &prog);  
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( let ( [ x 5 ] ) ( begin ( closure ( lambda ( #%self1 y ) ( begin ( closure ( lambda ( #%self0 ) ( begin ( + ( closure-ref #%self0 1 ) ( closure-ref #%self0 2 ) ) ) ) ( closure-ref #%self1 1 ) y ) ) ) x ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);  
   destroy_tokens_vector(ctxt, &tokens);
@@ -819,7 +859,7 @@ static void test_closure_conversion_2()
   schemerlicht_single_begin_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( lambda ( #%self1 x y z ) ( begin ( let ( [ f ( closure ( lambda ( #%self0 a b ) ( begin ( + ( * a ( closure-ref #%self0 1 ) ) ( 8 b ( closure-ref #%self0 2 ) ) ) ) ) x y ) ] ) ( begin ( - ( f 1 2 ) ( f 3 4 ) ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -840,7 +880,7 @@ static void test_call_cc()
   schemerlicht_assignable_variable_conversion(ctxt, &prog);
   schemerlicht_free_variable_analysis(ctxt, &prog);
   schemerlicht_closure_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING("( set! call/cc ( lambda ( #%self1 k f ) ( begin ( f k ( closure ( lambda ( #%self0 dummy-k result ) ( begin ( ( closure-ref #%self0 1 ) result ) ) ) k ) ) ) ) ) ", res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -877,7 +917,7 @@ static void test_quote_conversion_aux(const char* script, const char* expected)
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_vector quotes = schemerlicht_quote_collection(ctxt, &prog);  
   schemerlicht_quote_conversion(ctxt, &prog, &quotes);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   schemerlicht_quote_collection_destroy(ctxt, &quotes);
@@ -912,7 +952,7 @@ static void test_alpha_conversion_aux(const char* script, const char* expected)
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);  
   schemerlicht_alpha_conversion(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);  
   destroy_tokens_vector(ctxt, &tokens);
@@ -947,7 +987,7 @@ static void test_constant_propagation_aux(const char* script, const char* expect
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);  
   schemerlicht_constant_propagation(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -967,7 +1007,7 @@ static void test_constant_folding_aux(const char* script, const char* expected)
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_simplify_to_core_forms(ctxt, &prog);
   schemerlicht_constant_folding(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
@@ -1005,7 +1045,7 @@ static void test_full_conversion_aux(const char* script, const char* expected)
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
   schemerlicht_program prog = make_program(ctxt, &tokens);
   schemerlicht_preprocess(ctxt, &prog);
-  schemerlicht_string res = schemerlicht_dump(ctxt, &prog);
+  schemerlicht_string res = schemerlicht_dump(ctxt, &prog, 1);
   TEST_EQ_STRING(expected, res.string_ptr);
   schemerlicht_string_destroy(ctxt, &res);
   destroy_tokens_vector(ctxt, &tokens);
