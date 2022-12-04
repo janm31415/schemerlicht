@@ -435,7 +435,11 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         {
         schemerlicht_fixnum function_id = target->value.fx;
         //schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+#ifdef SCHEMERLICHT_USE_INLINES
         inline_functions(a, b, c);
+#else
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+#endif
         schemerlicht_string_append_cstr(ctxt, s, "   primitive call\n");
         printf("  primitive call\n");
         }
@@ -446,7 +450,11 @@ schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerl
         //schemerlicht_string_destroy(ctxt, &stackstr);
         schemerlicht_fixnum function_id = target->value.fx;
         //schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1); // skip the closure argument
+#ifdef SCHEMERLICHT_USE_INLINES
         inline_functions(a, b - 1, c + 1);
+#else
+        schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
+#endif
         schemerlicht_string_append_cstr(ctxt, s, "   primitive object call\n");
         printf("  primitive object call\n");
         //stackstr = schemerlicht_show_stack(ctxt, 0, 9);
@@ -759,15 +767,21 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
         case schemerlicht_object_type_primitive:
         {
         const schemerlicht_fixnum function_id = target->value.fx;
+#ifdef SCHEMERLICHT_USE_INLINES
         inline_functions(a, b, c);
+#else
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+#endif
         break;
         }
         case schemerlicht_object_type_primitive_object:
         {
         const schemerlicht_fixnum function_id = target->value.fx;
-        //const int b = SCHEMERLICHT_GETARG_B(i);
-        //const int c = SCHEMERLICHT_GETARG_C(i);
+#ifdef SCHEMERLICHT_USE_INLINES
         inline_functions(a, b - 1, c + 1);
+#else
+        schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
+#endif
         //schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1); // skip the closure argument        
         schemerlicht_object continuation = *schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
         schemerlicht_assert(schemerlicht_object_get_type(&continuation) == schemerlicht_object_type_closure || schemerlicht_object_get_type(&continuation) == schemerlicht_object_type_lambda);

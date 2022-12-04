@@ -3564,8 +3564,8 @@ void run_all_compiler_tests()
     test_newton();
     test_compile_cc();
     test_compile_cc_2();    
-    //test_ack_performance();
-    //test_fib_performance();    
+    test_ack_performance();
+    test_fib_performance();    
     test_lambda_variable_arity_not_using_rest_arg();
     test_lambda_variable_arity_while_using_rest_arg();
     test_lambda_long_list();
