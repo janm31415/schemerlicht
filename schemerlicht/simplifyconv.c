@@ -201,7 +201,7 @@ static void convert_when(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   assert(strcmp(e->expr.prim.name.string_ptr, "when") == 0);
   if (e->expr.prim.arguments.vector_size == 0)
     {
-    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "invalid when statement");
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, &e->expr.prim.filename, "invalid when statement");
     return;
     }
   schemerlicht_expression i = schemerlicht_init_if(ctxt);
@@ -228,7 +228,7 @@ static void convert_unless(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   assert(strcmp(e->expr.prim.name.string_ptr, "unless") == 0);
   if (e->expr.prim.arguments.vector_size == 0)
     {
-    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "invalid unless statement");
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, &e->expr.prim.filename, "invalid unless statement");
     return;
     }
   schemerlicht_expression i = schemerlicht_init_if(ctxt);
@@ -258,7 +258,7 @@ static void convert_delay(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   assert(strcmp(e->expr.prim.name.string_ptr, "delay") == 0);
   if (e->expr.prim.arguments.vector_size != 1)
     {
-    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "invalid number of arguments for delay");
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, &e->expr.prim.filename, "invalid number of arguments for delay");
     return;
     }
   schemerlicht_expression lam = schemerlicht_init_lambda(ctxt);
@@ -512,7 +512,7 @@ static void convert_cond(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
     }
   else
     {
-    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.cond.line_nr, e->expr.cond.column_nr, "cond expression");
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.cond.line_nr, e->expr.cond.column_nr, &e->expr.cond.filename, "cond expression");
     }
   }
 

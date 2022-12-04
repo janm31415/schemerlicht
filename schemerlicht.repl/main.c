@@ -199,8 +199,13 @@ static void run_scheme_from_file(schemerlicht_context* ctxt, const char* filenam
       }
     fclose(f);
     schemerlicht_stream_rewind(&str);
+    schemerlicht_string filename_loading;
+    schemerlicht_string_init(ctxt, &filename_loading, filename);
+    schemerlicht_vector_push_back(ctxt, &ctxt->filenames_list, filename_loading, schemerlicht_string);
     execute_scheme(ctxt, &str);
     schemerlicht_stream_close(ctxt, &str);
+    schemerlicht_string_destroy(ctxt, schemerlicht_vector_back(&ctxt->filenames_list, schemerlicht_string));
+    schemerlicht_vector_pop_back(&ctxt->filenames_list);
     }
   }
 

@@ -169,21 +169,21 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
     schemerlicht_assert(it->type == schemerlicht_type_primitive_call);
     if (it->expr.prim.arguments.vector_size < 2)
       {
-      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro expects at least 2 arguments");
+      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro expects at least 2 arguments");
       schemerlicht_macro_finder_visitor_free(ctxt, v);
       return prog_out;
       }
     schemerlicht_expression* fun = schemerlicht_vector_begin(&it->expr.prim.arguments, schemerlicht_expression);
     if (fun->type != schemerlicht_type_funcall)
       {
-      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid first argument");
+      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid first argument");
       schemerlicht_macro_finder_visitor_free(ctxt, v);
       return prog_out;
       }
     schemerlicht_expression* var = schemerlicht_vector_begin(&fun->expr.funcall.fun, schemerlicht_expression);
     if (var->type != schemerlicht_type_variable)
       {
-      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid first argument");
+      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid first argument");
       schemerlicht_macro_finder_visitor_free(ctxt, v);
       return prog_out;
       }
@@ -206,7 +206,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
             schemerlicht_string_destroy(ctxt, sit);
             }
           schemerlicht_vector_destroy(ctxt, &variable_names);
-          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
           schemerlicht_macro_finder_visitor_free(ctxt, v);
           return prog_out;
           }
@@ -226,7 +226,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
               schemerlicht_string_destroy(ctxt, sit);
               }
             schemerlicht_vector_destroy(ctxt, &variable_names);
-            schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+            schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
             schemerlicht_macro_finder_visitor_free(ctxt, v);
             return prog_out;
             }
@@ -235,7 +235,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
         }
       else
         {
-        schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+        schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
         schemerlicht_macro_finder_visitor_free(ctxt, v);
         return prog_out;
         }
@@ -255,7 +255,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
             schemerlicht_string_destroy(ctxt, sit);
             }
           schemerlicht_vector_destroy(ctxt, &variable_names);
-          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
           schemerlicht_macro_finder_visitor_free(ctxt, v);
           return prog_out;
           }
@@ -300,14 +300,14 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
     schemerlicht_assert(it->type == schemerlicht_type_primitive_call);
     if (it->expr.prim.arguments.vector_size < 3)
       {
-      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, it->expr.prim.line_nr, it->expr.prim.column_nr, "defmacro expects at least 2 arguments");
+      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "defmacro expects at least 2 arguments");
       schemerlicht_macro_finder_visitor_free(ctxt, v);
       return prog_out;
       }
     schemerlicht_expression* var = schemerlicht_vector_begin(&it->expr.prim.arguments, schemerlicht_expression);
     if (var->type != schemerlicht_type_variable)
       {
-      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "defmacro invalid first argument");
+      schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "defmacro invalid first argument");
       schemerlicht_macro_finder_visitor_free(ctxt, v);
       return prog_out;
       }
@@ -324,7 +324,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
         {
         schemerlicht_string_destroy(ctxt, &macro_name);
         schemerlicht_vector_destroy(ctxt, &variable_names);
-        schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "defmacro invalid first argument");
+        schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "defmacro invalid first argument");
         schemerlicht_macro_finder_visitor_free(ctxt, v);
         return prog_out;
         }
@@ -344,7 +344,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
               schemerlicht_string_destroy(ctxt, sit);
               }
             schemerlicht_vector_destroy(ctxt, &variable_names);
-            schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+            schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
             schemerlicht_macro_finder_visitor_free(ctxt, v);
             return prog_out;
             }
@@ -364,7 +364,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
                 schemerlicht_string_destroy(ctxt, sit);
                 }
               schemerlicht_vector_destroy(ctxt, &variable_names);
-              schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+              schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
               schemerlicht_macro_finder_visitor_free(ctxt, v);
               return prog_out;
               }
@@ -373,7 +373,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
           }
         else
           {
-          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
           schemerlicht_macro_finder_visitor_free(ctxt, v);
           return prog_out;
           }
@@ -393,7 +393,7 @@ static schemerlicht_program get_macros(schemerlicht_context* ctxt, schemerlicht_
               schemerlicht_string_destroy(ctxt, sit);
               }
             schemerlicht_vector_destroy(ctxt, &variable_names);
-            schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, "define-macro invalid argument");
+            schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, it->expr.prim.line_nr, it->expr.prim.column_nr, &it->expr.prim.filename, "define-macro invalid argument");
             schemerlicht_macro_finder_visitor_free(ctxt, v);
             return prog_out;
             }
@@ -458,7 +458,7 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
         {
         if (e->expr.funcall.arguments.vector_size != number_of_arguments)
           {
-          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, &e->expr.funcall.filename, "macro has invalid number of arguments");
           return 0;
           }
         }
@@ -466,7 +466,7 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
         {
         if (e->expr.funcall.arguments.vector_size+1 < number_of_arguments)
           {
-          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, "macro has invalid number of arguments");
+          schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.funcall.line_nr, e->expr.funcall.column_nr, &e->expr.funcall.filename, "macro has invalid number of arguments");
           return 0;
           }
         }

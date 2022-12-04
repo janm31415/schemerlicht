@@ -408,7 +408,7 @@ static void compile_set_iterative(schemerlicht_context* ctxt, compiler_expressio
   int find_var = schemerlicht_environment_find(&lookup_entry, ctxt, &state->expr->expr.set.name);
   if (find_var == 0)
     {
-    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN, state->expr->expr.set.line_nr, state->expr->expr.set.column_nr, state->expr->expr.set.name.string_ptr);
+    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_VARIABLE_UNKNOWN, state->expr->expr.set.line_nr, state->expr->expr.set.column_nr, &state->expr->expr.set.filename, state->expr->expr.set.name.string_ptr);
     }
   else
     {
@@ -535,7 +535,7 @@ static void compile_foreign_iterative(schemerlicht_context* ctxt, compiler_expre
   schemerlicht_object* pos = schemerlicht_map_get(ctxt, ctxt->externals_map, &key);
   if (pos == NULL)
     {
-    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_EXTERNAL_UNKNOWN, state->expr->expr.foreign.line_nr, state->expr->expr.foreign.column_nr, state->expr->expr.foreign.name.string_ptr);
+    schemerlicht_compile_error_cstr(ctxt, SCHEMERLICHT_ERROR_EXTERNAL_UNKNOWN, state->expr->expr.foreign.line_nr, state->expr->expr.foreign.column_nr, &state->expr->expr.foreign.filename, state->expr->expr.foreign.name.string_ptr);
     }
   else
     {

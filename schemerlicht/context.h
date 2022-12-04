@@ -75,6 +75,7 @@ struct schemerlicht_context
   schemerlicht_object empty_continuation;
   schemerlicht_vector gc_save_list;
   schemerlicht_function* callcc_fun;
+  schemerlicht_vector filenames_list;
   };
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);

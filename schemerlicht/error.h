@@ -17,10 +17,10 @@
 
 void schemerlicht_throw(schemerlicht_context* ctxt, int errorcode);
 
-void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg);
-void schemerlicht_syntax_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg);
-void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg);
-void schemerlicht_compile_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg);
+void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, schemerlicht_string* msg);
+void schemerlicht_syntax_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, const char* msg);
+void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, schemerlicht_string* msg);
+void schemerlicht_compile_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, const char* msg);
 void schemerlicht_runtime_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg);
 void schemerlicht_runtime_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg);
 

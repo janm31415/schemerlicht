@@ -381,7 +381,7 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
     {
     if (depth == 0)
       {      
-      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, "");
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_BAD_SYNTAX, -1, -1, NULL, "");
       //schemerlicht_expression q = schemerlicht_init_quote(ctxt);
       //q.expr.quote.arg = *c;
       //return q;

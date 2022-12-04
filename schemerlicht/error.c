@@ -37,7 +37,7 @@ static void append_error_code(schemerlicht_context* ctxt, schemerlicht_string* m
     }
   }
 
-void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg)
+void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, schemerlicht_string* msg)
   {
   schemerlicht_string message;
   schemerlicht_string_init(ctxt, &message, "syntax error");
@@ -69,14 +69,14 @@ void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int li
   schemerlicht_vector_push_back(ctxt, &ctxt->syntax_error_reports, report, schemerlicht_error_report);
   }
 
-void schemerlicht_syntax_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg)
+void schemerlicht_syntax_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, const char* msg)
   {
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, msg);
-  schemerlicht_syntax_error(ctxt, errorcode, line_nr, column_nr, &s);
+  schemerlicht_syntax_error(ctxt, errorcode, line_nr, column_nr, filename, &s);
   }
 
-void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg)
+void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, schemerlicht_string* msg)
   {
   schemerlicht_string message;
   schemerlicht_string_init(ctxt, &message, "compile error");
@@ -108,11 +108,11 @@ void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int l
   schemerlicht_vector_push_back(ctxt, &ctxt->compile_error_reports, report, schemerlicht_error_report);
   }
 
-void schemerlicht_compile_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, const char* msg)
+void schemerlicht_compile_error_cstr(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* filename, const char* msg)
   {
   schemerlicht_string s;
   schemerlicht_string_init(ctxt, &s, msg);
-  schemerlicht_compile_error(ctxt, errorcode, line_nr, column_nr, &s);
+  schemerlicht_compile_error(ctxt, errorcode, line_nr, column_nr, filename, &s);
   }
 
 void schemerlicht_runtime_error(schemerlicht_context* ctxt, int errorcode, int line_nr, int column_nr, schemerlicht_string* msg)

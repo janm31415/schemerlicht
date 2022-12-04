@@ -49,7 +49,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
   {
   if (expr->expr.prim.arguments.vector_size < 2)
     {
-    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "at least 2 arguments expected");
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, expr->expr.prim.line_nr, expr->expr.prim.column_nr, &expr->expr.prim.filename, "at least 2 arguments expected");
     return;
     }
   int alternative_syntax = 0;
@@ -79,7 +79,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
     schemerlicht_expression* var = schemerlicht_vector_at(&f.fun, 0, schemerlicht_expression);
     if (var->type != schemerlicht_type_variable)
       {
-      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "");
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, &expr->expr.prim.filename, "");
       schemerlicht_destroy_parsed_funcall(ctxt, &f);
       return;
       }
@@ -96,7 +96,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
       schemerlicht_expression* lit = schemerlicht_vector_at(&f.arguments, f.arguments.vector_size - 2, schemerlicht_expression);
       if (lit->expr.lit.type != schemerlicht_type_flonum)
         {
-        schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, ". expected");
+        schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, &expr->expr.prim.filename, ". expected");
         schemerlicht_destroy_parsed_lambda(ctxt, &lam);
         schemerlicht_destroy_parsed_funcall(ctxt, &f);
         return;
@@ -113,7 +113,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
           }
         if (!is_name(it))
           {
-          schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "name expected");
+          schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, &expr->expr.prim.filename, "name expected");
           }
         schemerlicht_vector_push_back(ctxt, &lam.variables, get_name(ctxt, it), schemerlicht_string);
         schemerlicht_expression_destroy(ctxt, it);
@@ -126,7 +126,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
       for (; it != it_end; ++it)
         {
         if (!is_name(it))
-          schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "name expected");
+          schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, expr->expr.prim.line_nr, expr->expr.prim.column_nr, &expr->expr.prim.filename, "name expected");
         schemerlicht_vector_push_back(ctxt, &lam.variables, get_name(ctxt, it), schemerlicht_string);
         schemerlicht_expression_destroy(ctxt, it);
         }
@@ -209,14 +209,14 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_vis
       schemerlicht_assert(strcmp(eit->expr.prim.name.string_ptr, "define") == 0);
       if (eit->expr.prim.arguments.vector_size != 2)
         {
-        schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, eit->expr.prim.line_nr, eit->expr.prim.column_nr, "2 arguments expected");
+        schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, eit->expr.prim.line_nr, eit->expr.prim.column_nr, &eit->expr.prim.filename, "2 arguments expected");
         continue;
         }
       schemerlicht_expression* arg0 = schemerlicht_vector_at(&eit->expr.prim.arguments, 0, schemerlicht_expression);
       schemerlicht_expression* arg1 = schemerlicht_vector_at(&eit->expr.prim.arguments, 1, schemerlicht_expression);
       if (arg0->type != schemerlicht_type_variable)
         {
-        schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, eit->expr.prim.line_nr, eit->expr.prim.column_nr, "");
+        schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, eit->expr.prim.line_nr, eit->expr.prim.column_nr, &eit->expr.prim.filename, "");
         continue;
         }
       schemerlicht_let_binding b;
@@ -293,7 +293,7 @@ static int previsit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v
     {
     if (expr->expr.prim.arguments.vector_size < 2)
       {
-      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, expr->expr.prim.line_nr, expr->expr.prim.column_nr, "at least 2 arguments expected");
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, expr->expr.prim.line_nr, expr->expr.prim.column_nr, &expr->expr.prim.filename, "at least 2 arguments expected");
       return 0;
       }
     int alternative_syntax = 0;
@@ -344,7 +344,7 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
     rewrite_prim_define(ctxt, v, e);
     if (e->expr.prim.arguments.vector_size != 2)
       {
-      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, "");
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_NUMBER_OF_ARGUMENTS, e->expr.prim.line_nr, e->expr.prim.column_nr, &e->expr.prim.filename, "");
       return;
       }
     schemerlicht_parsed_set s;
@@ -375,7 +375,7 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
       }
     else
       {
-      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, e->expr.prim.line_nr, e->expr.prim.column_nr, "");
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, e->expr.prim.line_nr, e->expr.prim.column_nr, &e->expr.prim.filename, "");
       return;
       }
     s.originates_from_define = 1;

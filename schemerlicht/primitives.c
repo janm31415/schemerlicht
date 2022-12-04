@@ -8609,10 +8609,16 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
       FILE* f = fopen(fn->value.s.string_ptr, "r");
       if (!f)
         {
-
+        schemerlicht_string msg;
+        schemerlicht_string_init(ctxt, &msg, "Cannot open file ");
+        schemerlicht_string_append(ctxt, &msg, &fn->value.s);
+        schemerlicht_runtime_error(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, &msg);
         }
       if (f)
         {
+        schemerlicht_string filename_loading;
+        schemerlicht_string_copy(ctxt, &filename_loading, &fn->value.s);
+        schemerlicht_vector_push_back(ctxt, &ctxt->filenames_list, filename_loading, schemerlicht_string);
         schemerlicht_stream str;
         schemerlicht_stream_init(ctxt, &str, 256);
         char buffer[256];
@@ -8681,6 +8687,8 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         ctxt->stack.vector_ptr = store_stack_pointer;
         ctxt->stack.vector_size += a;
 #endif
+        schemerlicht_string_destroy(ctxt, schemerlicht_vector_back(&ctxt->filenames_list, schemerlicht_string));
+        schemerlicht_vector_pop_back(&ctxt->filenames_list);
         }
       else
         ra->type = schemerlicht_object_type_undefined;

@@ -239,7 +239,7 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
   {
   if (*token_it >= *token_it_end)
     {
-    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+    schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, NULL, "");
     return schemerlicht_make_nil_sym_cell(ctxt);
     }
   if ((*token_it)->type == SCHEMERLICHT_T_LEFT_ROUND_BRACKET)
@@ -250,7 +250,7 @@ schemerlicht_cell schemerlicht_read_quote(schemerlicht_context* ctxt, token** to
     ++(*token_it);
     if (*token_it == *token_it_end)
       {
-      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, "");
+      schemerlicht_syntax_error_cstr(ctxt, SCHEMERLICHT_ERROR_NO_TOKENS, -1, -1, NULL, "");
       return schemerlicht_make_nil_sym_cell(ctxt);
       }
     schemerlicht_vector items;

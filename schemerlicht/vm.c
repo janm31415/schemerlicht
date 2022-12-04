@@ -612,11 +612,11 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerl
   const schemerlicht_instruction* pc_end = schemerlicht_vector_end(&(fun)->code, schemerlicht_instruction);
   while (pc < pc_end)
     {
-    if (ctxt->number_of_runtime_errors > 0)
-      break;
+    //if (ctxt->number_of_runtime_errors > 0)
+    //  break;
     if (ctxt->heap_pos >= ctxt->raw_heap.vector_size / 2)
       {
-      printf("ERROR!!! HEAP FULL");
+      schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_MEMORY, -1, -1, "Heap is full!");
       break;
       }
     const schemerlicht_instruction i = *pc++;
