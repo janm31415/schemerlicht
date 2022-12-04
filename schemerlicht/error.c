@@ -41,6 +41,12 @@ void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int li
   {
   schemerlicht_string message;
   schemerlicht_string_init(ctxt, &message, "syntax error");
+  if (filename && filename->string_length > 0)
+    {
+    schemerlicht_string_append_cstr(ctxt, &message, " (");
+    schemerlicht_string_append(ctxt, &message, filename);
+    schemerlicht_string_push_back(ctxt, &message, ')');
+    }
   if (line_nr >= 0 && column_nr >= 0)
     {
     char number[256];
@@ -80,6 +86,12 @@ void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int l
   {
   schemerlicht_string message;
   schemerlicht_string_init(ctxt, &message, "compile error");
+  if (filename && filename->string_length > 0)
+    {
+    schemerlicht_string_append_cstr(ctxt, &message, " (");
+    schemerlicht_string_append(ctxt, &message, filename);
+    schemerlicht_string_push_back(ctxt, &message, ')');
+    }
   if (line_nr >= 0 && column_nr >= 0)
     {
     char number[256];
