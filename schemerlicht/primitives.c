@@ -4150,7 +4150,7 @@ void schemerlicht_primitive_string_hash(schemerlicht_context* ctxt, int a, int b
       ret.value.fx = 5381;
       char* str = rb->value.s.string_ptr;
       int ch;
-      while ((ch = *str++))
+      while ((ch = *str++) != 0)
         ret.value.fx = ((ret.value.fx << 5) + ret.value.fx) + ch; /* ret.value.fx * 33 + ch */
       }
     else

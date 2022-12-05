@@ -194,7 +194,7 @@ static void run_scheme_from_file(schemerlicht_context* ctxt, const char* filenam
     size_t bytes_read = fread(buffer, 1, 256, f);
     while (bytes_read)
       {
-      schemerlicht_stream_write(ctxt, &str, buffer, bytes_read, 0);
+      schemerlicht_stream_write(ctxt, &str, buffer, cast(schemerlicht_memsize, bytes_read), 0);
       bytes_read = fread(buffer, 1, 256, f);
       }
     fclose(f);

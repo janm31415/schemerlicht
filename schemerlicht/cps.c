@@ -640,6 +640,7 @@ static void cps_convert_if(schemerlicht_context* ctxt, schemerlicht_expression* 
 static void cps_convert_if_step2(schemerlicht_context* ctxt, schemerlicht_expression* e, cps_conversion_helper* cps)
   {
   UNUSED(ctxt);
+  UNUSED(e);
   schemerlicht_assert(e->type == schemerlicht_type_if);
   schemerlicht_vector_pop_back(&cps->continuation); // pop our local copy of the continuation
   }
