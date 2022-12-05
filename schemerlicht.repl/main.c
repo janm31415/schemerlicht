@@ -30,7 +30,7 @@
 #include "schemerlicht/environment.h"
 #include "schemerlicht/dump.h"
 
-char* getline(char** buffer, size_t* bufferlen)
+char* schemerlicht_getline(char** buffer, size_t* bufferlen)
   {
   char* line = *buffer;
   char* linep = line;
@@ -242,7 +242,7 @@ int main(int argc, char** argv)
   while (quit == 0)
     {
     printf("> ");
-    char* line = getline(&line_buffer, &line_buffer_len);
+    char* line = schemerlicht_getline(&line_buffer, &line_buffer_len);
     int input_is_scheme_command = 1;
     if (line[0] == ',') // check for commands
       {
