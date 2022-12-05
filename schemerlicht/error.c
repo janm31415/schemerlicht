@@ -2,6 +2,7 @@
 #include "limits.h"
 #include "context.h"
 #include "parser.h"
+#include "syscalls.h"
 
 #include <stdlib.h>
 #include <setjmp.h>
@@ -51,10 +52,10 @@ void schemerlicht_syntax_error(schemerlicht_context* ctxt, int errorcode, int li
     {
     char number[256];
     schemerlicht_string_append_cstr(ctxt, &message, " (");
-    sprintf(number, "%d", line_nr);
+    schemerlicht_int_to_char(number, line_nr);
     schemerlicht_string_append_cstr(ctxt, &message, number);
     schemerlicht_string_push_back(ctxt, &message, ',');
-    sprintf(number, "%d", column_nr);
+    schemerlicht_int_to_char(number, column_nr);
     schemerlicht_string_append_cstr(ctxt, &message, number);
     schemerlicht_string_push_back(ctxt, &message, ')');
     }
@@ -96,10 +97,10 @@ void schemerlicht_compile_error(schemerlicht_context* ctxt, int errorcode, int l
     {
     char number[256];
     schemerlicht_string_append_cstr(ctxt, &message, " (");
-    sprintf(number, "%d", line_nr);
+    schemerlicht_int_to_char(number, line_nr);
     schemerlicht_string_append_cstr(ctxt, &message, number);
     schemerlicht_string_push_back(ctxt, &message, ',');
-    sprintf(number, "%d", column_nr);
+    schemerlicht_int_to_char(number, column_nr);
     schemerlicht_string_append_cstr(ctxt, &message, number);
     schemerlicht_string_push_back(ctxt, &message, ')');
     }
@@ -135,10 +136,10 @@ void schemerlicht_runtime_error(schemerlicht_context* ctxt, int errorcode, int l
     {
     char number[256];
     schemerlicht_string_append_cstr(ctxt, &message, " (");
-    sprintf(number, "%d", line_nr);
+    schemerlicht_int_to_char(number, line_nr);
     schemerlicht_string_append_cstr(ctxt, &message, number);
     schemerlicht_string_push_back(ctxt, &message, ',');
-    sprintf(number, "%d", column_nr);
+    schemerlicht_int_to_char(number, column_nr);
     schemerlicht_string_append_cstr(ctxt, &message, number);
     schemerlicht_string_push_back(ctxt, &message, ')');
     }

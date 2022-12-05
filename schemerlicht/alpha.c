@@ -3,12 +3,13 @@
 #include "visitor.h"
 #include "string.h"
 #include "map.h"
+#include "syscalls.h"
 #include <stdio.h>
 
 schemerlicht_string schemerlicht_make_alpha_name(schemerlicht_context* ctxt, schemerlicht_string* original, schemerlicht_memsize index)
   {
   char buffer[256];
-  sprintf(buffer, "%d", index);
+  schemerlicht_memsize_to_char(buffer, index);  
   schemerlicht_string new_name;
   schemerlicht_string_init(ctxt, &new_name, "%");
   schemerlicht_string_append(ctxt, &new_name, original);

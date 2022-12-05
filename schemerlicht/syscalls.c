@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 int schemerlicht_write(int fd, const void* buffer, unsigned int count)
   {
@@ -98,4 +99,59 @@ int schemerlicht_file_exists(const char* filename)
     fclose(f);
     }
   return res;
+  }
+
+void schemerlicht_fixnum_to_char(char* buffer, schemerlicht_fixnum fx)
+  {
+  sprintf(buffer, "%lld", fx);
+  }
+
+void schemerlicht_fixnum_to_binary_char(char* str, schemerlicht_fixnum a)
+  {
+  if (a == 0)
+    {
+    str[0] = '0';
+    str[1] = 0;
+    }
+  else
+    {
+    int len = ceil(log2(a));
+    char* s = str + len;
+    *s-- = 0;
+    while (a > 0)
+      {
+      *s-- = a % 2 + '0';
+      a /= 2;
+      }
+    }
+  }
+
+void schemerlicht_fixnum_to_hex_char(char* buffer, schemerlicht_fixnum fx)
+  {
+  sprintf(buffer, "%llx", fx);
+  }
+
+void schemerlicht_fixnum_to_oct_char(char* buffer, schemerlicht_fixnum fx)
+  {
+  sprintf(buffer, "%llo", fx);
+  }
+
+void schemerlicht_flonum_to_char(char* buffer, schemerlicht_flonum fl)
+  {
+  sprintf(buffer, "%f", fl);
+  }
+
+void schemerlicht_flonum_to_char_scientific(char* buffer, schemerlicht_flonum fl)
+  {
+  sprintf(buffer, "%.17e", fl);
+  }
+
+void schemerlicht_memsize_to_char(char* buffer, schemerlicht_memsize s)
+  {
+  sprintf(buffer, "%d", s);
+  }
+
+void schemerlicht_int_to_char(char* buffer, int i)
+  {
+  sprintf(buffer, "%d", i);
   }

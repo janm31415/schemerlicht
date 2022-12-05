@@ -6798,28 +6798,6 @@ void schemerlicht_primitive_sqrt(schemerlicht_context* ctxt, int a, int b, int c
 
 ////////////////////////////////////////////////////
 
-static void to_binary(char* str, schemerlicht_fixnum a)
-  {
-  if (a == 0)
-    {
-    str[0] = '0';
-    str[1] = 0;
-    }
-  else
-    {
-    int len = ceil(log2(a));
-    char* s = str + len;
-    *s-- = 0;
-    while (a > 0)
-      {
-      *s-- = a % 2 + '0';
-      a /= 2;
-      }
-    }
-  }
-
-////////////////////////////////////////////////////
-
 void schemerlicht_primitive_number_string(schemerlicht_context* ctxt, int a, int b, int c)
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6857,16 +6835,16 @@ void schemerlicht_primitive_number_string(schemerlicht_context* ctxt, int a, int
         switch (base)
           {
           case 2:
-            to_binary(buffer, arg->value.fx);
+            schemerlicht_fixnum_to_binary_char(buffer, arg->value.fx);
             break;
           case 8:
-            sprintf(buffer, "%llo", arg->value.fx);
+            schemerlicht_fixnum_to_oct_char(buffer, arg->value.fx);
             break;
           case 16:
-            sprintf(buffer, "%llx", arg->value.fx);
+            schemerlicht_fixnum_to_hex_char(buffer, arg->value.fx);
             break;
           default:
-            sprintf(buffer, "%lld", arg->value.fx);
+            schemerlicht_fixnum_to_char(buffer, arg->value.fx);
             break;
           }
         obj.type = schemerlicht_object_type_string;
@@ -6882,7 +6860,7 @@ void schemerlicht_primitive_number_string(schemerlicht_context* ctxt, int a, int
         else if (isfinite(arg->value.fl))
           {
           char buffer[256];
-          sprintf(buffer, "%.17e", arg->value.fl);
+          schemerlicht_flonum_to_char_scientific(buffer, arg->value.fl);
           obj.type = schemerlicht_object_type_string;
           schemerlicht_string_init(ctxt, &obj.value.s, buffer);
           }

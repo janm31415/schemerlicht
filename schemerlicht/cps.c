@@ -4,6 +4,7 @@
 #include "tailcall.h"
 #include "limits.h"
 #include "copy.h"
+#include "syscalls.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -122,7 +123,7 @@ static schemerlicht_string make_var_name(schemerlicht_context* ctxt, schemerlich
   schemerlicht_string_init(ctxt, &s, "#%k");
   char buffer[20];
   memset(buffer, 0, 20 * sizeof(char));
-  sprintf(buffer, "%d", index);
+  schemerlicht_memsize_to_char(buffer, index);
   schemerlicht_string_append_cstr(ctxt, &s, buffer);
   return s;
   }

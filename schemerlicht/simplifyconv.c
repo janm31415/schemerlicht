@@ -12,7 +12,7 @@
 typedef struct schemerlicht_simplify_to_core_forms_visitor
   {
   schemerlicht_visitor* visitor;
-  uint64_t letrec_index;
+  schemerlicht_memsize letrec_index;
   } schemerlicht_simplify_to_core_forms_visitor;
 
 static schemerlicht_expression make_true()
@@ -298,7 +298,7 @@ static void convert_letrec(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
   for (; it != it_end; ++it)
     {   
     memset(buffer, 0, 20 * sizeof(char));
-    sprintf(buffer, "%lld", cast(schemerlicht_simplify_to_core_forms_visitor*, v->impl)->letrec_index);
+    schemerlicht_memsize_to_char(buffer, cast(schemerlicht_simplify_to_core_forms_visitor*, v->impl)->letrec_index);
     schemerlicht_string str;
     schemerlicht_string_init(ctxt, &str, "#%t");
     schemerlicht_string_append_cstr(ctxt, &str, buffer);

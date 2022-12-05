@@ -3,6 +3,7 @@
 #include "context.h"
 #include "string.h"
 #include "stringvec.h"
+#include "syscalls.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -91,7 +92,7 @@ static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v
     schemerlicht_string name;
     schemerlicht_string_init(ctxt, &name, "#%self");
     char number[256];
-    sprintf(number, "%d", vis->self_index);
+    schemerlicht_memsize_to_char(number, vis->self_index);
     ++vis->self_index;
     schemerlicht_string_append_cstr(ctxt, &name, number);
     schemerlicht_string* insert_it = schemerlicht_vector_at(&e->expr.lambda.variables, 0, schemerlicht_string);
@@ -103,7 +104,7 @@ static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v
     schemerlicht_string name;
     schemerlicht_string_init(ctxt, &name, "#%self");
     char number[256];
-    sprintf(number, "%d", vis->self_index);
+    schemerlicht_memsize_to_char(number, vis->self_index);
     ++vis->self_index;
     schemerlicht_string_append_cstr(ctxt, &name, number);
     schemerlicht_string* insert_it = schemerlicht_vector_at(&e->expr.lambda.variables, 0, schemerlicht_string);

@@ -59,10 +59,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "MOVE R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := R(");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
     break;
@@ -72,10 +72,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_Bx(i);
     schemerlicht_string_append_cstr(ctxt, &s, "LOADGLOBAL R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := GLOBAL(");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
     break;
@@ -85,10 +85,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_Bx(i);
     schemerlicht_string_append_cstr(ctxt, &s, "STOREGLOBAL GLOBAL(");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
     break;
@@ -98,16 +98,16 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "MOVETOP R(0)..R(");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")..R(");
-    sprintf(buffer, "%d", a + b);
+    schemerlicht_int_to_char(buffer, a + b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")   R(");
-    sprintf(buffer, "%d", b + 1);
+    schemerlicht_int_to_char(buffer, b + 1);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")->type = blocking");
     break;
@@ -117,10 +117,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_Bx(i);
     schemerlicht_string_append_cstr(ctxt, &s, "LOADK R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := K(");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
     break;
@@ -130,10 +130,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "SETPRIM R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     break;
     }
@@ -142,10 +142,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "SETPRIMOBJ R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     break;
     }
@@ -154,10 +154,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_sBx(i);
     schemerlicht_string_append_cstr(ctxt, &s, "SETFIXNUM R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     break;
     }
@@ -166,10 +166,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "SETCHAR R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     break;
     }
@@ -178,10 +178,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "SETTYPE R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ").type := ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     break;
     }
@@ -189,7 +189,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     {
     const int a = SCHEMERLICHT_GETARG_A(i);
     schemerlicht_string_append_cstr(ctxt, &s, "LISTSTACK R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") := (list R(A) R(A+1) ... R(A+x)), list until R(A+x+1).type == schemerlicht_object_type_blocked");
     break;
@@ -198,7 +198,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     {
     const int a = SCHEMERLICHT_GETARG_A(i);
     schemerlicht_string_append_cstr(ctxt, &s, "CALL R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
     break;
@@ -208,10 +208,10 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     const int a = SCHEMERLICHT_GETARG_A(i);
     const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_string_append_cstr(ctxt, &s, "EQTYPE if R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")->type == ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, " then skip next line");
     break;
@@ -220,7 +220,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     {
     int b = SCHEMERLICHT_GETARG_sBx(i);
     schemerlicht_string_append_cstr(ctxt, &s, "JUMP ");
-    sprintf(buffer, "%d", b);
+    schemerlicht_int_to_char(buffer, b);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     break;
     }
@@ -228,7 +228,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     {
     const int a = SCHEMERLICHT_GETARG_A(i);
     schemerlicht_string_append_cstr(ctxt, &s, "RETURN R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ")");
     break;
@@ -243,7 +243,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     schemerlicht_assert(position < ctxt->externals.vector_size);
     schemerlicht_external_function* ext = schemerlicht_vector_at(&ctxt->externals, position, schemerlicht_external_function);
     schemerlicht_string_append_cstr(ctxt, &s, "CALL FOREIGN R(");
-    sprintf(buffer, "%d", a);
+    schemerlicht_int_to_char(buffer, a);
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ") = ");
     schemerlicht_string_append(ctxt, &s, &ext->name);
@@ -262,23 +262,21 @@ static schemerlicht_string debug_object_to_string(schemerlicht_context* ctxt, sc
     {
     char buffer[256];
     uint64_t ptr = cast(uint64_t, obj->value.ptr);
-    sprintf(buffer, "%lld", ptr);
+    schemerlicht_fixnum_to_char(buffer, cast(schemerlicht_fixnum, ptr));
     schemerlicht_string_append_cstr(ctxt, &res, ": ");
     schemerlicht_string_append_cstr(ctxt, &res, buffer);
     }
   if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_primitive)
     {
     char buffer[256];
-    uint64_t fx = cast(uint64_t, obj->value.fx);
-    sprintf(buffer, "%lld", fx);
+    schemerlicht_fixnum_to_char(buffer, obj->value.fx);
     schemerlicht_string_append_cstr(ctxt, &res, ": ");
     schemerlicht_string_append_cstr(ctxt, &res, buffer);
     }
   if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_primitive_object)
     {
     char buffer[256];
-    uint64_t fx = cast(uint64_t, obj->value.fx);
-    sprintf(buffer, "%lld", fx);
+    schemerlicht_fixnum_to_char(buffer, obj->value.fx);
     schemerlicht_string_append_cstr(ctxt, &res, ": (as object) ");
     schemerlicht_string_append_cstr(ctxt, &res, buffer);
     }
@@ -987,7 +985,7 @@ schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stac
     stack_end = schemerlicht_maxstack - 1;
   for (int i = stack_start; i <= stack_end; ++i)
     {
-    sprintf(buffer, "%d", i);
+    schemerlicht_int_to_char(buffer, i);
     schemerlicht_string_append_cstr(ctxt, &s, "  ");
     schemerlicht_string_append_cstr(ctxt, &s, buffer);
     schemerlicht_string_append_cstr(ctxt, &s, ": ");

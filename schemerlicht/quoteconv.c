@@ -170,7 +170,7 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
       schemerlicht_expression set = schemerlicht_init_set(ctxt);
       set.expr.set.originates_from_quote = 1;
       schemerlicht_string_init(ctxt, &set.expr.set.name, "#%q");
-      sprintf(buffer, "%d", vis->index);
+      schemerlicht_memsize_to_char(buffer, vis->index);
       schemerlicht_string_append_cstr(ctxt, &set.expr.set.name, buffer);
 
       quote_object = schemerlicht_map_insert(ctxt, ctxt->quote_to_index, &key);
@@ -199,7 +199,7 @@ static void visit_quote(schemerlicht_context* ctxt, schemerlicht_visitor* v, sch
   schemerlicht_assert(schemerlicht_object_get_type(quote_object) == schemerlicht_object_type_fixnum);
   schemerlicht_expression var = schemerlicht_init_variable(ctxt);
   schemerlicht_string_init(ctxt, &var.expr.var.name, "#%q");
-  sprintf(buffer, "%lld", quote_object->value.fx);
+  schemerlicht_fixnum_to_char(buffer, quote_object->value.fx);
   schemerlicht_string_append_cstr(ctxt, &var.expr.var.name, buffer);
 
   if (clean_up_key_string)

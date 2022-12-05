@@ -1,6 +1,7 @@
 #include "dump.h"
 #include "memory.h"
 #include "reader.h"
+#include "syscalls.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -10,7 +11,7 @@ static void visit_fixnum(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
   char buffer[80];
   memset(buffer, 0, 80 * sizeof(char));
-  sprintf(buffer, "%lld", e->expr.lit.lit.fx.value);
+  schemerlicht_fixnum_to_char(buffer, e->expr.lit.lit.fx.value);
   schemerlicht_string_append_cstr(ctxt, &(d->s), buffer);
   schemerlicht_string_push_back(ctxt, &(d->s), ' ');
   }
@@ -20,7 +21,7 @@ static void visit_flonum(schemerlicht_context* ctxt, schemerlicht_visitor* v, sc
   schemerlicht_dump_visitor* d = (schemerlicht_dump_visitor*)(v->impl);
   char buffer[80];
   memset(buffer, 0, 80 * sizeof(char));
-  sprintf(buffer, "%f", e->expr.lit.lit.fl.value);
+  schemerlicht_flonum_to_char(buffer, e->expr.lit.lit.fl.value);
   schemerlicht_string_append_cstr(ctxt, &(d->s), buffer);
   schemerlicht_string_push_back(ctxt, &(d->s), ' ');
   }
@@ -108,7 +109,7 @@ static void visit_character(schemerlicht_context* ctxt, schemerlicht_visitor* v,
   char ch = e->expr.lit.lit.ch.value;
   char buffer[20];
   memset(buffer, 0, 20 * sizeof(char));
-  sprintf(buffer, "%d", (int)ch);
+  schemerlicht_int_to_char(buffer, (int)ch);
   schemerlicht_string_append_cstr(ctxt, &(d->s), "#\\");
   schemerlicht_string_append_cstr(ctxt, &(d->s), buffer);
   schemerlicht_string_push_back(ctxt, &(d->s), ' ');

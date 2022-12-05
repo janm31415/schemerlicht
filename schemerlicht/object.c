@@ -1,6 +1,7 @@
 #include "object.h"
 #include "pool.h"
 #include "context.h"
+#include "syscalls.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -572,14 +573,14 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         case schemerlicht_object_type_fixnum:
         {
         char str[256];
-        sprintf(str, "%lld", current_task.obj->value.fx);
+        schemerlicht_fixnum_to_char(str, current_task.obj->value.fx);
         schemerlicht_string_append_cstr(ctxt, &s, str);
         break;
         }
         case schemerlicht_object_type_flonum:
         {
         char str[256];
-        sprintf(str, "%f", current_task.obj->value.fl);
+        schemerlicht_flonum_to_char(str, current_task.obj->value.fl);
         schemerlicht_string_append_cstr(ctxt, &s, str);
         break;
         }
@@ -669,7 +670,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         else
           {
           char str[4];
-          sprintf(str, "%d", v);
+          schemerlicht_int_to_char(str, v);
           str[3] = 0;
           if (str[1] == 0)
             {
