@@ -115,7 +115,7 @@ void schemerlicht_fixnum_to_binary_char(char* str, schemerlicht_fixnum a)
     }
   else
     {
-    int len = ceil(log2(a));
+    int len = cast(int, ceil(log2(cast(double, a))));
     char* s = str + len;
     *s-- = 0;
     while (a > 0)

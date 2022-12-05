@@ -11,6 +11,7 @@ typedef struct schemerlicht_globdef_visitor
 
 static int previsit_set(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   if (e->expr.set.originates_from_define != 0)
     {
     schemerlicht_environment_entry entry;

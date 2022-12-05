@@ -350,7 +350,7 @@ static schemerlicht_expression qq_expand_list(schemerlicht_context* ctxt, scheme
     q.expr.quote.arg = *c;
     return q;
     }
-  return schemerlicht_init_nop(ctxt);
+  //return schemerlicht_init_nop(ctxt);
   }
 
 static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlicht_cell* c, int depth)
@@ -473,7 +473,7 @@ static schemerlicht_expression qq_expand(schemerlicht_context* ctxt, schemerlich
     q.expr.quote.arg = *c;
     return q;
     }
-  return schemerlicht_init_nop(ctxt);
+  //return schemerlicht_init_nop(ctxt);
   }
 
 static void convert(schemerlicht_context* ctxt, schemerlicht_expression* e)

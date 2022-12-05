@@ -767,6 +767,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
 schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, schemerlicht_object* input_obj)
   {
   schemerlicht_object result;
+  result.type = schemerlicht_object_type_undefined;
   schemerlicht_object* last_result = NULL;
   schemerlicht_vector parent;
   schemerlicht_vector_init(ctxt, &parent, schemerlicht_object*);
@@ -819,10 +820,10 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
         }
       else
         {
-        schemerlicht_object key;
-        key.type = schemerlicht_object_type_string;
-        schemerlicht_string_copy(ctxt, &key.value.s, &obj.value.s);
-        schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
+        schemerlicht_object key2;
+        key2.type = schemerlicht_object_type_string;
+        schemerlicht_string_copy(ctxt, &key2.value.s, &obj.value.s);
+        schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key2);
         new_symbol->type = schemerlicht_object_type_symbol;
         schemerlicht_string_copy(ctxt, &new_symbol->value.s, &obj.value.s);
         schemerlicht_set_object(&res, new_symbol);
@@ -866,7 +867,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
       {
       schemerlicht_vector_push_back(ctxt, &last_result->value.v, res, schemerlicht_object);
       schemerlicht_object* add_to_parent = schemerlicht_vector_back(&last_result->value.v, schemerlicht_object);
-      for (int i = 0; i < parents_to_add; ++i)
+      for (schemerlicht_memsize i = 0; i < parents_to_add; ++i)
         {
         schemerlicht_vector_push_back(ctxt, &parent, add_to_parent, schemerlicht_object*);
         }
@@ -874,7 +875,7 @@ schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, sc
     else
       {
       result = res;
-      for (int i = 0; i < parents_to_add; ++i)
+      for (schemerlicht_memsize i = 0; i < parents_to_add; ++i)
         {
         schemerlicht_vector_push_back(ctxt, &parent, &result, schemerlicht_object*);
         }

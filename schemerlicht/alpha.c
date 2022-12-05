@@ -158,6 +158,7 @@ static int previsit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, 
 
 static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(e);
   schemerlicht_alpha_conversion_visitor* vis = (schemerlicht_alpha_conversion_visitor*)(v->impl);
   pop_variables_child(ctxt, vis);
   }

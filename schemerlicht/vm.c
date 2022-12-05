@@ -7,6 +7,7 @@
 #include "inlines.h"
 #include "foreign.h"
 #include "environment.h"
+#include "syscalls.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -236,7 +237,7 @@ static schemerlicht_string instruction_to_string(schemerlicht_context* ctxt, sch
     case SCHEMERLICHT_OPCODE_CALL_FOREIGN:
     {
     const int a = SCHEMERLICHT_GETARG_A(i);
-    const int b = SCHEMERLICHT_GETARG_B(i);
+    //const int b = SCHEMERLICHT_GETARG_B(i);
     schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
     schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_fixnum);
     const schemerlicht_memsize position = cast(schemerlicht_memsize, ra->value.fx);

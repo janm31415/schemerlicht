@@ -7,6 +7,7 @@
 #include "reader.h"
 #include "parser.h"
 #include "environment.h"
+#include "syscalls.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -15,6 +16,7 @@
 static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_cell* inputcell)
   {
   schemerlicht_expression result;
+  result.type = schemerlicht_type_nop;
   schemerlicht_expression* last_result = NULL;
   schemerlicht_vector parent;
   schemerlicht_vector_init(ctxt, &parent, schemerlicht_expression*);
@@ -25,6 +27,7 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
   while (todo.vector_size > 0)
     {
     schemerlicht_expression res;
+    res.type = schemerlicht_type_nop;
     schemerlicht_cell c = *schemerlicht_vector_back(&todo, schemerlicht_cell);
     schemerlicht_vector_pop_back(&todo);
     schemerlicht_memsize parents_to_add = 0;
@@ -122,7 +125,7 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
       {
       schemerlicht_vector_push_back(ctxt, &last_result->expr.prim.arguments, res, schemerlicht_expression);
       schemerlicht_expression* add_to_parent = schemerlicht_vector_back(&last_result->expr.prim.arguments, schemerlicht_expression);
-      for (int i = 0; i < parents_to_add; ++i)
+      for (schemerlicht_memsize i = 0; i < parents_to_add; ++i)
         {
         schemerlicht_vector_push_back(ctxt, &parent, add_to_parent, schemerlicht_expression*);
         }
@@ -130,7 +133,7 @@ static schemerlicht_expression _parse(schemerlicht_context* ctxt, schemerlicht_c
     else
       {
       result = res;
-      for (int i = 0; i < parents_to_add; ++i)
+      for (schemerlicht_memsize i = 0; i < parents_to_add; ++i)
         {
         schemerlicht_vector_push_back(ctxt, &parent, &result, schemerlicht_expression*);
         }

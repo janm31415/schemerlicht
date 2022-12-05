@@ -352,6 +352,8 @@ schemerlicht_cell schemerlicht_read_datum(schemerlicht_context* ctxt, token* fir
   state.line_nr = 1;
   state.column_nr = 1;
   token tok;
+  tok.type = SCHEMERLICHT_T_BAD;
+  tok.value.string_ptr = NULL;
   if (first_token)
     {
     tok = *first_token;
@@ -604,6 +606,7 @@ schemerlicht_cell schemerlicht_cell_copy(schemerlicht_context* ctxt, schemerlich
 schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, schemerlicht_cell* inputcell)
   {
   schemerlicht_object result;
+  result.type = schemerlicht_object_type_undefined;
   schemerlicht_object* last_result = NULL;
   schemerlicht_vector parent;
   schemerlicht_vector_init(ctxt, &parent, schemerlicht_object*);
@@ -614,6 +617,7 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
   while (todo.vector_size > 0)
     {
     schemerlicht_object res;
+    res.type = schemerlicht_object_type_undefined;
     schemerlicht_cell c = *schemerlicht_vector_back(&todo, schemerlicht_cell);
     schemerlicht_vector_pop_back(&todo);
     schemerlicht_memsize parents_to_add = 0;
@@ -675,10 +679,10 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
           }
         else
           {
-          schemerlicht_object key;
-          key.type = schemerlicht_object_type_string;
-          schemerlicht_string_copy(ctxt, &key.value.s, &c.value.str);
-          schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key);
+          schemerlicht_object key2;
+          key2.type = schemerlicht_object_type_string;
+          schemerlicht_string_copy(ctxt, &key2.value.s, &c.value.str);
+          schemerlicht_object* new_symbol = schemerlicht_map_insert(ctxt, ctxt->string_to_symbol, &key2);
           new_symbol->type = schemerlicht_object_type_symbol;
           schemerlicht_string_copy(ctxt, &new_symbol->value.s, &c.value.str);
           schemerlicht_set_object(&res, new_symbol);
@@ -733,7 +737,7 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
       {
       schemerlicht_vector_push_back(ctxt, &last_result->value.v, res, schemerlicht_object);
       schemerlicht_object* add_to_parent = schemerlicht_vector_back(&last_result->value.v, schemerlicht_object);
-      for (int i = 0; i < parents_to_add; ++i)
+      for (schemerlicht_memsize i = 0; i < parents_to_add; ++i)
         {
         schemerlicht_vector_push_back(ctxt, &parent, add_to_parent, schemerlicht_object*);
         }
@@ -741,7 +745,7 @@ schemerlicht_object schemerlicht_cell_to_object(schemerlicht_context* ctxt, sche
     else
       {
       result = res;
-      for (int i = 0; i < parents_to_add; ++i)
+      for (schemerlicht_memsize i = 0; i < parents_to_add; ++i)
         {
         schemerlicht_vector_push_back(ctxt, &parent, &result, schemerlicht_object*);
         }

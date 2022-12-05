@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "copy.h"
 #include "error.h"
+#include "syscalls.h"
 
 #include <stdio.h>
 #include <string.h>

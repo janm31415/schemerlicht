@@ -206,6 +206,7 @@ static void fold_primcall(schemerlicht_context* ctxt, schemerlicht_expression* e
 
 static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   if (e->expr.prim.as_object || (e->expr.prim.arguments.vector_size == 0))
     return;
   if (!all_arguments_are_simple_literals(e))
@@ -218,6 +219,7 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
 
 static void postvisit_if(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(v);
   schemerlicht_assert(e->expr.i.arguments.vector_size == 3);
   if (schemerlicht_vector_begin(&e->expr.i.arguments, schemerlicht_expression)->type == schemerlicht_type_literal)
     {

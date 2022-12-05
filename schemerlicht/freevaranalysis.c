@@ -69,6 +69,7 @@ static void postvisit_let_bindings(schemerlicht_context* ctxt, schemerlicht_visi
 
 static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, schemerlicht_expression* e)
   {
+  UNUSED(e);
   schemerlicht_free_variable_analysis_visitor* vis = (schemerlicht_free_variable_analysis_visitor*)(v->impl);
   schemerlicht_vector* loc_vars = schemerlicht_vector_back(&vis->local_variables, schemerlicht_vector);
   schemerlicht_vector* free_vars = schemerlicht_vector_back(&vis->free_variables, schemerlicht_vector);

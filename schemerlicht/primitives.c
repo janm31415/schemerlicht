@@ -5281,6 +5281,7 @@ void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c)
       }
     schemerlicht_object ret;
     ret.type = type;
+    ret.value.fx = 0;
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     switch (type)
       {
@@ -5369,7 +5370,7 @@ void schemerlicht_primitive_max(schemerlicht_context* ctxt, int a, int b, int c)
       }
       case schemerlicht_object_type_char:
       {
-      ret.value.ch = cast(schemerlicht_flonum, first_arg->value.ch);
+      ret.value.ch = first_arg->value.ch;
       for (int j = 1; j < b; ++j)
         {
         schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
@@ -5415,6 +5416,7 @@ void schemerlicht_primitive_min(schemerlicht_context* ctxt, int a, int b, int c)
       }
     schemerlicht_object ret;
     ret.type = type;
+    ret.value.fx = 0;
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     switch (type)
       {
@@ -5503,7 +5505,7 @@ void schemerlicht_primitive_min(schemerlicht_context* ctxt, int a, int b, int c)
       }
       case schemerlicht_object_type_char:
       {
-      ret.value.ch = cast(schemerlicht_flonum, first_arg->value.ch);
+      ret.value.ch = first_arg->value.ch;
       for (int j = 1; j < b; ++j)
         {
         schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
@@ -5538,7 +5540,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
     --b;
     while (schemerlicht_object_get_type(last_arg) == schemerlicht_object_type_pair)
       {
-      if (a + c + b + 1 >= ctxt->stack.vector_size)
+      if (a + c + b + 1 >= cast(int, ctxt->stack.vector_size))
         {
         schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_MEMORY, -1, -1, "stack overflow in apply.");
         ra->type = schemerlicht_object_type_undefined;
@@ -6508,6 +6510,25 @@ void schemerlicht_primitive_exp(schemerlicht_context* ctxt, int a, int b, int c)
 
 ////////////////////////////////////////////////////
 
+static schemerlicht_fixnum ipow(schemerlicht_fixnum base, schemerlicht_fixnum exp)
+  {
+  if (exp < 0)
+    return 0;
+  schemerlicht_fixnum result = 1;  
+  for (;;)
+    {
+    if (exp & 1)
+      result *= base;
+    exp >>= 1;
+    if (!exp)
+      break;
+    base *= base;
+    }
+  return result;
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_primitive_expt(schemerlicht_context* ctxt, int a, int b, int c)
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6523,7 +6544,7 @@ void schemerlicht_primitive_expt(schemerlicht_context* ctxt, int a, int b, int c
     if (schemerlicht_object_get_type(arg1) == schemerlicht_object_type_fixnum && schemerlicht_object_get_type(arg2) == schemerlicht_object_type_fixnum)
       {
       obj.type = schemerlicht_object_type_fixnum;
-      obj.value.fx = pow(arg1->value.fx, arg2->value.fx);
+      obj.value.fx = ipow(arg1->value.fx, arg2->value.fx);
       }
     else if ((schemerlicht_object_get_type(arg1) == schemerlicht_object_type_fixnum || schemerlicht_object_get_type(arg1) == schemerlicht_object_type_flonum) && (schemerlicht_object_get_type(arg2) == schemerlicht_object_type_fixnum || schemerlicht_object_get_type(arg2) == schemerlicht_object_type_flonum))
       {
@@ -7921,7 +7942,7 @@ void schemerlicht_primitive_write_char(schemerlicht_context* ctxt, int a, int b,
       schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
       if (current_pos >= buffer_length)
         {
-        schemerlicht_write(fileid, buffer->value.s.string_ptr, current_pos);
+        schemerlicht_write(fileid, buffer->value.s.string_ptr, cast(schemerlicht_memsize, current_pos));
         current_pos = 0;
         }
       buffer->value.s.string_ptr[current_pos++] = ch->value.ch;
@@ -7953,9 +7974,9 @@ void schemerlicht_primitive_flush_output_port(schemerlicht_context* ctxt, int a,
       if (fileid >= 0)
         {
         schemerlicht_fixnum current_pos = schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx;
-        schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
+        //schemerlicht_fixnum buffer_length = schemerlicht_vector_at(&p->value.v, 5, schemerlicht_object)->value.fx;
         schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
-        schemerlicht_write(fileid, buffer->value.s.string_ptr, current_pos);
+        schemerlicht_write(fileid, buffer->value.s.string_ptr, cast(schemerlicht_memsize, current_pos));
         schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
         }
       }
@@ -7980,7 +8001,7 @@ static int get_char(schemerlicht_byte* ch, schemerlicht_object* p, int read)
   schemerlicht_object* buffer = schemerlicht_vector_at(&p->value.v, 3, schemerlicht_object);
   if (current_pos >= bytes_read)
     { // read buffer
-    int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, buffer_length);
+    int bytes_last_read = schemerlicht_read(fileid, buffer->value.s.string_ptr, cast(schemerlicht_memsize, buffer_length));
     current_pos = 0;
     schemerlicht_vector_at(&p->value.v, 4, schemerlicht_object)->value.fx = 0;
     schemerlicht_vector_at(&p->value.v, 6, schemerlicht_object)->value.fx = cast(schemerlicht_fixnum, bytes_last_read);
@@ -8243,7 +8264,7 @@ void schemerlicht_primitive_close_input_port(schemerlicht_context* ctxt, int a, 
       {
       ra->type = schemerlicht_object_type_void;
       schemerlicht_object* id = schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object);
-      schemerlicht_close_file(id->value.fx);
+      schemerlicht_close_file(cast(int, id->value.fx));
       schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object)->value.fx = -1; // remove file handle / mark as closed
       }
     else
@@ -8272,7 +8293,7 @@ void schemerlicht_primitive_close_output_port(schemerlicht_context* ctxt, int a,
       {
       ra->type = schemerlicht_object_type_void;
       schemerlicht_object* id = schemerlicht_vector_at(&p->value.v, 2, schemerlicht_object);
-      schemerlicht_close_file(id->value.fx);
+      schemerlicht_close_file(cast(int, id->value.fx));
       }
     else
       {
@@ -8376,7 +8397,7 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
           schemerlicht_string new_string;
           schemerlicht_memsize size_init = 256;
           if (required_length - available_length > size_init)
-            size_init = required_length - available_length;
+            size_init = cast(schemerlicht_memsize, required_length - available_length);
           schemerlicht_string_init_with_size(ctxt, &new_string, size_init + s->value.s.string_length, 0);
           s->value.s = new_string; // old string is on the heap and will be cleaned up by gc
           schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
@@ -8398,7 +8419,7 @@ void schemerlicht_primitive_write(schemerlicht_context* ctxt, int a, int b, int 
         if (buffer_size_remaining < dist)
           {
           memcpy(buffer->value.s.string_ptr + current_pos, chars_to_write, buffer_size_remaining);
-          schemerlicht_write(fileid, buffer->value.s.string_ptr, buffer_length);
+          schemerlicht_write(fileid, buffer->value.s.string_ptr, cast(schemerlicht_memsize, buffer_length));
           current_pos = 0;
           chars_to_write += buffer_size_remaining;
           }
@@ -8452,7 +8473,7 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
           schemerlicht_string new_string;
           schemerlicht_memsize size_init = 256;
           if (required_length - available_length > size_init)
-            size_init = required_length - available_length;
+            size_init = cast(schemerlicht_memsize, required_length - available_length);
           schemerlicht_string_init_with_size(ctxt, &new_string, size_init + s->value.s.string_length, 0);
           s->value.s = new_string; // old string is on the heap and will be cleaned up by gc
           schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
@@ -8474,7 +8495,7 @@ void schemerlicht_primitive_display(schemerlicht_context* ctxt, int a, int b, in
         if (buffer_size_remaining < dist)
           {
           memcpy(buffer->value.s.string_ptr + current_pos, chars_to_write, buffer_size_remaining);
-          schemerlicht_write(fileid, buffer->value.s.string_ptr, buffer_length);
+          schemerlicht_write(fileid, buffer->value.s.string_ptr, cast(schemerlicht_memsize, buffer_length));
           current_pos = 0;
           chars_to_write += buffer_size_remaining;
           }
@@ -8603,7 +8624,7 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
         size_t bytes_read = fread(buffer, 1, 256, f);
         while (bytes_read)
           {
-          schemerlicht_stream_write(ctxt, &str, buffer, bytes_read, 0);
+          schemerlicht_stream_write(ctxt, &str, buffer, cast(schemerlicht_memsize, bytes_read), 0);
           bytes_read = fread(buffer, 1, 256, f);
           }
         fclose(f);
@@ -8709,7 +8730,7 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
       {      
       while (schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object)->type != schemerlicht_object_type_blocking)
         ++stack_offset;
-      cast(schemerlicht_object*, ctxt->stack.vector_ptr) += stack_offset;
+      ctxt->stack.vector_ptr = cast(void*, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + stack_offset);
       ctxt->stack.vector_size -= stack_offset;
       }
     schemerlicht_stream str;
@@ -8844,6 +8865,8 @@ void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b
 
 void schemerlicht_primitive_interaction_environment(schemerlicht_context* ctxt, int a, int b, int c)
   {
+  UNUSED(b);
+  UNUSED(c);
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
