@@ -1788,6 +1788,9 @@ static schemerlicht_expression make_literal(schemerlicht_context* ctxt, token** 
         return expr;
         }
       }
+      (*token_it)->type = SCHEMERLICHT_T_ID; // treat this as a variable
+      return make_variable(ctxt, token_it, token_it_end);
+    break;
     }
     default:
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
