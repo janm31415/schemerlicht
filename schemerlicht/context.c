@@ -23,6 +23,8 @@ static void context_free(schemerlicht_context* ctxt)
   schemerlicht_vector_destroy(ctxt, &ctxt->gc_save_list);
   schemerlicht_function_free(ctxt, ctxt->empty_continuation_function);
   schemerlicht_object_destroy(ctxt, &ctxt->empty_continuation);
+  schemerlicht_function_free(ctxt, ctxt->halt_continuation_function);
+  schemerlicht_object_destroy(ctxt, &ctxt->halt_continuation);
   schemerlicht_map_keys_free(ctxt, ctxt->quote_to_index);
   schemerlicht_map_free(ctxt, ctxt->quote_to_index);
   schemerlicht_map_keys_free(ctxt, ctxt->macro_map);
@@ -151,6 +153,18 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_object* empty_lambda = schemerlicht_vector_begin(&ctxt->empty_continuation.value.v, schemerlicht_object);
   empty_lambda->type = schemerlicht_object_type_lambda;
   empty_lambda->value.ptr = ctxt->empty_continuation_function;
+
+  ctxt->halt_continuation_function = schemerlicht_function_new(ctxt);
+  schemerlicht_instruction i = 0;
+  SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_RETURN);
+  SCHEMERLICHT_SETARG_A(i, 1);
+  SCHEMERLICHT_SETARG_B(i, 1);
+  schemerlicht_vector_push_back(ctxt, &ctxt->halt_continuation_function->code, i, schemerlicht_instruction);
+  ctxt->halt_continuation = make_schemerlicht_object_closure(ctxt, 1);
+  schemerlicht_object* halt_lambda = schemerlicht_vector_begin(&ctxt->halt_continuation.value.v, schemerlicht_object);
+  halt_lambda->type = schemerlicht_object_type_lambda;
+  halt_lambda->value.ptr = ctxt->halt_continuation_function;
+
   ctxt->callcc_fun = NULL;
   }
 

@@ -1,1 +1,0 @@
-(define %call/cc (lambda(k f) (f k (lambda(dummy-k result) (k result)))))

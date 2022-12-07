@@ -1,1 +1,0 @@
-(define result (+ 5 4))

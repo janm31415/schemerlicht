@@ -73,6 +73,8 @@ struct schemerlicht_context
   schemerlicht_string module_path;
   schemerlicht_function* empty_continuation_function;
   schemerlicht_object empty_continuation;
+  schemerlicht_function* halt_continuation_function;
+  schemerlicht_object halt_continuation;
   schemerlicht_vector gc_save_list;
   schemerlicht_function* callcc_fun;
   schemerlicht_vector filenames_list;

@@ -3490,6 +3490,118 @@ static void test_octal()
   test_compile_aux("0", "#o8");
   }
 
+static void test_build_function()
+  {
+  const char* script = "(lambda (a b) (+ a b))";
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_preprocess(ctxt, &prog);
+   
+#if 0
+  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
+  printf("%s\n", dumped.string_ptr);
+  schemerlicht_string_destroy(ctxt, &dumped);
+#endif  
+  schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
+  schemerlicht_function* fun = cast(schemerlicht_function*, res->value.ptr);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
+  schemerlicht_print_any_error(ctxt); 
+  TEST_EQ_STRING("<lambda>", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);  
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  
+  schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+  schemerlicht_object* st2 = schemerlicht_vector_at(&ctxt->stack, 2, schemerlicht_object);
+  schemerlicht_object* st3 = schemerlicht_vector_at(&ctxt->stack, 3, schemerlicht_object);
+    
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  st2->type = schemerlicht_object_type_fixnum;
+  st2->value.fx = 20;
+  st3->type = schemerlicht_object_type_fixnum;
+  st3->value.fx = 25;
+  res = schemerlicht_run(ctxt, fun);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
+  schemerlicht_print_any_error(ctxt);
+  TEST_EQ_STRING("45", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  st2->type = schemerlicht_object_type_fixnum;
+  st2->value.fx = 123;
+  st3->type = schemerlicht_object_type_fixnum;
+  st3->value.fx = 456;
+  res = schemerlicht_run(ctxt, fun);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
+  schemerlicht_print_any_error(ctxt);
+  TEST_EQ_STRING("579", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+
+  schemerlicht_compiled_program_destroy(ctxt, &compiled_program);
+  schemerlicht_close(ctxt);
+  }
+
+static void test_build_function_2()
+  {
+  const char* script = "(define my_global_var 180)";
+  schemerlicht_context* ctxt = schemerlicht_open(256);
+  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_preprocess(ctxt, &prog);
+  schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
+  schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+  const char* script2 = "(lambda (x) (+ x my_global_var))";
+  tokens = schemerlicht_script2tokens(ctxt, script2);
+  prog = make_program(ctxt, &tokens);
+  schemerlicht_preprocess(ctxt, &prog);
+  schemerlicht_vector compiled_program2 = schemerlicht_compile_program(ctxt, &prog);
+  res = schemerlicht_run_program(ctxt, &compiled_program2);
+  schemerlicht_function* fun = cast(schemerlicht_function*, res->value.ptr);
+  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
+  schemerlicht_print_any_error(ctxt);
+  TEST_EQ_STRING("<lambda>", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+
+  schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+  schemerlicht_object* st2 = schemerlicht_vector_at(&ctxt->stack, 2, schemerlicht_object);
+  schemerlicht_object* st3 = schemerlicht_vector_at(&ctxt->stack, 3, schemerlicht_object);
+
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  st2->type = schemerlicht_object_type_fixnum;
+  st2->value.fx = 20;
+  res = schemerlicht_run(ctxt, fun);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
+  schemerlicht_print_any_error(ctxt);
+  TEST_EQ_STRING("200", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  st2->type = schemerlicht_object_type_fixnum;
+  st2->value.fx = 123;
+  res = schemerlicht_run(ctxt, fun);
+  s = schemerlicht_object_to_string(ctxt, res, 0);
+  schemerlicht_print_any_error(ctxt);
+  TEST_EQ_STRING("303", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
+
+  schemerlicht_compiled_program_destroy(ctxt, &compiled_program);
+  schemerlicht_compiled_program_destroy(ctxt, &compiled_program2);
+  schemerlicht_close(ctxt);
+  }
+
 void run_all_compiler_tests()
   { 
   for (int i = 0; i < 2; ++i)
@@ -3621,6 +3733,8 @@ void run_all_compiler_tests()
     test_hex();
     test_bin();
     test_octal();
+    test_build_function();
+    test_build_function_2();
 #endif            
     }
   }
