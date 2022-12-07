@@ -3575,7 +3575,6 @@ static void test_build_function_2()
   schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
   schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
   schemerlicht_object* st2 = schemerlicht_vector_at(&ctxt->stack, 2, schemerlicht_object);
-  schemerlicht_object* st3 = schemerlicht_vector_at(&ctxt->stack, 3, schemerlicht_object);
 
   *st0 = ctxt->empty_continuation;
   *st1 = ctxt->halt_continuation;
