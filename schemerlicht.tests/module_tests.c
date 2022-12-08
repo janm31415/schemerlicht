@@ -18,49 +18,6 @@
 
 #include <time.h>
 
-static void test_compile_aux_w_dump(schemerlicht_context* ctxt, const char* expected_value, const char* script)
-  {
-  schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  schemerlicht_preprocess(ctxt, &prog);
-#if 1
-  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog, 0);
-  printf("%s\n", dumped.string_ptr);
-  schemerlicht_string_destroy(ctxt, &dumped);
-#endif
-  schemerlicht_function* func = schemerlicht_compile_expression(ctxt, schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression));
-  schemerlicht_string debug_str;
-  schemerlicht_string_init(ctxt, &debug_str, "");
-  schemerlicht_object* res = schemerlicht_run_debug(ctxt, &debug_str, func);
-  printf("%s\n", debug_str.string_ptr);
-  schemerlicht_string_destroy(ctxt, &debug_str);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
-
-  if (ctxt->number_of_compile_errors > 0)
-    {
-    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->compile_error_reports, schemerlicht_error_report);
-    printf("%s\n", it->message.string_ptr);
-    }
-  if (ctxt->number_of_syntax_errors > 0)
-    {
-    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->syntax_error_reports, schemerlicht_error_report);
-    printf("%s\n", it->message.string_ptr);
-    }
-  if (ctxt->number_of_runtime_errors > 0)
-    {
-    schemerlicht_error_report* it = schemerlicht_vector_back(&ctxt->runtime_error_reports, schemerlicht_error_report);
-    printf("%s\n", it->message.string_ptr);
-    }
-
-  TEST_EQ_STRING(expected_value, s.string_ptr);
-
-  schemerlicht_string_destroy(ctxt, &s);
-
-  schemerlicht_vector_push_back(ctxt, &ctxt->lambdas, func, schemerlicht_function*);
-
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  }
 
 static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_value, const char* script)
   {

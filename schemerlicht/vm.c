@@ -306,12 +306,14 @@ static void opcode_liststack(schemerlicht_context* ctxt, schemerlicht_instructio
 static void opcode_foreigncall(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun);
 
 
-static opcode_fun dispatch_table[] = { &opcode_move, &opcode_loadk, &opcode_setfixnum, &opcode_setchar, &opcode_setprim, &opcode_setprimobj, 
-&opcode_settype, &opcode_movetop, &opcode_call, &opcode_eqtype, &opcode_jmp, &opcode_return, &opcode_loadglobal, &opcode_storeglobal, 
+static opcode_fun dispatch_table[] = { &opcode_move, &opcode_loadk, &opcode_setfixnum, &opcode_setchar, &opcode_setprim, &opcode_setprimobj,
+&opcode_settype, &opcode_movetop, &opcode_call, &opcode_eqtype, &opcode_jmp, &opcode_return, &opcode_loadglobal, &opcode_storeglobal,
 &opcode_liststack, &opcode_foreigncall };
 
 static void opcode_move(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_MOVE);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -319,11 +321,12 @@ static void opcode_move(schemerlicht_context* ctxt, schemerlicht_instruction** p
   schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
   schemerlicht_set_object(target, source);
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_movetop(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_MOVETOP);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -336,11 +339,12 @@ static void opcode_movetop(schemerlicht_context* ctxt, schemerlicht_instruction*
     }
   schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
   blocking->type = schemerlicht_object_type_blocking;
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_loadglobal(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_LOADGLOBAL);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -348,11 +352,12 @@ static void opcode_loadglobal(schemerlicht_context* ctxt, schemerlicht_instructi
   schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   const schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, bx, schemerlicht_object);
   schemerlicht_set_object(target, global);
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_storeglobal(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_STOREGLOBAL);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -360,11 +365,12 @@ static void opcode_storeglobal(schemerlicht_context* ctxt, schemerlicht_instruct
   const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, bx, schemerlicht_object);
   schemerlicht_set_object(global, source);
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_loadk(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_LOADK);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -383,11 +389,12 @@ static void opcode_loadk(schemerlicht_context* ctxt, schemerlicht_instruction** 
     {
     schemerlicht_set_object(target, k);
     }
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_setfixnum(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_SETFIXNUM);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -395,11 +402,12 @@ static void opcode_setfixnum(schemerlicht_context* ctxt, schemerlicht_instructio
   const int b = SCHEMERLICHT_GETARG_sBx(i);
   target->type = schemerlicht_object_type_fixnum;
   target->value.fx = b;
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_setprim(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_SETPRIM);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -407,11 +415,12 @@ static void opcode_setprim(schemerlicht_context* ctxt, schemerlicht_instruction*
   const int b = SCHEMERLICHT_GETARG_B(i);
   target->type = schemerlicht_object_type_primitive;
   target->value.fx = b;
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_setprimobj(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_SETPRIMOBJ);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -419,11 +428,12 @@ static void opcode_setprimobj(schemerlicht_context* ctxt, schemerlicht_instructi
   const int b = SCHEMERLICHT_GETARG_B(i);
   target->type = schemerlicht_object_type_primitive_object;
   target->value.fx = b;
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_setchar(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_SETCHAR);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -431,17 +441,17 @@ static void opcode_setchar(schemerlicht_context* ctxt, schemerlicht_instruction*
   const int b = SCHEMERLICHT_GETARG_B(i);
   target->type = schemerlicht_object_type_char;
   target->value.ch = cast(schemerlicht_byte, b);
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_settype(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_SETTYPE);
   schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(i), schemerlicht_object);
   const int b = SCHEMERLICHT_GETARG_B(i);
   target->type = b;
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_call(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
@@ -554,11 +564,12 @@ static void opcode_call(schemerlicht_context* ctxt, schemerlicht_instruction** p
     *pc = *pc_end;
     }
     }
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_eqtype(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   const int a = SCHEMERLICHT_GETARG_A(i);
   const int b = SCHEMERLICHT_GETARG_B(i);
@@ -574,11 +585,12 @@ static void opcode_eqtype(schemerlicht_context* ctxt, schemerlicht_instruction**
     const int offset = SCHEMERLICHT_GETARG_sBx(next_i);
     *pc += offset;
     }
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_liststack(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_LIST_STACK);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -590,11 +602,12 @@ static void opcode_liststack(schemerlicht_context* ctxt, schemerlicht_instructio
     rx = schemerlicht_vector_at(&ctxt->stack, x, schemerlicht_object);
     }
   make_variable_arity_list(ctxt, a, x - a);
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_foreigncall(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_CALL_FOREIGN);
   const int a = SCHEMERLICHT_GETARG_A(i);
@@ -607,16 +620,17 @@ static void opcode_foreigncall(schemerlicht_context* ctxt, schemerlicht_instruct
   //schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
   schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a + 1, b);
   schemerlicht_set_object(ra, &result);
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_jmp(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
   {
+  UNUSED(fun);
+  UNUSED(pc_end);
+  UNUSED(ctxt);
   const schemerlicht_instruction i = *(*pc)++;
   schemerlicht_assert(SCHEMERLICHT_GET_OPCODE(i) == SCHEMERLICHT_OPCODE_JMP);
   const int sbx = SCHEMERLICHT_GETARG_sBx(i);
   *pc += sbx;
-  (*dispatch_table[SCHEMERLICHT_GET_OPCODE(*(*pc))])(ctxt, pc, pc_end, fun); // tail call
   }
 
 static void opcode_return(schemerlicht_context* ctxt, schemerlicht_instruction** pc, schemerlicht_instruction** pc_end, schemerlicht_function** fun)
@@ -655,7 +669,14 @@ void schemerlicht_run_tailcall(schemerlicht_context* ctxt, schemerlicht_function
 schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerlicht_function* fun)
   {
   schemerlicht_assert(fun != NULL);
-  schemerlicht_run_tailcall(ctxt, cast(schemerlicht_function*, fun));
+  schemerlicht_instruction* pc = schemerlicht_vector_begin(&(fun)->code, schemerlicht_instruction);
+  schemerlicht_instruction* pc_end = schemerlicht_vector_end(&(fun)->code, schemerlicht_instruction);
+  while (pc < pc_end)
+    {
+    const schemerlicht_instruction i = *pc;
+    const int opcode = SCHEMERLICHT_GET_OPCODE(i);
+    (*dispatch_table[opcode])(ctxt, &pc, &pc_end, &cast(schemerlicht_function*, fun));
+    }
   return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
   }
 

@@ -3603,9 +3603,6 @@ static void test_build_function_2()
 
 void run_all_compiler_tests()
   { 
-  test_ack_performance();
-  test_fib_performance(); 
-  return;
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
@@ -3676,8 +3673,10 @@ void run_all_compiler_tests()
     test_parameter_passing();
     test_cond();
     test_newton();
+#ifndef SCHEMERLICHT_USE_DIRECT_CALL_THREADING
     test_compile_cc();
     test_compile_cc_2();    
+#endif
     //test_ack_performance();
     //test_fib_performance();    
     test_lambda_variable_arity_not_using_rest_arg();
