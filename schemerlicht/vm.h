@@ -26,9 +26,6 @@
 * represented by 2*max), which is half the maximum for the corresponding
 * unsigned argument.
 *==========================================================================*/
-
-enum schemerlicht_opcode_mode { schemerlicht_iABC, schemerlicht_iABx, schemerlicht_iAsBx };  /* basic instruction format */
-
 /*
 ** size and position of opcode arguments.
 */
