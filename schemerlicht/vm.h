@@ -118,7 +118,6 @@ typedef enum
 #define SCHEMERLICHT_SETARG_sBx(i,b)	SCHEMERLICHT_SETARG_Bx((i),cast(unsigned int, (b)+SCHEMERLICHT_MAXARG_sBx))
 
 
-schemerlicht_object* schemerlicht_run_debug(schemerlicht_context* ctxt, schemerlicht_string* s, const schemerlicht_function* fun);
 schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, const schemerlicht_function* fun);
 schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, const schemerlicht_vector* functions);
 

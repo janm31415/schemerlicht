@@ -3603,6 +3603,9 @@ static void test_build_function_2()
 
 void run_all_compiler_tests()
   { 
+  test_ack_performance();
+  test_fib_performance(); 
+  return;
   for (int i = 0; i < 2; ++i)
     {
     full_preprocessor = i;
