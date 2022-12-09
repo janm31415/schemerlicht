@@ -924,7 +924,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-        inline_functions2(a, b, c);
+        inline_functions(a, b, c);
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b, c);
 #endif
@@ -934,7 +934,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-        inline_functions2(a, b - 1, c + 1);
+        inline_functions(a, b - 1, c + 1);
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
 #endif
