@@ -108,7 +108,9 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
     {
     it->type = schemerlicht_object_type_blocking;
     }
+#ifdef SCHEMERLICHT_DEBUG
   ctxt->time_spent_gc = 0;
+#endif
   ctxt->heap_pos = 0;
   schemerlicht_vector_init_with_size(ctxt, &ctxt->raw_heap, heap_size, schemerlicht_object);
   it = schemerlicht_vector_begin(&ctxt->raw_heap, schemerlicht_object);

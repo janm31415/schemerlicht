@@ -134,8 +134,10 @@ static void test_compile_aux_heap(const char* expected_value, const char* script
 
   schemerlicht_print_any_error(ctxt);
 
+#ifdef SCHEMERLICHT_DEBUG
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+#endif
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
@@ -1581,8 +1583,10 @@ static void test_compile_aux_callcc(const char* expected_value, const char* scri
   schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
+#ifdef SCHEMERLICHT_DEBUG
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+#endif
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
@@ -2770,8 +2774,10 @@ static void test_compile_aux_r5rs(const char* expected_value, const char* script
   schemerlicht_print_any_error(ctxt);
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
+#ifdef SCHEMERLICHT_DEBUG
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+#endif
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 
@@ -2820,8 +2826,10 @@ static void test_compile_aux_r5rs_heap(const char* expected_value, const char* s
 #endif
   schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
 
+#ifdef SCHEMERLICHT_DEBUG
   if (print_gc_time)
     printf("Time spent in GC: %lldms\n", ctxt->time_spent_gc * 1000 / CLOCKS_PER_SEC);
+#endif
 
   TEST_EQ_STRING(expected_value, s.string_ptr);
 

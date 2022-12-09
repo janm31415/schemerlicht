@@ -60,7 +60,9 @@ struct schemerlicht_context
   schemerlicht_map* string_to_symbol;
   schemerlicht_memsize quote_to_index_size;
   schemerlicht_vector overrides; // stringvec with names of primitives that were overridden
+#ifdef SCHEMERLICHT_DEBUG
   uint64_t time_spent_gc;
+#endif
 #ifdef SCHEMERLICHT_USE_POOL
   schemerlicht_pool_allocator pool[SCHEMERLICHT_MAX_POOL];
 #endif

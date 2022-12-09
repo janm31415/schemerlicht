@@ -3808,7 +3808,6 @@ void schemerlicht_primitive_halt(schemerlicht_context* ctxt, int a, int b, int c
 
 void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, int c)
   {
-
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
@@ -3818,21 +3817,12 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_set_object(heap_obj, &v);
   ++ctxt->heap_pos;
   memcpy(heap_obj->value.v.vector_ptr, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + a + c + 1, b * sizeof(schemerlicht_object));
+#ifdef SCHEMERLICHT_DEBUG
   schemerlicht_object* lambda = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
   if (schemerlicht_object_get_type(lambda) != schemerlicht_object_type_lambda)
     {
     schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, "closure without a lambda as first argument");
     }
-#if 0
-  for (int j = 0; j < b; ++j)
-    {
-    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
-    schemerlicht_object* obj_at_pos = schemerlicht_vector_at(&heap_obj->value.v, j, schemerlicht_object);
-    schemerlicht_set_object(obj_at_pos, arg);
-    }
-  //schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-  //schemerlicht_set_object(heap_obj, &v);
-  //++ctxt->heap_pos;
 #endif
   schemerlicht_set_object(ra, heap_obj);
   }
@@ -3845,7 +3835,7 @@ void schemerlicht_primitive_closure_ref(schemerlicht_context* ctxt, int a, int b
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSUREREF);
-#if 1
+#ifdef SCHEMERLICHT_DEBUG
   schemerlicht_object ret;
   if (b < 2)
     {

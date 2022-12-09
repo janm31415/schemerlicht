@@ -3,7 +3,9 @@
 #include "environment.h"
 #include "error.h"
 
+#ifdef SCHEMERLICHT_DEBUG
 #include <time.h>
+#endif
 
 typedef struct gc_state
   {
@@ -227,7 +229,9 @@ static void scan_target_space(gc_state* state)
 
 void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   {
+#ifdef SCHEMERLICHT_DEBUG
   int c0 = clock();
+#endif
   schemerlicht_assert(ctxt->heap_pos < ctxt->raw_heap.vector_size / 2);
   gc_state state;
   state.gc_heap_pos = 0;
@@ -271,8 +275,10 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   //  obj->type &= ~schemerlicht_int_gcmark_bit;
   //  }
   unmark_object_pointer(&ctxt->empty_continuation);
+#ifdef SCHEMERLICHT_DEBUG
   int c1 = clock();
   ctxt->time_spent_gc += c1 - c0;
+#endif
   if (schemerlicht_need_to_perform_gc(ctxt))
     {
     schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_MEMORY);
