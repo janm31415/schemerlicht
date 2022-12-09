@@ -11,88 +11,88 @@ on the main page.
 
 ack
 running "ack" (20)
-Ran for 17.431000 seconds
-Compiled and ran for 17.434000 seconds
+Ran for 17.534000 seconds
+Compiled and ran for 17.537000 seconds
 array1
 running "array1" (2)
-Ran for 7.087000 seconds
-Compiled and ran for 7.090000 seconds
+Ran for 6.630000 seconds
+Compiled and ran for 6.633000 seconds
 boyer
 running "boyer" (50)
-Ran for 21.628000 seconds
-Compiled and ran for 21.639000 seconds
+Ran for 21.678000 seconds
+Compiled and ran for 21.689000 seconds
 browse
 running "browse" (600)
-Ran for 18.012000 seconds
-Compiled and ran for 18.022000 seconds
+Ran for 17.242000 seconds
+Compiled and ran for 17.250000 seconds
 cat
 running "cat" (12)
-Ran for 23.461000 seconds
-Compiled and ran for 23.464000 seconds
+Ran for 21.685000 seconds
+Compiled and ran for 21.687000 seconds
 compiler
 running "compiler" (500)
-Ran for 14.528000 seconds
-Compiled and ran for 18.242000 seconds
+Ran for 14.015000 seconds
+Compiled and ran for 17.610000 seconds
 conform
 running "conform" (70)
-Ran for 28.261000 seconds
-Compiled and ran for 28.277000 seconds
+Ran for 25.890000 seconds
+Compiled and ran for 25.905000 seconds
 cpstak
 running "cpstak" (1700)
-Ran for 17.080000 seconds
-Compiled and ran for 17.082000 seconds
+Ran for 15.838000 seconds
+Compiled and ran for 15.841000 seconds
 ctak
 running "ctak" (160)
-Ran for 6.798000 seconds
-Compiled and ran for 6.802000 seconds
+Ran for 6.834000 seconds
+Compiled and ran for 6.836000 seconds
 dderiv
 running "dderiv" (3000000)
-Ran for 37.982000 seconds
-Compiled and ran for 37.986000 seconds
+Ran for 37.482000 seconds
+Compiled and ran for 37.486000 seconds
 deriv
 running "deriv" (4000000)
-Ran for 36.775000 seconds
-Compiled and ran for 36.778000 seconds
+Ran for 35.001000 seconds
+Compiled and ran for 35.004000 seconds
 destruc
 running "destruc" (800)
-Ran for 12.562000 seconds
-Compiled and ran for 12.567000 seconds
+Ran for 11.525000 seconds
+Compiled and ran for 11.528000 seconds
 diviter
 running "diviter" (1200000)
-Ran for 28.496000 seconds
-Compiled and ran for 28.499000 seconds
+Ran for 27.080000 seconds
+Compiled and ran for 27.083000 seconds
 dynamic
 running "dynamic" (70)
-Ran for 14.424000 seconds
-Compiled and ran for 14.474000 seconds
+Ran for 14.125000 seconds
+Compiled and ran for 14.176000 seconds
 earley
 running "earley" (400)
-Ran for 33.273000 seconds
-Compiled and ran for 33.289000 seconds
+Ran for 31.785000 seconds
+Compiled and ran for 31.801000 seconds
 fft
 running "fft" (4000)
-Ran for 7.869000 seconds
-Compiled and ran for 7.872000 seconds
+Ran for 6.845000 seconds
+Compiled and ran for 6.848000 seconds
 fib
 running "fib" (6)
-Ran for 17.691000 seconds
-Compiled and ran for 17.693000 seconds
+Ran for 16.833000 seconds
+Compiled and ran for 16.835000 seconds
 fibc
 running "fibc" (900)
-Ran for 11.526000 seconds
-Compiled and ran for 11.530000 seconds
+Ran for 11.515000 seconds
+Compiled and ran for 11.518000 seconds
 fibfp
 running "fibfp" (2)
-Ran for 6.007000 seconds
-Compiled and ran for 6.011000 seconds
+Ran for 5.915000 seconds
+Compiled and ran for 5.917000 seconds
 formattest
 running "fibfp" (2)
-Ran for 6.236000 seconds
-Compiled and ran for 6.242000 seconds
+Ran for 5.831000 seconds
+Compiled and ran for 5.832000 seconds
 fpsum
 running "fpsum" (60)
-Ran for 3.089000 seconds
-Compiled and ran for 3.091000 seconds
+Ran for 2.901000 seconds
+Compiled and ran for 2.903000 seconds
 gcbench
 The garbage collector should touch about 32 megabytes of heap storage.
 The use of more or less memory will skew the results.
@@ -155,140 +155,139 @@ Creating 8 trees of depth 16
 GCBench: Top down construction
 GCBench: Bottom up construction
  Total memory available= ???????? bytes  Free memory= ???????? bytes
-Ran for 16.417000 seconds
-Compiled and ran for 16.428000 seconds
+Ran for 16.017000 seconds
+Compiled and ran for 16.023000 seconds
 graphs
 running "graphs" (500)
-Ran for 22.916000 seconds
-Compiled and ran for 22.923000 seconds
+Ran for 21.230000 seconds
+Compiled and ran for 21.238000 seconds
 lattice
 running "lattice" (2)
-Ran for 44.993000 seconds
-Compiled and ran for 44.997000 seconds
+Ran for 44.653000 seconds
+Compiled and ran for 44.659000 seconds
 maze
 running "maze" (4000)
-Ran for 16.126000 seconds
-Compiled and ran for 16.164000 seconds
+Ran for 15.583000 seconds
+Compiled and ran for 15.618000 seconds
 mazefun
 running "mazefun" (2500)
-Ran for 21.189000 seconds
-Compiled and ran for 21.202000 seconds
+Ran for 21.015000 seconds
+Compiled and ran for 21.028000 seconds
 mbrot
 running "mbrot" (120)
-Ran for 3.131000 seconds
-Compiled and ran for 3.133000 seconds
+Ran for 3.088000 seconds
+Compiled and ran for 3.091000 seconds
 nboyer
 running "nboyer0" (150)
-Ran for 34.917000 seconds
-Compiled and ran for 34.933000 seconds
+Ran for 32.844000 seconds
+Compiled and ran for 32.859000 seconds
 nqueens
 running "nqueens" (4000)
-Ran for 26.547000 seconds
-Compiled and ran for 26.551000 seconds
+Ran for 23.550000 seconds
+Compiled and ran for 23.553000 seconds
 ntakl
 running "ntakl" (600)
-Ran for 23.633000 seconds
-Compiled and ran for 23.647000 seconds
+Ran for 23.001000 seconds
+Compiled and ran for 23.004000 seconds
 paraffins
 running "paraffins" (1800)
-Ran for 21.914000 seconds
-Compiled and ran for 21.922000 seconds
+Ran for 20.155000 seconds
+Compiled and ran for 20.160000 seconds
 parsing
 running "parsing:parsing-data.scm:360" (360)
-Ran for 16.206000 seconds
-Compiled and ran for 16.275000 seconds
+Ran for 14.529000 seconds
+Compiled and ran for 14.582000 seconds
 perm9
 running "perm9" (12)
-Ran for 10.495000 seconds
-Compiled and ran for 11.161000 seconds
+Ran for 10.104000 seconds
+Compiled and ran for 10.729000 seconds
 peval
 running "peval" (400)
-Ran for 31.096000 seconds
-Compiled and ran for 31.118000 seconds
+Ran for 29.574000 seconds
+Compiled and ran for 29.594000 seconds
 pnpoly
 running "pnpoly" (140000)
-Ran for 8.040000 seconds
-Compiled and ran for 8.383000 seconds
+Ran for 7.389000 seconds
+Compiled and ran for 7.726000 seconds
 primes
 running "primes" (180000)
-Ran for 24.082000 seconds
-Compiled and ran for 24.086000 seconds
+Ran for 22.822000 seconds
+Compiled and ran for 22.825000 seconds
 puzzle
 running "puzzle" (180)
-Ran for 15.198000 seconds
-Compiled and ran for 15.205000 seconds
+Ran for 13.301000 seconds
+Compiled and ran for 13.306000 seconds
 quicksort
 running "quicksort30" (60)
-Ran for 12.243000 seconds
-Compiled and ran for 12.252000 seconds
+Ran for 11.443000 seconds
+Compiled and ran for 11.449000 seconds
 ray
 running "ray" (5)
-Ran for 16.613000 seconds
-Compiled and ran for 16.621000 seconds
+Ran for 15.981000 seconds
+Compiled and ran for 15.987000 seconds
 sboyer
 running "sboyer0" (200)
-Ran for 43.194000 seconds
-Compiled and ran for 43.207000 seconds
+Ran for 40.434000 seconds
+Compiled and ran for 40.448000 seconds
 scheme
 running "scheme" (40000)
-Ran for 20.564000 seconds
-Compiled and ran for 20.589000 seconds
+Ran for 19.242000 seconds
+Compiled and ran for 19.264000 seconds
 simplex
 running "simplex" (160000)
-Ran for 27.737000 seconds
-Compiled and ran for 27.896000 seconds
+Ran for 25.592000 seconds
+Compiled and ran for 25.737000 seconds
 slatex
 running "slatex" (30)
-Ran for 3.947000 seconds
-Compiled and ran for 4.011000 seconds
+Ran for 3.447000 seconds
+Compiled and ran for 3.505000 seconds
 string
 running "string" (4)
 Ran for 0.016000 seconds
-Compiled and ran for 0.020000 seconds
+Compiled and ran for 0.019000 seconds
 sum
 running "sum" (30000)
-Ran for 15.489000 seconds
-Compiled and ran for 15.493000 seconds
+Ran for 14.600000 seconds
+Compiled and ran for 14.603000 seconds
 sum1
 running "sum1" (5)
-Ran for 5.211000 seconds
+Ran for 4.998000 seconds
 15794.975000
-Compiled and ran for 5.215000 seconds
+Compiled and ran for 5.002000 seconds
 sumfp
 running "sumfp" (8000)
-Ran for 4.151000 seconds
-Compiled and ran for 4.153000 seconds
+Ran for 3.776000 seconds
+Compiled and ran for 3.778000 seconds
 sumloop
 running "sumloop" (2)
-Ran for 11.950000 seconds
-Compiled and ran for 11.952000 seconds
+Ran for 10.982000 seconds
+Compiled and ran for 10.984000 seconds
 tail
 running "tail" (4)
-Ran for 12.874000 seconds
-Compiled and ran for 12.877000 seconds
+Ran for 11.752000 seconds
+Compiled and ran for 11.756000 seconds
 tak
 running "tak" (3000)
-Ran for 24.953000 seconds
-Compiled and ran for 24.955000 seconds
+Ran for 28.290000 seconds
+Compiled and ran for 28.292000 seconds
 takl
 running "takl" (500)
-Ran for 21.002000 seconds
-Compiled and ran for 21.006000 seconds
+Ran for 20.560000 seconds
+Compiled and ran for 20.562000 seconds
 trav1
 running "trav1" (150)
-Ran for 14.630000 seconds
-Compiled and ran for 14.636000 seconds
+Ran for 13.394000 seconds
+Compiled and ran for 13.399000 seconds
 trav2
 running "trav2" (40)
-Ran for 46.400000 seconds
-Compiled and ran for 46.500000 seconds
+Ran for 41.173000 seconds
+Compiled and ran for 41.261000 seconds
 triangl
 running "triangl" (12)
-Ran for 15.616000 seconds
-Compiled and ran for 15.620000 seconds
+Ran for 14.069000 seconds
+Compiled and ran for 14.072000 seconds
 wc
 running "wc" (15)
-Ran for 24.148000 seconds
-Compiled and ran for 24.152000 seconds
-#undefined
->
+Ran for 23.335000 seconds
+Compiled and ran for 23.337000 seconds
+#undefined
