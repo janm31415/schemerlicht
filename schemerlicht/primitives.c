@@ -8150,7 +8150,27 @@ void schemerlicht_primitive_open_input_file(schemerlicht_context* ctxt, int a, i
       schemerlicht_object* id = schemerlicht_vector_at(&v.value.v, 2, schemerlicht_object);
       id->type = schemerlicht_object_type_fixnum;
       id->value.fx = cast(schemerlicht_fixnum, schemerlicht_open_input_file(fn->value.s.string_ptr));
-
+      if (id->value.fx < 0 && ctxt->filenames_list.vector_size > 0)
+        {
+        for (int i = cast(int, ctxt->filenames_list.vector_size - 1); i >= 0; --i)
+          {
+          schemerlicht_string* pathfile = schemerlicht_vector_at(&ctxt->filenames_list, cast(schemerlicht_memsize, i), schemerlicht_string);
+          int pos = cast(int, pathfile->string_length) - 1;
+          while (pos >= 0 && pathfile->string_ptr[pos] != '/' && pathfile->string_ptr[pos] != '\\')
+            --pos;
+          schemerlicht_assert(pos < 0 || pathfile->string_ptr[pos] == '/' || pathfile->string_ptr[pos] == '\\');
+          if (pos > 0)
+            {
+            schemerlicht_string path;
+            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr + pos + 1);
+            schemerlicht_string_append(ctxt, &path, &fn->value.s);
+            id->value.fx = cast(schemerlicht_fixnum, schemerlicht_open_input_file(path.string_ptr));
+            schemerlicht_string_destroy(ctxt, &path);
+            if (id->value.fx>=0)
+              break;
+            }
+          }
+        }
       schemerlicht_object* str = schemerlicht_vector_at(&v.value.v, 3, schemerlicht_object);
       str->type = schemerlicht_object_type_string;
       schemerlicht_string_init_with_size(ctxt, &str->value.s, 4096, 0);
@@ -8596,6 +8616,27 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
     if (schemerlicht_object_get_type(fn) == schemerlicht_object_type_string)
       {
       FILE* f = fopen(fn->value.s.string_ptr, "r");
+      if (!f && ctxt->filenames_list.vector_size > 0)
+        {
+        for (int i = cast(int, ctxt->filenames_list.vector_size-1); i >= 0; --i)
+          {
+          schemerlicht_string* pathfile = schemerlicht_vector_at(&ctxt->filenames_list, cast(schemerlicht_memsize, i), schemerlicht_string);
+          int pos = cast(int, pathfile->string_length)-1;
+          while (pos >= 0 && pathfile->string_ptr[pos]!='/' && pathfile->string_ptr[pos] != '\\')
+            --pos;
+          schemerlicht_assert(pos < 0 || pathfile->string_ptr[pos] == '/' || pathfile->string_ptr[pos] == '\\');
+          if (pos > 0)
+            {
+            schemerlicht_string path;
+            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr+pos+1);
+            schemerlicht_string_append(ctxt, &path, &fn->value.s);
+            f = fopen(path.string_ptr, "r");
+            schemerlicht_string_destroy(ctxt, &path);
+            if (f)
+              break;
+            }
+          }
+        }
       if (!f)
         {
         schemerlicht_string msg;
@@ -8835,6 +8876,27 @@ void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b
     if (schemerlicht_object_get_type(str) == schemerlicht_object_type_string)
       {
       int exists = schemerlicht_file_exists(str->value.s.string_ptr);
+      if (exists==0 && ctxt->filenames_list.vector_size > 0)
+        {
+        for (int i = cast(int, ctxt->filenames_list.vector_size - 1); i >= 0; --i)
+          {
+          schemerlicht_string* pathfile = schemerlicht_vector_at(&ctxt->filenames_list, cast(schemerlicht_memsize, i), schemerlicht_string);
+          int pos = cast(int, pathfile->string_length) - 1;
+          while (pos >= 0 && pathfile->string_ptr[pos] != '/' && pathfile->string_ptr[pos] != '\\')
+            --pos;
+          schemerlicht_assert(pos < 0 || pathfile->string_ptr[pos] == '/' || pathfile->string_ptr[pos] == '\\');
+          if (pos > 0)
+            {
+            schemerlicht_string path;
+            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr + pos + 1);
+            schemerlicht_string_append(ctxt, &path, &str->value.s);
+            exists = schemerlicht_file_exists(path.string_ptr);
+            schemerlicht_string_destroy(ctxt, &path);
+            if (exists)
+              break;
+            }
+          }
+        }
       if (exists)
         {
         ra->type = schemerlicht_object_type_true;

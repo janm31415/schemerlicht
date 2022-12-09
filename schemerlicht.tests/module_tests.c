@@ -101,8 +101,6 @@ static void test_csv(schemerlicht_context* ctxt)
 
 static void test_mbe(schemerlicht_context* ctxt)
   {
-  //test_compile_aux(ctxt, "#t", "(import 'slib)");
-  //test_compile_aux(ctxt, "#t", "(require 'macro-by-example)");
   test_compile_aux(ctxt, "#t", "(import 'mbe)");
   test_compile_aux(ctxt, "#undefined", "(define-syntax and2 (syntax-rules() ((and2) #t) ((and2 test) test) ((and2 test1 test2 ...) (if test1(and2 test2 ...) #f))))");
   test_compile_aux(ctxt, "#t", "(and2 #t #t #t #t)");
