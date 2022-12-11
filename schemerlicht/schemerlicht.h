@@ -60,4 +60,16 @@ SCHEMERLICHT_API void schemerlicht_show_stack(schemerlicht_context* ctxt, scheme
 SCHEMERLICHT_API void schemerlicht_show_environment(schemerlicht_context* ctxt, schemerlicht_string* s);
 SCHEMERLICHT_API void schemerlicht_show_memory(schemerlicht_context* ctxt, schemerlicht_string* s);
 SCHEMERLICHT_API void schemerlicht_show_object(schemerlicht_context* ctxt, schemerlicht_object* obj, schemerlicht_string* s);
+
+typedef enum schemerlicht_foreign_return_type
+  {
+  schemerlicht_foreign_char_pointer,
+  schemerlicht_foreign_flonum,
+  schemerlicht_foreign_fixnum,
+  schemerlicht_foreign_void,
+  schemerlicht_foreign_object
+  } schemerlicht_foreign_return_type;
+
+SCHEMERLICHT_API void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, void* func_ptr, schemerlicht_foreign_return_type return_type, int number_of_arguments);
+
 #endif //SCHEMERLICHT_H

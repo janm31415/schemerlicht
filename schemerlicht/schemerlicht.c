@@ -17,6 +17,7 @@
 #include "dump.h"
 #include "string.h"
 #include "syscalls.h"
+#include "foreign.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -140,4 +141,34 @@ void schemerlicht_show_memory(schemerlicht_context* ctxt, schemerlicht_string* s
 void schemerlicht_show_object(schemerlicht_context* ctxt, schemerlicht_object* obj, schemerlicht_string* s)
   {
   schemerlicht_object_append_to_string(ctxt, obj, s, 0);
+  }
+
+void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, void* func_ptr, schemerlicht_foreign_return_type return_type, int number_of_arguments)
+  {
+  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, name, func_ptr, return_type);
+  schemerlicht_register_external_function(ctxt, &ext);
+
+  schemerlicht_stream str;
+  schemerlicht_stream_init(ctxt, &str, 10);
+
+  schemerlicht_stream_write_str(ctxt, &str, "(define (");
+  schemerlicht_stream_write_str(ctxt, &str, name);
+  for (int i = 0; i < number_of_arguments; ++i)
+    {
+    schemerlicht_stream_write_byte(ctxt, &str, ' ');
+    schemerlicht_stream_write_byte(ctxt, &str, (char)(i+97));    
+    }
+  schemerlicht_stream_write_str(ctxt, &str, ") (foreign-call ");
+  schemerlicht_stream_write_str(ctxt, &str, name);
+  for (int i = 0; i < number_of_arguments; ++i)
+    {
+    schemerlicht_stream_write_byte(ctxt, &str, ' ');
+    schemerlicht_stream_write_byte(ctxt, &str, (char)(i + 97));
+    }
+  schemerlicht_stream_write_str(ctxt, &str, "))");
+  schemerlicht_stream_rewind(&str);
+  
+  schemerlicht_object* res = execute_scheme(ctxt, &str);
+
+  schemerlicht_stream_close(ctxt, &str);
   }

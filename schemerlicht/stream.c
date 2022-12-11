@@ -63,7 +63,7 @@ void schemerlicht_stream_write_byte(schemerlicht_context* ctxt, schemerlicht_str
 
 schemerlicht_memsize schemerlicht_stream_write_str(schemerlicht_context* ctxt, schemerlicht_stream* stream, const char* str)
   {
-  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(str) + 1);
+  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(str));
   return schemerlicht_stream_write(ctxt, stream, str, len, 0);
   }
 

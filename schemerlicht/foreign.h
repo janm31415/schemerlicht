@@ -6,14 +6,14 @@
 #include "vector.h"
 #include "object.h"
 
-typedef enum schemerlicht_foreign_return_type
-  {
-  schemerlicht_foreign_char_pointer,
-  schemerlicht_foreign_flonum,
-  schemerlicht_foreign_fixnum,
-  schemerlicht_foreign_void,
-  schemerlicht_foreign_object
-  } schemerlicht_foreign_return_type;
+//typedef enum schemerlicht_foreign_return_type
+//  {
+//  schemerlicht_foreign_char_pointer,
+//  schemerlicht_foreign_flonum,
+//  schemerlicht_foreign_fixnum,
+//  schemerlicht_foreign_void,
+//  schemerlicht_foreign_object
+//  } schemerlicht_foreign_return_type;
 
 typedef struct schemerlicht_external_function
   {
