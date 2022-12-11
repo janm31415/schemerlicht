@@ -39,6 +39,7 @@ quoteconv.h
 r5rs.h
 reader.h
 schemerlicht.h
+schemerlicht_api.h
 simplifyconv.h
 stackreduce.h
 stream.h
@@ -89,6 +90,7 @@ quoteconv.c
 quotecollect.c
 r5rs.c
 reader.c
+schemerlicht.c
 simplifyconv.c
 stackreduce.c
 stream.c

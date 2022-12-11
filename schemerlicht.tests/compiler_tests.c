@@ -199,7 +199,9 @@ static void test_compile_aux_w_dump(const char* expected_value, const char* scri
   //printf("%s\n", debuginfo.string_ptr);
   schemerlicht_string_destroy(ctxt, &debuginfo);
 
-  schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, 9);
+  schemerlicht_string stackstring;
+  schemerlicht_string_init(ctxt, &stackstring, "");
+  schemerlicht_show_stack(ctxt, &stackstring, 0, 9);
   printf("%s\n", stackstring.string_ptr);
   schemerlicht_string_destroy(ctxt, &stackstring);
 

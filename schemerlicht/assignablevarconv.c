@@ -25,7 +25,7 @@ static void postvisit_let(schemerlicht_context* ctxt, schemerlicht_visitor* v, s
   {
   schemerlicht_find_assignable_variables_visitor* vis = (schemerlicht_find_assignable_variables_visitor*)(v->impl);
   schemerlicht_vector* vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
-  swap(e->expr.let.assignable_variables, *vec, schemerlicht_vector);
+  schemerlicht_swap(e->expr.let.assignable_variables, *vec, schemerlicht_vector);
   schemerlicht_vector_destroy(ctxt, vec);
   schemerlicht_vector_pop_back(&vis->assignable_variables);
   vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
@@ -53,7 +53,7 @@ static void postvisit_lambda(schemerlicht_context* ctxt, schemerlicht_visitor* v
   {
   schemerlicht_find_assignable_variables_visitor* vis = (schemerlicht_find_assignable_variables_visitor*)(v->impl);
   schemerlicht_vector* vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
-  swap(e->expr.lambda.assignable_variables, *vec, schemerlicht_vector);
+  schemerlicht_swap(e->expr.lambda.assignable_variables, *vec, schemerlicht_vector);
   schemerlicht_vector_destroy(ctxt, vec);
   schemerlicht_vector_pop_back(&vis->assignable_variables);
   vec = schemerlicht_vector_back(&vis->assignable_variables, schemerlicht_vector);
@@ -195,8 +195,8 @@ static int previsit_let_assvarconv(schemerlicht_context* ctxt, schemerlicht_visi
   else
     {
     schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
-    swap(new_let.expr.let.bindings, new_bindings, schemerlicht_vector);
-    swap(new_let.expr.let.body, e->expr.let.body, schemerlicht_vector);
+    schemerlicht_swap(new_let.expr.let.bindings, new_bindings, schemerlicht_vector);
+    schemerlicht_swap(new_let.expr.let.body, e->expr.let.body, schemerlicht_vector);
     schemerlicht_vector_destroy(ctxt, &new_bindings);
     schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
     schemerlicht_vector_push_back(ctxt, &new_begin.expr.beg.arguments, new_let, schemerlicht_expression);
@@ -270,8 +270,8 @@ static int previsit_lambda_assvarconv(schemerlicht_context* ctxt, schemerlicht_v
   else
     {
     schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
-    swap(new_let.expr.let.bindings, new_bindings, schemerlicht_vector);
-    swap(new_let.expr.let.body, e->expr.lambda.body, schemerlicht_vector);
+    schemerlicht_swap(new_let.expr.let.bindings, new_bindings, schemerlicht_vector);
+    schemerlicht_swap(new_let.expr.let.body, e->expr.lambda.body, schemerlicht_vector);
     schemerlicht_vector_destroy(ctxt, &new_bindings);
     schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
     schemerlicht_vector_push_back(ctxt, &new_begin.expr.beg.arguments, new_let, schemerlicht_expression);

@@ -513,10 +513,8 @@ static schemerlicht_runtime_task make_text_task(const char* txt)
   return task;
   }
 
-schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* input_obj, int display)
+void schemerlicht_object_append_to_string(schemerlicht_context* ctxt, schemerlicht_object* input_obj, schemerlicht_string* s, int display)
   {
-  schemerlicht_string s;
-  schemerlicht_string_init(ctxt, &s, "");
   schemerlicht_vector tasks;
   schemerlicht_vector_init(ctxt, &tasks, schemerlicht_runtime_task);
   schemerlicht_runtime_task first_task = make_object_task(input_obj);
@@ -527,86 +525,86 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
     schemerlicht_vector_pop_back(&tasks);
     if (current_task.text != 0)
       {
-      schemerlicht_string_append_cstr(ctxt, &s, current_task.text);
+      schemerlicht_string_append_cstr(ctxt, s, current_task.text);
       }
     else
       {
       switch (schemerlicht_object_get_type(current_task.obj))
         {
         case schemerlicht_object_type_undefined:
-          schemerlicht_string_append_cstr(ctxt, &s, "#undefined");
+          schemerlicht_string_append_cstr(ctxt, s, "#undefined");
           break;
         case schemerlicht_object_type_false:
-          schemerlicht_string_append_cstr(ctxt, &s, "#f");
+          schemerlicht_string_append_cstr(ctxt, s, "#f");
           break;
         case schemerlicht_object_type_true:
-          schemerlicht_string_append_cstr(ctxt, &s, "#t");
+          schemerlicht_string_append_cstr(ctxt, s, "#t");
           break;
         case schemerlicht_object_type_nil:
-          schemerlicht_string_append_cstr(ctxt, &s, "()");
+          schemerlicht_string_append_cstr(ctxt, s, "()");
           break;
         case schemerlicht_object_type_closure:
-          schemerlicht_string_append_cstr(ctxt, &s, "<closure>");
+          schemerlicht_string_append_cstr(ctxt, s, "<closure>");
           break;
         case schemerlicht_object_type_lambda:
-          schemerlicht_string_append_cstr(ctxt, &s, "<lambda>");
+          schemerlicht_string_append_cstr(ctxt, s, "<lambda>");
           break;
         case schemerlicht_object_type_environment:
-          schemerlicht_string_append_cstr(ctxt, &s, "<environment>");
+          schemerlicht_string_append_cstr(ctxt, s, "<environment>");
           break;
         case schemerlicht_object_type_eof:
-          schemerlicht_string_append_cstr(ctxt, &s, "#eof");
+          schemerlicht_string_append_cstr(ctxt, s, "#eof");
           break;
         case schemerlicht_object_type_unassigned:
-          schemerlicht_string_append_cstr(ctxt, &s, "#unassigned");
+          schemerlicht_string_append_cstr(ctxt, s, "#unassigned");
           break;
         case schemerlicht_object_type_void:
-          schemerlicht_string_append_cstr(ctxt, &s, "#<void>");
+          schemerlicht_string_append_cstr(ctxt, s, "#<void>");
           break;
         case schemerlicht_object_type_blocking:
-          schemerlicht_string_append_cstr(ctxt, &s, "#blocking");
+          schemerlicht_string_append_cstr(ctxt, s, "#blocking");
           break;
         case schemerlicht_object_type_primitive:
         case schemerlicht_object_type_primitive_object:
-          schemerlicht_string_append_cstr(ctxt, &s, "<procedure>");
+          schemerlicht_string_append_cstr(ctxt, s, "<procedure>");
           break;
         case schemerlicht_object_type_fixnum:
         {
         char str[256];
         schemerlicht_fixnum_to_char(str, current_task.obj->value.fx);
-        schemerlicht_string_append_cstr(ctxt, &s, str);
+        schemerlicht_string_append_cstr(ctxt, s, str);
         break;
         }
         case schemerlicht_object_type_flonum:
         {
         char str[256];
         schemerlicht_flonum_to_char(str, current_task.obj->value.fl);
-        schemerlicht_string_append_cstr(ctxt, &s, str);
+        schemerlicht_string_append_cstr(ctxt, s, str);
         break;
         }
         case schemerlicht_object_type_string:
         {
         if (!display)
           {
-          schemerlicht_string_append_cstr(ctxt, &s, "\"");
+          schemerlicht_string_append_cstr(ctxt, s, "\"");
           schemerlicht_string tmp = schemerlicht_string_add_escape_chars(ctxt, &current_task.obj->value.s);
-          schemerlicht_string_append(ctxt, &s, &tmp);
+          schemerlicht_string_append(ctxt, s, &tmp);
           schemerlicht_string_destroy(ctxt, &tmp);
-          schemerlicht_string_push_back(ctxt, &s, '"');
+          schemerlicht_string_push_back(ctxt, s, '"');
           }
         else
           {
-          schemerlicht_string_append(ctxt, &s, &current_task.obj->value.s);
+          schemerlicht_string_append(ctxt, s, &current_task.obj->value.s);
           }
         break;
         }
         case schemerlicht_object_type_symbol:
-          schemerlicht_string_append(ctxt, &s, &current_task.obj->value.s);
+          schemerlicht_string_append(ctxt, s, &current_task.obj->value.s);
           break;
         case schemerlicht_object_type_char:
         {
         if (!display)
-          schemerlicht_string_append_cstr(ctxt, &s, "#\\");
+          schemerlicht_string_append_cstr(ctxt, s, "#\\");
         int v = (int)current_task.obj->value.ch;
         int done = 0;
         if (display)
@@ -614,15 +612,15 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           switch (v)
             {
             case 9:
-              schemerlicht_string_append_cstr(ctxt, &s, "\t");
+              schemerlicht_string_append_cstr(ctxt, s, "\t");
               done = 1;
               break;
             case 10:
-              schemerlicht_string_append_cstr(ctxt, &s, "\n");
+              schemerlicht_string_append_cstr(ctxt, s, "\n");
               done = 1;
               break;
             case 13:
-              schemerlicht_string_append_cstr(ctxt, &s, "\r");
+              schemerlicht_string_append_cstr(ctxt, s, "\r");
               done = 1;
               break;
             }
@@ -632,31 +630,31 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           switch (v)
             {
             case 8:
-              schemerlicht_string_append_cstr(ctxt, &s, "backspace");
+              schemerlicht_string_append_cstr(ctxt, s, "backspace");
               done = 1;
               break;
             case 9:
-              schemerlicht_string_append_cstr(ctxt, &s, "tab");
+              schemerlicht_string_append_cstr(ctxt, s, "tab");
               done = 1;
               break;
             case 10:
-              schemerlicht_string_append_cstr(ctxt, &s, "newline");
+              schemerlicht_string_append_cstr(ctxt, s, "newline");
               done = 1;
               break;
             case 11:
-              schemerlicht_string_append_cstr(ctxt, &s, "vtab");
+              schemerlicht_string_append_cstr(ctxt, s, "vtab");
               done = 1;
               break;
             case 12:
-              schemerlicht_string_append_cstr(ctxt, &s, "page");
+              schemerlicht_string_append_cstr(ctxt, s, "page");
               done = 1;
               break;
             case 13:
-              schemerlicht_string_append_cstr(ctxt, &s, "return");
+              schemerlicht_string_append_cstr(ctxt, s, "return");
               done = 1;
               break;
             case 32:
-              schemerlicht_string_append_cstr(ctxt, &s, "space");
+              schemerlicht_string_append_cstr(ctxt, s, "space");
               done = 1;
               break;
             }
@@ -665,7 +663,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
           break;
         if (current_task.obj->value.ch > 31 && current_task.obj->value.ch < 127)
           {
-          schemerlicht_string_push_back(ctxt, &s, current_task.obj->value.ch);
+          schemerlicht_string_push_back(ctxt, s, current_task.obj->value.ch);
           }
         else
           {
@@ -684,13 +682,13 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
             str[1] = str[0];
             str[0] = '0';
             }
-          schemerlicht_string_append_cstr(ctxt, &s, str);
+          schemerlicht_string_append_cstr(ctxt, s, str);
           }
         break;
         }
         case schemerlicht_object_type_port:
         {
-        schemerlicht_string_append_cstr(ctxt, &s, "<port>: ");
+        schemerlicht_string_append_cstr(ctxt, s, "<port>: ");
         schemerlicht_object* port_name = schemerlicht_vector_at(&current_task.obj->value.v, 1, schemerlicht_object);
         schemerlicht_runtime_task task = make_object_task(port_name);
         schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
@@ -698,12 +696,12 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         }
         case schemerlicht_object_type_promise:
         {
-        schemerlicht_string_append_cstr(ctxt, &s, "<promise>");
+        schemerlicht_string_append_cstr(ctxt, s, "<promise>");
         break;
         }
         case schemerlicht_object_type_vector:
         {
-        schemerlicht_string_append_cstr(ctxt, &s, "#(");
+        schemerlicht_string_append_cstr(ctxt, s, "#(");
         schemerlicht_runtime_task task = make_text_task(")");
         schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
         for (schemerlicht_memsize j = current_task.obj->value.v.vector_size; j > 0; --j)
@@ -730,7 +728,7 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
         schemerlicht_object* second = schemerlicht_vector_at(&current_task.obj->value.v, 1, schemerlicht_object);
         if (!current_task.second_item_of_pair)
           {
-          schemerlicht_string_append_cstr(ctxt, &s, "(");
+          schemerlicht_string_append_cstr(ctxt, s, "(");
           schemerlicht_runtime_task task = make_text_task(")");
           schemerlicht_vector_push_back(ctxt, &tasks, task, schemerlicht_runtime_task);
           }
@@ -760,6 +758,13 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
     }
 
   schemerlicht_vector_destroy(ctxt, &tasks);
+  }
+
+schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* input_obj, int display)
+  {
+  schemerlicht_string s;
+  schemerlicht_string_init(ctxt, &s, "");
+  schemerlicht_object_append_to_string(ctxt, input_obj, &s, display);
   return s;
   }
 

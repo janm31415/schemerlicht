@@ -596,12 +596,12 @@ static void cps_convert_let(schemerlicht_context* ctxt, schemerlicht_expression*
         }
       }
     schemerlicht_expression new_let = schemerlicht_init_let(ctxt);
-    swap(new_let.expr.let.bindings, nonsimple_bindings, schemerlicht_vector);
-    swap(e->expr.let.body, new_let.expr.let.body, schemerlicht_vector);
+    schemerlicht_swap(new_let.expr.let.bindings, nonsimple_bindings, schemerlicht_vector);
+    schemerlicht_swap(e->expr.let.body, new_let.expr.let.body, schemerlicht_vector);
     schemerlicht_expression new_begin = schemerlicht_init_begin(ctxt);
     schemerlicht_vector_push_back(ctxt, &new_begin.expr.beg.arguments, new_let, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &e->expr.let.body, new_begin, schemerlicht_expression);
-    swap(e->expr.let.bindings, simple_bindings, schemerlicht_vector);
+    schemerlicht_swap(e->expr.let.bindings, simple_bindings, schemerlicht_vector);
     schemerlicht_vector_destroy(ctxt, &simple_bindings);
     schemerlicht_vector_destroy(ctxt, &nonsimple_bindings);
     cps_convert_let_nonsimple(ctxt, schemerlicht_vector_at(&schemerlicht_vector_at(&e->expr.let.body, 0, schemerlicht_expression)->expr.beg.arguments, 0, schemerlicht_expression), cps);

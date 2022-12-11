@@ -40,6 +40,6 @@ int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, sche
 
 schemerlicht_object* schemerlicht_environment_find_key_given_position(schemerlicht_context* ctxt, schemerlicht_fixnum global_position);
 
-schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt);
+//schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt);
 
 #endif //SCHEMERLICHT_ENVIRONMENT_H

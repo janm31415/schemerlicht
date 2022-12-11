@@ -13,22 +13,7 @@
 #endif
 #endif  
 
-#include "schemerlicht/schemerlicht.h"
-#include "schemerlicht/limits.h"
-#include "schemerlicht/context.h"
-#include "schemerlicht/parser.h"
-#include "schemerlicht/token.h"
-#include "schemerlicht/preprocess.h"
-#include "schemerlicht/compiler.h"
-#include "schemerlicht/vm.h"
-#include "schemerlicht/callcc.h"
-#include "schemerlicht/r5rs.h"
-#include "schemerlicht/inputoutput.h"
-#include "schemerlicht/modules.h"
-#include "schemerlicht/modulesconf.h"
-#include "schemerlicht/error.h"
-#include "schemerlicht/environment.h"
-#include "schemerlicht/dump.h"
+#include "schemerlicht/schemerlicht_api.h"
 
 char* schemerlicht_getline(char** buffer, size_t* bufferlen)
   {
@@ -77,30 +62,29 @@ static void print_help()
 
 static void print_stack(schemerlicht_context* ctxt, int stack_end)
   {
-  schemerlicht_string stackstring = schemerlicht_show_stack(ctxt, 0, stack_end);
+  schemerlicht_string stackstring;
+  schemerlicht_string_init(ctxt, &stackstring, "");
+  schemerlicht_show_stack(ctxt, &stackstring, 0, stack_end);
   printf("%s\n", stackstring.string_ptr);
   schemerlicht_string_destroy(ctxt, &stackstring);
   }
 
 static void print_env(schemerlicht_context* ctxt)
   {
-  schemerlicht_string envstring = schemerlicht_show_environment(ctxt);
+  schemerlicht_string envstring;
+  schemerlicht_string_init(ctxt, &envstring, "");
+  schemerlicht_show_environment(ctxt, &envstring);
   printf("%s\n", envstring.string_ptr);
   schemerlicht_string_destroy(ctxt, &envstring);
   }
 
 static void print_mem(schemerlicht_context* ctxt)
   {
-  schemerlicht_memsize nr_globals = ctxt->globals.vector_size;
-  schemerlicht_memsize nr_locals = schemerlicht_maxstack;
-  schemerlicht_memsize heap_size = ctxt->raw_heap.vector_size;
-  printf("Global variables assigned: %d\n", nr_globals);
-  printf("Stack size: %d entries\n", nr_locals);
-  printf("Heap size: %d bytes\n", heap_size * (schemerlicht_memsize)sizeof(schemerlicht_object));
-  printf("Heap semispace size: %d bytes\n", heap_size * (schemerlicht_memsize)sizeof(schemerlicht_object)/2);
-  printf("Heap size used: %d bytes\n", ctxt->heap_pos * (schemerlicht_memsize)sizeof(schemerlicht_object));
-  printf("Heap size available until overflow: %d bytes\n", (heap_size/2 - ctxt->heap_pos) * (schemerlicht_memsize)sizeof(schemerlicht_object));
-  printf("Heap size available until gc: %d bytes\n", (ctxt->gc_heap_pos_threshold - ctxt->heap_pos) * (schemerlicht_memsize)sizeof(schemerlicht_object));
+  schemerlicht_string memstring;
+  schemerlicht_string_init(ctxt, &memstring, "");
+  schemerlicht_show_memory(ctxt, &memstring);
+  printf("%s\n", memstring.string_ptr);
+  schemerlicht_string_destroy(ctxt, &memstring);  
   }
 
 static void init_debug()
@@ -121,91 +105,16 @@ static void close_debug()
 #endif
   }
 
-static void execute_scheme(schemerlicht_context* ctxt, schemerlicht_stream* str)
+void print_result(schemerlicht_context* ctxt, schemerlicht_object* result)
   {
-  schemerlicht_syntax_errors_clear(ctxt);
-  schemerlicht_compile_errors_clear(ctxt);
-  schemerlicht_runtime_errors_clear(ctxt);
-  schemerlicht_vector tokens = tokenize(ctxt, str);
-  if (schemerlicht_context_is_error_free(ctxt) == 0)
-    {
-    schemerlicht_print_any_error(ctxt);
-    return;
-    }
-  schemerlicht_program prog = make_program(ctxt, &tokens);
-  if (schemerlicht_context_is_error_free(ctxt) == 0)
-    {
-    destroy_tokens_vector(ctxt, &tokens);
-    schemerlicht_print_any_error(ctxt);
-    return;
-    }
-  schemerlicht_preprocess(ctxt, &prog);
-  if (schemerlicht_context_is_error_free(ctxt) == 0)
-    {
-    destroy_tokens_vector(ctxt, &tokens);
-    schemerlicht_program_destroy(ctxt, &prog);
-    schemerlicht_print_any_error(ctxt);
-    return;
-    }
-  schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
-#if 0
-  schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
-  printf("%s\n", dumped.string_ptr);
-  schemerlicht_string_destroy(ctxt, &dumped);
-#endif
-  if (schemerlicht_context_is_error_free(ctxt) == 0)
-    {
-    destroy_tokens_vector(ctxt, &tokens);
-    schemerlicht_program_destroy(ctxt, &prog);
-    schemerlicht_print_any_error(ctxt);
-    return;
-    }
-  schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
   schemerlicht_print_any_error(ctxt);
-  schemerlicht_string s = schemerlicht_object_to_string(ctxt, res, 0);
-  printf("%s\n", s.string_ptr);
-  schemerlicht_string_destroy(ctxt, &s);
-
-  schemerlicht_compiled_program_register(ctxt, &compiled_program);
-
-  destroy_tokens_vector(ctxt, &tokens);
-  schemerlicht_program_destroy(ctxt, &prog);
-  }
-
-static void execute_scheme_cstr(schemerlicht_context* ctxt, const char* script)
-  {
-  schemerlicht_stream str;
-  schemerlicht_stream_init(ctxt, &str, 10);
-  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(script));
-  schemerlicht_stream_write(ctxt, &str, script, len, 0);
-  schemerlicht_stream_rewind(&str);
-  execute_scheme(ctxt, &str);
-  schemerlicht_stream_close(ctxt, &str);
-  }
-
-static void run_scheme_from_file(schemerlicht_context* ctxt, const char* filename)
-  {
-  FILE* f = fopen(filename, "r");
-  if (f)
+  if (result)
     {
-    schemerlicht_stream str;
-    schemerlicht_stream_init(ctxt, &str, 256);
-    char buffer[256];
-    size_t bytes_read = fread(buffer, 1, 256, f);
-    while (bytes_read)
-      {
-      schemerlicht_stream_write(ctxt, &str, buffer, cast(schemerlicht_memsize, bytes_read), 0);
-      bytes_read = fread(buffer, 1, 256, f);
-      }
-    fclose(f);
-    schemerlicht_stream_rewind(&str);
-    schemerlicht_string filename_loading;
-    schemerlicht_string_init(ctxt, &filename_loading, filename);
-    schemerlicht_vector_push_back(ctxt, &ctxt->filenames_list, filename_loading, schemerlicht_string);
-    execute_scheme(ctxt, &str);
-    schemerlicht_stream_close(ctxt, &str);
-    schemerlicht_string_destroy(ctxt, schemerlicht_vector_back(&ctxt->filenames_list, schemerlicht_string));
-    schemerlicht_vector_pop_back(&ctxt->filenames_list);
+    schemerlicht_string s;
+    schemerlicht_string_init(ctxt, &s, "");
+    schemerlicht_show_object(ctxt, result, &s);
+    printf("%s\n", s.string_ptr);
+    schemerlicht_string_destroy(ctxt, &s);
     }
   }
 
@@ -215,17 +124,14 @@ int main(int argc, char** argv)
   {
   init_debug();
 
-  size_t line_buffer_len = COMMAND_BUFFER_LENGTH*4;
+  size_t line_buffer_len = COMMAND_BUFFER_LENGTH * 4;
   char* line_buffer = malloc(line_buffer_len);
 
 
   char command_buffer[COMMAND_BUFFER_LENGTH];
 
   schemerlicht_context* ctxt = schemerlicht_open(1024 * 1024 * 4);
-  schemerlicht_compile_callcc(ctxt);
-  schemerlicht_compile_r5rs(ctxt);
-  schemerlicht_compile_input_output(ctxt);
-  schemerlicht_compile_modules(ctxt, SCHEMERLICHT_MODULES_PATH);
+  schemerlicht_build_base(ctxt);
 
   int quit = 0;
 
@@ -235,7 +141,8 @@ int main(int argc, char** argv)
   for (int idx = 1; idx < argc; ++idx)
     {
     char* filename = argv[idx];
-    run_scheme_from_file(ctxt, filename);
+    schemerlicht_object* res = schemerlicht_execute_file(ctxt, filename);
+    print_result(ctxt, res);
     }
 
 
@@ -277,7 +184,8 @@ int main(int argc, char** argv)
       }
     if (input_is_scheme_command)
       {
-      execute_scheme_cstr(ctxt, line);
+      schemerlicht_object* res = schemerlicht_execute(ctxt, line);
+      print_result(ctxt, res);
       }
     }
 

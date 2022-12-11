@@ -11,11 +11,11 @@ static schemerlicht_string* partition(schemerlicht_string* it, schemerlicht_stri
     {
     if (schemerlicht_string_compare_less(j, pivot))
       {
-      swap(*i, *j, schemerlicht_string);
+      schemerlicht_swap(*i, *j, schemerlicht_string);
       ++i;
       }
     }
-  swap(*i, *pivot, schemerlicht_string);
+  schemerlicht_swap(*i, *pivot, schemerlicht_string);
   return i;
   }
 

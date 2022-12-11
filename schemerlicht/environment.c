@@ -127,10 +127,9 @@ int schemerlicht_environment_base_at(schemerlicht_environment_entry* entry, sche
   return 0;
   }
 
-schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt)
+void schemerlicht_show_environment(schemerlicht_context* ctxt, schemerlicht_string* s)
   {
-  schemerlicht_string s;
-  schemerlicht_string_init(ctxt, &s, "SCHEMERLICHT ENVIRONMENT:\n");
+  schemerlicht_string_append_cstr(ctxt, s, "SCHEMERLICHT ENVIRONMENT:\n");
   schemerlicht_map** map_it = schemerlicht_vector_begin(&ctxt->environment, schemerlicht_map*);
   schemerlicht_map** map_it_end = schemerlicht_vector_end(&ctxt->environment, schemerlicht_map*);
   for (; map_it != map_it_end; ++map_it)
@@ -141,8 +140,8 @@ schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt)
       {
       if (schemerlicht_object_get_type(&m->node[i].key) == schemerlicht_object_type_string)
         {
-        schemerlicht_string_append(ctxt, &s, &m->node[i].key.value.s);
-        schemerlicht_string_append_cstr(ctxt, &s, ": ");
+        schemerlicht_string_append(ctxt, s, &m->node[i].key.value.s);
+        schemerlicht_string_append_cstr(ctxt, s, ": ");
         schemerlicht_environment_entry entry;
         entry.type = m->node[i].value.type - 1;
         entry.position = m->node[i].value.value.fx;
@@ -155,20 +154,19 @@ schemerlicht_string schemerlicht_show_environment(schemerlicht_context* ctxt)
         else
           {
           schemerlicht_string tmp2 = schemerlicht_object_to_string(ctxt, &m->node[i].value, 0);
-          schemerlicht_string_append(ctxt, &s, &tmp2);
+          schemerlicht_string_append(ctxt, s, &tmp2);
           schemerlicht_string_destroy(ctxt, &tmp2);
-          schemerlicht_string_append_cstr(ctxt, &s, ": ");
+          schemerlicht_string_append_cstr(ctxt, s, ": ");
           schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, entry.position, schemerlicht_object);
           tmp = schemerlicht_object_to_string(ctxt, global, 0);
           }
-        schemerlicht_string_append(ctxt, &s, &tmp);
+        schemerlicht_string_append(ctxt, s, &tmp);
 
-        schemerlicht_string_append_cstr(ctxt, &s, "\n");
+        schemerlicht_string_append_cstr(ctxt, s, "\n");
         schemerlicht_string_destroy(ctxt, &tmp);
         }      
       }
-    }
-  return s;
+    }  
   }
 
 schemerlicht_object* schemerlicht_environment_find_key_given_position(schemerlicht_context* ctxt, schemerlicht_fixnum global_position)

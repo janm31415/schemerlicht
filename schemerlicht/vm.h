@@ -120,6 +120,4 @@ schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, const 
 
 schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schemerlicht_function* fun);
 
-schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stack_start, int stack_end);
-
 #endif //SCHEMERLICHT_VM_H

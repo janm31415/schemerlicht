@@ -203,29 +203,48 @@ void schemerlicht_runtime_errors_clear(schemerlicht_context* ctxt)
   ctxt->number_of_runtime_errors = 0;
   }
 
-void schemerlicht_print_any_error(schemerlicht_context* ctxt)
+void schemerlicht_get_error_string(schemerlicht_context* ctxt, schemerlicht_string* s)
   {
   if (ctxt->number_of_compile_errors > 0)
     {
     schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->compile_error_reports, schemerlicht_error_report);
     schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->compile_error_reports, schemerlicht_error_report);
     for (; it != it_end; ++it)
-      printf("%s\n", it->message.string_ptr);
+      {
+      schemerlicht_string_append(ctxt, s, &it->message);
+      schemerlicht_string_push_back(ctxt, s, '\n');
+      }
     }
   if (ctxt->number_of_syntax_errors > 0)
     {
     schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->syntax_error_reports, schemerlicht_error_report);
     schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->syntax_error_reports, schemerlicht_error_report);
     for (; it != it_end; ++it)
-      printf("%s\n", it->message.string_ptr);
+      {
+      schemerlicht_string_append(ctxt, s, &it->message);
+      schemerlicht_string_push_back(ctxt, s, '\n');
+      }
     }
   if (ctxt->number_of_runtime_errors > 0)
     {
     schemerlicht_error_report* it = schemerlicht_vector_begin(&ctxt->runtime_error_reports, schemerlicht_error_report);
     schemerlicht_error_report* it_end = schemerlicht_vector_end(&ctxt->runtime_error_reports, schemerlicht_error_report);
     for (; it != it_end; ++it)
-      printf("%s\n", it->message.string_ptr);
+      {
+      schemerlicht_string_append(ctxt, s, &it->message);
+      schemerlicht_string_push_back(ctxt, s, '\n');
+      }
     }
+  }
+
+void schemerlicht_print_any_error(schemerlicht_context* ctxt)
+  {
+  schemerlicht_string s;
+  schemerlicht_string_init(ctxt, &s, "");
+  schemerlicht_get_error_string(ctxt, &s);
+  if (s.string_length > 0)
+    printf("%s", s.string_ptr);
+  schemerlicht_string_destroy(ctxt, &s);
   }
 
 int schemerlicht_context_is_error_free(schemerlicht_context* ctxt)

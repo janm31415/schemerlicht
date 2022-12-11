@@ -1122,34 +1122,32 @@ schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schem
   return s;
   }
 
-schemerlicht_string schemerlicht_show_stack(schemerlicht_context* ctxt, int stack_start, int stack_end)
+void schemerlicht_show_stack(schemerlicht_context* ctxt, schemerlicht_string* s, int stack_start, int stack_end)
   {
   char buffer[256];
-  schemerlicht_string s;
-  schemerlicht_string_init(ctxt, &s, "SCHEMERLICHT STACK:\n");
+  schemerlicht_string_append_cstr(ctxt, s, "SCHEMERLICHT STACK:\n");
   if (stack_end >= schemerlicht_maxstack)
     stack_end = schemerlicht_maxstack - 1;
   for (int i = stack_start; i <= stack_end; ++i)
     {
     schemerlicht_int_to_char(buffer, i);
-    schemerlicht_string_append_cstr(ctxt, &s, "  ");
-    schemerlicht_string_append_cstr(ctxt, &s, buffer);
-    schemerlicht_string_append_cstr(ctxt, &s, ": ");
+    schemerlicht_string_append_cstr(ctxt, s, "  ");
+    schemerlicht_string_append_cstr(ctxt, s, buffer);
+    schemerlicht_string_append_cstr(ctxt, s, ": ");
     schemerlicht_object* stack_item = schemerlicht_vector_at(&ctxt->stack, i, schemerlicht_object);
     schemerlicht_string tmp = schemerlicht_object_to_string(ctxt, stack_item, 0);
-    schemerlicht_string_append(ctxt, &s, &tmp);
+    schemerlicht_string_append(ctxt, s, &tmp);
     schemerlicht_string_destroy(ctxt, &tmp);
 #ifdef SCHEMERLICHT_DEBUG_LAMBDA_DEFINITION
     if (schemerlicht_object_get_type(stack_item) == schemerlicht_object_type_closure)
       {
       schemerlicht_object* lam = schemerlicht_vector_at(&stack_item->value.v, 0, schemerlicht_object);
       schemerlicht_function* fun = cast(schemerlicht_function*, lam->value.ptr);
-      schemerlicht_string_append(ctxt, &s, &fun->function_definition);
+      schemerlicht_string_append(ctxt, s, &fun->function_definition);
       }
 #endif
-    schemerlicht_string_push_back(ctxt, &s, '\n');
-    }
-  return s;
+    schemerlicht_string_push_back(ctxt, s, '\n');
+    }  
   }
 
 schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, const schemerlicht_vector* functions)

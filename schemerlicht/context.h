@@ -82,11 +82,11 @@ struct schemerlicht_context
   schemerlicht_vector filenames_list;
   };
 
-SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
-SCHEMERLICHT_API void schemerlicht_close(schemerlicht_context* ctxt);
+//SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
+//SCHEMERLICHT_API void schemerlicht_close(schemerlicht_context* ctxt);
 
 // for new threads
-SCHEMERLICHT_API schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size);
-SCHEMERLICHT_API void schemerlicht_context_destroy(schemerlicht_context* ctxt);
+//SCHEMERLICHT_API schemerlicht_context* schemerlicht_context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_size);
+//SCHEMERLICHT_API void schemerlicht_context_destroy(schemerlicht_context* ctxt);
 
 #endif //SCHEMERLICHT_CONTEXT_H

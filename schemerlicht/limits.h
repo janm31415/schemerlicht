@@ -23,10 +23,6 @@ typedef union { schemerlicht_fixnum fx; schemerlicht_flonum fl; void* ptr; } sch
 typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
 #endif
 
-#ifndef schemerlicht_memsize
-#define schemerlicht_memsize uint32_t
-#endif
-
 #ifndef schemerlicht_memsize_sign_bit
 #define schemerlicht_memsize_sign_bit 0x80000000
 #endif
@@ -40,7 +36,7 @@ typedef SCHEMERLICHT_ALIGNMENT schemerlicht_alignment;
 #define schemerlicht_mem_invalid_size ((schemerlicht_memsize)(-1))
 #endif
 
-#define swap(a, b, type) \
+#define schemerlicht_swap(a, b, type) \
   { type tmp = (a); \
   (a) = (b); \
   (b) = tmp; }

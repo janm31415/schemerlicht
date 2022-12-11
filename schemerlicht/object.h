@@ -81,6 +81,8 @@ schemerlicht_object make_schemerlicht_object_promise(schemerlicht_context* ctxt)
 
 void schemerlicht_object_destroy(schemerlicht_context* ctxt, schemerlicht_object* obj);
 
+
+void schemerlicht_object_append_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj, schemerlicht_string* s, int display);
 schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, schemerlicht_object* obj, int display);
 
 schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, schemerlicht_object* obj);
