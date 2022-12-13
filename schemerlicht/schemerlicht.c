@@ -275,3 +275,20 @@ void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const 
 
   schemerlicht_stream_close(ctxt, &str);
   }
+
+schemerlicht_object* schemerlicht_find_global(schemerlicht_context* ctxt, const char* name)
+  {
+  schemerlicht_object* result = NULL;
+  schemerlicht_environment_entry entry;
+  schemerlicht_string s;
+  schemerlicht_string_init(ctxt, &s, name);
+  if (schemerlicht_environment_find(&entry, ctxt, &s))
+    {
+    if (entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL)
+      {
+      result = schemerlicht_vector_at(&ctxt->globals, entry.position, schemerlicht_object);
+      }
+    }
+  schemerlicht_string_destroy(ctxt, &s);
+  return result;
+  }

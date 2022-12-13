@@ -59,6 +59,7 @@ SCHEMERLICHT_API void schemerlicht_compiled_program_destroy(schemerlicht_context
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program);
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_execute(schemerlicht_context* ctxt, const char* script);
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_execute_file(schemerlicht_context* ctxt, const char* filename);
+SCHEMERLICHT_API schemerlicht_object* schemerlicht_find_global(schemerlicht_context* ctxt, const char* name);
 
 SCHEMERLICHT_API void schemerlicht_get_error_string(schemerlicht_context* ctxt, schemerlicht_string* s);
 SCHEMERLICHT_API void schemerlicht_print_any_error(schemerlicht_context* ctxt);
