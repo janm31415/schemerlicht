@@ -30,8 +30,53 @@ void schemerlicht_build_base(schemerlicht_context* ctxt)
   schemerlicht_compile_modules(ctxt, SCHEMERLICHT_MODULES_PATH);
   }
 
+static schemerlicht_vector compile_scheme(schemerlicht_context* ctxt, schemerlicht_stream* str)
+  {
+  schemerlicht_syntax_errors_clear(ctxt);
+  schemerlicht_compile_errors_clear(ctxt);
+  schemerlicht_runtime_errors_clear(ctxt);
+  schemerlicht_vector tokens = tokenize(ctxt, str);
+  if (schemerlicht_context_is_error_free(ctxt) == 0)
+    {
+    schemerlicht_vector v;
+    v.vector_size = 0;
+    v.vector_capacity = 0;
+    v.vector_ptr = NULL;
+    v.element_size = 0;
+    return v;
+    }
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  if (schemerlicht_context_is_error_free(ctxt) == 0)
+    {
+    destroy_tokens_vector(ctxt, &tokens);
+    schemerlicht_vector v;
+    v.vector_size = 0;
+    v.vector_capacity = 0;
+    v.vector_ptr = NULL;
+    v.element_size = 0;
+    return v;
+    }
+  schemerlicht_preprocess(ctxt, &prog);
+  if (schemerlicht_context_is_error_free(ctxt) == 0)
+    {
+    destroy_tokens_vector(ctxt, &tokens);
+    schemerlicht_program_destroy(ctxt, &prog);
+    schemerlicht_vector v;
+    v.vector_size = 0;
+    v.vector_capacity = 0;
+    v.vector_ptr = NULL;
+    v.element_size = 0;
+    return v;
+    }
+  schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);  
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  return compiled_program;
+  }
+
 static schemerlicht_object* execute_scheme(schemerlicht_context* ctxt, schemerlicht_stream* str)
   {
+  /*
   schemerlicht_syntax_errors_clear(ctxt);
   schemerlicht_compile_errors_clear(ctxt);
   schemerlicht_runtime_errors_clear(ctxt);
@@ -66,6 +111,64 @@ static schemerlicht_object* execute_scheme(schemerlicht_context* ctxt, schemerli
   destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   return res;
+  */
+  schemerlicht_vector compiled_program = compile_scheme(ctxt, str);
+  if (compiled_program.vector_size > 0)
+    {
+    schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
+    schemerlicht_compiled_program_register(ctxt, &compiled_program);
+    return res;
+    }
+  else
+    return NULL;
+  }
+
+void schemerlicht_compile(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program, const char* script)
+  {
+  schemerlicht_stream str;
+  schemerlicht_stream_init(ctxt, &str, 10);
+  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(script));
+  schemerlicht_stream_write(ctxt, &str, script, len, 0);
+  schemerlicht_stream_rewind(&str);
+  schemerlicht_vector compiled = compile_scheme(ctxt, &str);
+  schemerlicht_stream_close(ctxt, &str);
+  schemerlicht_function** it = schemerlicht_vector_begin(&compiled, schemerlicht_function*);
+  schemerlicht_function** it_end = schemerlicht_vector_end(&compiled, schemerlicht_function*);
+  schemerlicht_function** where_it = schemerlicht_vector_end(compiled_program, schemerlicht_function*);
+  schemerlicht_vector_insert(ctxt, compiled_program, &where_it, &it, &it_end, schemerlicht_function*);
+  schemerlicht_vector_destroy(ctxt, &compiled);
+  }
+
+void schemerlicht_compile_file(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program, const char* filename)
+  {
+  FILE* f = fopen(filename, "r");
+  if (f)
+    {
+    schemerlicht_stream str;
+    schemerlicht_stream_init(ctxt, &str, 256);
+    char buffer[256];
+    size_t bytes_read = fread(buffer, 1, 256, f);
+    while (bytes_read)
+      {
+      schemerlicht_stream_write(ctxt, &str, buffer, cast(schemerlicht_memsize, bytes_read), 0);
+      bytes_read = fread(buffer, 1, 256, f);
+      }
+    fclose(f);
+    schemerlicht_stream_rewind(&str);
+    schemerlicht_string filename_loading;
+    schemerlicht_string_init(ctxt, &filename_loading, filename);
+    schemerlicht_vector_push_back(ctxt, &ctxt->filenames_list, filename_loading, schemerlicht_string);
+    schemerlicht_vector compiled = compile_scheme(ctxt, &str);
+    schemerlicht_stream_close(ctxt, &str);
+    schemerlicht_function** it = schemerlicht_vector_begin(&compiled, schemerlicht_function*);
+    schemerlicht_function** it_end = schemerlicht_vector_end(&compiled, schemerlicht_function*);
+    schemerlicht_function** where_it = schemerlicht_vector_end(compiled_program, schemerlicht_function*);
+    schemerlicht_vector_insert(ctxt, compiled_program, &where_it, &it, &it_end, schemerlicht_function*);
+    schemerlicht_vector_destroy(ctxt, &compiled);
+    schemerlicht_stream_close(ctxt, &str);
+    schemerlicht_string_destroy(ctxt, schemerlicht_vector_back(&ctxt->filenames_list, schemerlicht_string));
+    schemerlicht_vector_pop_back(&ctxt->filenames_list);
+    }
   }
 
 schemerlicht_object* schemerlicht_execute(schemerlicht_context* ctxt, const char* script)
@@ -168,7 +271,7 @@ void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const 
   schemerlicht_stream_write_str(ctxt, &str, "))");
   schemerlicht_stream_rewind(&str);
   
-  schemerlicht_object* res = execute_scheme(ctxt, &str);
+  execute_scheme(ctxt, &str);
 
   schemerlicht_stream_close(ctxt, &str);
   }
