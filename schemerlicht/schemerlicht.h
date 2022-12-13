@@ -55,6 +55,7 @@ typedef struct schemerlicht_vector schemerlicht_vector;
 SCHEMERLICHT_API void schemerlicht_compile(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program, const char* script);
 SCHEMERLICHT_API void schemerlicht_compile_file(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program, const char* filename);
 SCHEMERLICHT_API void schemerlicht_compiled_program_register(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program);
+SCHEMERLICHT_API void schemerlicht_compiled_program_destroy(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program);
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_run_program(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program);
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_execute(schemerlicht_context* ctxt, const char* script);
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_execute_file(schemerlicht_context* ctxt, const char* filename);
