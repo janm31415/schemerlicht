@@ -91,9 +91,7 @@ static void* get_argument_pointer(schemerlicht_context* ctxt, int stack_offset)
       { \
       typedef const char* (*fun)funargs; \
       obj.type = schemerlicht_object_type_string; \
-      obj.value.s.string_ptr = cast(char*, (cast(fun, ext->address))args); \
-      obj.value.s.string_length = cast(schemerlicht_memsize, strlen(obj.value.s.string_ptr)); \
-      obj.value.s.string_capacity = 0; \
+      schemerlicht_string_init(ctxt, &obj.value.s, cast(char*, (cast(fun, ext->address))args)); \
       break; \
       } \
       case schemerlicht_foreign_void: \
