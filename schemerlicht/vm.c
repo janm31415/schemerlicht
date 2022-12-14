@@ -4,13 +4,13 @@
 #include "map.h"
 #include "primitives.h"
 #include "gc.h"
-#include "inlines.h"
 #include "foreign.h"
 #include "environment.h"
 #include "syscalls.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 static void make_variable_arity_list(schemerlicht_context* ctxt, int a, int b)
   {
@@ -474,7 +474,10 @@ static void opcode_call(schemerlicht_context* ctxt, schemerlicht_instruction** p
     {
     const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-    inline_functions2(a, b, c);
+    int aa = a;
+    int bb = b;
+    int cc = c;
+#include "inlines.h"
 #else
     schemerlicht_call_primitive(ctxt, function_id, a, b, c);
 #endif
@@ -484,7 +487,10 @@ static void opcode_call(schemerlicht_context* ctxt, schemerlicht_instruction** p
     {
     const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-    inline_functions2(a, b - 1, c + 1);
+    int aa = a;
+    int bb = b-1;
+    int cc = c+1;
+#include "inlines.h"
 #else
     schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
 #endif
@@ -924,7 +930,10 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-        inline_functions(a, b, c);
+        int aa = a;
+        int bb = b;
+        int cc = c;
+#include "inlines.h"
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b, c);
 #endif
@@ -934,7 +943,10 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-        inline_functions(a, b - 1, c + 1);
+        int aa = a;
+        int bb = b-1;
+        int cc = c+1;
+#include "inlines.h"
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
 #endif
