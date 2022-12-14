@@ -345,6 +345,68 @@ else if ((bb) == 1)
       }
     break;
     }
+    case schemerlicht_object_type_fixnum:
+    {
+    switch (function_id)
+      {
+      case SCHEMERLICHT_FLOOR:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx;
+        break;
+      case SCHEMERLICHT_CEILING:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx;
+        break;
+      case SCHEMERLICHT_TRUNCATE:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx;
+        break;
+      case SCHEMERLICHT_ROUND:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx;
+        break;
+      case SCHEMERLICHT_EXP:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = exp(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_LOG:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = log(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_SIN:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = sin(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_COS:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = cos(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_TAN:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = tan(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_ASIN:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = asin(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_ACOS:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = acos(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_ATAN:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = atan(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      case SCHEMERLICHT_SQRT:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = sqrt(cast(schemerlicht_flonum, arg1->value.fx));
+        break;
+      default:
+        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        break;
+      }
+    break;
+    }
     default:
       schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
       break;

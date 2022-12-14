@@ -7,6 +7,7 @@
 #include "foreign.h"
 #include "environment.h"
 #include "syscalls.h"
+#include "limits.h"
 
 #include <stdio.h>
 #include <string.h>
