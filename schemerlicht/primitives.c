@@ -9011,7 +9011,8 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
 
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum function_id, int a, int b, int c)
   {
-#ifdef SCHEMERLICHT_USE_INLINES
+//#ifdef SCHEMERLICHT_USE_INLINES
+#ifdef SCHEMERLICHT_BLABLA
 #include "primswitch.h"
 #else
   switch (function_id)

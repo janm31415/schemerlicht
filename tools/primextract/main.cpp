@@ -304,6 +304,7 @@ int main(int argc, char** argv)
   if (argc < 3)
     {
     printf("Usage: primextract <primitives.c> <folder>");
+    printf("Output is the file primswitch.h which contains a large switch with all primitives inlined.");
     }
   else
     {

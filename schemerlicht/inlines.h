@@ -1,6 +1,4 @@
-switch (b)
-  {
-  case 2:
+if ((b) == 2)
   {
   const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
@@ -263,9 +261,8 @@ switch (b)
       schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;
     }
-  break;
   }
-  case 1:
+else if ((b) == 1)
   {
   const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
@@ -348,6 +345,7 @@ switch (b)
       }
     break;
     }
+    /*
     case schemerlicht_object_type_fixnum:
     {
     switch (function_id)
@@ -409,13 +407,13 @@ switch (b)
         break;
       }
     break;
-    }
+    }*/
     default:
       schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;
     }
-  break;
   }
-  default:
-    schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+else
+  {
+  schemerlicht_call_primitive(ctxt, function_id, a, b, c);
   }
