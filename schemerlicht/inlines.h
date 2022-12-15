@@ -3,6 +3,32 @@ if ((b) == 2)
   const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
     {
+    case schemerlicht_object_type_closure:
+    {
+    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
+    switch (schemerlicht_object_get_type(arg2))
+      {
+      case schemerlicht_object_type_fixnum:
+      {
+      switch (function_id)
+        {
+        case SCHEMERLICHT_CLOSUREREF:
+        {
+        schemerlicht_set_object(target, schemerlicht_vector_at(&arg1->value.v, arg2->value.fx, schemerlicht_object));
+        break;
+        }
+        default:
+          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+          break;
+        }
+      break;
+      }
+      default:
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+        break;
+      }
+    break;
+    }
     case schemerlicht_object_type_fixnum:
     {
     const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
@@ -175,33 +201,7 @@ if ((b) == 2)
         break;
       }
     break;
-    }
-    case schemerlicht_object_type_closure:
-    {
-    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
-    switch (schemerlicht_object_get_type(arg2))
-      {
-      case schemerlicht_object_type_fixnum:
-      {
-      switch (function_id)
-        {
-        case SCHEMERLICHT_CLOSUREREF:
-        {
-        schemerlicht_set_object(target, schemerlicht_vector_at(&arg1->value.v, arg2->value.fx, schemerlicht_object));
-        break;
-        }
-        default:
-          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-          break;
-        }
-      break;
-      }
-      default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
-      }
-    break;
-    }
+    }    
     case schemerlicht_object_type_vector:
     {
     const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);

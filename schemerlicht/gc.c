@@ -246,35 +246,22 @@ void schemerlicht_collect_garbage(schemerlicht_context* ctxt)
   for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
     {
     schemerlicht_object* obj = state.source_heap + i;
-    int marked = is_marked(obj);
-    if (marked)
-      unmark_object_pointer(obj);
     if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_blocking)
       break;
-    if (marked == 0)
+    if (is_marked(obj))    
+      {
+      unmark_object_pointer(obj);
+      }
+    else
       {
       schemerlicht_object_destroy(ctxt, obj);
       }
     obj->type = schemerlicht_object_type_blocking;
     }
-  /*
-  for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
-    {
-    schemerlicht_object* obj = state.source_heap + i;
-    unmark_object_pointer(obj);
-    if (schemerlicht_object_get_type(obj) == schemerlicht_object_type_blocking)
-      break;
-    obj->type = schemerlicht_object_type_blocking;
-    }
-  */
   ctxt->heap = state.target_heap;
   ctxt->heap_pos = state.gc_heap_pos;
-  //for (schemerlicht_memsize i = 0; i < state.heap_size; ++i)
-  //  {
-  //  schemerlicht_object* obj = state.target_heap + i;
-  //  obj->type &= ~schemerlicht_int_gcmark_bit;
-  //  }
   unmark_object_pointer(&ctxt->empty_continuation);
+  unmark_object_pointer(&ctxt->halt_continuation);
 #ifdef SCHEMERLICHT_DEBUG
   int c1 = clock();
   ctxt->time_spent_gc += c1 - c0;
