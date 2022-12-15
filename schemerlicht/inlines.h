@@ -1,11 +1,11 @@
-if ((bb) == 2)
+if ((b) == 2)
   {
-  const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+1, schemerlicht_object);
+  const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
     {
     case schemerlicht_object_type_fixnum:
     {
-    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+2, schemerlicht_object);
+    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
     switch (schemerlicht_object_get_type(arg2))
       {
       case schemerlicht_object_type_fixnum:
@@ -81,20 +81,20 @@ if ((bb) == 2)
         break;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
           break;
         }
       break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
     }
     case schemerlicht_object_type_flonum:
     {
-    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+2, schemerlicht_object);
+    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
     switch (schemerlicht_object_get_type(arg2))
       {
       case schemerlicht_object_type_flonum:
@@ -165,20 +165,20 @@ if ((bb) == 2)
         break;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
           break;
         }
       break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
     }
     case schemerlicht_object_type_closure:
     {
-    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+2, schemerlicht_object);
+    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
     switch (schemerlicht_object_get_type(arg2))
       {
       case schemerlicht_object_type_fixnum:
@@ -191,20 +191,20 @@ if ((bb) == 2)
         break;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
           break;
         }
       break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
     }
     case schemerlicht_object_type_vector:
     {
-    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+2, schemerlicht_object);
+    const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
     switch (schemerlicht_object_get_type(arg2))
       {
       case schemerlicht_object_type_fixnum:
@@ -224,13 +224,13 @@ if ((bb) == 2)
         break;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
           break;
         }
       break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
@@ -241,30 +241,30 @@ if ((bb) == 2)
       {
       case SCHEMERLICHT_SET_CAR:
       {
-      const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+2, schemerlicht_object);
+      const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
       schemerlicht_set_object(schemerlicht_vector_at(&arg1->value.v, 0, schemerlicht_object), arg2);
       break;
       }
       case SCHEMERLICHT_SET_CDR:
       {
-      const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+2, schemerlicht_object);
+      const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
       schemerlicht_set_object(schemerlicht_vector_at(&arg1->value.v, 1, schemerlicht_object), arg2);
       break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
     }
     default:
-      schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+      schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;
     }
   }
-else if ((bb) == 1)
+else if ((b) == 1)
   {
-  const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (aa)+(cc)+1, schemerlicht_object);
+  const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
     {
     case schemerlicht_object_type_pair:
@@ -278,7 +278,7 @@ else if ((bb) == 1)
         schemerlicht_set_object(target, schemerlicht_vector_at(&arg1->value.v, 1, schemerlicht_object));
         break;
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
@@ -340,7 +340,7 @@ else if ((bb) == 1)
         target->value.fl = sqrt(arg1->value.fl);
         break;
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
@@ -402,17 +402,17 @@ else if ((bb) == 1)
         target->value.fl = sqrt(cast(schemerlicht_flonum, arg1->value.fx));
         break;
       default:
-        schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
         break;
       }
     break;
     }
     default:
-      schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+      schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;
     }
   }
 else
   {
-  schemerlicht_call_primitive(ctxt, function_id, aa, bb, cc);
+  schemerlicht_call_primitive(ctxt, function_id, a, b, c);
   }

@@ -14,5 +14,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/schemerlicht/modulesconf.h.in"
 add_subdirectory(schemerlicht)
 add_subdirectory(schemerlicht.tests)
 add_subdirectory(schemerlicht.repl)
+add_subdirectory(tools/primextract)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

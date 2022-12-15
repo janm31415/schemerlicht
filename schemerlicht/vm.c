@@ -474,10 +474,7 @@ static void opcode_call(schemerlicht_context* ctxt, schemerlicht_instruction** p
     case schemerlicht_object_type_primitive:
     {
     const schemerlicht_fixnum function_id = target->value.fx;
-#ifdef SCHEMERLICHT_USE_INLINES
-    int aa = a;
-    int bb = b;
-    int cc = c;
+#ifdef SCHEMERLICHT_USE_INLINES    
 #include "inlines.h"
 #else
     schemerlicht_call_primitive(ctxt, function_id, a, b, c);
@@ -488,9 +485,8 @@ static void opcode_call(schemerlicht_context* ctxt, schemerlicht_instruction** p
     {
     const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-    int aa = a;
-    int bb = b-1;
-    int cc = c+1;
+    --b;
+    ++c;
 #include "inlines.h"
 #else
     schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
@@ -916,8 +912,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       case SCHEMERLICHT_OPCODE_CALL:
       {
       const int a = SCHEMERLICHT_GETARG_A(i);
-      const int b = SCHEMERLICHT_GETARG_B(i);
-      const int c = SCHEMERLICHT_GETARG_C(i);
+      int b = SCHEMERLICHT_GETARG_B(i);
+      int c = SCHEMERLICHT_GETARG_C(i);
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       if (schemerlicht_object_get_type(target) == schemerlicht_object_type_unassigned)
         {
@@ -930,10 +926,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         case schemerlicht_object_type_primitive:
         {
         const schemerlicht_fixnum function_id = target->value.fx;
-#ifdef SCHEMERLICHT_USE_INLINES
-        int aa = a;
-        int bb = b;
-        int cc = c;
+#ifdef SCHEMERLICHT_USE_INLINES        
 #include "inlines.h"
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b, c);
@@ -944,9 +937,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES
-        int aa = a;
-        int bb = b-1;
-        int cc = c+1;
+        --b;
+        ++c;
 #include "inlines.h"
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b - 1, c + 1);
