@@ -16,6 +16,45 @@ void write_to_file(const std::string& filename, const std::string& content, cons
   t << content;
   }
 
+void replace_in_string(std::string& s, const std::string& substring_to_be_replaced, const std::string& replace_by_this_string)
+  {
+  std::string::size_type pos = 0;
+  while ((pos = s.find(substring_to_be_replaced, pos)) != std::string::npos)
+    {
+    s.replace(pos, substring_to_be_replaced.size(), replace_by_this_string);
+    pos += replace_by_this_string.size();
+    }
+  }
+
+std::string get_prim_enum(const std::string& prim_name)
+  {
+  if (prim_name == std::string("halt"))
+    {
+    return std::string("SCHEMERLICHT_HALT");
+    }
+  else if (prim_name == std::string("equal"))
+    {
+    return std::string("SCHEMERLICHT_EQUAL");
+    }
+  else if (prim_name == std::string("string_less"))
+    {
+    return std::string("SCHEMERLICHT_STRING_LESS");
+    }
+  else if (prim_name == std::string("string_greater"))
+    {
+    return std::string("SCHEMERLICHT_STRING_GREATER");
+    }
+  else if (prim_name == std::string("string_ci_less"))
+    {
+    return std::string("SCHEMERLICHT_STRING_CI_LESS");
+    }
+  else if (prim_name == std::string("string_ci_greater"))
+    {
+    return std::string("SCHEMERLICHT_STRING_CI_GREATER");
+    }
+  return std::string();
+  }
+
 bool ignore_character(const char& ch)
   {
   return (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r');
@@ -60,7 +99,7 @@ void treat_buffer(std::string& buff, parse_state& state)
     case parse_action::FINDING_ENDING_BRACE:
     {
     std::size_t pos = buff.find("SCHEMERLICHT_");
-    if (pos != std::string::npos && state.count_brace == 1)
+    if (pos != std::string::npos && state.count_brace == 1 && state.current_prim_enum.empty())
       {
       state.current_prim_enum = buff;
       }
@@ -137,11 +176,14 @@ void parse_file(const std::string& str, const std::string& folder)
       --state.count_brace;
       if (state.count_brace == 0 && state.action == parse_action::FINDING_ENDING_BRACE)
         {
-        std::string prim_content(state.first_brace, state.s+1);
+        std::string prim_content(state.first_brace, state.s + 1);
+        if (state.current_prim_enum.empty())
+          state.current_prim_enum = get_prim_enum(state.current_prim_name);
         std::cout << "Content for primitive " << state.current_prim_name << " with enum " << state.current_prim_enum << std::endl;
         std::cout << prim_content << std::endl;
         write_to_file(state.current_prim_name, prim_content, folder);
         large_switch << "  case " << state.current_prim_enum << ":\n  ";
+        //replace_in_string(prim_content, "return;", "goto SCHEMERLICHT_STOP_LABEL;");
         large_switch << prim_content;
         large_switch << "\n  break;\n";
         state.action = parse_action::FINDING_PRIMITIVE;
@@ -248,6 +290,9 @@ void parse_file(const std::string& str, const std::string& folder)
 
     }
   treat_buffer(buff, state);
+  large_switch << "  default:\n";
+  large_switch << "    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);\n";
+  large_switch << "    break;\n";
   large_switch << "  }\n";
   std::string large_switch_content = large_switch.str();
   write_to_file("large_switch", large_switch_content, folder);

@@ -9009,9 +9009,12 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
 
 ////////////////////////////////////////////////////
 
-void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
+void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum function_id, int a, int b, int c)
   {
-  switch (prim_id)
+#ifdef SCHEMERLICHT_USE_INLINES
+#include "../prims/large_switch.h"
+#else
+  switch (function_id)
     {
     case SCHEMERLICHT_ADD1:
       schemerlicht_primitive_add1(ctxt, a, b, c);
@@ -9629,6 +9632,7 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
     }
+#endif
   }
 
 static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, int value)
