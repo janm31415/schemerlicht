@@ -1,4 +1,6 @@
-if ((b) == 2)
+switch (b)
+  {
+  case 2:
   {
   const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
@@ -261,8 +263,9 @@ if ((b) == 2)
       schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;
     }
+  break;
   }
-else if ((b) == 1)
+  case 1:
   {
   const schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+1, schemerlicht_object);
   switch (schemerlicht_object_get_type(arg1))
@@ -411,8 +414,8 @@ else if ((b) == 1)
       schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;
     }
+  break;
   }
-else
-  {
-  schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+  default:
+    schemerlicht_call_primitive(ctxt, function_id, a, b, c);
   }
