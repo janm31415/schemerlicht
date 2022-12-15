@@ -1513,6 +1513,7 @@ static void cps_start(schemerlicht_context* ctxt, schemerlicht_expression* e)
 void schemerlicht_continuation_passing_style(schemerlicht_context* ctxt, schemerlicht_program* program)
   {
   schemerlicht_assert(program->expressions.vector_size <= 1);
+  program->cps_converted = 1;
   if (program->expressions.vector_size == 0)
     return;
   schemerlicht_expression* e = schemerlicht_vector_at(&program->expressions, 0, schemerlicht_expression);

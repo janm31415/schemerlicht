@@ -4,7 +4,7 @@
 #include "schemerlicht.h"
 #include "limits.h"
 
-#define MINSIZEVECTOR 2
+#define SCHEMERLICHT_MINSIZEVECTOR 2
 
 SCHEMERLICHT_API void* schemerlicht_realloc(schemerlicht_context* ctxt, void* chunk, schemerlicht_memsize old_size, schemerlicht_memsize new_size);
 

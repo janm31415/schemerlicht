@@ -417,6 +417,7 @@ void schemerlicht_primitive_is_environment(schemerlicht_context* ctxt, int a, in
 void schemerlicht_primitive_null_environment(schemerlicht_context* ctxt, int a, int b, int c);
 void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a, int b, int c);
 
+void schemerlicht_call_primitive_inlined(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
 schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt);

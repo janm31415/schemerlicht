@@ -2008,6 +2008,7 @@ schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vecto
     schemerlicht_vector_push_back(ctxt, &prog.expressions, expr, schemerlicht_expression);
     }
 
+  prog.cps_converted = 0;
   return prog;
   }
 

@@ -725,6 +725,16 @@ schemerlicht_function* schemerlicht_compile_expression(schemerlicht_context* ctx
   return fun;
   }
 
+static void add_return_statements_to_lambdas(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program)
+  {
+  schemerlicht_function** it = schemerlicht_vector_begin(compiled_program, schemerlicht_function*);
+  schemerlicht_function** it_end = schemerlicht_vector_end(compiled_program, schemerlicht_function*);
+  for (; it != it_end; ++it)
+    {
+    make_code_ab(ctxt, (*it), SCHEMERLICHT_OPCODE_RETURN, 0, 1);
+    }
+  }
+
 schemerlicht_vector schemerlicht_compile_program(schemerlicht_context* ctxt, schemerlicht_program* prog)
   {
   schemerlicht_vector compiled;
@@ -735,6 +745,10 @@ schemerlicht_vector schemerlicht_compile_program(schemerlicht_context* ctxt, sch
     {
     schemerlicht_function* fun = schemerlicht_compile_expression(ctxt, it);
     schemerlicht_vector_push_back(ctxt, &compiled, fun, schemerlicht_function*);
+    }
+  if (prog->cps_converted == 0)
+    {
+    add_return_statements_to_lambdas(ctxt, &compiled);
     }
   return compiled;
   }

@@ -146,18 +146,18 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   schemerlicht_vector_init(ctxt, &ctxt->environments, schemerlicht_context*);
   schemerlicht_string_init(ctxt, &ctxt->module_path, "");
   ctxt->empty_continuation_function = schemerlicht_function_new(ctxt);
-  //schemerlicht_instruction i = 0;
-  //SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_MOVE);
-  //SCHEMERLICHT_SETARG_A(i, 0);
-  //SCHEMERLICHT_SETARG_B(i, 1);
-  //schemerlicht_vector_push_back(ctxt, &ctxt->empty_continuation_function->code, i, schemerlicht_instruction);
+  schemerlicht_instruction i = 0;
+  SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_RETURN);
+  SCHEMERLICHT_SETARG_A(i, 0);
+  SCHEMERLICHT_SETARG_B(i, 0);
+  schemerlicht_vector_push_back(ctxt, &ctxt->empty_continuation_function->code, i, schemerlicht_instruction);
   ctxt->empty_continuation = make_schemerlicht_object_closure(ctxt, 1);
   schemerlicht_object* empty_lambda = schemerlicht_vector_begin(&ctxt->empty_continuation.value.v, schemerlicht_object);
   empty_lambda->type = schemerlicht_object_type_lambda;
   empty_lambda->value.ptr = ctxt->empty_continuation_function;
 
   ctxt->halt_continuation_function = schemerlicht_function_new(ctxt);
-  schemerlicht_instruction i = 0;
+  i = 0;
   SCHEMERLICHT_SET_OPCODE(i, SCHEMERLICHT_OPCODE_RETURN);
   SCHEMERLICHT_SETARG_A(i, 1);
   SCHEMERLICHT_SETARG_B(i, 1);

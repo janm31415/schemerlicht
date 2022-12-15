@@ -184,7 +184,7 @@ void parse_file(const std::string& str, const std::string& folder)
         std::cout << prim_content << std::endl;
         //write_to_file(state.current_prim_name, prim_content, folder);
         large_switch << "  case " << state.current_prim_enum << ":\n  ";
-        //replace_in_string(prim_content, "return;", "goto SCHEMERLICHT_STOP_LABEL;");
+        //replace_in_string(prim_content, "return;", "goto stop;");
         large_switch << prim_content;
         large_switch << "\n  break;\n";
         state.action = parse_action::FINDING_PRIMITIVE;

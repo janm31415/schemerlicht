@@ -344,8 +344,7 @@ else if ((b) == 1)
         break;
       }
     break;
-    }
-    /*
+    }    
     case schemerlicht_object_type_fixnum:
     {
     switch (function_id)
@@ -407,7 +406,7 @@ else if ((b) == 1)
         break;
       }
     break;
-    }*/
+    }
     default:
       schemerlicht_call_primitive(ctxt, function_id, a, b, c);
       break;

@@ -10,7 +10,11 @@
 ** block size; some allocators may use that.)
 */
 #ifndef SCHEMERLICHT_REALLOC
+#ifdef _WIN32
+#define SCHEMERLICHT_REALLOC(ptr, old_size, size) _aligned_realloc(ptr, size, 32)
+#else
 #define SCHEMERLICHT_REALLOC(ptr, old_size, size) realloc(ptr, size)
+#endif
 #endif
 
 /*
@@ -18,7 +22,11 @@
 ** allocators may use that.)
 */
 #ifndef SCHEMERLICHT_FREE
+#ifdef _WIN32
+#define SCHEMERLICHT_FREE(ptr,old_size) _aligned_free(ptr)
+#else
 #define SCHEMERLICHT_FREE(ptr,old_size) free(ptr)
+#endif
 #endif
 
 void* schemerlicht_realloc(schemerlicht_context* ctxt, void* chunk, schemerlicht_memsize old_size, schemerlicht_memsize new_size)
@@ -53,8 +61,8 @@ void* schemerlicht_growvector_aux(schemerlicht_context* ctxt, void* chunk, schem
   {
   void* newblock;
   schemerlicht_memsize newsize = (*size) * 2;
-  if (newsize < MINSIZEVECTOR)
-    newsize = MINSIZEVECTOR;  /* minimum size */
+  if (newsize < SCHEMERLICHT_MINSIZEVECTOR)
+    newsize = SCHEMERLICHT_MINSIZEVECTOR;  /* minimum size */
   newblock = schemerlicht_realloc(ctxt, chunk,
     *size * element_size,
     newsize * element_size);

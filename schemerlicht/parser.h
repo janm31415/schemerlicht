@@ -288,6 +288,7 @@ typedef struct schemerlicht_expression
 typedef struct schemerlicht_program
   {
   schemerlicht_vector expressions;
+  int cps_converted;
   } schemerlicht_program;
 
 schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt, token** token_it, token** token_it_end);

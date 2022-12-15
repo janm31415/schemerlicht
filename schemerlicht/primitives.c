@@ -3812,11 +3812,19 @@ void schemerlicht_primitive_closure(schemerlicht_context* ctxt, int a, int b, in
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSURE);
-  schemerlicht_object v = make_schemerlicht_object_closure(ctxt, b);
   schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-  schemerlicht_set_object(heap_obj, &v);
+  *heap_obj = make_schemerlicht_object_closure(ctxt, b);
   ++ctxt->heap_pos;
+#if 1
   memcpy(heap_obj->value.v.vector_ptr, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + a + c + 1, b * sizeof(schemerlicht_object));
+#else
+  for (int j = 0; j < b; ++j)
+    {
+    schemerlicht_object* target = schemerlicht_vector_at(&heap_obj->value.v, j, schemerlicht_object);
+    const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, a + c + 1 + j, schemerlicht_object);
+    schemerlicht_set_object(target, source);
+    }
+#endif
 #ifdef SCHEMERLICHT_DEBUG
   schemerlicht_object* lambda = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
   if (schemerlicht_object_get_type(lambda) != schemerlicht_object_type_lambda)
@@ -5626,7 +5634,7 @@ void schemerlicht_primitive_apply(schemerlicht_context* ctxt, int a, int b, int 
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);
       *continuation = original_continuation;
-      schemerlicht_vector_pop_back(&ctxt->gc_save_list);      
+      schemerlicht_vector_pop_back(&ctxt->gc_save_list);
       }
     else if (schemerlicht_object_get_type(op) == schemerlicht_object_type_lambda)
       {
@@ -6504,7 +6512,7 @@ static schemerlicht_fixnum ipow(schemerlicht_fixnum base, schemerlicht_fixnum ex
   {
   if (exp < 0)
     return 0;
-  schemerlicht_fixnum result = 1;  
+  schemerlicht_fixnum result = 1;
   for (;;)
     {
     if (exp & 1)
@@ -8166,7 +8174,7 @@ void schemerlicht_primitive_open_input_file(schemerlicht_context* ctxt, int a, i
             schemerlicht_string_append(ctxt, &path, &fn->value.s);
             id->value.fx = cast(schemerlicht_fixnum, schemerlicht_open_input_file(path.string_ptr));
             schemerlicht_string_destroy(ctxt, &path);
-            if (id->value.fx>=0)
+            if (id->value.fx >= 0)
               break;
             }
           }
@@ -8618,17 +8626,17 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
       FILE* f = fopen(fn->value.s.string_ptr, "r");
       if (!f && ctxt->filenames_list.vector_size > 0)
         {
-        for (int i = cast(int, ctxt->filenames_list.vector_size-1); i >= 0; --i)
+        for (int i = cast(int, ctxt->filenames_list.vector_size - 1); i >= 0; --i)
           {
           schemerlicht_string* pathfile = schemerlicht_vector_at(&ctxt->filenames_list, cast(schemerlicht_memsize, i), schemerlicht_string);
-          int pos = cast(int, pathfile->string_length)-1;
-          while (pos >= 0 && pathfile->string_ptr[pos]!='/' && pathfile->string_ptr[pos] != '\\')
+          int pos = cast(int, pathfile->string_length) - 1;
+          while (pos >= 0 && pathfile->string_ptr[pos] != '/' && pathfile->string_ptr[pos] != '\\')
             --pos;
           schemerlicht_assert(pos < 0 || pathfile->string_ptr[pos] == '/' || pathfile->string_ptr[pos] == '\\');
           if (pos > 0)
             {
             schemerlicht_string path;
-            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr+pos+1);
+            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr + pos + 1);
             schemerlicht_string_append(ctxt, &path, &fn->value.s);
             f = fopen(path.string_ptr, "r");
             schemerlicht_string_destroy(ctxt, &path);
@@ -8758,7 +8766,7 @@ void schemerlicht_primitive_eval(schemerlicht_context* ctxt, int a, int b, int c
     int stack_offset = 2;
     void* store_stack_pointer = ctxt->stack.vector_ptr;
     if (eval_ctxt == ctxt)
-      {      
+      {
       while (schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object)->type != schemerlicht_object_type_blocking)
         ++stack_offset;
       ctxt->stack.vector_ptr = cast(void*, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + stack_offset);
@@ -8876,7 +8884,7 @@ void schemerlicht_primitive_file_exists(schemerlicht_context* ctxt, int a, int b
     if (schemerlicht_object_get_type(str) == schemerlicht_object_type_string)
       {
       int exists = schemerlicht_file_exists(str->value.s.string_ptr);
-      if (exists==0 && ctxt->filenames_list.vector_size > 0)
+      if (exists == 0 && ctxt->filenames_list.vector_size > 0)
         {
         for (int i = cast(int, ctxt->filenames_list.vector_size - 1); i >= 0; --i)
           {
@@ -9009,12 +9017,15 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
 
 ////////////////////////////////////////////////////
 
+void schemerlicht_call_primitive_inlined(schemerlicht_context* ctxt, schemerlicht_fixnum function_id, int a, int b, int c)
+  {
+#include "primswitch.h"
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum function_id, int a, int b, int c)
   {
-//#ifdef SCHEMERLICHT_USE_INLINES
-#ifdef SCHEMERLICHT_BLABLA
-#include "primswitch.h"
-#else
   switch (function_id)
     {
     case SCHEMERLICHT_ADD1:
@@ -9633,7 +9644,6 @@ void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum
       schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       break;
     }
-#endif
   }
 
 static void map_insert(schemerlicht_context* ctxt, schemerlicht_map* m, const char* str, int value)
