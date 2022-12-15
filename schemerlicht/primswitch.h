@@ -42,7 +42,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXADD1:
   {
 
@@ -80,7 +80,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLADD1:
   {
 
@@ -118,7 +118,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_SUB1:
   {
 
@@ -159,7 +159,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXSUB1:
   {
 
@@ -197,7 +197,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLSUB1:
   {
 
@@ -235,7 +235,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_ADD:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -328,7 +328,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXADD:
   {
 
@@ -370,7 +370,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLADD:
   {
 
@@ -412,7 +412,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_SUB:
   {
 
@@ -563,7 +563,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXSUB:
   {
 
@@ -628,7 +628,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLSUB:
   {
 
@@ -693,7 +693,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_MUL:
   {
 
@@ -815,7 +815,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXMUL:
   {
 
@@ -865,7 +865,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLMUL:
   {
 
@@ -915,7 +915,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_DIV:
   {
 
@@ -1075,7 +1075,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXDIV:
   {
 
@@ -1140,7 +1140,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLDIV:
   {
 
@@ -1205,7 +1205,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_EQUAL:
   {
 
@@ -1384,7 +1384,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FXEQUAL:
   {
 
@@ -1437,7 +1437,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLEQUAL:
   {
 
@@ -1490,7 +1490,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAREQUAL:
   {
 
@@ -1535,7 +1535,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARCIEQUAL:
   {
 
@@ -1580,7 +1580,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_NOT_EQUAL:
   {
 
@@ -1598,7 +1598,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_true;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_LESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -1768,7 +1768,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FXLESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -1806,7 +1806,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLLESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -1844,7 +1844,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARLESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -1874,7 +1874,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARCILESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -1904,7 +1904,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_GEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2074,7 +2074,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FXGEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2104,7 +2104,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FLGEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2134,7 +2134,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARGEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2164,7 +2164,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARCIGEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2194,7 +2194,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_GREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2364,7 +2364,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FXGREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2402,7 +2402,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLGREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2440,7 +2440,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARGREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2470,7 +2470,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARCIGREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2500,7 +2500,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_LEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2670,7 +2670,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FXLEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2700,7 +2700,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_FLLEQ:
   {
 
@@ -2731,7 +2731,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARLEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2761,7 +2761,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHARCILEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2791,7 +2791,7 @@ switch (function_id)
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_FIXNUM:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2815,7 +2815,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_FLONUM:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2839,7 +2839,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_NULL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -2864,7 +2864,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_ZERO:
   {
 
@@ -2901,7 +2901,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FXZERO:
   {
 
@@ -2934,7 +2934,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_FLZERO:
   {
 
@@ -2967,7 +2967,7 @@ switch (function_id)
   schemerlicht_set_object(ra, &ret);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_BOOLEAN:
   {
 
@@ -2992,7 +2992,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_CHAR:
   {
 
@@ -3017,7 +3017,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_NOT:
   {
 
@@ -3042,7 +3042,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FIXNUM_CHAR:
   {
 
@@ -3072,7 +3072,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FIXNUM_FLONUM:
   {
 
@@ -3107,7 +3107,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_FIXNUM:
   {
 
@@ -3137,7 +3137,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FLONUM_FIXNUM:
   {
 
@@ -3172,7 +3172,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_BITWISE_AND:
   {
 
@@ -3215,7 +3215,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_BITWISE_OR:
   {
 
@@ -3258,7 +3258,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_BITWISE_NOT:
   {
 
@@ -3288,7 +3288,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_BITWISE_XOR:
   {
 
@@ -3331,7 +3331,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_ARITHMETIC_SHIFT:
   {
 
@@ -3376,7 +3376,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_VECTOR:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -3395,7 +3395,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_VECTORREF:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -3429,7 +3429,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_VECTORSET:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -3454,7 +3454,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_VECTOR:
   {
 
@@ -3477,7 +3477,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_PAIR:
   {
 
@@ -3500,7 +3500,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CONS:
   {
 
@@ -3536,7 +3536,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_LIST:
   {
 
@@ -3576,7 +3576,7 @@ switch (function_id)
     schemerlicht_set_object(ra, heap_obj);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_CDR:
   {
 
@@ -3604,7 +3604,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CAR:
   {
 
@@ -3632,7 +3632,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_HALT:
   {
   UNUSED(c);
@@ -3640,18 +3640,26 @@ switch (function_id)
   UNUSED(a);
   UNUSED(ctxt);
   }
-  break;
+  return;
   case SCHEMERLICHT_CLOSURE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_CLOSURE);
-  schemerlicht_object v = make_schemerlicht_object_closure(ctxt, b);
   schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-  schemerlicht_set_object(heap_obj, &v);
+  *heap_obj = make_schemerlicht_object_closure(ctxt, b);
   ++ctxt->heap_pos;
+#if 1
   memcpy(heap_obj->value.v.vector_ptr, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + a + c + 1, b * sizeof(schemerlicht_object));
+#else
+  for (int j = 0; j < b; ++j)
+    {
+    schemerlicht_object* target = schemerlicht_vector_at(&heap_obj->value.v, j, schemerlicht_object);
+    const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, a + c + 1 + j, schemerlicht_object);
+    schemerlicht_set_object(target, source);
+    }
+#endif
 #ifdef SCHEMERLICHT_DEBUG
   schemerlicht_object* lambda = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
   if (schemerlicht_object_get_type(lambda) != schemerlicht_object_type_lambda)
@@ -3661,7 +3669,7 @@ switch (function_id)
 #endif
   schemerlicht_set_object(ra, heap_obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_CLOSUREREF:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -3705,7 +3713,7 @@ switch (function_id)
   UNUSED(b);
 #endif
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_CLOSURE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -3727,7 +3735,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_PROCEDURE:
   {
 
@@ -3750,7 +3758,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_MAKE_VECTOR:
   {
 
@@ -3792,7 +3800,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_MAKE_STRING:
   {
 
@@ -3831,7 +3839,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_VECTOR_LENGTH:
   {
 
@@ -3850,7 +3858,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_LENGTH:
   {
 
@@ -3869,7 +3877,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_REF:
   {
 
@@ -3906,7 +3914,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_SET:
   {
 
@@ -3932,7 +3940,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_HASH:
   {
 
@@ -3964,7 +3972,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_STRING:
   {
 
@@ -3987,7 +3995,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_EQ:
   {
 
@@ -4006,7 +4014,7 @@ switch (function_id)
   ret.type = result ? schemerlicht_object_type_true : schemerlicht_object_type_false;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_EQV:
   {
 
@@ -4025,7 +4033,7 @@ switch (function_id)
   ret.type = result ? schemerlicht_object_type_true : schemerlicht_object_type_false;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_EQUAL:
   {
 
@@ -4044,7 +4052,7 @@ switch (function_id)
   ret.type = result ? schemerlicht_object_type_true : schemerlicht_object_type_false;
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING:
   {
 
@@ -4069,7 +4077,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_TO_SYMBOL:
   {
 
@@ -4112,7 +4120,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_SYMBOL_TO_STRING:
   {
 
@@ -4148,7 +4156,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_LENGTH:
   {
 
@@ -4188,7 +4196,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_SET_CAR:
   {
 
@@ -4211,7 +4219,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_SET_CDR:
   {
 
@@ -4234,7 +4242,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_SYMBOL:
   {
 
@@ -4257,7 +4265,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_RECLAIM:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4272,7 +4280,7 @@ switch (function_id)
   schemerlicht_assert(0);
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_RECLAIM_GARBAGE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4287,7 +4295,7 @@ switch (function_id)
   schemerlicht_assert(0);
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_MEMV:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4326,7 +4334,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_MEMQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4365,7 +4373,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_MEMBER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4404,7 +4412,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_ASSV:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4435,7 +4443,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_ASSQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4466,7 +4474,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_ASSOC:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4497,7 +4505,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_APPEND:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4520,7 +4528,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_COPY:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4551,7 +4559,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_FILL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4579,7 +4587,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_VECTOR_FILL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4612,7 +4620,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_CURRENT_SECONDS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4626,7 +4634,7 @@ switch (function_id)
   UNUSED(c);
   UNUSED(b);
   }
-  break;
+  return;
   case SCHEMERLICHT_CURRENT_MILLISECONDS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4640,7 +4648,7 @@ switch (function_id)
   UNUSED(c);
   UNUSED(b);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_LIST:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4661,7 +4669,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_EQUAL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4684,7 +4692,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_LESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4724,7 +4732,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_GREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4764,7 +4772,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_LEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4781,7 +4789,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_true;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_GEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4798,7 +4806,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_true;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_CI_EQUAL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4833,7 +4841,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_CI_LESS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4873,7 +4881,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_CI_GREATER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4913,7 +4921,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_CI_LEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4930,7 +4938,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_true;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_CI_GEQ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4947,7 +4955,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_true;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_SUBSTRING:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -4979,7 +4987,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_MAX:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5112,7 +5120,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_MIN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5245,7 +5253,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &ret);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_APPLY:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5361,7 +5369,7 @@ switch (function_id)
       schemerlicht_object ret = *schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object); // return value is at position 1, as our fake continuation lambda is simply empty, which means: R0 == lambda itself, R1 == first lambda arg (which is return value)
       schemerlicht_set_object(ra, &ret);
       *continuation = original_continuation;
-      schemerlicht_vector_pop_back(&ctxt->gc_save_list);      
+      schemerlicht_vector_pop_back(&ctxt->gc_save_list);
       }
     else if (schemerlicht_object_get_type(op) == schemerlicht_object_type_lambda)
       {
@@ -5440,7 +5448,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_undefined;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_APPEND:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5493,7 +5501,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_EXACT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5512,7 +5520,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_INEXACT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5531,7 +5539,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_NUMBER:
   {  // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
@@ -5549,7 +5557,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_RATIONAL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5573,7 +5581,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_POSITIVE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5601,7 +5609,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_NEGATIVE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5629,7 +5637,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_ODD:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5660,7 +5668,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_EVEN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5691,7 +5699,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_COMPLEX:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5710,7 +5718,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_REAL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5729,7 +5737,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_INTEGER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5759,7 +5767,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_ABS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5787,7 +5795,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_QUOTIENT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5817,7 +5825,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_REMAINDER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5847,7 +5855,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_MODULO:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5879,7 +5887,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_GCD:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -5943,7 +5951,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_LCM:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6007,7 +6015,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FLOOR:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6036,7 +6044,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_CEILING:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6064,7 +6072,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_TRUNCATE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6092,7 +6100,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_ROUND:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6120,7 +6128,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_EXP:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6148,7 +6156,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_EXPT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6180,7 +6188,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_LOG:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6208,7 +6216,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_SIN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6236,7 +6244,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_COS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6264,7 +6272,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_TAN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6292,7 +6300,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_ASIN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6320,7 +6328,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_ACOS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6348,7 +6356,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_ATAN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6392,7 +6400,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_SQRT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6420,7 +6428,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_NUMBER_STRING:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6505,7 +6513,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_NUMBER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6553,7 +6561,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_NAN:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6579,7 +6587,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_INF:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6605,7 +6613,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_FINITE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6631,7 +6639,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &obj);
   }
-  break;
+  return;
   case SCHEMERLICHT_LIST_REF:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6713,7 +6721,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_LIST_TAIL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6774,7 +6782,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_REVERSE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6853,7 +6861,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_UPCASE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6876,7 +6884,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_DOWNCASE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6899,7 +6907,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_IS_UPPER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6923,7 +6931,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_IS_LOWER:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6947,7 +6955,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_IS_ALPHA:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6971,7 +6979,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_IS_NUMERIC:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -6995,7 +7003,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_CHAR_IS_WHITESPACE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7029,7 +7037,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_STRING_LIST:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7087,7 +7095,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_LIST_STRING:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7145,7 +7153,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_VECTOR_LIST:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7201,7 +7209,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_LIST_VECTOR:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7260,7 +7268,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_MAKE_PROMISE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7284,7 +7292,7 @@ switch (function_id)
   ++ctxt->heap_pos;
   schemerlicht_set_object(ra, &v);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_PROMISE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7306,7 +7314,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_SLOT_REF:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7340,7 +7348,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_SLOT_SET:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7365,7 +7373,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_MAKE_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7437,7 +7445,7 @@ switch (function_id)
     schemerlicht_set_object(ra, &v);
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7459,7 +7467,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_WRITE_CHAR:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7507,7 +7515,7 @@ switch (function_id)
     }
   ra->type = schemerlicht_object_type_void;
   }
-  break;
+  return;
   case SCHEMERLICHT_FLUSH_OUTPUT_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7536,7 +7544,7 @@ switch (function_id)
     }
   ra->type = schemerlicht_object_type_void;
   }
-  break;
+  return;
   case SCHEMERLICHT_READ_CHAR:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7569,7 +7577,7 @@ switch (function_id)
     schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read-char expects a port as argument.");
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_PEEK_CHAR:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7602,7 +7610,7 @@ switch (function_id)
     schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%peek-char expects a port as argument.");
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_INPUT_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7623,7 +7631,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_OUTPUT_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7644,7 +7652,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_OPEN_INPUT_FILE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7688,7 +7696,7 @@ switch (function_id)
             schemerlicht_string_append(ctxt, &path, &fn->value.s);
             id->value.fx = cast(schemerlicht_fixnum, schemerlicht_open_input_file(path.string_ptr));
             schemerlicht_string_destroy(ctxt, &path);
-            if (id->value.fx>=0)
+            if (id->value.fx >= 0)
               break;
             }
           }
@@ -7719,7 +7727,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_OPEN_OUTPUT_FILE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7774,7 +7782,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_CLOSE_INPUT_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7801,7 +7809,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_CLOSE_OUTPUT_PORT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7827,7 +7835,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_EOF:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7849,7 +7857,7 @@ switch (function_id)
     }
   schemerlicht_set_object(ra, &ret);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_CHAR_READY:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7886,7 +7894,7 @@ switch (function_id)
     schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%char-ready expects an input port as argument.");
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_WRITE:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -7960,7 +7968,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_DISPLAY:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8034,7 +8042,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_READ:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8075,7 +8083,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_LOAD:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8094,17 +8102,17 @@ switch (function_id)
       FILE* f = fopen(fn->value.s.string_ptr, "r");
       if (!f && ctxt->filenames_list.vector_size > 0)
         {
-        for (int i = cast(int, ctxt->filenames_list.vector_size-1); i >= 0; --i)
+        for (int i = cast(int, ctxt->filenames_list.vector_size - 1); i >= 0; --i)
           {
           schemerlicht_string* pathfile = schemerlicht_vector_at(&ctxt->filenames_list, cast(schemerlicht_memsize, i), schemerlicht_string);
-          int pos = cast(int, pathfile->string_length)-1;
-          while (pos >= 0 && pathfile->string_ptr[pos]!='/' && pathfile->string_ptr[pos] != '\\')
+          int pos = cast(int, pathfile->string_length) - 1;
+          while (pos >= 0 && pathfile->string_ptr[pos] != '/' && pathfile->string_ptr[pos] != '\\')
             --pos;
           schemerlicht_assert(pos < 0 || pathfile->string_ptr[pos] == '/' || pathfile->string_ptr[pos] == '\\');
           if (pos > 0)
             {
             schemerlicht_string path;
-            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr+pos+1);
+            schemerlicht_string_init_ranged(ctxt, &path, pathfile->string_ptr, pathfile->string_ptr + pos + 1);
             schemerlicht_string_append(ctxt, &path, &fn->value.s);
             f = fopen(path.string_ptr, "r");
             schemerlicht_string_destroy(ctxt, &path);
@@ -8205,7 +8213,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_EVAL:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8232,7 +8240,7 @@ switch (function_id)
     int stack_offset = 2;
     void* store_stack_pointer = ctxt->stack.vector_ptr;
     if (eval_ctxt == ctxt)
-      {      
+      {
       while (schemerlicht_vector_at(&ctxt->stack, stack_offset, schemerlicht_object)->type != schemerlicht_object_type_blocking)
         ++stack_offset;
       ctxt->stack.vector_ptr = cast(void*, cast(schemerlicht_object*, ctxt->stack.vector_ptr) + stack_offset);
@@ -8262,7 +8270,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_PUTENV:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8291,7 +8299,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_GETENV:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8327,7 +8335,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_FILE_EXISTS:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8344,7 +8352,7 @@ switch (function_id)
     if (schemerlicht_object_get_type(str) == schemerlicht_object_type_string)
       {
       int exists = schemerlicht_file_exists(str->value.s.string_ptr);
-      if (exists==0 && ctxt->filenames_list.vector_size > 0)
+      if (exists == 0 && ctxt->filenames_list.vector_size > 0)
         {
         for (int i = cast(int, ctxt->filenames_list.vector_size - 1); i >= 0; --i)
           {
@@ -8380,7 +8388,7 @@ switch (function_id)
       }
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_INTERACTION_ENVIRONMENT:
   {
   UNUSED(b);
@@ -8392,7 +8400,7 @@ switch (function_id)
   ra->type = schemerlicht_object_type_environment;
   ra->value.ptr = cast(void*, ctxt);
   }
-  break;
+  return;
   case SCHEMERLICHT_IS_ENVIRONMENT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8412,7 +8420,7 @@ switch (function_id)
     ra->type = schemerlicht_object_type_false;
     }
   }
-  break;
+  return;
   case SCHEMERLICHT_NULL_ENVIRONMENT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8437,7 +8445,7 @@ switch (function_id)
   schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
   ra->value.ptr = cast(void*, new_ctxt);
   }
-  break;
+  return;
   case SCHEMERLICHT_SCHEME_ENVIRONMENT:
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
@@ -8466,8 +8474,8 @@ switch (function_id)
   schemerlicht_vector_push_back(ctxt, &ctxt->environments, new_ctxt, schemerlicht_context*);
   ra->value.ptr = cast(void*, new_ctxt);
   }
-  break;
+  return;
   default:
     schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
-    break;
+    return;
   }

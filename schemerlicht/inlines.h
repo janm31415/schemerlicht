@@ -15,19 +15,15 @@ if ((b) == 2)
         case SCHEMERLICHT_CLOSUREREF:
         {
         schemerlicht_set_object(target, schemerlicht_vector_at(&arg1->value.v, arg2->value.fx, schemerlicht_object));
-        break;
+        continue;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-          break;
+          goto slow_lane;          
         }
-      break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }
     case schemerlicht_object_type_fixnum:
     {
@@ -43,21 +39,21 @@ if ((b) == 2)
         {
         target->value.fx = arg1->value.fx + arg2->value.fx;
         target->type = schemerlicht_object_type_fixnum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_SUB:
         case SCHEMERLICHT_FXSUB:
         {
         target->value.fx = arg1->value.fx - arg2->value.fx;
         target->type = schemerlicht_object_type_fixnum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_MUL:
         case SCHEMERLICHT_FXMUL:
         {
         target->value.fx = arg1->value.fx * arg2->value.fx;
         target->type = schemerlicht_object_type_fixnum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_DIV:
         case SCHEMERLICHT_FXDIV:
@@ -69,54 +65,50 @@ if ((b) == 2)
           target->value.fx = arg1->value.fx / arg2->value.fx;
           target->type = schemerlicht_object_type_fixnum;
           }
-        break;
+        continue;
         }
         case SCHEMERLICHT_NOT_EQUAL:
         {
         target->type = (arg1->value.fx != arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_EQUAL:
         case SCHEMERLICHT_FXEQUAL:
         {
         target->type = (arg1->value.fx == arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_LESS:
         case SCHEMERLICHT_FXLESS:
         {
         target->type = (arg1->value.fx < arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_GREATER:
         case SCHEMERLICHT_FXGREATER:
         {
         target->type = (arg1->value.fx > arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_LEQ:
         case SCHEMERLICHT_FXLEQ:
         {
         target->type = (arg1->value.fx <= arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_GEQ:
         case SCHEMERLICHT_FXGEQ:
         {
         target->type = (arg1->value.fx >= arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-          break;
+          goto slow_lane;          
         }
-      break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }
     case schemerlicht_object_type_flonum:
     {
@@ -132,75 +124,71 @@ if ((b) == 2)
         {
         target->value.fl = arg1->value.fl + arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_SUB:
         case SCHEMERLICHT_FLSUB:
         {
         target->value.fl = arg1->value.fl - arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_MUL:
         case SCHEMERLICHT_FLMUL:
         {
         target->value.fl = arg1->value.fl * arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_DIV:
         case SCHEMERLICHT_FLDIV:
         {
         target->value.fl = arg1->value.fl / arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
-        break;
+        continue;
         }
         case SCHEMERLICHT_NOT_EQUAL:
         {
         target->type = (arg1->value.fl != arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_EQUAL:
         case SCHEMERLICHT_FLEQUAL:
         {
         target->type = (arg1->value.fl == arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_LESS:
         case SCHEMERLICHT_FLLESS:
         {
         target->type = (arg1->value.fl < arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_GREATER:
         case SCHEMERLICHT_FLGREATER:
         {
         target->type = (arg1->value.fl > arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_LEQ:
         case SCHEMERLICHT_FLLEQ:
         {
         target->type = (arg1->value.fl <= arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         case SCHEMERLICHT_GEQ:
         case SCHEMERLICHT_FLGEQ:
         {
         target->type = (arg1->value.fl >= arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-        break;
+        continue;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-          break;
+          goto slow_lane;          
         }
-      break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }    
     case schemerlicht_object_type_vector:
     {
@@ -221,19 +209,15 @@ if ((b) == 2)
           {
           target->type = schemerlicht_object_type_undefined;
           }
-        break;
+        continue;
         }
         default:
-          schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-          break;
+          goto slow_lane;          
         }
-      break;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }
     case schemerlicht_object_type_pair:
     {
@@ -243,23 +227,20 @@ if ((b) == 2)
       {
       const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
       schemerlicht_set_object(schemerlicht_vector_at(&arg1->value.v, 0, schemerlicht_object), arg2);
-      break;
+      continue;
       }
       case SCHEMERLICHT_SET_CDR:
       {
       const schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, (a)+(c)+2, schemerlicht_object);
       schemerlicht_set_object(schemerlicht_vector_at(&arg1->value.v, 1, schemerlicht_object), arg2);
-      break;
+      continue;
       }
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }
     default:
-      schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-      break;
+      goto slow_lane;      
     }
   }
 else if ((b) == 1)
@@ -273,15 +254,13 @@ else if ((b) == 1)
       {
       case SCHEMERLICHT_CAR:
         schemerlicht_set_object(target, schemerlicht_vector_at(&arg1->value.v, 0, schemerlicht_object));
-        break;
+        continue;
       case SCHEMERLICHT_CDR:
         schemerlicht_set_object(target, schemerlicht_vector_at(&arg1->value.v, 1, schemerlicht_object));
-        break;
+        continue;
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }
     case schemerlicht_object_type_flonum:
     {
@@ -290,60 +269,58 @@ else if ((b) == 1)
       case SCHEMERLICHT_FLOOR:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = floor(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_CEILING:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = ceil(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_TRUNCATE:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = trunc(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_ROUND:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = round(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_EXP:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = exp(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_LOG:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = log(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_SIN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = sin(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_COS:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = cos(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_TAN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = tan(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_ASIN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = asin(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_ACOS:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = acos(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_ATAN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = atan(arg1->value.fl);
-        break;
+        continue;
       case SCHEMERLICHT_SQRT:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = sqrt(arg1->value.fl);
-        break;
+        continue;
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }    
     case schemerlicht_object_type_fixnum:
     {
@@ -352,67 +329,61 @@ else if ((b) == 1)
       case SCHEMERLICHT_FLOOR:
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx;
-        break;
+        continue;
       case SCHEMERLICHT_CEILING:
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx;
-        break;
+        continue;
       case SCHEMERLICHT_TRUNCATE:
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx;
-        break;
+        continue;
       case SCHEMERLICHT_ROUND:
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx;
-        break;
+        continue;
       case SCHEMERLICHT_EXP:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = exp(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_LOG:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = log(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_SIN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = sin(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_COS:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = cos(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_TAN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = tan(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_ASIN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = asin(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_ACOS:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = acos(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_ATAN:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = atan(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       case SCHEMERLICHT_SQRT:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = sqrt(cast(schemerlicht_flonum, arg1->value.fx));
-        break;
+        continue;
       default:
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-        break;
+        goto slow_lane;        
       }
-    break;
     }
     default:
-      schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-      break;
+      goto slow_lane;      
     }
   }
-else
-  {
-  schemerlicht_call_primitive(ctxt, function_id, a, b, c);
-  }
+slow_lane:

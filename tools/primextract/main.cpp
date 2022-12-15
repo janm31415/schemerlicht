@@ -3,6 +3,14 @@
 #include <fstream>
 #include <sstream>
 
+//#define USE_CONTINUE
+
+#ifdef USE_CONTINUE
+#define PRIMEXTRACTFILENAME "primswitch2"
+#else
+#define PRIMEXTRACTFILENAME "primswitch"
+#endif
+
 void read_file(std::ostream& ostr, const char* filename)
   {
   std::ifstream t(filename);
@@ -184,9 +192,16 @@ void parse_file(const std::string& str, const std::string& folder)
         std::cout << prim_content << std::endl;
         //write_to_file(state.current_prim_name, prim_content, folder);
         large_switch << "  case " << state.current_prim_enum << ":\n  ";
-        //replace_in_string(prim_content, "return;", "goto stop;");
+#ifdef USE_CONTINUE
+        replace_in_string(prim_content, "return;", "goto stop;");
+#endif
         large_switch << prim_content;
-        large_switch << "\n  break;\n";
+        //large_switch << "\n  break;\n";
+#ifdef USE_CONTINUE
+        large_switch << "\n  continue;\n";
+#else
+        large_switch << "\n  return;\n";
+#endif
         state.action = parse_action::FINDING_PRIMITIVE;
         state.current_prim_enum.clear();
         state.current_prim_name.clear();
@@ -293,10 +308,18 @@ void parse_file(const std::string& str, const std::string& folder)
   treat_buffer(buff, state);
   large_switch << "  default:\n";
   large_switch << "    schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);\n";
-  large_switch << "    break;\n";
+  //large_switch << "    break;\n";
+#ifdef USE_CONTINUE
+  large_switch << "    continue;\n";
+#else
+  large_switch << "    return;\n";
+#endif
   large_switch << "  }\n";
+#ifdef USE_CONTINUE
+  large_switch << "stop: continue;\n";
+#endif
   std::string large_switch_content = large_switch.str();
-  write_to_file("primswitch", large_switch_content, folder);
+  write_to_file(PRIMEXTRACTFILENAME, large_switch_content, folder);
   }
 
 int main(int argc, char** argv)
@@ -304,7 +327,7 @@ int main(int argc, char** argv)
   if (argc < 3)
     {
     printf("Usage: primextract <primitives.c> <folder>");
-    printf("Output is the file primswitch.h which contains a large switch with all primitives inlined.");
+    printf("Output is the file %s.h which contains a large switch with all primitives inlined.", PRIMEXTRACTFILENAME);
     }
   else
     {
