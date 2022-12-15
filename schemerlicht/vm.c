@@ -13,7 +13,7 @@
 #include <string.h>
 #include <math.h>
 
-#if 1
+#if 0
 #include "object.h"
 #include "func.h"
 #include "syscalls.h"
@@ -400,11 +400,10 @@ static schemerlicht_string debug_object_to_string(schemerlicht_context* ctxt, sc
 schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_function* fun)
   {
   schemerlicht_assert(fun != NULL);
-  const schemerlicht_instruction* pc = schemerlicht_vector_begin(&(fun)->code, schemerlicht_instruction);
-  const schemerlicht_instruction* pc_end = schemerlicht_vector_end(&(fun)->code, schemerlicht_instruction);
+  const schemerlicht_instruction* pc = schemerlicht_vector_begin(&(fun)->code, schemerlicht_instruction);  
   while (1)
     {
-    schemerlicht_assert(pc < pc_end);
+    schemerlicht_assert(pc < schemerlicht_vector_end(&(fun)->code, schemerlicht_instruction));
 #ifdef SCHEMERLICHT_CHECK_HEAP_OVERFLOW
     if (ctxt->heap_pos >= ctxt->raw_heap.vector_size / 2)
       {
@@ -428,7 +427,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
 #else
       memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr)+a, ((schemerlicht_object*)ctxt->stack.vector_ptr) + b, sizeof(schemerlicht_object));
 #endif
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_MOVETOP:
       {
@@ -446,7 +445,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         }
       schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
       blocking->type = schemerlicht_object_type_blocking;
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_LOADGLOBAL:
       {
@@ -459,7 +458,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
 #else
       memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr) + a, ((schemerlicht_object*)ctxt->globals.vector_ptr) + bx, sizeof(schemerlicht_object));
 #endif
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_STOREGLOBAL:
       {
@@ -472,7 +471,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
 #else
       memcpy(((schemerlicht_object*)ctxt->globals.vector_ptr) + bx, ((schemerlicht_object*)ctxt->stack.vector_ptr) + a, sizeof(schemerlicht_object));
 #endif
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_LOADK:
       {
@@ -492,7 +491,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         schemerlicht_set_object(target, k);
         }
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_SETFIXNUM:
       {
@@ -501,7 +500,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_sBx(instruc);
       target->type = schemerlicht_object_type_fixnum;
       target->value.fx = b;
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_SETPRIM:
       {
@@ -510,7 +509,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_B(instruc);
       target->type = schemerlicht_object_type_primitive;
       target->value.fx = b;
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_SETPRIMOBJ:
       {
@@ -519,7 +518,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_B(instruc);
       target->type = schemerlicht_object_type_primitive_object;
       target->value.fx = b;
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_SETCHAR:
       {
@@ -528,20 +527,20 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_B(instruc);
       target->type = schemerlicht_object_type_char;
       target->value.ch = cast(schemerlicht_byte, b);
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_SETTYPE:
       {
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(instruc), schemerlicht_object);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
       target->type = b;
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_CALL:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
-      int b = SCHEMERLICHT_GETARG_B(instruc);
-      int c = SCHEMERLICHT_GETARG_C(instruc);
+      const int b = SCHEMERLICHT_GETARG_B(instruc);
+      const int c = SCHEMERLICHT_GETARG_C(instruc);
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       if (schemerlicht_object_get_type(target) == schemerlicht_object_type_unassigned)
         {
@@ -557,11 +556,10 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
 #ifdef SCHEMERLICHT_USE_INLINES  
         #include "inlines.h"
         schemerlicht_call_primitive_inlined(ctxt, function_id, a, b, c);
-        //#include "primswitch2.h"
 #else
         schemerlicht_call_primitive(ctxt, function_id, a, b, c);
 #endif
-        break;
+        continue;
         }
         case schemerlicht_object_type_primitive_object:
         {
@@ -579,20 +577,18 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
           const schemerlicht_object* lambda_obj = schemerlicht_vector_at(&continuation.value.v, 0, schemerlicht_object);
           schemerlicht_assert(schemerlicht_object_get_type(lambda_obj) == schemerlicht_object_type_lambda);
           schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
-          pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
-          pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
+          pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);          
           fun = lambda;
           }
         else
           {
           schemerlicht_assert(schemerlicht_object_get_type(&continuation) == schemerlicht_object_type_lambda);
           schemerlicht_function* lambda = cast(schemerlicht_function*, continuation.value.ptr);
-          pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
-          pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
+          pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);          
           fun = lambda;
           }
         schemerlicht_check_garbage_collection(ctxt);
-        break;
+        continue;
         }
         case schemerlicht_object_type_closure:
         {
@@ -602,21 +598,19 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         schemerlicht_function* lambda = cast(schemerlicht_function*, lambda_obj->value.ptr);
         //at R(0) we expect the closure (i.e. target) but this already so by compile_funcall
         //schemerlicht_set_object(schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object), target); 
-        pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
-        pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
+        pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);        
         fun = lambda;
         schemerlicht_check_garbage_collection(ctxt);
-        break;
+        continue;
         }
         case schemerlicht_object_type_lambda:
         {
         schemerlicht_assert(a == 0); // closures restart the stack
         schemerlicht_function* lambda = cast(schemerlicht_function*, target->value.ptr);
-        pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);
-        pc_end = schemerlicht_vector_end(&lambda->code, schemerlicht_instruction);
+        pc = schemerlicht_vector_begin(&lambda->code, schemerlicht_instruction);        
         fun = lambda;
         schemerlicht_check_garbage_collection(ctxt);
-        break;
+        continue;
         }
         default:
         {
@@ -639,7 +633,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
           schemerlicht_string_destroy(ctxt, &tmp);
           }
         schemerlicht_runtime_error(ctxt, SCHEMERLICHT_ERROR_INVALID_ARGUMENT, -1, -1, &error_message);
-        pc = pc_end;
+        return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
         }
         }
       break;
@@ -660,7 +654,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         const int offset = SCHEMERLICHT_GETARG_sBx(next_i);
         pc += offset;
         }
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_LIST_STACK:
       {
@@ -673,7 +667,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         rx = schemerlicht_vector_at(&ctxt->stack, x, schemerlicht_object);
         }
       make_variable_arity_list(ctxt, a, x - a);
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_CALL_FOREIGN:
       {
@@ -687,13 +681,13 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       //schemerlicht_assert(ext->arguments.vector_size == cast(schemerlicht_memsize, b));
       schemerlicht_object result = schemerlicht_call_external(ctxt, ext, a + 1, b);
       schemerlicht_set_object(ra, &result);
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_JMP:
       {
       const int sbx = SCHEMERLICHT_GETARG_sBx(instruc);
       pc += sbx;
-      break;
+      continue;
       }
       case SCHEMERLICHT_OPCODE_RETURN:
       {
@@ -710,16 +704,14 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         }
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
       stack_to_block->type = schemerlicht_object_type_blocking;
-      //pc = pc_end;
       schemerlicht_check_garbage_collection(ctxt);
       return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
-      //break;
       }
-      default:
-        schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
+      //default:
+      //  schemerlicht_throw(ctxt, SCHEMERLICHT_ERROR_NOT_IMPLEMENTED);
       }
     }
-  return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  //return schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
   }
 
 schemerlicht_string schemerlicht_fun_to_string(schemerlicht_context* ctxt, schemerlicht_function* fun)
