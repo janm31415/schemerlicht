@@ -79,7 +79,7 @@ struct parse_state
   std::string current_prim_enum;
   const char* first_brace;
   std::vector<std::string> enum_values;
-  std::vector<std::pair<std::string, std::string>> primitive_pairs;
+  std::vector<std::pair<std::string, std::string> > primitive_pairs;
   };
 
 void treat_buffer(std::string& buff, parse_state& state)
