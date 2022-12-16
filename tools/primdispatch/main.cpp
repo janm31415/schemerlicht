@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 void read_file(std::ostream& ostr, const char* filename)
   {
