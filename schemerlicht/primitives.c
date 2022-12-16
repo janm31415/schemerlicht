@@ -9017,6 +9017,15 @@ void schemerlicht_primitive_scheme_environment(schemerlicht_context* ctxt, int a
 
 ////////////////////////////////////////////////////
 
+#include "primdispatch.h"
+
+void schemerlicht_call_primitive_dispatch(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c)
+  {
+  (*prim_fun_dispatch_table[prim_id])(ctxt, a, b, c);
+  }
+
+////////////////////////////////////////////////////
+
 void schemerlicht_call_primitive_inlined(schemerlicht_context* ctxt, schemerlicht_fixnum function_id, int a, int b, int c)
   {
 #include "primswitch.h"

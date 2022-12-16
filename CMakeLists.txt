@@ -15,5 +15,8 @@ add_subdirectory(schemerlicht)
 add_subdirectory(schemerlicht.tests)
 add_subdirectory(schemerlicht.repl)
 add_subdirectory(tools/primextract)
+add_subdirectory(tools/primdispatch)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_target_properties (primextract PROPERTIES FOLDER tools)
+set_target_properties (primdispatch PROPERTIES FOLDER tools)

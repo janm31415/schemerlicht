@@ -555,16 +555,16 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES  
         #include "inlines.h"
-        schemerlicht_call_primitive_inlined(ctxt, function_id, a, b, c);
+        schemerlicht_call_primitive_dispatch(ctxt, function_id, a, b, c);
 #else
-        schemerlicht_call_primitive(ctxt, function_id, a, b, c);
+        schemerlicht_call_primitive_dispatch(ctxt, function_id, a, b, c);
 #endif
         continue;
         }
         case schemerlicht_object_type_primitive_object:
         {
         const schemerlicht_fixnum function_id = target->value.fx;
-        schemerlicht_call_primitive_inlined(ctxt, function_id, a, b - 1, c + 1);       
+        schemerlicht_call_primitive_dispatch(ctxt, function_id, a, b - 1, c + 1);
         schemerlicht_object continuation = *schemerlicht_vector_at(&ctxt->stack, a + 1, schemerlicht_object);
         schemerlicht_assert(schemerlicht_object_get_type(&continuation) == schemerlicht_object_type_closure || schemerlicht_object_get_type(&continuation) == schemerlicht_object_type_lambda);
         schemerlicht_object result_of_prim_call = *schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
