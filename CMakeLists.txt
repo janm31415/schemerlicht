@@ -6,7 +6,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
 set(CMAKE_PDB_OUTPUT_DIRECTORY     "${CMAKE_CURRENT_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
-set(schemerlicht_modules_path "${CMAKE_CURRENT_SOURCE_DIR}/scm/")
+set(SCHEMERLICHT_MODULES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scm/" CACHE STRING "Provide the location of your Scheme library folder")
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/schemerlicht/modulesconf.h.in"
                "${CMAKE_CURRENT_SOURCE_DIR}/schemerlicht/modulesconf.h" @ONLY)
