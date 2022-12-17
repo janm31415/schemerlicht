@@ -556,7 +556,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES  
-        //#include "inlines.h"
+        #include "inlines.h"
         //schemerlicht_call_primitive_dispatch(ctxt, function_id, a, b, c);
         (*prim_fun_dispatch_table[function_id])(ctxt, a, b, c);
 //#include "primswitch2.h"
