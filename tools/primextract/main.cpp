@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-//#define USE_CONTINUE
+#define USE_CONTINUE
 
 void read_file(std::ostream& ostr, const char* filename)
   {

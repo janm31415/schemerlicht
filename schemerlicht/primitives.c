@@ -1278,8 +1278,8 @@ void schemerlicht_primitive_equal(schemerlicht_context* ctxt, int a, int b, int 
   {
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
-  //schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
-  //schemerlicht_assert(ra->value.fx == SCHEMERLICHT_EQUAL);
+  schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
+  schemerlicht_assert(ra->value.fx == SCHEMERLICHT_EQUAL);
   switch (b)
     {
     case 0:
@@ -1334,7 +1334,7 @@ void schemerlicht_primitive_equal(schemerlicht_context* ctxt, int a, int b, int 
           {
           if (first_arg->value.fx != arg->value.fx)
             {
-            ra->type = schemerlicht_object_type_false;            
+            ra->type = schemerlicht_object_type_false;
             return;
             }
           break;
@@ -1453,8 +1453,8 @@ void schemerlicht_primitive_equal(schemerlicht_context* ctxt, int a, int b, int 
       break;
       }
       default:
-      {      
-      ra->type = schemerlicht_object_type_undefined;      
+      {
+      ra->type = schemerlicht_object_type_undefined;
       return;
       }
       }
@@ -1467,111 +1467,81 @@ void schemerlicht_primitive_equal(schemerlicht_context* ctxt, int a, int b, int 
 
 void schemerlicht_primitive_fxequal(schemerlicht_context* ctxt, int a, int b, int c)
   {
-
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FXEQUAL);
-#if 1
-  if (b == 0)
+  switch (b)
     {
-    schemerlicht_object ret;
-    ret.type = schemerlicht_object_type_true;
-    schemerlicht_set_object(ra, &ret);
+    case 0:
+    case 1:
+    {
+    ra->type = schemerlicht_object_type_true;
     return;
     }
-  schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_fixnum)
+    case 2:
     {
-    schemerlicht_object ret;
-    ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_set_object(ra, &ret);
+    schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+    ra->type = (arg1->value.fx == arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
     return;
     }
-  for (int j = 1; j < b; ++j)
+    default:
     {
-    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
-    if (schemerlicht_object_get_type(arg) != schemerlicht_object_type_fixnum)
+    schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    for (int j = 1; j < b; ++j)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
+      schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+      if (first_arg->value.fx != arg->value.fx)
+        {
+        ra->type = schemerlicht_object_type_false;
+        return;
+        }
       }
-    if (first_arg->value.fx != arg->value.fx)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
+    ra->type = schemerlicht_object_type_true;
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
-#else
-  schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-  schemerlicht_object ret;
-  ret.type = arg0->value.fx == arg1->value.fx ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-  schemerlicht_set_object(ra, &ret);
-#endif
+    }
   }
 
 ////////////////////////////////////////////////////
 
 void schemerlicht_primitive_flequal(schemerlicht_context* ctxt, int a, int b, int c)
   {
-
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FLEQUAL);
-#if 1
-  if (b == 0)
+  switch (b)
     {
-    schemerlicht_object ret;
-    ret.type = schemerlicht_object_type_true;
-    schemerlicht_set_object(ra, &ret);
+    case 0:
+    case 1:
+    {
+    ra->type = schemerlicht_object_type_true;
     return;
     }
-  schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_flonum)
+    case 2:
     {
-    schemerlicht_object ret;
-    ret.type = schemerlicht_object_type_undefined;
-    schemerlicht_set_object(ra, &ret);
+    schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+    ra->type = (arg1->value.fl == arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
     return;
     }
-  for (int j = 1; j < b; ++j)
+    default:
     {
-    schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
-    if (schemerlicht_object_get_type(arg) != schemerlicht_object_type_flonum)
+    schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    for (int j = 1; j < b; ++j)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
+      schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+      if (first_arg->value.fl != arg->value.fl)
+        {
+        ra->type = schemerlicht_object_type_false;
+        return;
+        }
       }
-    if (first_arg->value.fl != arg->value.fl)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
+    ra->type = schemerlicht_object_type_true;
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
-#else
-  schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-  schemerlicht_object ret;
-  ret.type = arg0->value.fl == arg1->value.fl ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-  schemerlicht_set_object(ra, &ret);
-#endif
-      }
+    }
+  }
 
 ////////////////////////////////////////////////////
 
@@ -1588,7 +1558,7 @@ void schemerlicht_primitive_charequal(schemerlicht_context* ctxt, int a, int b, 
     ret.type = schemerlicht_object_type_true;
     schemerlicht_set_object(ra, &ret);
     return;
-    }
+  }
   schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
   if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_char)
     {
@@ -1680,19 +1650,190 @@ void schemerlicht_primitive_charciequal(schemerlicht_context* ctxt, int a, int b
 
 void schemerlicht_primitive_not_equal(schemerlicht_context* ctxt, int a, int b, int c)
   {
-
   // R(A) := R(A)(R(A+1+C), ... ,R(A+B+C)) */
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_NOT_EQUAL);
-  schemerlicht_primitive_equal(ctxt, a, b, c);
-  if (schemerlicht_object_get_type(ra) == schemerlicht_object_type_true)
+  switch (b)
     {
+    case 0:
+    case 1:
+      ra->type = schemerlicht_object_type_false;
+      return;
+    case 2:
+    {
+    schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    schemerlicht_object* arg2 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
+    if (arg1->type == arg2->type)
+      {
+      switch (arg1->type)
+        {
+        case schemerlicht_object_type_fixnum:
+        {
+        ra->type = (arg1->value.fx != arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
+        return;
+        }
+        case schemerlicht_object_type_flonum:
+        {
+        ra->type = (arg1->value.fl != arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
+        return;
+        }
+        case schemerlicht_object_type_char:
+        {
+        ra->type = (arg1->value.ch != arg2->value.ch) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
+        return;
+        }
+        default:
+        {
+        ra->type = schemerlicht_object_type_undefined;
+        return;
+        }
+        }
+      }
+    // if not similar types, fall back to default behaviour
+    }
+    default:
+    {
+    schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
+    switch (schemerlicht_object_get_type(first_arg))
+      {
+      case schemerlicht_object_type_fixnum:
+      {
+      for (int j = 1; j < b; ++j)
+        {
+        schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+        switch (schemerlicht_object_get_type(arg))
+          {
+          case schemerlicht_object_type_fixnum:
+          {
+          if (first_arg->value.fx != arg->value.fx)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          case schemerlicht_object_type_flonum:
+          {
+          if (first_arg->value.fx != arg->value.fl)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          case schemerlicht_object_type_char:
+          {
+          if (first_arg->value.fx != arg->value.ch)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          default:
+          {
+          ra->type = schemerlicht_object_type_undefined;
+          return;
+          }
+          }
+        }
+      break;
+      }
+      case schemerlicht_object_type_flonum:
+      {
+      for (int j = 1; j < b; ++j)
+        {
+        schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+        switch (schemerlicht_object_get_type(arg))
+          {
+          case schemerlicht_object_type_fixnum:
+          {
+          if (first_arg->value.fl != arg->value.fx)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          case schemerlicht_object_type_flonum:
+          {
+          if (first_arg->value.fl != arg->value.fl)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          case schemerlicht_object_type_char:
+          {
+          if (first_arg->value.fl != arg->value.ch)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          default:
+          {
+          ra->type = schemerlicht_object_type_undefined;
+          return;
+          }
+          }
+        }
+      break;
+      }
+      case schemerlicht_object_type_char:
+      {
+      for (int j = 1; j < b; ++j)
+        {
+        schemerlicht_object* arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
+        switch (schemerlicht_object_get_type(arg))
+          {
+          case schemerlicht_object_type_fixnum:
+          {
+          if (first_arg->value.ch != arg->value.fx)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          case schemerlicht_object_type_flonum:
+          {
+          if (first_arg->value.ch != arg->value.fl)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          case schemerlicht_object_type_char:
+          {
+          if (first_arg->value.ch != arg->value.ch)
+            {
+            ra->type = schemerlicht_object_type_true;
+            return;
+            }
+          break;
+          }
+          default:
+          {
+          ra->type = schemerlicht_object_type_undefined;
+          return;
+          }
+          }
+        }
+      break;
+      }
+      default:
+      {
+      ra->type = schemerlicht_object_type_undefined;
+      return;
+      }
+      }
     ra->type = schemerlicht_object_type_false;
     }
-  else if (schemerlicht_object_get_type(ra) == schemerlicht_object_type_false)
-    {
-    ra->type = schemerlicht_object_type_true;
     }
   }
 
@@ -1717,10 +1858,8 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fx >= second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -1729,9 +1868,7 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.fx >= second_arg->value.fl)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
@@ -1740,18 +1877,14 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.fx >= second_arg->value.ch)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
         }
         default:
         {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        ra->type = schemerlicht_object_type_undefined;
         return;
         }
 
@@ -1760,16 +1893,13 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
       }
       case schemerlicht_object_type_flonum:
       {
-
       switch (schemerlicht_object_get_type(second_arg))
         {
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fl >= second_arg->value.fx)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
@@ -1778,9 +1908,7 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.fl >= second_arg->value.fl)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
@@ -1789,18 +1917,14 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.fl >= second_arg->value.ch)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
         }
         default:
         {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        ra->type = schemerlicht_object_type_undefined;
         return;
         }
 
@@ -1815,9 +1939,7 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.ch >= second_arg->value.fx)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
@@ -1826,9 +1948,7 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.ch >= second_arg->value.fl)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
@@ -1837,18 +1957,14 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
         {
         if (first_arg->value.ch >= second_arg->value.ch)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;
           return;
           }
         break;
         }
         default:
         {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        ra->type = schemerlicht_object_type_undefined;
         return;
         }
         }
@@ -1856,16 +1972,12 @@ void schemerlicht_primitive_less(schemerlicht_context* ctxt, int a, int b, int c
       }
       default:
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
+      ra->type = schemerlicht_object_type_undefined;
       return;
       }
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+  ra->type = schemerlicht_object_type_true;
   }
 
 ////////////////////////////////////////////////////
@@ -1876,36 +1988,17 @@ void schemerlicht_primitive_fxless(schemerlicht_context* ctxt, int a, int b, int
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FXLESS);
-#if 1
   for (int j = 0; j < b - 1; ++j)
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_fixnum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_fixnum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fx >= second_arg->value.fx)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      {      
+      ra->type = schemerlicht_object_type_false;      
       return;
       }
-    }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
-#else
-  schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-  schemerlicht_object ret;
-  ret.type = arg0->value.fx < arg1->value.fx ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-  schemerlicht_set_object(ra, &ret);
-#endif
+    }  
+  ra->type = schemerlicht_object_type_true;  
   }
 
 ////////////////////////////////////////////////////
@@ -1916,37 +2009,18 @@ void schemerlicht_primitive_flless(schemerlicht_context* ctxt, int a, int b, int
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FLLESS);
-#if 1
   for (int j = 0; j < b - 1; ++j)
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_flonum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_flonum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fl >= second_arg->value.fl)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      ra->type = schemerlicht_object_type_false;
       return;
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
-#else
-  schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-  schemerlicht_object ret;
-  ret.type = arg0->value.fl < arg1->value.fl ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-  schemerlicht_set_object(ra, &ret);
-#endif
-      }
+  ra->type = schemerlicht_object_type_true;
+  }
 
 ////////////////////////////////////////////////////
 
@@ -1974,7 +2048,7 @@ void schemerlicht_primitive_charless(schemerlicht_context* ctxt, int a, int b, i
       schemerlicht_set_object(ra, &ret);
       return;
       }
-    }
+  }
   schemerlicht_object ret;
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
@@ -2033,10 +2107,8 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fx < second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2044,10 +2116,8 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.fx < second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2055,19 +2125,15 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.fx < second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
 
@@ -2082,10 +2148,8 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fl < second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2093,10 +2157,8 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.fl < second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2104,22 +2166,17 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.fl < second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
-
         }
       break;
       }
@@ -2130,10 +2187,8 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.ch < second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2141,10 +2196,8 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.ch < second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2152,36 +2205,28 @@ void schemerlicht_primitive_geq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.ch < second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
         }
       break;
       }
       default:
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
+      {      
+      ra->type = schemerlicht_object_type_undefined;      
       return;
       }
       }
-    }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+    }  
+  ra->type = schemerlicht_object_type_true;  
   }
 
 ////////////////////////////////////////////////////
@@ -2196,24 +2241,13 @@ void schemerlicht_primitive_fxgeq(schemerlicht_context* ctxt, int a, int b, int 
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_fixnum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_fixnum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fx < second_arg->value.fx)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      {      
+      ra->type = schemerlicht_object_type_false;      
       return;
       }
-    }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+    }  
+  ra->type = schemerlicht_object_type_true;  
   }
 
 ////////////////////////////////////////////////////
@@ -2228,24 +2262,13 @@ void schemerlicht_primitive_flgeq(schemerlicht_context* ctxt, int a, int b, int 
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_flonum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_flonum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fl < second_arg->value.fl)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      ra->type = schemerlicht_object_type_false;
       return;
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+  ra->type = schemerlicht_object_type_true;
   }
 
 ////////////////////////////////////////////////////
@@ -2333,10 +2356,8 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fx <= second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2344,10 +2365,8 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.fx <= second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2355,19 +2374,15 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.fx <= second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
 
@@ -2382,10 +2397,8 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fl <= second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2393,10 +2406,8 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.fl <= second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2404,19 +2415,15 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.fl <= second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
 
@@ -2430,10 +2437,8 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.ch <= second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2441,10 +2446,8 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.ch <= second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2452,36 +2455,28 @@ void schemerlicht_primitive_greater(schemerlicht_context* ctxt, int a, int b, in
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.ch <= second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
         }
       break;
       }
       default:
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
+      {      
+      ra->type = schemerlicht_object_type_undefined;      
       return;
       }
       }
-    }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+    }  
+  ra->type = schemerlicht_object_type_true;
   }
 
 ////////////////////////////////////////////////////
@@ -2492,36 +2487,17 @@ void schemerlicht_primitive_fxgreater(schemerlicht_context* ctxt, int a, int b, 
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FXGREATER);
-#if 1
   for (int j = 0; j < b - 1; ++j)
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_fixnum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_fixnum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fx <= second_arg->value.fx)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      {      
+      ra->type = schemerlicht_object_type_false;      
       return;
       }
-    }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
-#else
-  schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-  schemerlicht_object ret;
-  ret.type = arg0->value.fx > arg1->value.fx ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-  schemerlicht_set_object(ra, &ret);
-#endif
+    }  
+  ra->type = schemerlicht_object_type_true; 
   }
 
 ////////////////////////////////////////////////////
@@ -2532,37 +2508,18 @@ void schemerlicht_primitive_flgreater(schemerlicht_context* ctxt, int a, int b, 
   schemerlicht_object* ra = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
   schemerlicht_assert(schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive || schemerlicht_object_get_type(ra) == schemerlicht_object_type_primitive_object);
   schemerlicht_assert(ra->value.fx == SCHEMERLICHT_FLGREATER);
-#if 1
   for (int j = 0; j < b - 1; ++j)
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_flonum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_flonum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fl <= second_arg->value.fl)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      ra->type = schemerlicht_object_type_false;
       return;
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
-#else
-  schemerlicht_object* arg0 = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
-  schemerlicht_object* arg1 = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-  schemerlicht_object ret;
-  ret.type = arg0->value.fl > arg1->value.fl ? schemerlicht_object_type_true : schemerlicht_object_type_false;
-  schemerlicht_set_object(ra, &ret);
-#endif
-      }
+  ra->type = schemerlicht_object_type_true;
+  }
 
 ////////////////////////////////////////////////////
 
@@ -2590,7 +2547,7 @@ void schemerlicht_primitive_chargreater(schemerlicht_context* ctxt, int a, int b
       schemerlicht_set_object(ra, &ret);
       return;
       }
-    }
+  }
   schemerlicht_object ret;
   ret.type = schemerlicht_object_type_true;
   schemerlicht_set_object(ra, &ret);
@@ -2650,9 +2607,7 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         {
         if (first_arg->value.fx > second_arg->value.fx)
           {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2660,10 +2615,8 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.fx > second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2671,19 +2624,15 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.fx > second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
 
@@ -2698,10 +2647,8 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.fl > second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2709,10 +2656,8 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.fl > second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2720,19 +2665,15 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.fl > second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
 
@@ -2746,10 +2687,8 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_fixnum:
         {
         if (first_arg->value.ch > second_arg->value.fx)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2757,10 +2696,8 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_flonum:
         {
         if (first_arg->value.ch > second_arg->value.fl)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
@@ -2768,36 +2705,28 @@ void schemerlicht_primitive_leq(schemerlicht_context* ctxt, int a, int b, int c)
         case schemerlicht_object_type_char:
         {
         if (first_arg->value.ch > second_arg->value.ch)
-          {
-          schemerlicht_object ret;
-          ret.type = schemerlicht_object_type_false;
-          schemerlicht_set_object(ra, &ret);
+          {          
+          ra->type = schemerlicht_object_type_false;          
           return;
           }
         break;
         }
         default:
-        {
-        schemerlicht_object ret;
-        ret.type = schemerlicht_object_type_undefined;
-        schemerlicht_set_object(ra, &ret);
+        {        
+        ra->type = schemerlicht_object_type_undefined;        
         return;
         }
         }
       break;
       }
       default:
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
+      {      
+      ra->type = schemerlicht_object_type_undefined;      
       return;
       }
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+  ra->type = schemerlicht_object_type_true;  
   }
 
 ////////////////////////////////////////////////////
@@ -2812,24 +2741,13 @@ void schemerlicht_primitive_fxleq(schemerlicht_context* ctxt, int a, int b, int 
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_fixnum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_fixnum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fx > second_arg->value.fx)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      ra->type = schemerlicht_object_type_false;
       return;
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+  ra->type = schemerlicht_object_type_true;
   }
 
 ////////////////////////////////////////////////////
@@ -2845,24 +2763,13 @@ void schemerlicht_primitive_flleq(schemerlicht_context* ctxt, int a, int b, int 
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + c, schemerlicht_object);
     schemerlicht_object* second_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + j + 1, schemerlicht_object);
-    if (schemerlicht_object_get_type(first_arg) != schemerlicht_object_type_flonum || schemerlicht_object_get_type(second_arg) != schemerlicht_object_type_flonum)
-      {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_undefined;
-      schemerlicht_set_object(ra, &ret);
-      return;
-      }
     if (first_arg->value.fl > second_arg->value.fl)
       {
-      schemerlicht_object ret;
-      ret.type = schemerlicht_object_type_false;
-      schemerlicht_set_object(ra, &ret);
+      ra->type = schemerlicht_object_type_false;
       return;
       }
     }
-  schemerlicht_object ret;
-  ret.type = schemerlicht_object_type_true;
-  schemerlicht_set_object(ra, &ret);
+  ra->type = schemerlicht_object_type_true;
   }
 
 ////////////////////////////////////////////////////
@@ -3127,7 +3034,7 @@ void schemerlicht_primitive_is_boolean(schemerlicht_context* ctxt, int a, int b,
     schemerlicht_object ret;
     ret.type = schemerlicht_object_type_undefined;
     schemerlicht_set_object(ra, &ret);
-    }
+  }
   else
     {
     schemerlicht_object* first_arg = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
@@ -3924,7 +3831,7 @@ void schemerlicht_primitive_is_closure(schemerlicht_context* ctxt, int a, int b,
     ret.type = schemerlicht_object_type_false;
     }
   schemerlicht_set_object(ra, &ret);
-  }
+      }
 
 ////////////////////////////////////////////////////
 
@@ -8618,13 +8525,13 @@ void schemerlicht_primitive_read(schemerlicht_context* ctxt, int a, int b, int c
         }
       schemerlicht_string_destroy(ctxt, &buff);
       schemerlicht_destroy_cell(ctxt, &cell);
-        }
+      }
     else
       {
       schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "%read expects an input port as argument.");
       ra->type = schemerlicht_object_type_undefined;
-      }
-      }
+    }
+  }
     }
 
 ////////////////////////////////////////////////////
@@ -8725,13 +8632,13 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
             schemerlicht_set_object(ra, res);
             //ra->type = schemerlicht_object_type_undefined;          
             schemerlicht_compiled_program_register(ctxt, &compiled_program);
-          }
+            }
           else
             {
             schemerlicht_compiled_program_destroy(ctxt, &compiled_program);
             ra->type = schemerlicht_object_type_undefined;
             }
-        }
+            }
         else
           {
           destroy_tokens_vector(ctxt, &tokens);
@@ -8748,16 +8655,16 @@ void schemerlicht_primitive_load(schemerlicht_context* ctxt, int a, int b, int c
 #endif
         schemerlicht_string_destroy(ctxt, schemerlicht_vector_back(&ctxt->filenames_list, schemerlicht_string));
         schemerlicht_vector_pop_back(&ctxt->filenames_list);
-      }
+          }
       else
         ra->type = schemerlicht_object_type_undefined;
-      }
+        }
     else
       {
       ra->type = schemerlicht_object_type_undefined;
       }
+      }
     }
-  }
 
 ////////////////////////////////////////////////////
 

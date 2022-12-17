@@ -13,7 +13,7 @@
 #include <string.h>
 #include <math.h>
 
-#if 1
+#if 0
 #include "object.h"
 #include "func.h"
 #include "syscalls.h"
