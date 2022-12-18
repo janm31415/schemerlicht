@@ -18,17 +18,17 @@ endif (UNIX)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-add_executable(life ${HDRS} ${SRCS})
+add_executable(gameoflife ${HDRS} ${SRCS})
 source_group("Header Files" FILES ${hdrs})
 source_group("Source Files" FILES ${srcs})
     
 if (WIN32)
-target_include_directories(life
+target_include_directories(gameoflife
    PRIVATE
    ${CMAKE_CURRENT_SOURCE_DIR}/../../
    )
 
-target_link_libraries(life
+target_link_libraries(gameoflife
     PRIVATE
     schemerlicht
     )
@@ -44,13 +44,13 @@ set(XLIBINCLUDE "/usr/X11/include/")
 set(XLIBLIBRARY "/usr/X11/lib/libX11.dylib")
 endif (APPLE)
 
-target_include_directories(life
+target_include_directories(gameoflife
    PRIVATE
    ${CMAKE_CURRENT_SOURCE_DIR}/../../
    ${XLIBINCLUDE}
    )
    
-target_link_libraries(life
+target_link_libraries(gameoflife
     PRIVATE
     schemerlicht
     ${XLIBLIBRARY}
