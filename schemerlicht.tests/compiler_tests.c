@@ -2429,24 +2429,24 @@ static schemerlicht_object createCustomObject()
   return obj;
   }
 
-static schemerlicht_fixnum addone(schemerlicht_fixnum* fx)
+static schemerlicht_fixnum addone(schemerlicht_object* obj)
   {
-  return *fx + 1;
+  return obj->value.fx + 1;
   }
 
-static schemerlicht_flonum addonef(schemerlicht_flonum* fl)
+static schemerlicht_flonum addonef(schemerlicht_object* obj)
   {
-  return *fl + 1.0;
+  return obj->value.fl + 1.0;
   }
 
-static schemerlicht_fixnum getStringLength(char* str)
+static schemerlicht_fixnum getStringLength(schemerlicht_object* obj)
   {
-  return cast(schemerlicht_fixnum, strlen(str));
+  return cast(schemerlicht_fixnum, strlen(obj->value.s.string_ptr));
   }
 
-static schemerlicht_flonum add_three(schemerlicht_fixnum* a, schemerlicht_fixnum* b, schemerlicht_flonum* c)
+static schemerlicht_flonum add_three(schemerlicht_object* a, schemerlicht_object* b, schemerlicht_object* c)
   {
-  return *a + *b + *c;
+  return a->value.fx + b->value.fx + c->value.fl;
   }
 
 static void test_foreign()
