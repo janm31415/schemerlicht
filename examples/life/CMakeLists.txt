@@ -11,7 +11,7 @@ window.cpp
 )
 
 if (UNIX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11")
 endif (UNIX)
 
 # general build definitions
@@ -46,7 +46,7 @@ endif (APPLE)
 
 target_include_directories(life
    PRIVATE
-   ${CMAKE_CURRENT_SOURCE_DIR}/../
+   ${CMAKE_CURRENT_SOURCE_DIR}/../../
    ${XLIBINCLUDE}
    )
    

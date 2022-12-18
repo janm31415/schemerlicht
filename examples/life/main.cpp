@@ -21,7 +21,7 @@ std::vector<uint8_t> image;
 WindowHandle wh;
 std::unique_ptr<std::thread> game_thread;
 std::atomic<bool> stop_game_thread;
-std::atomic<double> game_sleep_time = 50.0;
+std::atomic<double> game_sleep_time(50.0);
 
 void paint_grid()
   {
