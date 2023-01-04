@@ -2405,7 +2405,7 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "list->vector", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "list?", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "log", schemerlicht_et_primitive_call);
-  map_insert(ctxt, m, "%make-port", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "make-port", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "%make-promise", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "make-string", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "make-vector", schemerlicht_et_primitive_call);
@@ -2448,8 +2448,8 @@ schemerlicht_map* generate_expression_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "set-car!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "set-cdr!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sin", schemerlicht_et_primitive_call);
-  map_insert(ctxt, m, "%slot-ref", schemerlicht_et_primitive_call);
-  map_insert(ctxt, m, "%slot-set!", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "slot-ref", schemerlicht_et_primitive_call);
+  map_insert(ctxt, m, "slot-set!", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string->number", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "sqrt", schemerlicht_et_primitive_call);
   map_insert(ctxt, m, "string", schemerlicht_et_primitive_call);

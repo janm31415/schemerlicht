@@ -2861,11 +2861,11 @@ static void test_control_ops()
     "        '(0 1 2 3 4))\n"
     "     v) #; blabla\n");
 
-  test_compile_aux("1", "(%slot-ref (cons 1 2) 0)");
-  test_compile_aux("2", "(%slot-ref (cons 1 2) 1)");
+  test_compile_aux("1", "(slot-ref (cons 1 2) 0)");
+  test_compile_aux("2", "(slot-ref (cons 1 2) 1)");
   test_compile_aux_r5rs("<promise>", "(define p (make-promise(lambda() (+ 5 6))))");
   test_compile_aux_r5rs("#t", "(define p (make-promise(lambda() (+ 5 6)))) (promise? p)");
-  test_compile_aux_r5rs("#t", "(define p (make-promise(lambda() (+ 5 6)))) (closure? (%slot-ref p 0))");
+  test_compile_aux_r5rs("#t", "(define p (make-promise(lambda() (+ 5 6)))) (closure? (slot-ref p 0))");
   test_compile_aux_r5rs("11", "(define p (make-promise(lambda() (+ 5 6)))) (force p)");
   test_compile_aux_r5rs("11", "(define p (make-promise(lambda() (+ 5 6)))) (force p) (force p)");
   test_compile_aux_r5rs("13", "(define p (make-promise(lambda() (+ 5 6)))) (force p) (force p) (force 13)");
@@ -2893,15 +2893,15 @@ static void test_quasiquote()
 
 static void test_port()
   {
-  test_compile_aux("#t", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (port? default-port)");
+  test_compile_aux("#t", "(define default-port (make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (port? default-port)");
   test_compile_aux("#f", "(port? (vector #f \"stdout\" 1 (make-string 1024) 0 1024))");
   test_compile_aux("#f", "(output-port? (vector #f \"stdout\" 1 (make-string 1024) 0 1024))");
   test_compile_aux("#f", "(input-port? (vector #f \"stdout\" 1 (make-string 1024) 0 1024))");
-  test_compile_aux("#t", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
-  test_compile_aux("#f", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
-  test_compile_aux("#t", "(define default-port (%make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
-  test_compile_aux("#f", "(define default-port (%make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
-  test_compile_aux("#<void>", "(define default-port (%make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (%write-char #\\f default-port) (%write-char #\\o default-port) (%write-char #\\o default-port) (%write-char #\\013 default-port) (%flush-output-port default-port)");
+  test_compile_aux("#t", "(define default-port (make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
+  test_compile_aux("#f", "(define default-port (make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
+  test_compile_aux("#t", "(define default-port (make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (input-port? default-port)");
+  test_compile_aux("#f", "(define default-port (make-port #t \"stdin\" 1 (make-string 1024) 0 1024)) (output-port? default-port)");
+  test_compile_aux("#<void>", "(define default-port (make-port #f \"stdout\" 1 (make-string 1024) 0 1024)) (%write-char #\\f default-port) (%write-char #\\o default-port) (%write-char #\\o default-port) (%write-char #\\013 default-port) (%flush-output-port default-port)");
   test_compile_aux("<port>: \"out.txt\"", "(define my_file (open-output-file \"out.txt\"))");
   test_compile_aux("#<void>", "(define my_file (open-output-file \"out.txt\")) (close-output-port my_file)");
   test_compile_aux("#\\f", "(define my_file (open-output-file \"out.txt\"))"
@@ -2947,7 +2947,7 @@ static void test_port()
     "(close-output-port wf)"
   );
   test_compile_aux("#<void>", "(define wf (open-output-file \"out2.txt\"))"
-    "(%slot-set! wf 5 1)"
+    "(slot-set! wf 5 1)"
     "(%write (+ 7 9) wf)"
     "(%flush-output-port wf)"
     "(close-output-port wf)"
@@ -3033,9 +3033,9 @@ static void test_read()
 
 static void test_write()
   {  
-  test_compile_aux("\"50#\\\\space3.141590\\\"FOO\\\"\n\\\"FOO\\\\\\\"BAR\\\"\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
-    "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
-    "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
+  test_compile_aux("\"50#\\\\space3.141590\\\"FOO\\\"\n\\\"FOO\\\\\\\"BAR\\\"\"", "(define open-input-string (lambda (s) (make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+    "(define open-output-string (lambda() (make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
+    "(define get-output-string(lambda(s) (substring(slot-ref s 3) 0 (slot-ref s 4))))\n"
     "(define ostr (open-output-string))\n"
     "(%write 50 ostr) (%write #\\032 ostr)\n"
     "(%write 3.14159 ostr)\n"
@@ -3048,9 +3048,9 @@ static void test_write()
 
 static void test_display()
   {
-  test_compile_aux("\"50 3.141590\nFOOBAR\"", "(define open-input-string (lambda (s) (%make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
-    "(define open-output-string (lambda() (%make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
-    "(define get-output-string(lambda(s) (substring(%slot-ref s 3) 0 (%slot-ref s 4))))\n"
+  test_compile_aux("\"50 3.141590\nFOOBAR\"", "(define open-input-string (lambda (s) (make-port #t \"input-string\" -2 s 0 (string-length s))))\n"
+    "(define open-output-string (lambda() (make-port #f \"output-string\" -2 (make-string 256) 0 256)))\n"
+    "(define get-output-string(lambda(s) (substring(slot-ref s 3) 0 (slot-ref s 4))))\n"
     "(define ostr (open-output-string))\n"
     "(%display 50 ostr) (%display #\\032 ostr)\n"
     "(%display 3.14159 ostr)\n"

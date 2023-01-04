@@ -7411,37 +7411,37 @@ void schemerlicht_primitive_make_port(schemerlicht_context* ctxt, int a, int b, 
         case 0:
           if (schemerlicht_object_get_type(ri) != schemerlicht_object_type_true && schemerlicht_object_get_type(ri) != schemerlicht_object_type_false)
             {
-            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "first argument of %make-port should be #t or #f.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "first argument of make-port should be #t or #f.");
             }
           break;
         case 1:
           if (schemerlicht_object_get_type(ri) != schemerlicht_object_type_string)
             {
-            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "second argument of %make-port should be a string indicating the port name.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "second argument of make-port should be a string indicating the port name.");
             }
           break;
         case 2:
           if (schemerlicht_object_get_type(ri) != schemerlicht_object_type_fixnum)
             {
-            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "third argument of %make-port should be a fixnum representing the file descriptor.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "third argument of make-port should be a fixnum representing the file descriptor.");
             }
           break;
         case 3:
           if (schemerlicht_object_get_type(ri) != schemerlicht_object_type_string)
             {
-            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "fourth argument of %make-port should be a string representing the port buffer.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "fourth argument of make-port should be a string representing the port buffer.");
             }
           break;
         case 4:
           if (schemerlicht_object_get_type(ri) != schemerlicht_object_type_fixnum)
             {
-            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "fifth argument of %make-port should be an index pointing to the next position in the buffer.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "fifth argument of make-port should be an index pointing to the next position in the buffer.");
             }
           break;
         case 5:
           if (schemerlicht_object_get_type(ri) != schemerlicht_object_type_fixnum)
             {
-            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "sixth argument of %make-port should be an index representing the size of the buffer.");
+            schemerlicht_runtime_error_cstr(ctxt, SCHEMERLICHT_ERROR_RUNERROR, -1, -1, "sixth argument of make-port should be an index representing the size of the buffer.");
             }
           schemerlicht_object* bytes_read = schemerlicht_vector_at(&v.value.v, 6, schemerlicht_object);
           bytes_read->type = schemerlicht_object_type_fixnum;
@@ -9416,9 +9416,9 @@ schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt)
   map_insert(ctxt, m, "list->vector", SCHEMERLICHT_LIST_VECTOR);
   map_insert(ctxt, m, "%make-promise", SCHEMERLICHT_MAKE_PROMISE);
   map_insert(ctxt, m, "promise?", SCHEMERLICHT_IS_PROMISE);
-  map_insert(ctxt, m, "%slot-ref", SCHEMERLICHT_SLOT_REF);
-  map_insert(ctxt, m, "%slot-set!", SCHEMERLICHT_SLOT_SET);
-  map_insert(ctxt, m, "%make-port", SCHEMERLICHT_MAKE_PORT);
+  map_insert(ctxt, m, "slot-ref", SCHEMERLICHT_SLOT_REF);
+  map_insert(ctxt, m, "slot-set!", SCHEMERLICHT_SLOT_SET);
+  map_insert(ctxt, m, "make-port", SCHEMERLICHT_MAKE_PORT);
   map_insert(ctxt, m, "port?", SCHEMERLICHT_IS_PORT);
   map_insert(ctxt, m, "%write-char", SCHEMERLICHT_WRITE_CHAR);
   map_insert(ctxt, m, "%read-char", SCHEMERLICHT_READ_CHAR);
