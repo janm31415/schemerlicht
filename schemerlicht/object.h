@@ -63,6 +63,8 @@ int schemerlicht_objects_equal(schemerlicht_context* ctxt, const schemerlicht_ob
 int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_object* obj2);
 int schemerlicht_objects_eqv(const schemerlicht_object* obj1, const schemerlicht_object* obj2);
 
+int schemerlicht_object_contains_vector_slots(const schemerlicht_object* obj);
+
 int schemerlicht_log2(uint32_t x);
 
 schemerlicht_object make_schemerlicht_object_fixnum(schemerlicht_fixnum fx);

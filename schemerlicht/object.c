@@ -5,6 +5,21 @@
 #include <string.h>
 #include <stdio.h>
 
+int schemerlicht_object_contains_vector_slots(const schemerlicht_object* obj)
+  {
+  switch (schemerlicht_object_get_type(obj))
+    {
+    case schemerlicht_object_type_vector:
+    case schemerlicht_object_type_closure:
+    case schemerlicht_object_type_port:
+    case schemerlicht_object_type_promise:
+    case schemerlicht_object_type_pair:
+      return 1;
+    default:
+      return 0;
+    }
+  }
+
 int schemerlicht_objects_eq(const schemerlicht_object* obj1, const schemerlicht_object* obj2)
   {
   if (schemerlicht_object_get_type(obj1) != schemerlicht_object_get_type(obj2))

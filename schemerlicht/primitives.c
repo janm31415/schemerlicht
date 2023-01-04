@@ -7342,7 +7342,7 @@ void schemerlicht_primitive_slot_ref(schemerlicht_context* ctxt, int a, int b, i
     {
     schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     schemerlicht_object* pos = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
-    if (schemerlicht_object_get_type(pos) != schemerlicht_object_type_fixnum)
+    if (schemerlicht_object_get_type(pos) != schemerlicht_object_type_fixnum || schemerlicht_object_contains_vector_slots(v)==0)
       {
       ra->type = schemerlicht_object_type_undefined;
       }
@@ -7374,7 +7374,7 @@ void schemerlicht_primitive_slot_set(schemerlicht_context* ctxt, int a, int b, i
     schemerlicht_object* v = schemerlicht_vector_at(&ctxt->stack, a + 1 + c, schemerlicht_object);
     schemerlicht_object* pos = schemerlicht_vector_at(&ctxt->stack, a + 2 + c, schemerlicht_object);
     schemerlicht_object* value = schemerlicht_vector_at(&ctxt->stack, a + 3 + c, schemerlicht_object);
-    if (schemerlicht_object_get_type(pos) == schemerlicht_object_type_fixnum)
+    if (schemerlicht_object_get_type(pos) == schemerlicht_object_type_fixnum && schemerlicht_object_contains_vector_slots(v) != 0)
       {
       if (pos->value.fx >= 0 && pos->value.fx < v->value.v.vector_size)
         {
