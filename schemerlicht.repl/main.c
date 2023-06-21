@@ -118,7 +118,7 @@ void print_result(schemerlicht_context* ctxt, schemerlicht_object* result)
     }
   }
 
-static void print_hello_world()
+static void print_hello_world(schemerlicht_context* ctxt()
   {
   printf("Hello world!\n");
   }

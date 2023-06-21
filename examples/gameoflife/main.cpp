@@ -46,7 +46,7 @@ void run_game_loop()
     }
   }
 
-void scm_stop()
+void scm_stop(schemerlicht_context* ctxt)
   {
   if (game_thread)
     {
@@ -56,14 +56,14 @@ void scm_stop()
     }
   }
 
-void scm_run()
+void scm_run(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   stop_game_thread = false;
   game_thread.reset(new std::thread(run_game_loop));
   }
 
-void scm_resize(schemerlicht_object* w, schemerlicht_object* h)
+void scm_resize(schemerlicht_context* ctxt, schemerlicht_object* w, schemerlicht_object* h)
   {
   if (w->type != schemerlicht_object_type_fixnum)
     {
@@ -75,7 +75,7 @@ void scm_resize(schemerlicht_object* w, schemerlicht_object* h)
     std::cout << "Second argument should be a fixnum\n";
     return;
     }
-  scm_stop();
+  scm_stop(ctxt);
   if (w->value.fx > 0)
     width = (int)w->value.fx;
   if (h->value.fx > 0)
@@ -84,9 +84,9 @@ void scm_resize(schemerlicht_object* w, schemerlicht_object* h)
   paint_grid();
   }
 
-void scm_randomize()
+void scm_randomize(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -102,14 +102,14 @@ void scm_randomize()
   paint_grid();
   }
 
-void scm_clear()
+void scm_clear(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   grid = cell_map(width, height);
   paint_grid();
   }
 
-void scm_game_sleep(schemerlicht_object* s)
+void scm_game_sleep(schemerlicht_context* ctxt, schemerlicht_object* s)
   {
   if (s->type == schemerlicht_object_type_fixnum)
     game_sleep_time = (double)(s->value.fx);
@@ -117,7 +117,7 @@ void scm_game_sleep(schemerlicht_object* s)
     game_sleep_time = (double)(s->value.fl);
   }
 
-void scm_set_cell(schemerlicht_object* x, schemerlicht_object* y)
+void scm_set_cell(schemerlicht_context* ctxt, schemerlicht_object* x, schemerlicht_object* y)
   {
   if (x->type != schemerlicht_object_type_fixnum)
     {
@@ -129,7 +129,7 @@ void scm_set_cell(schemerlicht_object* x, schemerlicht_object* y)
     std::cout << "Second argument should be a fixnum\n";
     return;
     }
-  scm_stop();
+  scm_stop(ctxt);
   if (x->value.fx >= 0 && y->value.fx >= 0 && x->value.fx < grid.width && y->value.fx < grid.height)
     {
     if (grid.cell_state((int)(x->value.fx), (int)(y->value.fx)) == 0)
@@ -138,7 +138,7 @@ void scm_set_cell(schemerlicht_object* x, schemerlicht_object* y)
   paint_grid();
   }
 
-void scm_clear_cell(schemerlicht_object* x, schemerlicht_object* y)
+void scm_clear_cell(schemerlicht_context* ctxt, schemerlicht_object* x, schemerlicht_object* y)
   {
   if (x->type != schemerlicht_object_type_fixnum)
     {
@@ -150,7 +150,7 @@ void scm_clear_cell(schemerlicht_object* x, schemerlicht_object* y)
     std::cout << "Second argument should be a fixnum\n";
     return;
     }
-  scm_stop();
+  scm_stop(ctxt);
   if (x->value.fx >= 0 && y->value.fx >= 0 && x->value.fx < grid.width && y->value.fx < grid.height)
     {
     if (grid.cell_state((int)(x->value.fx), (int)(y->value.fx)) != 0)
@@ -159,16 +159,16 @@ void scm_clear_cell(schemerlicht_object* x, schemerlicht_object* y)
   paint_grid();
   }
 
-void scm_next()
+void scm_next(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   grid = next_generation(grid);
   paint_grid();
   }
 
-void scm_gun()
+void scm_gun(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   if (width < 38)
     width = 38;
   if (height < 11)
@@ -218,9 +218,9 @@ void scm_gun()
   }
 
 
-void scm_space_rake()
+void scm_space_rake(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   if (width < 26)
     width = 26;
   if (height < 23)
@@ -303,9 +303,9 @@ void scm_space_rake()
   }
 
 
-void scm_spaceship()
+void scm_spaceship(schemerlicht_context* ctxt)
   {
-  scm_stop();
+  scm_stop(ctxt);
   if (width < 7)
     width = 7;
   if (height < 6)
@@ -354,9 +354,9 @@ std::string get_cleaned_command(std::string txt)
 int main()
   {
   wh = create_window("Game of life", 512, 512); // create window for visualization
-  scm_randomize(); // fill grid cells at random  
 
   schemerlicht_context* ctxt = schemerlicht_open(1024);
+  scm_randomize(ctxt); // fill grid cells at random
   schemerlicht_build_base(ctxt);
   register_functions(ctxt);
 
@@ -396,7 +396,7 @@ int main()
       }
     }
 
-  scm_stop(); // stop the game thread
+  scm_stop(ctxt); // stop the game thread
 
   schemerlicht_close(ctxt);
   close_window(wh); // close the visualization window

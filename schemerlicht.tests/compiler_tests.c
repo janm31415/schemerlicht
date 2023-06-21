@@ -2321,7 +2321,7 @@ static void test_apply()
   test_compile_aux("1800", "(define compose (lambda(f g)(lambda args(f(apply g args))))) (define twice (lambda (x) (* 2 x))) ((compose twice *) 12 75)");
   }
 
-static schemerlicht_fixnum seventeen()
+static schemerlicht_fixnum seventeen(schemerlicht_context* ctxt)
   {
   return 17;
   }
@@ -2408,43 +2408,43 @@ static void test_foreign_aux(const char* expected, const char* script, const cha
   schemerlicht_close(ctxt);
   }
 
-static schemerlicht_flonum mathpi()
+static schemerlicht_flonum mathpi(schemerlicht_context* ctxt)
   {
   return 3.1415926535897;
   }
 
-static void dosomething()
+static void dosomething(schemerlicht_context* ctxt)
   {
   }
 
-static const char* printHelloWorld()
+static const char* printHelloWorld(schemerlicht_context* ctxt)
   {
   return "Hello World!";
   }
 
-static schemerlicht_object createCustomObject()
+static schemerlicht_object createCustomObject(schemerlicht_context* ctxt)
   {
   schemerlicht_object obj;
   obj.type = schemerlicht_object_type_true;
   return obj;
   }
 
-static schemerlicht_fixnum addone(schemerlicht_object* obj)
+static schemerlicht_fixnum addone(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   return obj->value.fx + 1;
   }
 
-static schemerlicht_flonum addonef(schemerlicht_object* obj)
+static schemerlicht_flonum addonef(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   return obj->value.fl + 1.0;
   }
 
-static schemerlicht_fixnum getStringLength(schemerlicht_object* obj)
+static schemerlicht_fixnum getStringLength(schemerlicht_context* ctxt, schemerlicht_object* obj)
   {
   return cast(schemerlicht_fixnum, strlen(obj->value.s.string_ptr));
   }
 
-static schemerlicht_flonum add_three(schemerlicht_object* a, schemerlicht_object* b, schemerlicht_object* c)
+static schemerlicht_flonum add_three(schemerlicht_context* ctxt, schemerlicht_object* a, schemerlicht_object* b, schemerlicht_object* c)
   {
   return a->value.fx + b->value.fx + c->value.fl;
   }

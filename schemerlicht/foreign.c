@@ -124,20 +124,20 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     {
     case 0:
     {
-    SCHEMERLICHT_CALL_EXTERNAL((),());
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*),(ctxt));
     break;
     }
     case 1:
     {
     void* arg1 = get_argument_pointer(ctxt, argument_stack_offset);
-    SCHEMERLICHT_CALL_EXTERNAL((void*), (arg1));    
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*), (ctxt, arg1));
     break;
     }
     case 2:
     {
     void* arg1 = get_argument_pointer(ctxt, argument_stack_offset);
     void* arg2 = get_argument_pointer(ctxt, argument_stack_offset+1);
-    SCHEMERLICHT_CALL_EXTERNAL((void*,void*), (arg1,arg2));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*,void*), (ctxt, arg1, arg2));
     break;
     }
     case 3:
@@ -145,7 +145,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     void* arg1 = get_argument_pointer(ctxt, argument_stack_offset);
     void* arg2 = get_argument_pointer(ctxt, argument_stack_offset + 1);
     void* arg3 = get_argument_pointer(ctxt, argument_stack_offset + 2);
-    SCHEMERLICHT_CALL_EXTERNAL((void*, void*, void*), (arg1, arg2, arg3));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*, void*, void*), (ctxt, arg1, arg2, arg3));
     break;
     }
     case 4:
@@ -154,7 +154,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     void* arg2 = get_argument_pointer(ctxt, argument_stack_offset + 1);
     void* arg3 = get_argument_pointer(ctxt, argument_stack_offset + 2);
     void* arg4 = get_argument_pointer(ctxt, argument_stack_offset + 3);
-    SCHEMERLICHT_CALL_EXTERNAL((void*, void*, void*, void*), (arg1, arg2, arg3, arg4));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*, void*, void*, void*), (ctxt, arg1, arg2, arg3, arg4));
     break;
     }
     case 5:
@@ -164,7 +164,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     void* arg3 = get_argument_pointer(ctxt, argument_stack_offset + 2);
     void* arg4 = get_argument_pointer(ctxt, argument_stack_offset + 3);
     void* arg5 = get_argument_pointer(ctxt, argument_stack_offset + 4);
-    SCHEMERLICHT_CALL_EXTERNAL((void*, void*, void*, void*, void*), (arg1, arg2, arg3, arg4, arg5));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*, void*, void*, void*, void*), (ctxt, arg1, arg2, arg3, arg4, arg5));
     break;
     }
     case 6:
@@ -175,7 +175,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     void* arg4 = get_argument_pointer(ctxt, argument_stack_offset + 3);
     void* arg5 = get_argument_pointer(ctxt, argument_stack_offset + 4);
     void* arg6 = get_argument_pointer(ctxt, argument_stack_offset + 5);
-    SCHEMERLICHT_CALL_EXTERNAL((void*, void*, void*, void*, void*, void*), (arg1, arg2, arg3, arg4, arg5, arg6));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*, void*, void*, void*, void*, void*), (ctxt, arg1, arg2, arg3, arg4, arg5, arg6));
     break;
     }
     case 7:
@@ -187,7 +187,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     void* arg5 = get_argument_pointer(ctxt, argument_stack_offset + 4);
     void* arg6 = get_argument_pointer(ctxt, argument_stack_offset + 5);
     void* arg7 = get_argument_pointer(ctxt, argument_stack_offset + 6);
-    SCHEMERLICHT_CALL_EXTERNAL((void*, void*, void*, void*, void*, void*, void*), (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*, void*, void*, void*, void*, void*, void*), (ctxt, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
     break;
     }
     case 8:
@@ -200,7 +200,7 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     void* arg6 = get_argument_pointer(ctxt, argument_stack_offset + 5);
     void* arg7 = get_argument_pointer(ctxt, argument_stack_offset + 6);
     void* arg8 = get_argument_pointer(ctxt, argument_stack_offset + 7);
-    SCHEMERLICHT_CALL_EXTERNAL((void*, void*, void*, void*, void*, void*, void*, void*), (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
+    SCHEMERLICHT_CALL_EXTERNAL((schemerlicht_context*,void*, void*, void*, void*, void*, void*, void*, void*), (ctxt, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
     break;
     }
     default:
