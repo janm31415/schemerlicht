@@ -138,7 +138,7 @@ int main(int argc, char** argv)
   schemerlicht_context* ctxt = schemerlicht_open(1024 * 1024 * 4);
   schemerlicht_build_base(ctxt);
 
-  schemerlicht_register_external_primitive(ctxt, "hello", (void*)&print_hello_world, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "hello", (SCHEMERLICHT_FUNPTR())&print_hello_world, schemerlicht_foreign_void, 0);
 
   int quit = 0;
 

@@ -246,7 +246,7 @@ void schemerlicht_show_object(schemerlicht_context* ctxt, schemerlicht_object* o
   schemerlicht_object_append_to_string(ctxt, obj, s, 0);
   }
 
-void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, void* func_ptr, schemerlicht_foreign_return_type return_type, int number_of_arguments)
+void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, SCHEMERLICHT_FUNPTR(func_ptr), schemerlicht_foreign_return_type return_type, int number_of_arguments)
   {
   schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, name, func_ptr, return_type);
   schemerlicht_register_external_function(ctxt, &ext);

@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-schemerlicht_external_function schemerlicht_external_function_init(schemerlicht_context* ctxt, const char* name, void* address, schemerlicht_foreign_return_type ret_type)
+schemerlicht_external_function schemerlicht_external_function_init(schemerlicht_context* ctxt, const char* name, SCHEMERLICHT_FUNPTR(address), schemerlicht_foreign_return_type ret_type)
   {
   schemerlicht_external_function ext;
   schemerlicht_string_init(ctxt, &ext.name, name);

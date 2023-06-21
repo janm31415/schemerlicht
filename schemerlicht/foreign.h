@@ -18,12 +18,12 @@
 typedef struct schemerlicht_external_function
   {
   schemerlicht_string name;
-  void* address;
+  SCHEMERLICHT_FUNPTR(address);
   //schemerlicht_vector arguments;
   schemerlicht_foreign_return_type return_type;
   } schemerlicht_external_function;
 
-schemerlicht_external_function schemerlicht_external_function_init(schemerlicht_context* ctxt, const char* name, void* address, schemerlicht_foreign_return_type ret_type);
+schemerlicht_external_function schemerlicht_external_function_init(schemerlicht_context* ctxt, const char* name, SCHEMERLICHT_FUNPTR(address), schemerlicht_foreign_return_type ret_type);
 //void schemerlicht_external_function_push_argument(schemerlicht_context* ctxt, schemerlicht_external_function* ext, schemerlicht_foreign_return_type arg);
 
 void schemerlicht_external_function_destroy(schemerlicht_context* ctxt, schemerlicht_external_function* ext);

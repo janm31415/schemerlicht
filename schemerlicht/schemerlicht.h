@@ -35,6 +35,10 @@ typedef unsigned char schemerlicht_byte;
 //#define SCHEMERLICHT_CHECK_HEAP_OVERFLOW
 //#define SCHEMERLICHT_DEBUG
 
+#ifndef SCHEMERLICHT_FUNPTR
+#define SCHEMERLICHT_FUNPTR(x) void (*x)(void*)
+#endif
+
 
 SCHEMERLICHT_API schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size);
 SCHEMERLICHT_API void schemerlicht_close(schemerlicht_context* ctxt);
@@ -74,6 +78,6 @@ typedef enum schemerlicht_foreign_return_type
   schemerlicht_foreign_object
   } schemerlicht_foreign_return_type;
 
-SCHEMERLICHT_API void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, void* func_ptr, schemerlicht_foreign_return_type return_type, int number_of_arguments);
+SCHEMERLICHT_API void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, SCHEMERLICHT_FUNPTR(func_ptr), schemerlicht_foreign_return_type return_type, int number_of_arguments);
 
 #endif //SCHEMERLICHT_H

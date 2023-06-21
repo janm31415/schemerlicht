@@ -2329,7 +2329,7 @@ static schemerlicht_fixnum seventeen()
 static void test_foreign_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
-  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, "seventeen", cast(void*, &seventeen), schemerlicht_foreign_fixnum);
+  schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, "seventeen", cast(SCHEMERLICHT_FUNPTR(), &seventeen), schemerlicht_foreign_fixnum);
   schemerlicht_register_external_function(ctxt, &ext);
 
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(foreign-call seventeen)");
@@ -2367,7 +2367,7 @@ static void test_foreign_1()
   schemerlicht_close(ctxt);
   }
 
-static void test_foreign_aux(const char* expected, const char* script, const char* name, void* address, schemerlicht_foreign_return_type ret_type)
+static void test_foreign_aux(const char* expected, const char* script, const char* name, SCHEMERLICHT_FUNPTR(address), schemerlicht_foreign_return_type ret_type)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_external_function ext = schemerlicht_external_function_init(ctxt, name, address, ret_type);
@@ -2451,14 +2451,14 @@ static schemerlicht_flonum add_three(schemerlicht_object* a, schemerlicht_object
 
 static void test_foreign()
   {
-  test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", cast(void*, &seventeen), schemerlicht_foreign_fixnum);
-  test_foreign_aux("3.141593", "(foreign-call mathpi)", "mathpi", cast(void*, &mathpi), schemerlicht_foreign_flonum);
-  test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", cast(void*, &printHelloWorld), schemerlicht_foreign_char_pointer);
-  test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", cast(void*, &createCustomObject), schemerlicht_foreign_object);
-  test_foreign_aux("8", "(foreign-call addone 7)", "addone", cast(void*, &addone), schemerlicht_foreign_fixnum);
-  test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", cast(void*, &addonef), schemerlicht_foreign_flonum);
-  test_foreign_aux("5", "(foreign-call get-string-length \"abcde\")", "get-string-length", cast(void*, &getStringLength), schemerlicht_foreign_fixnum);
-  test_foreign_aux("16.200000", "(foreign-call add_three 7 9 0.2)", "add_three", cast(void*, &add_three), schemerlicht_foreign_flonum);
+  test_foreign_aux("17", "(foreign-call seventeen)", "seventeen", cast(SCHEMERLICHT_FUNPTR(), &seventeen), schemerlicht_foreign_fixnum);
+  test_foreign_aux("3.141593", "(foreign-call mathpi)", "mathpi", cast(SCHEMERLICHT_FUNPTR(), &mathpi), schemerlicht_foreign_flonum);
+  test_foreign_aux("\"Hello World!\"", "(foreign-call printHelloWorld)", "printHelloWorld", cast(SCHEMERLICHT_FUNPTR(), &printHelloWorld), schemerlicht_foreign_char_pointer);
+  test_foreign_aux("#t", "(foreign-call createCustomObject)", "createCustomObject", cast(SCHEMERLICHT_FUNPTR(), &createCustomObject), schemerlicht_foreign_object);
+  test_foreign_aux("8", "(foreign-call addone 7)", "addone", cast(SCHEMERLICHT_FUNPTR(), &addone), schemerlicht_foreign_fixnum);
+  test_foreign_aux("4.140000", "(foreign-call addonef 3.14)", "addonef", cast(SCHEMERLICHT_FUNPTR(), &addonef), schemerlicht_foreign_flonum);
+  test_foreign_aux("5", "(foreign-call get-string-length \"abcde\")", "get-string-length", cast(SCHEMERLICHT_FUNPTR(), &getStringLength), schemerlicht_foreign_fixnum);
+  test_foreign_aux("16.200000", "(foreign-call add_three 7 9 0.2)", "add_three", cast(SCHEMERLICHT_FUNPTR(), &add_three), schemerlicht_foreign_flonum);
   }
 
 static void test_r5rs_funs()

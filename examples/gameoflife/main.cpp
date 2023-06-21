@@ -327,18 +327,18 @@ void scm_spaceship()
 
 void register_functions(schemerlicht_context* ctxt)
   {
-  schemerlicht_register_external_primitive(ctxt, "resize", (void*)&scm_resize, schemerlicht_foreign_void, 2);
-  schemerlicht_register_external_primitive(ctxt, "randomize", (void*)&scm_randomize, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "clear", (void*)&scm_clear, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "next", (void*)&scm_next, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "run", (void*)&scm_run, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "stop", (void*)&scm_stop, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "game-sleep", (void*)&scm_game_sleep, schemerlicht_foreign_void, 1);
-  schemerlicht_register_external_primitive(ctxt, "set-cell", (void*)&scm_set_cell, schemerlicht_foreign_void, 2);
-  schemerlicht_register_external_primitive(ctxt, "clear-cell", (void*)&scm_clear_cell, schemerlicht_foreign_void, 2);
-  schemerlicht_register_external_primitive(ctxt, "gun", (void*)&scm_gun, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "space-rake", (void*)&scm_space_rake, schemerlicht_foreign_void, 0);
-  schemerlicht_register_external_primitive(ctxt, "spaceship", (void*)&scm_spaceship, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "resize", (SCHEMERLICHT_FUNPTR())&scm_resize, schemerlicht_foreign_void, 2);
+  schemerlicht_register_external_primitive(ctxt, "randomize", (SCHEMERLICHT_FUNPTR())&scm_randomize, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "clear", (SCHEMERLICHT_FUNPTR())&scm_clear, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "next", (SCHEMERLICHT_FUNPTR())&scm_next, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "run", (SCHEMERLICHT_FUNPTR())&scm_run, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "stop", (SCHEMERLICHT_FUNPTR())&scm_stop, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "game-sleep", (SCHEMERLICHT_FUNPTR())&scm_game_sleep, schemerlicht_foreign_void, 1);
+  schemerlicht_register_external_primitive(ctxt, "set-cell", (SCHEMERLICHT_FUNPTR())&scm_set_cell, schemerlicht_foreign_void, 2);
+  schemerlicht_register_external_primitive(ctxt, "clear-cell", (SCHEMERLICHT_FUNPTR())&scm_clear_cell, schemerlicht_foreign_void, 2);
+  schemerlicht_register_external_primitive(ctxt, "gun", (SCHEMERLICHT_FUNPTR())&scm_gun, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "space-rake", (SCHEMERLICHT_FUNPTR())&scm_space_rake, schemerlicht_foreign_void, 0);
+  schemerlicht_register_external_primitive(ctxt, "spaceship", (SCHEMERLICHT_FUNPTR())&scm_spaceship, schemerlicht_foreign_void, 0);
   }
 
 std::string get_cleaned_command(std::string txt)
