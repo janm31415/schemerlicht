@@ -292,3 +292,13 @@ schemerlicht_object* schemerlicht_find_global(schemerlicht_context* ctxt, const 
   schemerlicht_string_destroy(ctxt, &s);
   return result;
   }
+
+void schemerlicht_register_user_data(schemerlicht_context* ctxt, void* user_data)
+  {
+  ctxt->global->main_context->user_data = user_data;
+  }
+
+void* schemerlicht_get_user_data(schemerlicht_context* ctxt)
+  {
+  return ctxt->global->main_context->user_data;
+  }

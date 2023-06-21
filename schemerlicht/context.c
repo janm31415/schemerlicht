@@ -97,6 +97,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   {
   schemerlicht_assert(ctxt->global != NULL);
   ctxt->error_jmp = NULL;
+  ctxt->user_data = NULL;
   ctxt->number_of_syntax_errors = 0;
   ctxt->number_of_compile_errors = 0;
   schemerlicht_vector_init(ctxt, &ctxt->gc_save_list, schemerlicht_object);

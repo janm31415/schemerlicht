@@ -80,4 +80,7 @@ typedef enum schemerlicht_foreign_return_type
 
 SCHEMERLICHT_API void schemerlicht_register_external_primitive(schemerlicht_context* ctxt, const char* name, SCHEMERLICHT_FUNPTR(func_ptr), schemerlicht_foreign_return_type return_type, int number_of_arguments);
 
+SCHEMERLICHT_API void schemerlicht_register_user_data(schemerlicht_context* ctxt, void* user_data);
+SCHEMERLICHT_API void* schemerlicht_get_user_data(schemerlicht_context* ctxt);
+
 #endif //SCHEMERLICHT_H
