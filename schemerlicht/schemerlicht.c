@@ -302,3 +302,113 @@ void* schemerlicht_get_user_data(schemerlicht_context* ctxt)
   {
   return ctxt->global->main_context->user_data;
   }
+
+schemerlicht_function* schemerlicht_lookup(schemerlicht_context* ctxt, const char* function_name)
+  {
+  schemerlicht_environment_entry lookup_entry;
+  schemerlicht_string s;
+  schemerlicht_string_init(ctxt, &s, function_name);
+  int find_var = schemerlicht_environment_find(&lookup_entry, ctxt, &s);
+  schemerlicht_string_destroy(ctxt, &s);
+  if (find_var != 0)
+    {
+    if (lookup_entry.type == SCHEMERLICHT_ENV_TYPE_GLOBAL)
+      {
+      const schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, lookup_entry.position, schemerlicht_object);
+      if (global->type == schemerlicht_object_type_lambda)
+        {
+        schemerlicht_function* fun = cast(schemerlicht_function*, global->value.ptr);
+        return fun;
+        }
+      }
+    }
+  return NULL;
+  }
+
+schemerlicht_object* schemerlicht_call_0(schemerlicht_context* ctxt, schemerlicht_function* fun)
+  {
+  schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  return schemerlicht_run(ctxt, fun);
+  }
+  
+schemerlicht_object* schemerlicht_call_1(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* arg1)
+  {
+  schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+  schemerlicht_object* st2 = schemerlicht_vector_at(&ctxt->stack, 2, schemerlicht_object);
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  *st2 = *arg1;
+  return schemerlicht_run(ctxt, fun);
+  }
+  
+schemerlicht_object* schemerlicht_call_2(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* arg1, schemerlicht_object* arg2)
+  {
+  schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+  schemerlicht_object* st2 = schemerlicht_vector_at(&ctxt->stack, 2, schemerlicht_object);
+  schemerlicht_object* st3 = schemerlicht_vector_at(&ctxt->stack, 3, schemerlicht_object);
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  *st2 = *arg1;
+  *st3 = *arg2;
+  return schemerlicht_run(ctxt, fun);
+  }
+  
+schemerlicht_object* schemerlicht_call_3(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* arg1, schemerlicht_object* arg2, schemerlicht_object* arg3)
+  {
+  schemerlicht_object* st0 = schemerlicht_vector_at(&ctxt->stack, 0, schemerlicht_object);
+  schemerlicht_object* st1 = schemerlicht_vector_at(&ctxt->stack, 1, schemerlicht_object);
+  schemerlicht_object* st2 = schemerlicht_vector_at(&ctxt->stack, 2, schemerlicht_object);
+  schemerlicht_object* st3 = schemerlicht_vector_at(&ctxt->stack, 3, schemerlicht_object);
+  schemerlicht_object* st4 = schemerlicht_vector_at(&ctxt->stack, 4, schemerlicht_object);
+  *st0 = ctxt->empty_continuation;
+  *st1 = ctxt->halt_continuation;
+  *st2 = *arg1;
+  *st3 = *arg2;
+  *st4 = *arg3;
+  return schemerlicht_run(ctxt, fun);
+  }
+
+schemerlicht_object schemerlicht_make_fixnum(schemerlicht_fixnum fx)
+  {
+  return make_schemerlicht_object_fixnum(fx);
+  }
+  
+schemerlicht_object schemerlicht_make_flonum(schemerlicht_flonum fl)
+  {
+  return make_schemerlicht_object_flonum(fl);
+  }
+  
+schemerlicht_object schemerlicht_make_true()
+  {
+  return make_schemerlicht_object_true();
+  }
+  
+schemerlicht_object schemerlicht_make_false()
+  {
+  return make_schemerlicht_object_false();
+  }
+
+schemerlicht_object schemerlicht_make_nil()
+  {
+  return make_schemerlicht_object_nil();
+  }
+  
+schemerlicht_object schemerlicht_make_char(schemerlicht_byte ch)
+  {
+  return make_schemerlicht_object_char(ch);
+  }
+  
+schemerlicht_object schemerlicht_make_string(schemerlicht_context* ctxt, const char* s)
+  {
+  return make_schemerlicht_object_string(ctxt, s);
+  }
+  
+schemerlicht_object schemerlicht_make_symbol(schemerlicht_context* ctxt, const char* s)
+  {
+  return make_schemerlicht_object_symbol(ctxt, s);  
+  }

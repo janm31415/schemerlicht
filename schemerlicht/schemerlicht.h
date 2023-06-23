@@ -83,4 +83,20 @@ SCHEMERLICHT_API void schemerlicht_register_external_primitive(schemerlicht_cont
 SCHEMERLICHT_API void schemerlicht_register_user_data(schemerlicht_context* ctxt, void* user_data);
 SCHEMERLICHT_API void* schemerlicht_get_user_data(schemerlicht_context* ctxt);
 
+SCHEMERLICHT_API schemerlicht_function* schemerlicht_lookup(schemerlicht_context* ctxt, const char* function_name);
+SCHEMERLICHT_API schemerlicht_object* schemerlicht_call_0(schemerlicht_context* ctxt, schemerlicht_function* fun);
+SCHEMERLICHT_API schemerlicht_object* schemerlicht_call_1(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* arg1);
+SCHEMERLICHT_API schemerlicht_object* schemerlicht_call_2(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* arg1, schemerlicht_object* arg2);
+SCHEMERLICHT_API schemerlicht_object* schemerlicht_call_3(schemerlicht_context* ctxt, schemerlicht_function* fun, schemerlicht_object* arg1, schemerlicht_object* arg2, schemerlicht_object* arg3);
+
+
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_fixnum(schemerlicht_fixnum fx);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_flonum(schemerlicht_flonum fl);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_true();
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_false();
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_nil();
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_char(schemerlicht_byte ch);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_string(schemerlicht_context* ctxt, const char* s);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_symbol(schemerlicht_context* ctxt, const char* s);
+
 #endif //SCHEMERLICHT_H
