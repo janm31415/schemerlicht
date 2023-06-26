@@ -89,4 +89,13 @@ schemerlicht_string schemerlicht_object_to_string(schemerlicht_context* ctxt, sc
 
 schemerlicht_object schemerlicht_object_deep_copy(schemerlicht_context* ctxt, schemerlicht_object* obj);
 
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_fixnum(schemerlicht_fixnum fx);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_flonum(schemerlicht_flonum fl);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_true();
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_false();
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_nil();
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_char(schemerlicht_byte ch);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_string(schemerlicht_context* ctxt, const char* s);
+SCHEMERLICHT_API schemerlicht_object schemerlicht_make_symbol(schemerlicht_context* ctxt, const char* s);
+
 #endif //SCHEMERLICHT_OBJECT_H
