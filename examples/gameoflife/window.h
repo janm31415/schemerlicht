@@ -22,8 +22,13 @@ class IWindowListener
 struct WindowHandleData;
 typedef WindowHandleData* WindowHandle;
 
+#ifdef _UNICODE
+WindowHandle create_window(const std::wstring& title, int w, int h);
+WindowHandle create_window(const std::wstring& title, int x, int y, int w, int h);
+#else
 WindowHandle create_window(const std::string& title, int w, int h);
 WindowHandle create_window(const std::string& title, int x, int y, int w, int h);
+#endif
 
 void close_window(WindowHandle& h_wnd);
 

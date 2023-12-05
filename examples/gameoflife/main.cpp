@@ -353,7 +353,11 @@ std::string get_cleaned_command(std::string txt)
 
 int main()
   {
+#ifdef _UNICODE
+  wh = create_window(L"Game of life", 512, 512); // create window for visualization
+#else
   wh = create_window("Game of life", 512, 512); // create window for visualization
+#endif
 
   schemerlicht_context* ctxt = schemerlicht_open(1024);
   scm_randomize(ctxt); // fill grid cells at random

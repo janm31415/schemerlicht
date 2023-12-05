@@ -219,11 +219,21 @@ namespace
     return 0;
     }
 
+#ifdef _UNICODE
+  HWND _create_window(const std::wstring& title, int x, int y, int w, int h)
+#else
   HWND _create_window(const std::string& title, int x, int y, int w, int h)
+#endif
     {
+#ifdef _UNICODE
+    std::wstringstream class_name_ss;
+    class_name_ss << L"jam_window_" << window_id++;
+    std::wstring class_name = class_name_ss.str();
+#else
     std::stringstream class_name_ss;
     class_name_ss << "jam_window_" << window_id++;
     std::string class_name = class_name_ss.str();
+#endif
 
     HINSTANCE hInstance = GetModuleHandle(0);
 
@@ -269,7 +279,11 @@ namespace
     return hwnd;
     }
 
+#ifdef _UNICODE
+  void _create_window_with_message_loop(HWND* h_wnd, WindowHandle user_data, const std::wstring& title, int x, int y, int w, int h)
+#else
   void _create_window_with_message_loop(HWND* h_wnd, WindowHandle user_data, const std::string& title, int x, int y, int w, int h)
+#endif
     {
     user_data->mt.lock();
     *h_wnd = _create_window(title, x, y, w, h);
@@ -286,7 +300,11 @@ namespace
       }
     }
 
+#ifdef _UNICODE
+  std::unique_ptr<std::thread> _create_threaded_window(HWND* h_wnd, WindowHandle user_data, const std::wstring& title, int x, int y, int w, int h)
+#else
   std::unique_ptr<std::thread> _create_threaded_window(HWND* h_wnd, WindowHandle user_data, const std::string& title, int x, int y, int w, int h)
+#endif
     {
     user_data->initialised = false;
     std::unique_ptr<std::thread> res(new std::thread(_create_window_with_message_loop, h_wnd, user_data, title, x, y, w, h));
@@ -558,7 +576,11 @@ void close_window(WindowHandle& h_wnd)
     }
   }
 
+#ifdef _UNICODE
+WindowHandle create_window(const std::wstring& title, int x, int y, int w, int h)
+#else
 WindowHandle create_window(const std::string& title, int x, int y, int w, int h)
+#endif
   {
 #ifdef _WIN32
   WindowHandle handle = new WindowHandleData();
@@ -592,7 +614,11 @@ WindowHandle create_window(const std::string& title, int x, int y, int w, int h)
   return handle;
   }
 
+#ifdef _UNICODE
+WindowHandle create_window(const std::wstring& title, int w, int h)
+#else
 WindowHandle create_window(const std::string& title, int w, int h)
+#endif
   {
 #ifdef _WIN32
   return create_window(title, CW_USEDEFAULT, CW_USEDEFAULT, w, h);
