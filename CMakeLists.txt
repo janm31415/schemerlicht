@@ -17,6 +17,7 @@ add_subdirectory(schemerlicht.repl)
 add_subdirectory(tools/primextract)
 add_subdirectory(tools/primdispatch)
 add_subdirectory(examples/gameoflife)
+add_subdirectory(benchc)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_target_properties (primextract PROPERTIES FOLDER tools)
