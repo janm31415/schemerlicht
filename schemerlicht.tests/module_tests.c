@@ -162,7 +162,10 @@ void run_all_module_tests()
   test_mbe(ctxt);
   test_jaffer(ctxt);
   test_srfi1(ctxt);
+  
+#ifdef SCHEMERLICHT_TEST_SLIB
   test_slib(ctxt);
+#endif
 
   schemerlicht_close(ctxt);
   }

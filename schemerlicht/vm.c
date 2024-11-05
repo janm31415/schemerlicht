@@ -435,6 +435,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
+#if 0
       for (int j = 0; j <= b; ++j)
         {
 #if 0
@@ -445,6 +446,9 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr) + j, ((schemerlicht_object*)ctxt->stack.vector_ptr) + a + j, sizeof(schemerlicht_object));
 #endif
         }
+#else
+      memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr), ((schemerlicht_object*)ctxt->stack.vector_ptr) + a, sizeof(schemerlicht_object)*(b+1));
+#endif
       schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
       blocking->type = schemerlicht_object_type_blocking;
       continue;
