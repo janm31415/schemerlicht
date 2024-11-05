@@ -94,6 +94,7 @@ if ((b) == 2)
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx ^ arg2->value.fx;
         continue;
+#ifdef SCHEMERLICHT_EXTENDED_INLINES
         case SCHEMERLICHT_ARITHMETIC_SHIFT:
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg2->value.fx > 0 ? arg1->value.fx << arg2->value.fx : arg1->value.fx >> -arg2->value.fx;
@@ -106,6 +107,7 @@ if ((b) == 2)
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx > arg2->value.fx ? arg2->value.fx : arg1->value.fx;
         continue;
+#endif
         default:
           goto slow_lane;          
         }
@@ -166,6 +168,7 @@ if ((b) == 2)
         case SCHEMERLICHT_FLGEQ:
         target->type = (arg1->value.fl >= arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
+#ifdef SCHEMERLICHT_EXTENDED_INLINES
         case SCHEMERLICHT_MAX:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = arg1->value.fl > arg2->value.fl ? arg1->value.fl : arg2->value.fl;
@@ -174,6 +177,7 @@ if ((b) == 2)
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = arg1->value.fl > arg2->value.fl ? arg2->value.fl : arg1->value.fl;
         continue;
+#endif
         default:
           goto slow_lane;          
         }
@@ -276,6 +280,7 @@ else if ((b) == 1)
         target->type = schemerlicht_object_type_true;
         continue;
       case SCHEMERLICHT_IS_FIXNUM:
+#ifdef SCHEMERLICHT_EXTENDED_INLINES
       case SCHEMERLICHT_IS_NULL:
       case SCHEMERLICHT_IS_BOOLEAN:
       case SCHEMERLICHT_IS_CHAR:
@@ -288,6 +293,7 @@ else if ((b) == 1)
       case SCHEMERLICHT_IS_LIST:
       case SCHEMERLICHT_IS_PROMISE:
       case SCHEMERLICHT_IS_PORT:
+#endif
         target->type = schemerlicht_object_type_false;
         continue;         
       case SCHEMERLICHT_FLOOR:
@@ -372,6 +378,7 @@ else if ((b) == 1)
         target->type = schemerlicht_object_type_true;
         continue;
       case SCHEMERLICHT_IS_FLONUM:
+#ifdef SCHEMERLICHT_EXTENDED_INLINES
       case SCHEMERLICHT_IS_NULL:
       case SCHEMERLICHT_IS_BOOLEAN:
       case SCHEMERLICHT_IS_CHAR:
@@ -383,7 +390,8 @@ else if ((b) == 1)
       case SCHEMERLICHT_IS_PROCEDURE:
       case SCHEMERLICHT_IS_LIST:
       case SCHEMERLICHT_IS_PROMISE:
-      case SCHEMERLICHT_IS_PORT:         
+      case SCHEMERLICHT_IS_PORT:     
+#endif
         target->type = schemerlicht_object_type_false;
         continue;      
       case SCHEMERLICHT_FLOOR:
