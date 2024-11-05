@@ -39,6 +39,10 @@ vector_tests.c
 
 option(SCHEMERLICHT_TEST_SLIB "Run slib tests. For this to work, slib should be installed correctly on your pc." OFF)
 
+if (SCHEMERLICHT_TEST_SLIB)
+add_definitions(-D_SCHEMERLICHT_TEST_SLIB)
+endif (SCHEMERLICHT_TEST_SLIB)
+
 #if (WIN32)
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:8388608")
 #endif (WIN32)

@@ -163,7 +163,7 @@ void run_all_module_tests()
   test_jaffer(ctxt);
   test_srfi1(ctxt);
   
-#ifdef SCHEMERLICHT_TEST_SLIB
+#ifdef _SCHEMERLICHT_TEST_SLIB
   test_slib(ctxt);
 #endif
 
