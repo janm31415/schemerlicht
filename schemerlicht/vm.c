@@ -483,6 +483,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int bx = SCHEMERLICHT_GETARG_Bx(instruc);
+      #if 0
       schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       const schemerlicht_object* k = schemerlicht_vector_at(&(fun)->constants, bx, schemerlicht_object);
       if (schemerlicht_object_get_type(k) == schemerlicht_object_type_string)
@@ -497,13 +498,24 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         {
         schemerlicht_set_object(target, k);
         }
+      #else
+        schemerlicht_object* target = ((schemerlicht_object*)ctxt->stack.vector_ptr) + a;
+        const schemerlicht_object* source = (schemerlicht_object*)(fun->constants.vector_ptr) + bx;
+        memcpy(target, source, sizeof(schemerlicht_object));
+        if (target->type == schemerlicht_object_type_string) {
+          schemerlicht_string_copy(ctxt, &target->value.s, &source->value.s);
+          schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
+          schemerlicht_set_object(heap_obj, target);
+          ++ctxt->heap_pos;
+        }
+      #endif
       continue;
       }
       case SCHEMERLICHT_OPCODE_SETFIXNUM:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       const int b = SCHEMERLICHT_GETARG_sBx(instruc);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       target->type = schemerlicht_object_type_fixnum;
       target->value.fx = b;
       continue;
@@ -511,8 +523,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       case SCHEMERLICHT_OPCODE_SETPRIM:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       target->type = schemerlicht_object_type_primitive;
       target->value.fx = b;
       continue;
@@ -520,8 +532,8 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       case SCHEMERLICHT_OPCODE_SETPRIMOBJ:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       target->type = schemerlicht_object_type_primitive_object;
       target->value.fx = b;
       continue;
@@ -529,16 +541,17 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       case SCHEMERLICHT_OPCODE_SETCHAR:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       target->type = schemerlicht_object_type_char;
       target->value.ch = cast(schemerlicht_byte, b);
       continue;
       }
       case SCHEMERLICHT_OPCODE_SETTYPE:
       {
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, SCHEMERLICHT_GETARG_A(instruc), schemerlicht_object);
+      const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
+      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
       target->type = b;
       continue;
       }

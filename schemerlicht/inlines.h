@@ -36,28 +36,21 @@ if ((b) == 2)
         {
         case SCHEMERLICHT_ADD:
         case SCHEMERLICHT_FXADD:
-        {
         target->value.fx = arg1->value.fx + arg2->value.fx;
         target->type = schemerlicht_object_type_fixnum;
         continue;
-        }
         case SCHEMERLICHT_SUB:
         case SCHEMERLICHT_FXSUB:
-        {
         target->value.fx = arg1->value.fx - arg2->value.fx;
         target->type = schemerlicht_object_type_fixnum;
         continue;
-        }
         case SCHEMERLICHT_MUL:
         case SCHEMERLICHT_FXMUL:
-        {
         target->value.fx = arg1->value.fx * arg2->value.fx;
         target->type = schemerlicht_object_type_fixnum;
         continue;
-        }
         case SCHEMERLICHT_DIV:
         case SCHEMERLICHT_FXDIV:
-        {
         if (arg2->value.fx == 0)
           target->type = schemerlicht_object_type_undefined;
         else
@@ -66,42 +59,53 @@ if ((b) == 2)
           target->type = schemerlicht_object_type_fixnum;
           }
         continue;
-        }
         case SCHEMERLICHT_NOT_EQUAL:
-        {
         target->type = (arg1->value.fx != arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_EQUAL:
         case SCHEMERLICHT_FXEQUAL:
-        {
         target->type = (arg1->value.fx == arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_LESS:
         case SCHEMERLICHT_FXLESS:
-        {
         target->type = (arg1->value.fx < arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_GREATER:
         case SCHEMERLICHT_FXGREATER:
-        {
         target->type = (arg1->value.fx > arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_LEQ:
         case SCHEMERLICHT_FXLEQ:
-        {
         target->type = (arg1->value.fx <= arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_GEQ:
         case SCHEMERLICHT_FXGEQ:
-        {
         target->type = (arg1->value.fx >= arg2->value.fx) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
+        case SCHEMERLICHT_BITWISE_OR:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx | arg2->value.fx;
+        continue;
+        case SCHEMERLICHT_BITWISE_AND:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx & arg2->value.fx;
+        continue;
+        case SCHEMERLICHT_BITWISE_XOR:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx ^ arg2->value.fx;
+        continue;
+        case SCHEMERLICHT_ARITHMETIC_SHIFT:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg2->value.fx > 0 ? arg1->value.fx << arg2->value.fx : arg1->value.fx >> -arg2->value.fx;
+        continue;
+        case SCHEMERLICHT_MAX:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx > arg2->value.fx ? arg1->value.fx : arg2->value.fx;
+        continue;
+        case SCHEMERLICHT_MIN:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx > arg2->value.fx ? arg2->value.fx : arg1->value.fx;
+        continue;
         default:
           goto slow_lane;          
         }
@@ -121,67 +125,55 @@ if ((b) == 2)
         {
         case SCHEMERLICHT_ADD:
         case SCHEMERLICHT_FLADD:
-        {
         target->value.fl = arg1->value.fl + arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
         continue;
-        }
         case SCHEMERLICHT_SUB:
         case SCHEMERLICHT_FLSUB:
-        {
         target->value.fl = arg1->value.fl - arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
         continue;
-        }
         case SCHEMERLICHT_MUL:
         case SCHEMERLICHT_FLMUL:
-        {
         target->value.fl = arg1->value.fl * arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
         continue;
-        }
         case SCHEMERLICHT_DIV:
         case SCHEMERLICHT_FLDIV:
-        {
         target->value.fl = arg1->value.fl / arg2->value.fl;
         target->type = schemerlicht_object_type_flonum;
         continue;
-        }
         case SCHEMERLICHT_NOT_EQUAL:
-        {
         target->type = (arg1->value.fl != arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_EQUAL:
         case SCHEMERLICHT_FLEQUAL:
-        {
         target->type = (arg1->value.fl == arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_LESS:
         case SCHEMERLICHT_FLLESS:
-        {
         target->type = (arg1->value.fl < arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_GREATER:
         case SCHEMERLICHT_FLGREATER:
-        {
         target->type = (arg1->value.fl > arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_LEQ:
         case SCHEMERLICHT_FLLEQ:
-        {
         target->type = (arg1->value.fl <= arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
         case SCHEMERLICHT_GEQ:
         case SCHEMERLICHT_FLGEQ:
-        {
         target->type = (arg1->value.fl >= arg2->value.fl) ? schemerlicht_object_type_true : schemerlicht_object_type_false;
         continue;
-        }
+        case SCHEMERLICHT_MAX:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = arg1->value.fl > arg2->value.fl ? arg1->value.fl : arg2->value.fl;
+        continue;
+        case SCHEMERLICHT_MIN:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = arg1->value.fl > arg2->value.fl ? arg2->value.fl : arg1->value.fl;
+        continue;
         default:
           goto slow_lane;          
         }
@@ -266,6 +258,38 @@ else if ((b) == 1)
     {
     switch (function_id)
       {
+      case SCHEMERLICHT_ADD1:
+      case SCHEMERLICHT_FLADD1:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = arg1->value.fl+1;
+        continue;
+      case SCHEMERLICHT_SUB1:
+      case SCHEMERLICHT_FLSUB1:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = arg1->value.fl-1;
+        continue;
+      case SCHEMERLICHT_IS_ZERO:
+      case SCHEMERLICHT_FLZERO:
+        target->type = arg1->value.fl == 0 ? schemerlicht_object_type_true : schemerlicht_object_type_false;
+        continue;
+      case SCHEMERLICHT_IS_FLONUM:
+        target->type = schemerlicht_object_type_true;
+        continue;
+      case SCHEMERLICHT_IS_FIXNUM:
+      case SCHEMERLICHT_IS_NULL:
+      case SCHEMERLICHT_IS_BOOLEAN:
+      case SCHEMERLICHT_IS_CHAR:
+      case SCHEMERLICHT_IS_VECTOR:
+      case SCHEMERLICHT_IS_PAIR:
+      case SCHEMERLICHT_IS_CLOSURE:
+      case SCHEMERLICHT_IS_STRING:
+      case SCHEMERLICHT_IS_SYMBOL:
+      case SCHEMERLICHT_IS_PROCEDURE:
+      case SCHEMERLICHT_IS_LIST:
+      case SCHEMERLICHT_IS_PROMISE:
+      case SCHEMERLICHT_IS_PORT:
+        target->type = schemerlicht_object_type_false;
+        continue;         
       case SCHEMERLICHT_FLOOR:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = floor(arg1->value.fl);
@@ -318,6 +342,10 @@ else if ((b) == 1)
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = sqrt(arg1->value.fl);
         continue;
+      case SCHEMERLICHT_ABS:
+        target->type = schemerlicht_object_type_flonum;
+        target->value.fl = fabs(arg1->value.fl);
+        continue;
       default:
         goto slow_lane;        
       }
@@ -326,6 +354,38 @@ else if ((b) == 1)
     {
     switch (function_id)
       {
+      case SCHEMERLICHT_ADD1:
+      case SCHEMERLICHT_FXADD1:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx+1;
+        continue;
+      case SCHEMERLICHT_SUB1:
+      case SCHEMERLICHT_FXSUB1:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx-1;
+        continue;
+      case SCHEMERLICHT_IS_ZERO:
+      case SCHEMERLICHT_FXZERO:
+        target->type = arg1->value.fx == 0 ? schemerlicht_object_type_true : schemerlicht_object_type_false;
+        continue;
+      case SCHEMERLICHT_IS_FIXNUM:
+        target->type = schemerlicht_object_type_true;
+        continue;
+      case SCHEMERLICHT_IS_FLONUM:
+      case SCHEMERLICHT_IS_NULL:
+      case SCHEMERLICHT_IS_BOOLEAN:
+      case SCHEMERLICHT_IS_CHAR:
+      case SCHEMERLICHT_IS_VECTOR:
+      case SCHEMERLICHT_IS_PAIR:
+      case SCHEMERLICHT_IS_CLOSURE:
+      case SCHEMERLICHT_IS_STRING:
+      case SCHEMERLICHT_IS_SYMBOL:
+      case SCHEMERLICHT_IS_PROCEDURE:
+      case SCHEMERLICHT_IS_LIST:
+      case SCHEMERLICHT_IS_PROMISE:
+      case SCHEMERLICHT_IS_PORT:         
+        target->type = schemerlicht_object_type_false;
+        continue;      
       case SCHEMERLICHT_FLOOR:
         target->type = schemerlicht_object_type_fixnum;
         target->value.fx = arg1->value.fx;
@@ -377,6 +437,14 @@ else if ((b) == 1)
       case SCHEMERLICHT_SQRT:
         target->type = schemerlicht_object_type_flonum;
         target->value.fl = sqrt(cast(schemerlicht_flonum, arg1->value.fx));
+        continue;
+      case SCHEMERLICHT_BITWISE_NOT:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = ~arg1->value.fx;
+        continue;
+      case SCHEMERLICHT_ABS:
+        target->type = schemerlicht_object_type_fixnum;
+        target->value.fx = arg1->value.fx >= 0 ? arg1->value.fx : -arg1->value.fx;
         continue;
       default:
         goto slow_lane;        
