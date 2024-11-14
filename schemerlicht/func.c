@@ -1,6 +1,8 @@
 #include "func.h"
 #include "vector.h"
 #include "object.h"
+#include "context.h"
+#include "vm.h"
 
 schemerlicht_function* schemerlicht_function_new(schemerlicht_context* ctxt)
   {
@@ -40,3 +42,13 @@ void schemerlicht_function_free(schemerlicht_context* ctxt, schemerlicht_functio
 #endif
   schemerlicht_delete(ctxt, f);
   }
+
+
+void schemerlicht_show_last_function(schemerlicht_context* ctxt, schemerlicht_string* s) {
+  if (ctxt->lambdas.vector_size == 0)
+    return;
+  schemerlicht_function** fun = schemerlicht_vector_back(&(ctxt->lambdas), schemerlicht_function*);
+  schemerlicht_string str = schemerlicht_fun_to_string(ctxt, *fun);
+  schemerlicht_string_append(ctxt, s, &str);
+  schemerlicht_string_destroy(ctxt, &str);
+}

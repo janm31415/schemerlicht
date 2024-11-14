@@ -74,6 +74,43 @@ static schemerlicht_vector compile_scheme(schemerlicht_context* ctxt, schemerlic
   return compiled_program;
   }
 
+void schemerlicht_dump_compiled_program(schemerlicht_context* ctxt, schemerlicht_string* s, const char* script) {
+  schemerlicht_stream str;
+  schemerlicht_stream_init(ctxt, &str, 10);
+  schemerlicht_memsize len = cast(schemerlicht_memsize, strlen(script));
+  schemerlicht_stream_write(ctxt, &str, script, len, 0);
+  schemerlicht_stream_rewind(&str);
+  schemerlicht_syntax_errors_clear(ctxt);
+  schemerlicht_compile_errors_clear(ctxt);
+  schemerlicht_runtime_errors_clear(ctxt);
+  schemerlicht_vector tokens = tokenize(ctxt, &str);
+  if (schemerlicht_context_is_error_free(ctxt) == 0) {
+    destroy_tokens_vector(ctxt, &tokens);
+    schemerlicht_stream_close(ctxt, &str);
+    return;
+  }
+  schemerlicht_program prog = make_program(ctxt, &tokens);
+  if (schemerlicht_context_is_error_free(ctxt) == 0) {
+    destroy_tokens_vector(ctxt, &tokens);
+    schemerlicht_stream_close(ctxt, &str);
+    schemerlicht_program_destroy(ctxt, &prog);
+    return;
+  }
+  schemerlicht_preprocess(ctxt, &prog);
+  if (schemerlicht_context_is_error_free(ctxt) == 0) {
+    destroy_tokens_vector(ctxt, &tokens);
+    schemerlicht_stream_close(ctxt, &str);
+    schemerlicht_program_destroy(ctxt, &prog);
+    return;
+  }
+  schemerlicht_string result = schemerlicht_dump(ctxt, &prog, 0);
+  schemerlicht_string_append(ctxt, s, &result);
+  schemerlicht_string_destroy(ctxt, &result);
+  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_program_destroy(ctxt, &prog);
+  schemerlicht_stream_close(ctxt, &str);
+}
+
 static schemerlicht_object* execute_scheme(schemerlicht_context* ctxt, schemerlicht_stream* str)
   {
   /*

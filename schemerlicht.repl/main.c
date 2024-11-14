@@ -54,10 +54,12 @@ static void print_help()
   {
   printf("This is Schemerlicht.You are interacting with the REPL.\n");
   printf("Enter scheme commands or one of the following:\n");
-  printf("  ,exit:      quit the application.\n");
-  printf("  ,stack <n>: print the stack.\n");
-  printf("  ,env:       print the environment.\n");
-  printf("  ,mem:       print the memory usage.\n\n");
+  printf("  ,exit:          quit the application.\n");
+  printf("  ,stack <n>:     print the stack.\n");
+  printf("  ,env:           print the environment.\n");
+  printf("  ,mem:           print the memory usage.\n");
+  printf("  ,dump <scheme>: print optimized scheme.\n");
+  printf("  ,fun:           print bytecode of latest function\n\n");
   }
 
 static void print_stack(schemerlicht_context* ctxt, int stack_end)
@@ -77,6 +79,24 @@ static void print_env(schemerlicht_context* ctxt)
   printf("%s\n", envstring.string_ptr);
   schemerlicht_string_destroy(ctxt, &envstring);
   }
+
+static void print_fun(schemerlicht_context* ctxt)
+{
+  schemerlicht_string funstring;
+  schemerlicht_string_init(ctxt, &funstring, "");
+  schemerlicht_show_last_function(ctxt, &funstring);
+  printf("%s\n", funstring.string_ptr);
+  schemerlicht_string_destroy(ctxt, &funstring);
+}
+
+static void print_dump(schemerlicht_context* ctxt, const char* s)
+{
+  schemerlicht_string funstring;
+  schemerlicht_string_init(ctxt, &funstring, "");
+  schemerlicht_dump_compiled_program(ctxt, &funstring, s);
+  printf("%s\n", funstring.string_ptr);
+  schemerlicht_string_destroy(ctxt, &funstring);
+}
 
 static void print_mem(schemerlicht_context* ctxt)
   {
@@ -181,6 +201,16 @@ int main(int argc, char** argv)
         input_is_scheme_command = 0;
         print_mem(ctxt);
         }
+      if (strcmp(command_buffer, ",fun") == 0)
+      {
+        input_is_scheme_command = 0;
+        print_fun(ctxt);
+      }
+      if (strcmp(command_buffer, ",dump") == 0)
+      {
+        input_is_scheme_command = 0;
+        print_dump(ctxt, line+6);
+      }
       if (strcmp(command_buffer, ",stack") == 0)
         {
         int stack_end = 9;
