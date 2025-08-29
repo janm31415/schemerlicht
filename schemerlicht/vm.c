@@ -422,33 +422,14 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
-#if 0
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
-      const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
-      schemerlicht_set_object(target, source);
-#else
       memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr)+a, ((schemerlicht_object*)ctxt->stack.vector_ptr) + b, sizeof(schemerlicht_object));
-#endif
       continue;
       }
       case SCHEMERLICHT_OPCODE_MOVETOP:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int b = SCHEMERLICHT_GETARG_B(instruc);
-#if 0
-      for (int j = 0; j <= b; ++j)
-        {
-#if 0
-        schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
-        const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, a + j, schemerlicht_object);
-        schemerlicht_set_object(target, source);
-#else
-        memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr) + j, ((schemerlicht_object*)ctxt->stack.vector_ptr) + a + j, sizeof(schemerlicht_object));
-#endif
-        }
-#else
       memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr), ((schemerlicht_object*)ctxt->stack.vector_ptr) + a, sizeof(schemerlicht_object)*(b+1));
-#endif
       schemerlicht_object* blocking = schemerlicht_vector_at(&ctxt->stack, b + 1, schemerlicht_object);
       blocking->type = schemerlicht_object_type_blocking;
       continue;
@@ -457,58 +438,29 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int bx = SCHEMERLICHT_GETARG_Bx(instruc);
-#if 0
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
-      const schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, bx, schemerlicht_object);
-      schemerlicht_set_object(target, global);
-#else
       memcpy(((schemerlicht_object*)ctxt->stack.vector_ptr) + a, ((schemerlicht_object*)ctxt->globals.vector_ptr) + bx, sizeof(schemerlicht_object));
-#endif
       continue;
       }
       case SCHEMERLICHT_OPCODE_STOREGLOBAL:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int bx = SCHEMERLICHT_GETARG_Bx(instruc);
-#if 0
-      const schemerlicht_object* source = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
-      schemerlicht_object* global = schemerlicht_vector_at(&ctxt->globals, bx, schemerlicht_object);
-      schemerlicht_set_object(global, source);
-#else
       memcpy(((schemerlicht_object*)ctxt->globals.vector_ptr) + bx, ((schemerlicht_object*)ctxt->stack.vector_ptr) + a, sizeof(schemerlicht_object));
-#endif
       continue;
       }
       case SCHEMERLICHT_OPCODE_LOADK:
       {
       const int a = SCHEMERLICHT_GETARG_A(instruc);
       const int bx = SCHEMERLICHT_GETARG_Bx(instruc);
-      #if 0
-      schemerlicht_object* target = schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object);
-      const schemerlicht_object* k = schemerlicht_vector_at(&(fun)->constants, bx, schemerlicht_object);
-      if (schemerlicht_object_get_type(k) == schemerlicht_object_type_string)
-        {
-        target->type = schemerlicht_object_type_string;
-        schemerlicht_string_copy(ctxt, &target->value.s, &k->value.s);
+      schemerlicht_object* target = ((schemerlicht_object*)ctxt->stack.vector_ptr) + a;
+      const schemerlicht_object* source = (schemerlicht_object*)(fun->constants.vector_ptr) + bx;
+      memcpy(target, source, sizeof(schemerlicht_object));
+      if (target->type == schemerlicht_object_type_string) {
+        schemerlicht_string_copy(ctxt, &target->value.s, &source->value.s);
         schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
         schemerlicht_set_object(heap_obj, target);
         ++ctxt->heap_pos;
-        }
-      else
-        {
-        schemerlicht_set_object(target, k);
-        }
-      #else
-        schemerlicht_object* target = ((schemerlicht_object*)ctxt->stack.vector_ptr) + a;
-        const schemerlicht_object* source = (schemerlicht_object*)(fun->constants.vector_ptr) + bx;
-        memcpy(target, source, sizeof(schemerlicht_object));
-        if (target->type == schemerlicht_object_type_string) {
-          schemerlicht_string_copy(ctxt, &target->value.s, &source->value.s);
-          schemerlicht_object* heap_obj = &ctxt->heap[ctxt->heap_pos];
-          schemerlicht_set_object(heap_obj, target);
-          ++ctxt->heap_pos;
-        }
-      #endif
+      }
       continue;
       }
       case SCHEMERLICHT_OPCODE_SETFIXNUM:
@@ -574,6 +526,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
         const schemerlicht_fixnum function_id = target->value.fx;
 #ifdef SCHEMERLICHT_USE_INLINES  
         #include "inlines.h"
+        //schemerlicht_call_primitive_inlined(ctxt, function_id, a, b, c);
         //schemerlicht_call_primitive_dispatch(ctxt, function_id, a, b, c);
         (*prim_fun_dispatch_table[function_id])(ctxt, a, b, c);
 //#include "primswitch2.h"
@@ -718,12 +671,7 @@ schemerlicht_object* schemerlicht_run(schemerlicht_context* ctxt, schemerlicht_f
       const int b = SCHEMERLICHT_GETARG_B(instruc);
       if (a != 0)
         {
-        for (int j = 0; j < b; ++j)
-          {
-          schemerlicht_object* retj = schemerlicht_vector_at(&ctxt->stack, j, schemerlicht_object);
-          const schemerlicht_object* srcj = schemerlicht_vector_at(&ctxt->stack, a + j, schemerlicht_object);
-          schemerlicht_set_object(retj, srcj);
-          }
+        memcpy(ctxt->stack.vector_ptr, schemerlicht_vector_at(&ctxt->stack, a, schemerlicht_object), sizeof(schemerlicht_object)*b);
         }
       schemerlicht_object* stack_to_block = schemerlicht_vector_at(&ctxt->stack, b, schemerlicht_object);
       stack_to_block->type = schemerlicht_object_type_blocking;

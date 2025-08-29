@@ -71,7 +71,7 @@ SCHEMERLICHT_API void schemerlicht_show_last_function(schemerlicht_context* ctxt
 SCHEMERLICHT_API void schemerlicht_show_environment(schemerlicht_context* ctxt, schemerlicht_string* s);
 SCHEMERLICHT_API void schemerlicht_show_memory(schemerlicht_context* ctxt, schemerlicht_string* s);
 SCHEMERLICHT_API void schemerlicht_show_object(schemerlicht_context* ctxt, schemerlicht_object* obj, schemerlicht_string* s);
-SCHEMERLICHT_API void schemerlicht_dump_compiled_programt(schemerlicht_context* ctxt, schemerlicht_string* s, const char* script);
+SCHEMERLICHT_API void schemerlicht_dump_compiled_program(schemerlicht_context* ctxt, schemerlicht_string* s, const char* script);
 
 typedef enum schemerlicht_foreign_return_type
   {
