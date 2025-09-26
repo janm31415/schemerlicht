@@ -106,7 +106,7 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
     "(load-module '(packages))\n";
 
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   schemerlicht_preprocess(ctxt, &prog);
 #if 0
   schemerlicht_string dmp = schemerlicht_dump(ctxt, &prog);
@@ -115,7 +115,7 @@ void schemerlicht_compile_modules(schemerlicht_context* ctxt, const char* module
 #endif
   schemerlicht_vector modules = schemerlicht_compile_program(ctxt, &prog);
   schemerlicht_run_program(ctxt, &modules);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_compiled_program_register(ctxt, &modules);
   }

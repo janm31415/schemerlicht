@@ -30,7 +30,7 @@ static schemerlicht_cell expression_to_cell(schemerlicht_context* ctxt, schemerl
   token* token_it = schemerlicht_vector_begin(&tokens, token);
   token* token_it_end = schemerlicht_vector_end(&tokens, token);
   schemerlicht_cell out_cell = schemerlicht_read_quote(ctxt, &token_it, &token_it_end, 1);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   return out_cell;
   }
 
@@ -516,13 +516,13 @@ static int previsit_funcall(schemerlicht_context* ctxt, schemerlicht_visitor* v,
       schemerlicht_vector tokens = tokenize(ctxt, &str);
       schemerlicht_stream_close(ctxt, &str);
       schemerlicht_string_destroy(ctxt, &s);
-      schemerlicht_program result = make_program(ctxt, &tokens);
+      schemerlicht_program result = schemerlicht_make_program(ctxt, &tokens);
 #if 0
       schemerlicht_string dumped2 = schemerlicht_dump(ctxt, &result);
       printf("%s\n", dumped2.string_ptr);
       schemerlicht_string_destroy(ctxt, &dumped2);
 #endif
-      destroy_tokens_vector(ctxt, &tokens);
+      schemerlicht_destroy_tokens_vector(ctxt, &tokens);
       schemerlicht_program_destroy(ctxt, &pr);
 
       if (result.expressions.vector_size == 0)

@@ -183,7 +183,7 @@ schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)
     g->dummy_node->next = NULL;
     g->main_context = ctxt;
     g->expression_map = generate_expression_map(ctxt);
-    g->primitives_map = generate_primitives_map(ctxt);
+    g->primitives_map = schemerlicht_generate_primitives_map(ctxt);
     g->true_sym = schemerlicht_make_true_sym_cell(ctxt);
     g->false_sym = schemerlicht_make_false_sym_cell(ctxt);
     g->nil_sym = schemerlicht_make_nil_sym_cell(ctxt);

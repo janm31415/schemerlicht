@@ -534,7 +534,7 @@ void schemerlicht_token_destroy(schemerlicht_context* ctxt, token* tok)
   schemerlicht_string_destroy(ctxt, &tok->value);
   }
 
-void destroy_tokens_vector(schemerlicht_context* ctxt, schemerlicht_vector* tokens)
+void schemerlicht_destroy_tokens_vector(schemerlicht_context* ctxt, schemerlicht_vector* tokens)
   {
   token* it = schemerlicht_vector_begin(tokens, token);
   token* it_end = schemerlicht_vector_end(tokens, token);

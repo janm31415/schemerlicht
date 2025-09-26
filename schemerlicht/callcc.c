@@ -20,7 +20,7 @@ void schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   {  
   char* script = "( define %call/cc ( lambda ( %self1 %k_0 %f_1 ) ( begin ( %f_1 %k_0 ( closure ( lambda ( %self0 %dummy-k_2 %result_3 ) ( begin ( ( closure-ref %self0 1 ) %result_3 ) ) ) %k_0 ) ) ) ) )\n";  
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   schemerlicht_define_conversion(ctxt, &prog);
   schemerlicht_global_define_environment_allocation(ctxt, &prog);  
   schemerlicht_vector callcc = schemerlicht_compile_program(ctxt, &prog);
@@ -28,7 +28,7 @@ void schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   schemerlicht_assert(schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object)->type == schemerlicht_object_type_lambda);
   schemerlicht_function* call_cc_fun = cast(schemerlicht_function*, schemerlicht_vector_begin(&ctxt->stack, schemerlicht_object)->value.ptr);
   ctxt->callcc_fun = call_cc_fun;
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_compiled_program_register(ctxt, &callcc);
   char* dynamic_wind_script = "(define %dynamic-winds '())\n"
@@ -62,11 +62,11 @@ void schemerlicht_compile_callcc(schemerlicht_context* ctxt)
   "          (%dynamic-unwind to(fx- delta 1)))))))\n"
   "  (define call/cc call-with-current-continuation)";
   tokens = schemerlicht_script2tokens(ctxt, dynamic_wind_script);
-  prog = make_program(ctxt, &tokens);
+  prog = schemerlicht_make_program(ctxt, &tokens);
   schemerlicht_preprocess_internal_libs(ctxt, &prog);
   schemerlicht_vector dynamic_wind = schemerlicht_compile_program(ctxt, &prog);
   schemerlicht_run_program(ctxt, &dynamic_wind);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_compiled_program_register(ctxt, &dynamic_wind);
   }

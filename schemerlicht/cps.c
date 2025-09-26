@@ -157,7 +157,7 @@ static cps_conversion_state init_conversion_state(schemerlicht_expression* e, in
   s.nonsimple_vars.vector_ptr = NULL;
   s.nonsimple_vars.vector_size = 0;
   s.nonsimple_vars.vector_capacity = 0;
-  s.nonsimple_fun_var = make_null_string();
+  s.nonsimple_fun_var = schemerlicht_make_null_string();
   s.var_index = 0;
   return s;
   }

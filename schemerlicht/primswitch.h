@@ -8161,7 +8161,7 @@ switch (function_id)
         ctxt->stack.vector_size -= a;
 #endif           
 
-        schemerlicht_program prog = make_program(ctxt, &tokens);
+        schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
         schemerlicht_preprocess(ctxt, &prog);
 #if 0
         schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
@@ -8172,7 +8172,7 @@ switch (function_id)
           {
           schemerlicht_vector compiled_program = schemerlicht_compile_program(ctxt, &prog);
           schemerlicht_print_any_error(ctxt);
-          destroy_tokens_vector(ctxt, &tokens);
+          schemerlicht_destroy_tokens_vector(ctxt, &tokens);
           schemerlicht_program_destroy(ctxt, &prog);
           if (ctxt->number_of_compile_errors == 0 && ctxt->number_of_syntax_errors == 0)
             {
@@ -8189,7 +8189,7 @@ switch (function_id)
           }
         else
           {
-          destroy_tokens_vector(ctxt, &tokens);
+          schemerlicht_destroy_tokens_vector(ctxt, &tokens);
           schemerlicht_program_destroy(ctxt, &prog);
           ra->type = schemerlicht_object_type_undefined;
           }
@@ -8253,13 +8253,13 @@ switch (function_id)
     schemerlicht_stream_rewind(&str);
     schemerlicht_vector tokens = tokenize(eval_ctxt, &str);
     schemerlicht_stream_close(eval_ctxt, &str);
-    schemerlicht_program prog = make_program(eval_ctxt, &tokens);
+    schemerlicht_program prog = schemerlicht_make_program(eval_ctxt, &tokens);
     schemerlicht_preprocess(eval_ctxt, &prog);
     schemerlicht_vector compiled_program = schemerlicht_compile_program(eval_ctxt, &prog);
     schemerlicht_object* res = schemerlicht_run_program(ctxt, &compiled_program);
     schemerlicht_object res_copy = schemerlicht_object_deep_copy(ctxt, res);
     schemerlicht_compiled_program_destroy(eval_ctxt, &compiled_program);
-    destroy_tokens_vector(eval_ctxt, &tokens);
+    schemerlicht_destroy_tokens_vector(eval_ctxt, &tokens);
     schemerlicht_program_destroy(eval_ctxt, &prog);
     schemerlicht_string_destroy(ctxt, &s);
     schemerlicht_set_object(ra, &res_copy);

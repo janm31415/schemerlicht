@@ -12,7 +12,7 @@
 static schemerlicht_parsed_variable make_var(schemerlicht_context* ctxt, const char* name)
   {
   schemerlicht_parsed_variable v;
-  v.filename = make_null_string();
+  v.filename = schemerlicht_make_null_string();
   schemerlicht_string_init(ctxt, &v.name, name);
   return v;
   }
@@ -66,10 +66,10 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
       f = first_arg->expr.funcall;
     else
       {
-      f.filename = make_null_string();
+      f.filename = schemerlicht_make_null_string();
       schemerlicht_vector_init(ctxt, &f.fun, schemerlicht_expression);
       schemerlicht_parsed_variable v;
-      v.filename = make_null_string();
+      v.filename = schemerlicht_make_null_string();
       v.name = first_arg->expr.prim.name;
       schemerlicht_expression e = schemerlicht_make_variable_expression(&v);
       schemerlicht_vector_push_back(ctxt, &f.fun, e, schemerlicht_expression);
@@ -89,7 +89,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
     schemerlicht_vector_init(ctxt, &lam.variables, schemerlicht_string);
     schemerlicht_vector_init(ctxt, &lam.free_variables, schemerlicht_string);
     schemerlicht_vector_init(ctxt, &lam.assignable_variables, schemerlicht_string);
-    lam.filename = make_null_string();
+    lam.filename = schemerlicht_make_null_string();
     if (f.arguments.vector_size >= 2 && schemerlicht_vector_at(&f.arguments, f.arguments.vector_size - 2, schemerlicht_expression)->type == schemerlicht_type_literal)
       {
       // variable arguments
@@ -133,7 +133,7 @@ static void rewrite_prim_define(schemerlicht_context* ctxt, schemerlicht_visitor
       }
     schemerlicht_parsed_begin beg;
     schemerlicht_vector_init(ctxt, &beg.arguments, schemerlicht_expression);
-    beg.filename = make_null_string();
+    beg.filename = schemerlicht_make_null_string();
     schemerlicht_expression* it = schemerlicht_vector_begin(&beg.arguments, schemerlicht_expression);
     schemerlicht_expression* p_it = schemerlicht_vector_begin(&expr->expr.prim.arguments, schemerlicht_expression) + 1;
     schemerlicht_expression* p_it_end = schemerlicht_vector_end(&expr->expr.prim.arguments, schemerlicht_expression);
@@ -196,8 +196,8 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_vis
       }
     schemerlicht_parsed_let let;
     let.bt = schemerlicht_bt_letrec;
-    let.filename = make_null_string();
-    let.let_name = make_null_string();
+    let.filename = schemerlicht_make_null_string();
+    let.let_name = schemerlicht_make_null_string();
     let.named_let = 0;
     schemerlicht_vector_init(ctxt, &let.bindings, schemerlicht_let_binding);
     schemerlicht_vector_init(ctxt, &let.body, schemerlicht_expression);
@@ -231,7 +231,7 @@ static void convert_internal_define(schemerlicht_context* ctxt, schemerlicht_vis
     schemerlicht_expression body_copy = *body;
     schemerlicht_vector_push_back(ctxt, &let.body, body_copy, schemerlicht_expression);
     body->expr.beg.arguments.vector_size = 0;
-    body->expr.beg.filename = make_null_string();
+    body->expr.beg.filename = schemerlicht_make_null_string();
     schemerlicht_vector_init(ctxt, &body->expr.beg.arguments, schemerlicht_expression);
     schemerlicht_vector_push_back(ctxt, &body->expr.beg.arguments, schemerlicht_make_let_expression(&let), schemerlicht_expression);
 
@@ -348,7 +348,7 @@ static void postvisit_primcall(schemerlicht_context* ctxt, schemerlicht_visitor*
       return;
       }
     schemerlicht_parsed_set s;
-    s.filename = make_null_string();
+    s.filename = schemerlicht_make_null_string();
     schemerlicht_expression* first_arg = schemerlicht_vector_at(&e->expr.prim.arguments, 0, schemerlicht_expression);
     if (first_arg->type == schemerlicht_type_variable)
       {

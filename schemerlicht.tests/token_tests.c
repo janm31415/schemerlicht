@@ -39,7 +39,7 @@ static void tokenize_symbol()
   TEST_EQ_INT(1, tokens.vector_size);
   token* first_token = schemerlicht_vector_at(&tokens, 0, token);
   TEST_EQ_INT(SCHEMERLICHT_T_SYMBOL, first_token->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -53,7 +53,7 @@ static void tokenize_list()
   TEST_EQ_INT(SCHEMERLICHT_T_ID, schemerlicht_vector_at(&tokens, 2, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_ID, schemerlicht_vector_at(&tokens, 3, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 4, token)->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -68,7 +68,7 @@ static void tokenize_string()
   schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->value;
   TEST_EQ_INT(15, s.string_length);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 3, token)->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -82,7 +82,7 @@ static void tokenize_fixnum_real()
   TEST_EQ_INT(SCHEMERLICHT_T_FIXNUM, schemerlicht_vector_at(&tokens, 2, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_FLONUM, schemerlicht_vector_at(&tokens, 3, token)->type);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 4, token)->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -97,7 +97,7 @@ static void tokenize_string_w_escape_chars()
   schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->value;
   TEST_EQ_INT(13, s.string_length);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 3, token)->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -112,7 +112,7 @@ static void tokenize_string_w_escape_chars_2()
   schemerlicht_string s = schemerlicht_vector_at(&tokens, 2, token)->value;
   TEST_EQ_INT(9, s.string_length);
   TEST_EQ_INT(SCHEMERLICHT_T_RIGHT_ROUND_BRACKET, schemerlicht_vector_at(&tokens, 3, token)->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 

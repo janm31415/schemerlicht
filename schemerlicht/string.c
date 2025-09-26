@@ -124,7 +124,7 @@ void schemerlicht_string_clear(schemerlicht_string* str)
     }
   }
 
-schemerlicht_string make_null_string()
+schemerlicht_string schemerlicht_make_null_string()
   {
   schemerlicht_string s;
   s.string_capacity = 0;

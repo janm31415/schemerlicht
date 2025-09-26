@@ -19,7 +19,7 @@ typedef struct schemerlicht_simplify_to_core_forms_visitor
 static schemerlicht_expression make_true()
   {
   schemerlicht_parsed_true t;
-  t.filename = make_null_string();
+  t.filename = schemerlicht_make_null_string();
   t.line_nr = -1;
   t.column_nr = -1;
   schemerlicht_expression expr;
@@ -32,7 +32,7 @@ static schemerlicht_expression make_true()
 static schemerlicht_expression make_false()
   {
   schemerlicht_parsed_false f;
-  f.filename = make_null_string();
+  f.filename = schemerlicht_make_null_string();
   f.line_nr = -1;
   f.column_nr = -1;
   schemerlicht_expression expr;
@@ -48,7 +48,7 @@ static schemerlicht_expression make_primitive_call(schemerlicht_context* ctxt, c
   p.as_object = 0;
   p.line_nr = -1;
   p.column_nr = -1;
-  p.filename = make_null_string();
+  p.filename = schemerlicht_make_null_string();
   schemerlicht_string_init(ctxt, &p.name, name);
   schemerlicht_vector_init(ctxt, &p.arguments, schemerlicht_expression);
   schemerlicht_expression* it = schemerlicht_vector_begin(&p.arguments, schemerlicht_expression);
@@ -64,7 +64,7 @@ static schemerlicht_expression make_if(schemerlicht_context* ctxt, schemerlicht_
   schemerlicht_parsed_if i;
   i.line_nr = -1;
   i.column_nr = -1;
-  i.filename = make_null_string();
+  i.filename = schemerlicht_make_null_string();
   schemerlicht_vector_init(ctxt, &i.arguments, schemerlicht_expression);
   schemerlicht_vector_push_back(ctxt, &i.arguments, *a, schemerlicht_expression);
   schemerlicht_vector_push_back(ctxt, &i.arguments, *b, schemerlicht_expression);
@@ -78,7 +78,7 @@ static schemerlicht_expression make_if(schemerlicht_context* ctxt, schemerlicht_
 static schemerlicht_expression make_var(schemerlicht_context* ctxt, const char* name)
   {
   schemerlicht_parsed_variable v;
-  v.filename = make_null_string();
+  v.filename = schemerlicht_make_null_string();
   v.line_nr = -1;
   v.column_nr = -1;
   schemerlicht_string_init(ctxt, &v.name, name);
@@ -91,7 +91,7 @@ static schemerlicht_expression make_var(schemerlicht_context* ctxt, const char* 
 static schemerlicht_expression make_var_string(schemerlicht_context* ctxt, schemerlicht_string* s)
   {
   schemerlicht_parsed_variable v;
-  v.filename = make_null_string();
+  v.filename = schemerlicht_make_null_string();
   v.name = *s;
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_variable;

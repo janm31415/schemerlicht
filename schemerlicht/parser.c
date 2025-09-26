@@ -196,7 +196,7 @@ static schemerlicht_expression make_nop()
   nop.column_nr = -1;
   nop.line_nr = -1;
   nop.tail_position = 0;
-  nop.filename = make_null_string();
+  nop.filename = schemerlicht_make_null_string();
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_nop;
   expr.expr.nop = nop;
@@ -685,7 +685,7 @@ static schemerlicht_expression make_cond(schemerlicht_context* ctxt, token** tok
         schemerlicht_parsed_true t;
         t.column_nr = -1;
         t.line_nr = -1;
-        t.filename = make_null_string();
+        t.filename = schemerlicht_make_null_string();
         schemerlicht_literal lit;
         lit.type = schemerlicht_type_true;
         lit.lit.t = t;
@@ -1035,12 +1035,12 @@ static schemerlicht_expression make_lambda(schemerlicht_context* ctxt, token** t
 schemerlicht_expression schemerlicht_init_let(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_let l;
-  l.filename = make_null_string();
+  l.filename = schemerlicht_make_null_string();
   l.line_nr = -1;
   l.column_nr = -1;
   l.bt = schemerlicht_bt_let;
   l.named_let = 0;
-  l.let_name = make_null_string();
+  l.let_name = schemerlicht_make_null_string();
   schemerlicht_vector_init(ctxt, &l.bindings, schemerlicht_let_binding);
   schemerlicht_vector_init(ctxt, &l.body, schemerlicht_expression);
   schemerlicht_vector_init(ctxt, &l.assignable_variables, schemerlicht_string);
@@ -1053,7 +1053,7 @@ schemerlicht_expression schemerlicht_init_let(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_begin(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_begin b;
-  b.filename = make_null_string();
+  b.filename = schemerlicht_make_null_string();
   b.line_nr = -1;
   b.column_nr = -1;
   schemerlicht_vector_init(ctxt, &b.arguments, schemerlicht_expression);
@@ -1066,7 +1066,7 @@ schemerlicht_expression schemerlicht_init_begin(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_lambda(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_lambda l;
-  l.filename = make_null_string();
+  l.filename = schemerlicht_make_null_string();
   l.line_nr = -1;
   l.column_nr = -1;
   l.variable_arity = 0;
@@ -1086,7 +1086,7 @@ schemerlicht_expression schemerlicht_init_fixnum(schemerlicht_context* ctxt)
   schemerlicht_parsed_fixnum fx;
   fx.column_nr = -1;
   fx.line_nr = -1;
-  fx.filename = make_null_string();
+  fx.filename = schemerlicht_make_null_string();
   fx.value = 0;
   schemerlicht_literal l;
   l.type = schemerlicht_type_fixnum;
@@ -1103,7 +1103,7 @@ schemerlicht_expression schemerlicht_init_flonum(schemerlicht_context* ctxt)
   schemerlicht_parsed_flonum fl;
   fl.column_nr = -1;
   fl.line_nr = -1;
-  fl.filename = make_null_string();
+  fl.filename = schemerlicht_make_null_string();
   fl.value = 0;
   schemerlicht_literal l;
   l.type = schemerlicht_type_flonum;
@@ -1120,8 +1120,8 @@ schemerlicht_expression schemerlicht_init_string(schemerlicht_context* ctxt)
   schemerlicht_parsed_string s;
   s.column_nr = -1;
   s.line_nr = -1;
-  s.filename = make_null_string();
-  s.value = make_null_string();
+  s.filename = schemerlicht_make_null_string();
+  s.value = schemerlicht_make_null_string();
   schemerlicht_literal l;
   l.type = schemerlicht_type_string;
   l.lit.str = s;
@@ -1137,7 +1137,7 @@ schemerlicht_expression schemerlicht_init_true(schemerlicht_context* ctxt)
   schemerlicht_parsed_true t;
   t.column_nr = -1;
   t.line_nr = -1;
-  t.filename = make_null_string();
+  t.filename = schemerlicht_make_null_string();
   schemerlicht_literal l;
   l.type = schemerlicht_type_true;
   l.lit.t = t;
@@ -1153,7 +1153,7 @@ schemerlicht_expression schemerlicht_init_false(schemerlicht_context* ctxt)
   schemerlicht_parsed_false f;
   f.column_nr = -1;
   f.line_nr = -1;
-  f.filename = make_null_string();
+  f.filename = schemerlicht_make_null_string();
   schemerlicht_literal l;
   l.type = schemerlicht_type_false;
   l.lit.f = f;
@@ -1169,7 +1169,7 @@ schemerlicht_expression schemerlicht_init_nil(schemerlicht_context* ctxt)
   schemerlicht_parsed_nil n;
   n.column_nr = -1;
   n.line_nr = -1;
-  n.filename = make_null_string();
+  n.filename = schemerlicht_make_null_string();
   schemerlicht_literal l;
   l.type = schemerlicht_type_nil;
   l.lit.nil = n;
@@ -1185,7 +1185,7 @@ schemerlicht_expression schemerlicht_init_char(schemerlicht_context* ctxt)
   schemerlicht_parsed_character ch;
   ch.column_nr = -1;
   ch.line_nr = -1;
-  ch.filename = make_null_string();
+  ch.filename = schemerlicht_make_null_string();
   ch.value = 0;
   schemerlicht_literal l;
   l.type = schemerlicht_type_character;
@@ -1199,7 +1199,7 @@ schemerlicht_expression schemerlicht_init_char(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_funcall f;
-  f.filename = make_null_string();
+  f.filename = schemerlicht_make_null_string();
   f.line_nr = -1;
   f.column_nr = -1;
   schemerlicht_vector_init(ctxt, &f.fun, schemerlicht_expression);
@@ -1213,12 +1213,12 @@ schemerlicht_expression schemerlicht_init_funcall(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_primcall(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_primitive_call p;
-  p.filename = make_null_string();
+  p.filename = schemerlicht_make_null_string();
   p.line_nr = -1;
   p.column_nr = -1;
   p.as_object = 0;
   //schemerlicht_string_init(ctxt, &p.name, "");
-  p.name = make_null_string();
+  p.name = schemerlicht_make_null_string();
   schemerlicht_vector_init(ctxt, &p.arguments, schemerlicht_expression);
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_primitive_call;
@@ -1229,10 +1229,10 @@ schemerlicht_expression schemerlicht_init_primcall(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_foreign(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_foreign_call f;
-  f.filename = make_null_string();
+  f.filename = schemerlicht_make_null_string();
   f.line_nr = -1;
   f.column_nr = -1;
-  f.name = make_null_string();
+  f.name = schemerlicht_make_null_string();
   schemerlicht_vector_init(ctxt, &f.arguments, schemerlicht_expression);
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_foreign_call;
@@ -1243,7 +1243,7 @@ schemerlicht_expression schemerlicht_init_foreign(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_if(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_if i;
-  i.filename = make_null_string();
+  i.filename = schemerlicht_make_null_string();
   i.line_nr = -1;
   i.column_nr = -1;
   schemerlicht_vector_init(ctxt, &i.arguments, schemerlicht_expression);
@@ -1257,7 +1257,7 @@ schemerlicht_expression schemerlicht_init_quote(schemerlicht_context* ctxt)
   {
   UNUSED(ctxt);
   schemerlicht_parsed_quote q;
-  q.filename = make_null_string();
+  q.filename = schemerlicht_make_null_string();
   q.line_nr = -1;
   q.column_nr = -1;
   q.qt = schemerlicht_qt_quote;
@@ -1275,8 +1275,8 @@ schemerlicht_expression schemerlicht_init_quote(schemerlicht_context* ctxt)
 schemerlicht_expression schemerlicht_init_set(schemerlicht_context* ctxt)
   {
   schemerlicht_parsed_set s;
-  s.filename = make_null_string();
-  s.name = make_null_string();
+  s.filename = schemerlicht_make_null_string();
+  s.name = schemerlicht_make_null_string();
   s.line_nr = -1;
   s.column_nr = -1;
   s.originates_from_define = 0;
@@ -1292,10 +1292,10 @@ schemerlicht_expression schemerlicht_init_variable(schemerlicht_context* ctxt)
   {
   UNUSED(ctxt);
   schemerlicht_parsed_variable v;
-  v.filename = make_null_string();
+  v.filename = schemerlicht_make_null_string();
   v.line_nr = -1;
   v.column_nr = -1;
-  v.name = make_null_string();
+  v.name = schemerlicht_make_null_string();
   schemerlicht_expression expr;
   expr.type = schemerlicht_type_variable;
   expr.expr.var = v;
@@ -1306,7 +1306,7 @@ schemerlicht_expression schemerlicht_init_nop(schemerlicht_context* ctxt)
   {
   UNUSED(ctxt);
   schemerlicht_parsed_nop n;
-  n.filename = make_null_string();
+  n.filename = schemerlicht_make_null_string();
   n.line_nr = -1;
   n.column_nr = -1;
   schemerlicht_expression expr;
@@ -1989,7 +1989,7 @@ schemerlicht_expression schemerlicht_make_expression(schemerlicht_context* ctxt,
   return make_nop();
   }
 
-schemerlicht_program make_program(schemerlicht_context* ctxt, schemerlicht_vector* tokens)
+schemerlicht_program schemerlicht_make_program(schemerlicht_context* ctxt, schemerlicht_vector* tokens)
   {
   last_token = make_bad_token();
   schemerlicht_syntax_errors_clear(ctxt);

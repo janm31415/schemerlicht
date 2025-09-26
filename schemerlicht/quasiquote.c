@@ -164,7 +164,7 @@ static schemerlicht_cell expression_to_cell(schemerlicht_context* ctxt, schemerl
   token* token_it_end = schemerlicht_vector_end(&tokens, token);
 
   schemerlicht_cell result = schemerlicht_read_quote(ctxt, &token_it, &token_it_end, 1);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
 
   schemerlicht_expression_destroy(ctxt, e);
   return result;
@@ -197,7 +197,7 @@ static schemerlicht_expression cell_to_expression(schemerlicht_context* ctxt, sc
   token* token_it_end = schemerlicht_vector_end(&tokens, token);
 
   schemerlicht_expression result = schemerlicht_make_expression(ctxt, &token_it, &token_it_end);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
 
   if (!as_list)
     return result;

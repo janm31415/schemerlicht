@@ -421,6 +421,6 @@ void schemerlicht_call_primitive_dispatch(schemerlicht_context* ctxt, schemerlic
 void schemerlicht_call_primitive_inlined(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 void schemerlicht_call_primitive(schemerlicht_context* ctxt, schemerlicht_fixnum prim_id, int a, int b, int c);
 
-schemerlicht_map* generate_primitives_map(schemerlicht_context* ctxt);
+schemerlicht_map* schemerlicht_generate_primitives_map(schemerlicht_context* ctxt);
 
 #endif //SCHEMERLICHT_PRIMITIVES_H

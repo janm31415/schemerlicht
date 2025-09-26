@@ -81,7 +81,7 @@ void schemerlicht_single_begin_conversion(schemerlicht_context* ctxt, schemerlic
   if (program->expressions.vector_size > 1)
     {
     schemerlicht_parsed_begin b;
-    b.filename = make_null_string();
+    b.filename = schemerlicht_make_null_string();
     b.arguments = program->expressions;
     program->expressions.vector_ptr = NULL;
     program->expressions.vector_size = 0;

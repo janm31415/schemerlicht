@@ -13,7 +13,7 @@ static void parse_fixnum_1()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "5");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
@@ -21,7 +21,7 @@ static void parse_fixnum_1()
   TEST_EQ_INT(5, expr->expr.lit.lit.fx.value);
   TEST_EQ_INT(1, expr->expr.lit.lit.fx.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.fx.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -30,7 +30,7 @@ static void parse_fixnum_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "-5555");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
@@ -38,7 +38,7 @@ static void parse_fixnum_2()
   TEST_EQ_INT(-5555, expr->expr.lit.lit.fx.value);
   TEST_EQ_INT(1, expr->expr.lit.lit.fx.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.fx.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -47,7 +47,7 @@ static void parse_flonum()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "3.14");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
@@ -55,7 +55,7 @@ static void parse_flonum()
   TEST_EQ_DOUBLE(3.14, expr->expr.lit.lit.fl.value);
   TEST_EQ_INT(1, expr->expr.lit.lit.fl.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.fl.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -64,14 +64,14 @@ static void parse_nil()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "()");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
   TEST_EQ_INT(schemerlicht_type_nil, expr->expr.lit.type);
   TEST_EQ_INT(1, expr->expr.lit.lit.nil.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.nil.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -80,14 +80,14 @@ static void parse_true()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#t");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
   TEST_EQ_INT(schemerlicht_type_true, expr->expr.lit.type);
   TEST_EQ_INT(1, expr->expr.lit.lit.t.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.t.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -96,14 +96,14 @@ static void parse_false()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#f");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
   TEST_EQ_INT(schemerlicht_type_false, expr->expr.lit.type);
   TEST_EQ_INT(1, expr->expr.lit.lit.f.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.f.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -112,14 +112,14 @@ static void parse_string()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "\"test\"");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
   TEST_EQ_INT(schemerlicht_type_string, expr->expr.lit.type);
   TEST_EQ_INT(1, expr->expr.lit.lit.str.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.str.column_nr);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -128,7 +128,7 @@ static void parse_character()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#\\45");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
@@ -136,7 +136,7 @@ static void parse_character()
   TEST_EQ_INT(1, expr->expr.lit.lit.ch.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.ch.column_nr);
   TEST_EQ_INT(45, expr->expr.lit.lit.ch.value);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -145,7 +145,7 @@ static void parse_character_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "#\\space");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_literal, expr->type);
@@ -153,7 +153,7 @@ static void parse_character_2()
   TEST_EQ_INT(1, expr->expr.lit.lit.ch.line_nr);
   TEST_EQ_INT(1, expr->expr.lit.lit.ch.column_nr);
   TEST_EQ_INT(32, expr->expr.lit.lit.ch.value);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -162,12 +162,12 @@ static void parse_begin()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(begin 1 2 3 4 5)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_begin, expr->type);
   TEST_EQ_INT(5, expr->expr.beg.arguments.vector_size);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -176,12 +176,12 @@ static void parse_primcall()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(+ 1 2)");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_primitive_call, expr->type);
   TEST_EQ_INT(2, expr->expr.prim.arguments.vector_size);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -190,11 +190,11 @@ static void parse_case()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(case (+ 7 5) [(1 2 3) 'small] [(10 11 12) 'big])");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_case, expr->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -203,11 +203,11 @@ static void parse_cond()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(cond(#f)(#f 12)(12 13))");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_cond, expr->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -216,11 +216,11 @@ static void parse_cond_2()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(cond((cons 1 2) => (lambda(x) (cdr x))))");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_cond, expr->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -229,11 +229,11 @@ static void parse_do()
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, "(do ([vec (make-vector 5)] [i 0 (+ i 1)])((= i 5) vec)(vector-set! vec i i))");
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   TEST_EQ_INT(1, prog.expressions.vector_size);
   schemerlicht_expression* expr = schemerlicht_vector_at(&prog.expressions, 0, schemerlicht_expression);
   TEST_EQ_INT(schemerlicht_type_do, expr->type);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   schemerlicht_close(ctxt);
   }
@@ -265,7 +265,7 @@ static void parse_error_aux(const char* script, const char* first_error_message)
   {
   schemerlicht_context* ctxt = schemerlicht_open(256);
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   int contains_error = ctxt->number_of_syntax_errors > 0 ? 1 : 0;  
   TEST_EQ_INT(1, contains_error);
   if (contains_error)
@@ -274,7 +274,7 @@ static void parse_error_aux(const char* script, const char* first_error_message)
     TEST_EQ_STRING(first_error_message, it->message.string_ptr);
     }
   schemerlicht_program_destroy(ctxt, &prog);
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 

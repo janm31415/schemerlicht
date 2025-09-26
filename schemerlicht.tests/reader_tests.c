@@ -52,7 +52,7 @@ static void test_read_vector_cells()
 
   schemerlicht_destroy_cell(ctxt, &c);
 
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -71,7 +71,7 @@ static void test_read_pair_cells_1()
 
   schemerlicht_destroy_cell(ctxt, &c);
 
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 
@@ -97,7 +97,7 @@ static void test_dump_cell(const char* script)
 
   schemerlicht_destroy_cell(ctxt, &c);
 
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_close(ctxt);
   }
 

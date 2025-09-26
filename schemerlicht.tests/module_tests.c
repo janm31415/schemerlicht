@@ -22,7 +22,7 @@
 static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_value, const char* script)
   {
   schemerlicht_vector tokens = schemerlicht_script2tokens(ctxt, script);
-  schemerlicht_program prog = make_program(ctxt, &tokens);
+  schemerlicht_program prog = schemerlicht_make_program(ctxt, &tokens);
   schemerlicht_preprocess(ctxt, &prog);
 #if 0
   schemerlicht_string dumped = schemerlicht_dump(ctxt, &prog);
@@ -41,7 +41,7 @@ static void test_compile_aux(schemerlicht_context* ctxt, const char* expected_va
 
   schemerlicht_compiled_program_register(ctxt, &compiled_program);
 
-  destroy_tokens_vector(ctxt, &tokens);
+  schemerlicht_destroy_tokens_vector(ctxt, &tokens);
   schemerlicht_program_destroy(ctxt, &prog);
   }
 
