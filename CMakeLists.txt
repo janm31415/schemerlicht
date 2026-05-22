@@ -8,6 +8,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 set(SCHEMERLICHT_MODULES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scm/" CACHE STRING "Provide the location of your Scheme library folder")
 
+if (APPLE)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "14.7" CACHE STRING "Minimum macOS deployment version" FORCE)
+endif(APPLE)
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/schemerlicht/modulesconf.h.in"
                "${CMAKE_CURRENT_SOURCE_DIR}/schemerlicht/modulesconf.h" @ONLY)
 
