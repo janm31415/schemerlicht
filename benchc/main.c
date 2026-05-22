@@ -118,7 +118,34 @@ void print_result(schemerlicht_context* ctxt, schemerlicht_object* result)
 
 #define COMMAND_BUFFER_LENGTH 32
 
-int main()//(int argc, char** argv)
+void run_benchmark_silent(schemerlicht_context* ctxt, const char* benchmark_name) {
+  char filename[COMMAND_BUFFER_LENGTH + 20] = "bench/";
+  int i = 0;
+  for (i = 0; i < COMMAND_BUFFER_LENGTH; ++i) {
+    if (benchmark_name[i] == 0)
+      break;
+    filename[i + 6] = benchmark_name[i];
+  }
+  filename[i + 6] = '.';
+  filename[i + 7] = 's';
+  filename[i + 8] = 'c';
+  filename[i + 9] = 'm';
+  filename[i + 10] = 0;
+  double tic = (double)clock() / (double)CLOCKS_PER_SEC;
+  schemerlicht_object* res1 = schemerlicht_execute_file(ctxt, filename);
+  double toc = (double)clock() / (double)CLOCKS_PER_SEC;
+  if (res1) {
+    const double compilation_time = toc-tic;
+    tic = (double)clock() / (double)CLOCKS_PER_SEC;
+    schemerlicht_object* res2 = schemerlicht_execute(ctxt, "(main)");
+    toc = (double)clock() / (double)CLOCKS_PER_SEC;
+    const double runtime = toc-tic;
+    printf("Compilation time: %fs\n", compilation_time);
+    printf("Run time: %fs\n", runtime);
+  }
+}
+
+int main(int argc, char** argv)
 {
   init_debug();
 
@@ -132,9 +159,32 @@ int main()//(int argc, char** argv)
   schemerlicht_build_base(ctxt);
 
   int quit = 0;
+  
+  if (argc > 1) {
+    schemerlicht_execute(ctxt, "(define run-silent #t)\n");
+    if (strcmp(argv[1], "all") == 0) {
+      const char* test_names[] = {"ack", "array1", "boyer", "browse", "cat", "compiler", "conform", "cpstak", "ctak", "dderiv", "deriv", "destruc", "diviter", "dynamic", "earley", "fft", "fib", "fibc", "fibfp", "formattest", "fpsum", "gcbench", "graphs", "lattice", "maze", "mazefun", "mbrot", "nboyer", "nqueens", "ntakl", "paraffins", "parsing", "perm9", "peval", "pnpoly", "primes", "puzzle", "quicksort", "ray", "sboyer", "scheme", "simplex", "slatex", "string", "sum", "sum1", "sumfp", "sumloop", "tail", "tak", "takl", "trav1", "trav2", "triangl", "wc", NULL};
+      double tic = (double)clock() / (double)CLOCKS_PER_SEC;
+      for (int i = 0; i < 100; ++i) {
+        if (test_names[i] == NULL)
+          break;
+        run_benchmark_silent(ctxt, test_names[i]);
+      }
+      double toc = (double)clock() / (double)CLOCKS_PER_SEC;
+      
+      const double total_run_time = toc-tic;
+      printf("\nTOTAL TIME: %fs\n", total_run_time);
+      
+    } else {
+      run_benchmark_silent(ctxt, argv[1]);
+    }
+    quit = 1;
+  } else {
 
-  printf("This is the Schemerlicht benchmark tool.\n");
-  printf("Type ,exit to quit or ,? for help.\n\n");
+    printf("This is the Schemerlicht benchmark tool.\n");
+    printf("Type ,exit to quit or ,? for help.\n\n");
+  
+  }
 
   while (quit == 0)
   {

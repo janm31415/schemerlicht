@@ -102,6 +102,24 @@
   )
 ))
 
+(define run-bench-silent (lambda (count run)
+  (let ((time-before-bench (current-milliseconds)))
+    (
+    begin
+      (define result
+        (let loop ((count (- count 1)) (run run))         
+          (cond
+	        ((eq? count 0) (run))
+	        (else (run) (loop (- count 1) run))
+	        )
+        )
+      )
+      result
+    )
+  )
+))
+
+
 (define run-benchmark (lambda (name count ok? run-maker . args)
   (display (format "running ~s (~s)~%" name count))
   (let ((run (apply run-maker args)))
@@ -114,4 +132,23 @@
 			    )
 			    (begin (display "I got ")(display result)(display "\n")(error "wrong result")))
 	   ))))
-		
+	   
+(define run-benchmark-silent (lambda (name count ok? run-maker . args)
+(if fast-run  (display (format "running ~s (1)~%" name))
+(display (format "running ~s (~s)~%" name count)))
+  (let ((run (apply run-maker args)))
+       (let ((result (if fast-run (run) (run-bench-silent count run))))
+	        (if (ok? result)
+	        (begin
+	          ;(display result)
+            ;(newline)
+			      (display "Success\n")
+			    )
+			    (begin (display "I got ")(display result)(display "\n")(error "wrong result")))
+	   ))))
+	   
+(if run-silent 
+(begin
+(define run-benchmark run-benchmark-silent)
+(define fast-run #t)
+))	
