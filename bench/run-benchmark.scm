@@ -150,5 +150,5 @@
 (if run-silent 
 (begin
 (define run-benchmark run-benchmark-silent)
-(define fast-run #t)
+;(define fast-run #t)
 ))	
