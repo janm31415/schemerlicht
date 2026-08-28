@@ -169,6 +169,7 @@ static void context_init(schemerlicht_context* ctxt, schemerlicht_memsize heap_s
   halt_lambda->value.ptr = ctxt->halt_continuation_function;
 
   ctxt->callcc_fun = NULL;
+  ctxt->current_external_begin_called = NULL;
   }
 
 schemerlicht_context* schemerlicht_open(schemerlicht_memsize heap_size)

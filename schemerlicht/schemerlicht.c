@@ -339,6 +339,20 @@ void* schemerlicht_get_user_data(schemerlicht_context* ctxt)
   {
   return ctxt->global->main_context->user_data;
   }
+  
+const char* schemerlicht_get_current_external_function_name(schemerlicht_context* ctxt)
+  {
+  if (ctxt->current_external_begin_called != NULL)
+    return ctxt->current_external_begin_called->name.string_ptr;
+  return NULL;
+  }
+  
+schemerlicht_foreign_return_type schemerlicht_get_current_external_function_return_type(schemerlicht_context* ctxt)
+  {
+  if (ctxt->current_external_begin_called != NULL)
+    return ctxt->current_external_begin_called->return_type;
+  return schemerlicht_foreign_void;
+  }  
 
 schemerlicht_function* schemerlicht_lookup(schemerlicht_context* ctxt, const char* function_name)
   {

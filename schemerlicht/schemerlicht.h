@@ -52,6 +52,7 @@ SCHEMERLICHT_API void schemerlicht_build_base(schemerlicht_context* ctxt);
 typedef struct schemerlicht_object schemerlicht_object;
 typedef struct schemerlicht_string schemerlicht_string;
 typedef struct schemerlicht_function schemerlicht_function;
+typedef struct schemerlicht_external_function schemerlicht_external_function;
 typedef struct schemerlicht_vector schemerlicht_vector;
 
 SCHEMERLICHT_API void schemerlicht_compile(schemerlicht_context* ctxt, schemerlicht_vector* compiled_program, const char* script);
@@ -86,6 +87,8 @@ SCHEMERLICHT_API void schemerlicht_register_external_primitive(schemerlicht_cont
 
 SCHEMERLICHT_API void schemerlicht_register_user_data(schemerlicht_context* ctxt, void* user_data);
 SCHEMERLICHT_API void* schemerlicht_get_user_data(schemerlicht_context* ctxt);
+SCHEMERLICHT_API const char* schemerlicht_get_current_external_function_name(schemerlicht_context* ctxt);
+SCHEMERLICHT_API schemerlicht_foreign_return_type schemerlicht_get_current_external_function_return_type(schemerlicht_context* ctxt);
 
 SCHEMERLICHT_API schemerlicht_function* schemerlicht_lookup(schemerlicht_context* ctxt, const char* function_name);
 SCHEMERLICHT_API schemerlicht_object* schemerlicht_call_0(schemerlicht_context* ctxt, schemerlicht_function* fun);

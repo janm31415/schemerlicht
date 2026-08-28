@@ -118,6 +118,7 @@ static void* get_argument_pointer(schemerlicht_context* ctxt, int stack_offset)
 
 schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schemerlicht_external_function* ext, int argument_stack_offset, int nr_of_args)
   {
+  ctxt->current_external_begin_called = ext;
   schemerlicht_object obj;
   obj.type = schemerlicht_object_type_undefined;
   switch (nr_of_args)
@@ -209,5 +210,6 @@ schemerlicht_object schemerlicht_call_external(schemerlicht_context* ctxt, schem
     break;
     }
     }
+  ctxt->current_external_begin_called = NULL;
   return obj;
   }

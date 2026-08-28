@@ -80,6 +80,7 @@ struct schemerlicht_context
   schemerlicht_vector gc_save_list;
   schemerlicht_function* callcc_fun;
   schemerlicht_vector filenames_list;
+  schemerlicht_external_function* current_external_begin_called;
   void* user_data;
   };
 
